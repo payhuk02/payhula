@@ -557,60 +557,77 @@ export default function DigitalProductDetail() {
               </TabsList>
               
               <TabsContent value="list" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Détails des fichiers</CardTitle>
-                <CardDescription>
-                  Liste complète des fichiers inclus avec ce produit
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {files.map((file, index) => (
-                    <div
-                      key={file.id}
-                      className="flex items-start gap-4 p-4 rounded-lg border"
-                    >
-                      <div className="p-3 rounded-lg bg-primary/10">
-                        <FileText className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h4 className="font-semibold">{file.name}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Version {file.version || '1.0'}
-                            </p>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Détails des fichiers</CardTitle>
+                    <CardDescription>
+                      Liste complète des fichiers inclus avec ce produit
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {files.map((file, index) => (
+                        <div
+                          key={file.id}
+                          className="flex items-start gap-4 p-4 rounded-lg border"
+                        >
+                          <div className="p-3 rounded-lg bg-primary/10">
+                            <FileText className="h-6 w-6 text-primary" />
                           </div>
-                          <div className="flex gap-2">
-                            {file.is_main && (
-                              <Badge variant="default">Principal</Badge>
-                            )}
-                            {file.is_preview && (
-                              <Badge variant="secondary">Aperçu</Badge>
-                            )}
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h4 className="font-semibold">{file.name}</h4>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Version {file.version || '1.0'}
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                {file.is_main && (
+                                  <Badge variant="default">Principal</Badge>
+                                )}
+                                {file.is_preview && (
+                                  <Badge variant="secondary">Aperçu</Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+                              <div>
+                                <p className="text-muted-foreground">Type</p>
+                                <p className="font-medium">{file.file_type}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Taille</p>
+                                <p className="font-medium">{file.file_size_mb.toFixed(2)} MB</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Téléchargements</p>
+                                <p className="font-medium">{file.download_count || 0}</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Type</p>
-                            <p className="font-medium">{file.file_type}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Taille</p>
-                            <p className="font-medium">{file.file_size_mb.toFixed(2)} MB</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Téléchargements</p>
-                            <p className="font-medium">{file.download_count || 0}</p>
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="versions" className="space-y-4">
+                {files.length > 0 && files[0]?.id && (
+                  <FileVersionManager fileId={files[0].id} digitalProductId={productId || ''} />
+                )}
+              </TabsContent>
+
+              <TabsContent value="metadata" className="space-y-4">
+                {files.length > 0 && files[0]?.id && (
+                  <FileMetadataEditor
+                    fileId={files[0].id}
+                    fileType={files[0].file_type}
+                  />
+                )}
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           {/* Reviews Tab */}

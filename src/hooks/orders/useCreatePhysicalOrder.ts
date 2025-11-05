@@ -492,11 +492,51 @@ export const useCreatePhysicalOrder = () => {
       };
     },
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast({
         title: '✅ Commande créée',
         description: 'Stock réservé. Redirection vers le paiement...',
       });
+
+      // Déclencher webhook pour achat (en arrière-plan)
+      if (data.orderId && storeId) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            // Récupérer les détails de la commande pour le payload
+            supabase
+              .from('orders')
+              .select('*, order_items(*, product_id, products(*))')
+              .eq('id', data.orderId)
+              .single()
+              .then(({ data: orderData }) => {
+                if (orderData) {
+                  triggerWebhooks(
+                    storeId,
+                    'purchase',
+                    {
+                      order_id: orderData.id,
+                      order_number: orderData.order_number || data.orderId,
+                      customer_id: orderData.customer_id,
+                      total_amount: orderData.total_amount,
+                      currency: orderData.currency,
+                      payment_status: orderData.payment_status,
+                      status: orderData.status,
+                      items: orderData.order_items || [],
+                    },
+                    orderData.id
+                  ).catch((error) => {
+                    logger.error('Error triggering purchase webhook', { error });
+                  });
+                }
+              })
+              .catch((error) => {
+                logger.error('Error fetching order for webhook', { error });
+              });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
     },
 
     onError: (error: Error) => {

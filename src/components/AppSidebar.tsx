@@ -52,6 +52,7 @@ import {
   BarChart,
   Layers,
   FileBarChart,
+  ShoppingBag,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -118,6 +119,11 @@ const menuSections = [
         title: "Mon Portail Digital",
         url: "/account/digital",
         icon: Package,
+      },
+      {
+        title: "Mon Portail Produits Physiques",
+        url: "/account/physical",
+        icon: ShoppingBag,
       },
       {
         title: "Mes Cours",
@@ -365,6 +371,11 @@ const menuSections = [
         icon: Webhook,
       },
       {
+        title: "Webhooks Produits Physiques",
+        url: "/dashboard/physical-webhooks",
+        icon: Webhook,
+      },
+      {
         title: "Programme de Fidélité",
         url: "/dashboard/loyalty",
         icon: Star,
@@ -579,6 +590,16 @@ const adminMenuSections = [
       {
         title: "Webhooks",
         url: "/admin/webhooks",
+        icon: Webhook,
+      },
+      {
+        title: "Webhooks Produits Digitaux",
+        url: "/dashboard/digital-webhooks",
+        icon: Webhook,
+      },
+      {
+        title: "Webhooks Produits Physiques",
+        url: "/dashboard/physical-webhooks",
         icon: Webhook,
       },
       {

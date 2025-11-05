@@ -376,13 +376,73 @@ export const useCreateReturn = () => {
 
       return data as ProductReturn;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['returns'] });
       queryClient.invalidateQueries({ queryKey: ['store-returns'] });
       toast({
         title: '✅ Demande de retour créée',
         description: `Votre demande de retour ${data.return_number} a été créée avec succès`,
       });
+
+      // Déclencher la notification de retour (création)
+      import('@/services/physical/notificationTriggers')
+        .then(({ triggerReturnNotification }) => {
+          triggerReturnNotification(data.id, 'requested').catch((error) => {
+            logger.error('Error triggering return notification', { error });
+          });
+        })
+        .catch((error) => {
+          logger.error('Error loading notification triggers', { error });
+        });
+
+      // Déclencher webhook pour retour demandé
+      if (data.store_id && data.order_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              data.store_id,
+              'return_requested',
+              {
+                return_id: data.id,
+                return_number: data.return_number,
+                order_id: data.order_id,
+                return_reason: data.return_reason,
+                quantity: data.quantity,
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering return_requested webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
+
+      // Déclencher webhook pour retour demandé
+      if (data.store_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              data.store_id,
+              'return_requested',
+              {
+                return_id: data.id,
+                return_number: data.return_number,
+                order_id: data.order_id,
+                status: 'requested',
+                return_reason: data.return_reason,
+                quantity: data.quantity,
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering return webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
     },
     onError: (error: any) => {
       logger.error('Error in useCreateReturn', { error });
@@ -426,13 +486,69 @@ export const useApproveReturn = () => {
 
       return data as ProductReturn;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['returns'] });
       queryClient.invalidateQueries({ queryKey: ['store-returns'] });
       toast({
         title: '✅ Retour approuvé',
         description: 'Le retour a été approuvé avec succès',
       });
+
+      // Déclencher la notification de retour
+      import('@/services/physical/notificationTriggers')
+        .then(({ triggerReturnNotification }) => {
+          triggerReturnNotification(data.id, 'approved').catch((error) => {
+            logger.error('Error triggering return notification', { error });
+          });
+        })
+        .catch((error) => {
+          logger.error('Error loading notification triggers', { error });
+        });
+
+      // Déclencher webhook pour retour approuvé
+      if (data.store_id && data.order_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              data.store_id,
+              'return_approved',
+              {
+                return_id: data.id,
+                return_number: data.return_number,
+                order_id: data.order_id,
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering return_approved webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
+
+      // Déclencher webhook pour retour approuvé
+      if (data.store_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              data.store_id,
+              'return_approved',
+              {
+                return_id: data.id,
+                return_number: data.return_number,
+                order_id: data.order_id,
+                status: 'approved',
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering return webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
     },
     onError: (error: any) => {
       logger.error('Error in useApproveReturn', { error });
@@ -477,13 +593,71 @@ export const useRejectReturn = () => {
 
       return data as ProductReturn;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['returns'] });
       queryClient.invalidateQueries({ queryKey: ['store-returns'] });
       toast({
         title: '✅ Retour rejeté',
         description: 'Le retour a été rejeté',
       });
+
+      // Déclencher la notification de retour
+      import('@/services/physical/notificationTriggers')
+        .then(({ triggerReturnNotification }) => {
+          triggerReturnNotification(data.id, 'rejected').catch((error) => {
+            logger.error('Error triggering return notification', { error });
+          });
+        })
+        .catch((error) => {
+          logger.error('Error loading notification triggers', { error });
+        });
+
+      // Déclencher webhook pour retour rejeté
+      if (data.store_id && data.order_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              data.store_id,
+              'return_rejected',
+              {
+                return_id: data.id,
+                return_number: data.return_number,
+                order_id: data.order_id,
+                rejection_reason: variables.rejectionReason,
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering return_rejected webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
+
+      // Déclencher webhook pour retour rejeté
+      if (data.store_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              data.store_id,
+              'return_rejected',
+              {
+                return_id: data.id,
+                return_number: data.return_number,
+                order_id: data.order_id,
+                status: 'rejected',
+                rejection_reason: data.rejection_reason,
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering return webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
     },
     onError: (error: any) => {
       logger.error('Error in useRejectReturn', { error });
@@ -549,13 +723,89 @@ export const useUpdateReturnStatus = () => {
 
       return data as ProductReturn;
     },
-    onSuccess: () => {
+    onSuccess: async (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['returns'] });
       queryClient.invalidateQueries({ queryKey: ['store-returns'] });
       toast({
         title: '✅ Statut mis à jour',
         description: 'Le statut du retour a été mis à jour',
       });
+
+      // Déclencher la notification de retour
+      import('@/services/physical/notificationTriggers')
+        .then(({ triggerReturnNotification }) => {
+          triggerReturnNotification(data.id, variables.status).catch((error) => {
+            logger.error('Error triggering return notification', { error });
+          });
+        })
+        .catch((error) => {
+          logger.error('Error loading notification triggers', { error });
+        });
+
+      // Déclencher webhook pour changement de statut retour
+      if (data.store_id && data.order_id) {
+        const webhookEventMap: Record<string, string> = {
+          'return_received': 'return_received',
+          'refunded': 'return_refunded',
+        };
+
+        const webhookEventType = webhookEventMap[variables.status];
+        if (webhookEventType) {
+          import('@/services/webhooks/physicalProductWebhooks')
+            .then(({ triggerWebhooks }) => {
+              triggerWebhooks(
+                data.store_id,
+                webhookEventType,
+                {
+                  return_id: data.id,
+                  return_number: data.return_number,
+                  order_id: data.order_id,
+                  status: variables.status,
+                  refund_amount: data.refund_amount,
+                },
+                data.id
+              ).catch((error) => {
+                logger.error(`Error triggering ${webhookEventType} webhook`, { error });
+              });
+            })
+            .catch((error) => {
+              logger.error('Error loading webhook service', { error });
+            });
+        }
+      }
+
+      // Déclencher webhook pour changement de statut retour
+      if (data.store_id) {
+        import('@/services/webhooks/physicalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            const eventTypeMap: Record<string, string> = {
+              'approved': 'return_approved',
+              'rejected': 'return_rejected',
+              'return_received': 'return_received',
+              'refunded': 'return_refunded',
+            };
+
+            const eventType = eventTypeMap[variables.status];
+            if (eventType) {
+              triggerWebhooks(
+                data.store_id,
+                eventType,
+                {
+                  return_id: data.id,
+                  return_number: data.return_number,
+                  order_id: data.order_id,
+                  status: variables.status,
+                },
+                data.id
+              ).catch((error) => {
+                logger.error('Error triggering return webhook', { error });
+              });
+            }
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
     },
     onError: (error: any) => {
       logger.error('Error in useUpdateReturnStatus', { error });

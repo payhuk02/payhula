@@ -82,6 +82,7 @@ const CustomerMyCourses = lazy(() => import("./pages/customer/MyCourses"));
 const CustomerMyProfile = lazy(() => import("./pages/customer/MyProfile"));
 const CustomerMyWishlist = lazy(() => import("./pages/customer/CustomerMyWishlist"));
 const CustomerDigitalPortal = lazy(() => import("./pages/customer/CustomerDigitalPortal"));
+const CustomerPhysicalPortal = lazy(() => import("./pages/customer/CustomerPhysicalPortal"));
 const CustomerMyInvoices = lazy(() => import("./pages/customer/CustomerMyInvoices"));
 const CustomerMyReturns = lazy(() => import("./pages/customer/CustomerMyReturns"));
 const CustomerLoyaltyPage = lazy(() => import("./pages/customer/CustomerLoyaltyPage"));
@@ -121,6 +122,7 @@ const AdminTaxManagement = lazy(() => import("./pages/admin/AdminTaxManagement")
 const AdminReturnManagement = lazy(() => import("./pages/admin/AdminReturnManagement"));
 const AdminWebhookManagement = lazy(() => import("./pages/admin/AdminWebhookManagement"));
 const DigitalProductWebhooks = lazy(() => import("./pages/admin/DigitalProductWebhooks"));
+const PhysicalProductWebhooks = lazy(() => import("./pages/admin/PhysicalProductWebhooks"));
 const AdminLoyaltyManagement = lazy(() => import("./pages/admin/AdminLoyaltyManagement"));
 const AdminGiftCardManagement = lazy(() => import("./pages/admin/AdminGiftCardManagement"));
 const AdminSuppliersManagement = lazy(() => import("./pages/admin/AdminSuppliersManagement"));
@@ -235,6 +237,7 @@ const AppContent = () => {
           <Route path="/account/orders" element={<ProtectedRoute><CustomerMyOrders /></ProtectedRoute>} />
           <Route path="/account/downloads" element={<ProtectedRoute><CustomerMyDownloads /></ProtectedRoute>} />
           <Route path="/account/digital" element={<ProtectedRoute><CustomerDigitalPortal /></ProtectedRoute>} />
+          <Route path="/account/physical" element={<ProtectedRoute><CustomerPhysicalPortal /></ProtectedRoute>} />
           <Route path="/account/courses" element={<ProtectedRoute><CustomerMyCourses /></ProtectedRoute>} />
           <Route path="/account/profile" element={<ProtectedRoute><CustomerMyProfile /></ProtectedRoute>} />
           <Route path="/account/wishlist" element={<ProtectedRoute><CustomerMyWishlist /></ProtectedRoute>} />
@@ -279,6 +282,7 @@ const AppContent = () => {
           <Route path="/dashboard/products/:id/edit" element={<ProtectedRoute><EditProduct /></ProtectedRoute>} />
           <Route path="/dashboard/webhooks" element={<ProtectedRoute><AdminWebhookManagement /></ProtectedRoute>} />
           <Route path="/dashboard/digital-webhooks" element={<ProtectedRoute><DigitalProductWebhooks /></ProtectedRoute>} />
+          <Route path="/dashboard/physical-webhooks" element={<ProtectedRoute><PhysicalProductWebhooks /></ProtectedRoute>} />
           <Route path="/dashboard/loyalty" element={<ProtectedRoute><AdminLoyaltyManagement /></ProtectedRoute>} />
           <Route path="/dashboard/gift-cards" element={<ProtectedRoute><AdminGiftCardManagement /></ProtectedRoute>} />
           <Route path="/dashboard/suppliers" element={<ProtectedRoute><AdminSuppliersManagement /></ProtectedRoute>} />
