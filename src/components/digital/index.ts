@@ -122,6 +122,13 @@ export {
   DigitalFilePreviewCompact,
 } from './DigitalFilePreview';
 
+// Recommendations
+export {
+  DigitalProductRecommendations,
+  BoughtTogetherRecommendations,
+  YouMightLikeRecommendations,
+} from './DigitalProductRecommendations';
+
 // Analytics
 export { DigitalAnalyticsDashboard } from './DigitalAnalyticsDashboard';
 

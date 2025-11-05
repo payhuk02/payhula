@@ -159,6 +159,8 @@ const NotificationSettings = lazy(() => import("./pages/settings/NotificationSet
 // Pages Produits Digitaux - Lazy loading
 const DigitalProductsList = lazy(() => import("./pages/digital/DigitalProductsList"));
 const DigitalProductDetail = lazy(() => import("./pages/digital/DigitalProductDetail"));
+const DigitalProductsSearch = lazy(() => import("./pages/digital/DigitalProductsSearch"));
+const DigitalProductsCompare = lazy(() => import("./pages/digital/DigitalProductsCompare"));
 const MyDownloads = lazy(() => import("./pages/digital/MyDownloads"));
 const CreateBundle = lazy(() => import("./pages/digital/CreateBundle"));
 const BundleDetail = lazy(() => import("./pages/digital/BundleDetail"));
@@ -299,6 +301,8 @@ const AppContent = () => {
 
           {/* --- Routes Produits Digitaux --- */}
           <Route path="/dashboard/digital-products" element={<ProtectedRoute><DigitalProductsList /></ProtectedRoute>} />
+          <Route path="/digital/search" element={<DigitalProductsSearch />} />
+          <Route path="/digital/compare" element={<DigitalProductsCompare />} />
           <Route path="/digital/:productId" element={<DigitalProductDetail />} />
           <Route path="/dashboard/my-downloads" element={<ProtectedRoute><MyDownloads /></ProtectedRoute>} />
           <Route path="/dashboard/digital-products/bundles/create" element={<ProtectedRoute><CreateBundle /></ProtectedRoute>} />

@@ -30,12 +30,17 @@ import {
   Clock,
   Lock,
   Unlock,
-  Loader2
+  Loader2,
+  Search
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DigitalDownloadButton } from '@/components/digital/DigitalDownloadButton';
 import { DigitalLicenseCard } from '@/components/digital/DigitalLicenseCard';
 import { DigitalFilePreview } from '@/components/digital/DigitalFilePreview';
+import {
+  DigitalProductRecommendations,
+  BoughtTogetherRecommendations,
+} from '@/components/digital/DigitalProductRecommendations';
 import { useDigitalProduct } from '@/hooks/digital/useDigitalProducts';
 import { useHasDownloadAccess } from '@/hooks/digital/useDigitalProducts';
 import { sanitizeHTML } from '@/lib/html-sanitizer';
@@ -48,6 +53,7 @@ import { useAnalyticsTracking } from '@/hooks/useProductAnalytics';
 import { useCreateDigitalOrder } from '@/hooks/orders/useCreateDigitalOrder';
 import { useAuth } from '@/hooks/useAuth';
 import { logger } from '@/lib/logger';
+import { useAddToComparison } from './DigitalProductsCompare';
 
 interface DigitalProductDetailParams {
   productId: string;
@@ -74,6 +80,9 @@ export default function DigitalProductDetail() {
 
   // Hook pour créer une commande
   const { mutateAsync: createDigitalOrder, isPending: isCreatingOrder } = useCreateDigitalOrder();
+  
+  // Hook pour ajouter à la comparaison
+  const addToComparison = useAddToComparison();
 
   // Track product view on mount
   useEffect(() => {
@@ -414,6 +423,24 @@ export default function DigitalProductDetail() {
                     )}
                   </Button>
                 )}
+
+                {/* Actions supplémentaires */}
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => addToComparison(productId || '')}
+                  >
+                    <Package className="h-4 w-4 mr-2" />
+                    Comparer
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/digital/search')}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* Product Specs */}
@@ -639,6 +666,23 @@ export default function DigitalProductDetail() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Recommendations */}
+        <div className="mt-12 space-y-8">
+          <DigitalProductRecommendations
+            productId={productId || ''}
+            category={product.category}
+            tags={product.tags}
+            limit={6}
+            variant="grid"
+            title="Produits similaires"
+          />
+          
+          <BoughtTogetherRecommendations
+            productId={productId || ''}
+            limit={4}
+          />
+        </div>
       </div>
     </div>
   );
