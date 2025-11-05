@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS public.physical_product_promotion_alerts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  category_id UUID REFERENCES public.product_categories(id) ON DELETE CASCADE,
+  category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
   
   -- Promotion settings
   min_discount_percentage NUMERIC, -- Pourcentage de réduction minimum
