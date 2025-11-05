@@ -7,4 +7,6 @@ export { FileVersionManager } from './FileVersionManager';
 export { FileVersionForm } from './FileVersionForm';
 export { FileCategoryManager } from './FileCategoryManager';
 export { FileCategoryForm } from './FileCategoryForm';
+export { FileMetadataEditor } from './FileMetadataEditor';
+export { FileUploadAdvanced } from './FileUploadAdvanced';
 
