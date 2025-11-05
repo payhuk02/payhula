@@ -161,6 +161,7 @@ const DigitalProductsList = lazy(() => import("./pages/digital/DigitalProductsLi
 const DigitalProductDetail = lazy(() => import("./pages/digital/DigitalProductDetail"));
 const DigitalProductsSearch = lazy(() => import("./pages/digital/DigitalProductsSearch"));
 const DigitalProductsCompare = lazy(() => import("./pages/digital/DigitalProductsCompare"));
+const SharedWishlist = lazy(() => import("./pages/customer/SharedWishlist"));
 const MyDownloads = lazy(() => import("./pages/digital/MyDownloads"));
 const CreateBundle = lazy(() => import("./pages/digital/CreateBundle"));
 const BundleDetail = lazy(() => import("./pages/digital/BundleDetail"));
@@ -304,6 +305,7 @@ const AppContent = () => {
           <Route path="/digital/search" element={<DigitalProductsSearch />} />
           <Route path="/digital/compare" element={<DigitalProductsCompare />} />
           <Route path="/digital/:productId" element={<DigitalProductDetail />} />
+          <Route path="/wishlist/shared/:token" element={<SharedWishlist />} />
           <Route path="/dashboard/my-downloads" element={<ProtectedRoute><MyDownloads /></ProtectedRoute>} />
           <Route path="/dashboard/digital-products/bundles/create" element={<ProtectedRoute><CreateBundle /></ProtectedRoute>} />
           <Route path="/bundles/:bundleId" element={<BundleDetail />} />

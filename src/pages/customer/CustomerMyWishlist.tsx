@@ -25,6 +25,9 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useMarketplaceFavorites } from '@/hooks/useMarketplaceFavorites';
 import { useCart } from '@/hooks/cart/useCart';
+import { usePriceDrops, useUpdatePriceAlertSettings, useMarkPriceAlertAsRead } from '@/hooks/wishlist/useWishlistPriceAlerts';
+import { WishlistShareDialog } from '@/components/wishlist/WishlistShareDialog';
+import { PriceAlertBadge } from '@/components/wishlist/PriceAlertBadge';
 import {
   Heart,
   ShoppingBag,
@@ -38,6 +41,10 @@ import {
   Filter,
   X,
   ShoppingCart,
+  Share2,
+  Bell,
+  BellOff,
+  TrendingDown,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -68,43 +75,64 @@ export default function CustomerMyWishlist() {
   const { addItem } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [productTypeFilter, setProductTypeFilter] = useState<string>('all');
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  
+  // Récupérer les baisses de prix
+  const { data: priceDrops } = usePriceDrops();
+  const updatePriceAlert = useUpdatePriceAlertSettings();
+  const markAsRead = useMarkPriceAlertAsRead();
 
   // Convertir le Set en array pour les requêtes
   const favoriteIds = Array.from(favorites);
 
-  // Fetch favorite products with details
+  // Fetch favorite products with details and price alert settings
   const { data: favoriteProducts, isLoading, refetch } = useQuery({
     queryKey: ['favorite-products', favoriteIds],
-    queryFn: async (): Promise<FavoriteProduct[]> => {
+    queryFn: async (): Promise<(FavoriteProduct & { price_alert_enabled?: boolean; price_when_added?: number })[]> => {
       if (favoriteIds.length === 0) return [];
 
-      const { data, error } = await supabase
-        .from('products')
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Récupérer les produits avec leurs paramètres d'alerte
+      const { data: favoritesData, error: favoritesError } = await supabase
+        .from('user_favorites')
         .select(`
-          id,
-          name,
-          slug,
-          description,
-          price,
-          currency,
-          image_url,
-          product_type,
-          category,
-          store_id,
-          created_at,
-          stores!inner (
+          product_id,
+          price_drop_alert_enabled,
+          price_when_added,
+          products!inner (
             id,
             name,
             slug,
-            logo_url
+            description,
+            price,
+            promotional_price,
+            currency,
+            image_url,
+            product_type,
+            category,
+            store_id,
+            created_at,
+            stores!inner (
+              id,
+              name,
+              slug,
+              logo_url
+            )
           )
         `)
-        .in('id', favoriteIds)
-        .eq('is_active', true)
+        .eq('user_id', user.id)
+        .in('product_id', favoriteIds)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+      if (favoritesError) throw favoritesError;
+
+      return (favoritesData || []).map((item: any) => ({
+        ...item.products,
+        price_alert_enabled: item.price_drop_alert_enabled,
+        price_when_added: item.price_when_added,
+      }));
     },
     enabled: favoriteIds.length > 0 && !favoritesLoading,
   });
@@ -288,7 +316,41 @@ export default function CustomerMyWishlist() {
                     : 'Aucun produit dans votre wishlist'}
                 </p>
               </div>
+              {stats.total > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowShareDialog(true)}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Partager
+                </Button>
+              )}
             </div>
+
+            {/* Alertes prix */}
+            {priceDrops && priceDrops.length > 0 && (
+              <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+                <TrendingDown className="h-4 w-4 text-green-600" />
+                <AlertDescription>
+                  <div className="flex items-center justify-between">
+                    <span>
+                      <strong>{priceDrops.length}</strong> produit{priceDrops.length > 1 ? 's' : ''} {priceDrops.length > 1 ? 'ont' : 'a'} baissé de prix !
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        priceDrops.forEach((drop: any) => {
+                          markAsRead.mutate(drop.product_id);
+                        });
+                      }}
+                    >
+                      Marquer comme lu
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
 
             {/* Statistiques */}
             {stats.total > 0 && (
@@ -438,10 +500,55 @@ export default function CustomerMyWishlist() {
                       )}
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold">
-                          {product.price.toLocaleString('fr-FR')} {product.currency}
-                        </span>
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex flex-col gap-1">
+                          {product.promotional_price ? (
+                            <>
+                              <span className="text-2xl font-bold text-primary">
+                                {product.promotional_price.toLocaleString('fr-FR')} {product.currency}
+                              </span>
+                              <span className="text-sm line-through text-muted-foreground">
+                                {product.price.toLocaleString('fr-FR')} {product.currency}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-2xl font-bold">
+                              {product.price.toLocaleString('fr-FR')} {product.currency}
+                            </span>
+                          )}
+                        </div>
+                        {priceDrops?.some((drop: any) => drop.product_id === product.id) && (
+                          <PriceAlertBadge
+                            oldPrice={priceDrops.find((drop: any) => drop.product_id === product.id)?.old_price || product.price}
+                            newPrice={priceDrops.find((drop: any) => drop.product_id === product.id)?.new_price || product.price}
+                            currency={product.currency}
+                          />
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const isEnabled = (product as any).price_alert_enabled ?? true;
+                            updatePriceAlert.mutate({
+                              productId: product.id,
+                              enabled: !isEnabled,
+                            });
+                          }}
+                        >
+                          {(product as any).price_alert_enabled !== false ? (
+                            <>
+                              <BellOff className="h-4 w-4 mr-2" />
+                              Désactiver alerte
+                            </>
+                          ) : (
+                            <>
+                              <Bell className="h-4 w-4 mr-2" />
+                              Activer alerte
+                            </>
+                          )}
+                        </Button>
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -477,6 +584,12 @@ export default function CustomerMyWishlist() {
           </div>
         </main>
       </div>
+
+      {/* Dialog de partage */}
+      <WishlistShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+      />
     </SidebarProvider>
   );
 }
