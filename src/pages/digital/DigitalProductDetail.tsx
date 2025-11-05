@@ -51,7 +51,7 @@ import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { useEffect, useState } from 'react';
 import { useAnalyticsTracking } from '@/hooks/useProductAnalytics';
 import { useCreateDigitalOrder } from '@/hooks/orders/useCreateDigitalOrder';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 import { useAddToComparison } from './DigitalProductsCompare';
 
