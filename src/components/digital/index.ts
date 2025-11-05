@@ -147,6 +147,18 @@ export {
 // Analytics
 export { DigitalAnalyticsDashboard } from './DigitalAnalyticsDashboard';
 
+// Subscription Management
+export {
+  SubscriptionManagement,
+  type SubscriptionManagementProps,
+} from './SubscriptionManagement';
+
+// Combined Coupons
+export {
+  CombinedCouponInput,
+  type CombinedCouponInputProps,
+} from './CombinedCouponInput';
+
 // License Management
 export { LicenseTable } from './LicenseTable';
 export { LicenseGenerator } from './LicenseGenerator';
