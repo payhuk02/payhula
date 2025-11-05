@@ -119,13 +119,13 @@ export const FileUploadAdvanced = ({
       const checksum = await calculateSHA256(selectedFile);
 
       // Upload vers Supabase Storage
-      const uploadResult = await uploadToSupabaseStorage({
-        file: selectedFile,
+      const uploadResult = await uploadToSupabaseStorage(selectedFile, {
         bucket: 'digital-products',
-        folder: digitalProductId,
+        path: digitalProductId,
         onProgress: (progress) => {
           setUploadProgress(progress);
         },
+        maxSizeBytes: 500 * 1024 * 1024, // 500 MB
       });
 
       if (!uploadResult.success || !uploadResult.url) {

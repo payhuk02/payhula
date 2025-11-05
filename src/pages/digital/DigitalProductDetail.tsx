@@ -54,6 +54,7 @@ import { useCreateDigitalOrder } from '@/hooks/orders/useCreateDigitalOrder';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 import { useAddToComparison } from './DigitalProductsCompare';
+import { FileVersionManager, FileMetadataEditor } from '@/components/digital/files';
 
 interface DigitalProductDetailParams {
   productId: string;
@@ -547,6 +548,15 @@ export default function DigitalProductDetail() {
 
           {/* Files Tab */}
           <TabsContent value="files" className="space-y-6">
+            {/* Gestion avancée des fichiers - Onglet dans l'onglet Files */}
+            <Tabs defaultValue="list" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="list">Liste des fichiers</TabsTrigger>
+                <TabsTrigger value="versions">Versions</TabsTrigger>
+                <TabsTrigger value="metadata">Métadonnées</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="list" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Détails des fichiers</CardTitle>

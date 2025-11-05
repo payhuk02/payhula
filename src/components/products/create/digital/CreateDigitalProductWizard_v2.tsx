@@ -44,6 +44,7 @@ import { cn } from '@/lib/utils';
 // Step components
 import { DigitalBasicInfoForm } from './DigitalBasicInfoForm';
 import { DigitalFilesUploader } from './DigitalFilesUploader';
+import { FileUploadAdvanced, FileCategoryManager } from '@/components/digital/files';
 import { DigitalLicenseConfig } from './DigitalLicenseConfig';
 import { DigitalAffiliateSettings } from './DigitalAffiliateSettings';
 import { DigitalPreview } from './DigitalPreview';
