@@ -40,6 +40,13 @@ export {
   type DigitalProductsListProps,
 } from './DigitalProductsList';
 
+// Liste virtualisée (optimisée pour grandes listes)
+export {
+  DigitalProductsListVirtualized,
+  type DigitalProductItem,
+  type DigitalProductsListVirtualizedProps,
+} from './DigitalProductsListVirtualized';
+
 // Gestion des bundles
 export {
   DigitalBundleManager,

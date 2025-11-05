@@ -19,6 +19,7 @@ import {
   FileText,
   CheckCircle2,
   XCircle,
+  FileDown,
 } from 'lucide-react';
 import {
   useDigitalProductAnalytics,
@@ -31,6 +32,16 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { subDays } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { exportAnalyticsToPDF, exportAnalyticsToExcel, exportAnalyticsToCSV } from '@/utils/exportDigitalAnalytics';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface DigitalAnalyticsDashboardProps {
   productId: string;
@@ -41,6 +52,7 @@ export const DigitalAnalyticsDashboard = ({
   productId,
   digitalProductId,
 }: DigitalAnalyticsDashboardProps) => {
+  const { toast } = useToast();
   const [dateRange] = useState({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -51,6 +63,143 @@ export const DigitalAnalyticsDashboard = ({
   const { data: topFiles } = useTopDownloadedFiles(digitalProductId, 5);
   const { data: userStats } = useUserDownloadStats(digitalProductId, 10);
   const { data: licenseAnalytics } = useLicenseAnalytics(digitalProductId);
+  
+  // Export handlers
+  const handleExportPDF = async () => {
+    try {
+      await exportAnalyticsToPDF(
+        {
+          total_downloads: analytics?.total_downloads || 0,
+          unique_downloaders: analytics?.unique_downloaders || 0,
+          success_rate: analytics?.success_rate || 0,
+          total_revenue: analytics?.total_revenue || 0,
+          total_bandwidth: analytics?.total_bandwidth || 0,
+          trends: trends?.map((t: any) => ({
+            date: t.date,
+            downloads: t.downloads,
+            users: t.users,
+          })),
+          topFiles: topFiles?.map((f: any) => ({
+            filename: f.filename,
+            downloads: f.downloads,
+            size: f.size,
+          })),
+          licenseStats: licenseAnalytics ? {
+            total: licenseAnalytics.total_licenses || 0,
+            active: licenseAnalytics.active_licenses || 0,
+            expired: licenseAnalytics.expired_licenses || 0,
+            suspended: licenseAnalytics.suspended_licenses || 0,
+          } : undefined,
+        },
+        {
+          format: 'pdf',
+          dateRange,
+          includeCharts: true,
+        }
+      );
+      toast({
+        title: 'Export réussi',
+        description: 'Le rapport PDF a été téléchargé avec succès',
+      });
+    } catch (error) {
+      logger.error('Erreur lors de l\'export PDF', { error });
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'exporter le rapport PDF',
+        variant: 'destructive',
+      });
+    }
+  };
+  
+  const handleExportExcel = () => {
+    try {
+      exportAnalyticsToExcel(
+        {
+          total_downloads: analytics?.total_downloads || 0,
+          unique_downloaders: analytics?.unique_downloaders || 0,
+          success_rate: analytics?.success_rate || 0,
+          total_revenue: analytics?.total_revenue || 0,
+          total_bandwidth: analytics?.total_bandwidth || 0,
+          trends: trends?.map((t: any) => ({
+            date: t.date,
+            downloads: t.downloads,
+            users: t.users,
+          })),
+          topFiles: topFiles?.map((f: any) => ({
+            filename: f.filename,
+            downloads: f.downloads,
+            size: f.size,
+          })),
+          licenseStats: licenseAnalytics ? {
+            total: licenseAnalytics.total_licenses || 0,
+            active: licenseAnalytics.active_licenses || 0,
+            expired: licenseAnalytics.expired_licenses || 0,
+            suspended: licenseAnalytics.suspended_licenses || 0,
+          } : undefined,
+        },
+        {
+          format: 'excel',
+          dateRange,
+        }
+      );
+      toast({
+        title: 'Export réussi',
+        description: 'Le rapport Excel a été téléchargé avec succès',
+      });
+    } catch (error) {
+      logger.error('Erreur lors de l\'export Excel', { error });
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'exporter le rapport Excel',
+        variant: 'destructive',
+      });
+    }
+  };
+  
+  const handleExportCSV = () => {
+    try {
+      exportAnalyticsToCSV(
+        {
+          total_downloads: analytics?.total_downloads || 0,
+          unique_downloaders: analytics?.unique_downloaders || 0,
+          success_rate: analytics?.success_rate || 0,
+          total_revenue: analytics?.total_revenue || 0,
+          total_bandwidth: analytics?.total_bandwidth || 0,
+          trends: trends?.map((t: any) => ({
+            date: t.date,
+            downloads: t.downloads,
+            users: t.users,
+          })),
+          topFiles: topFiles?.map((f: any) => ({
+            filename: f.filename,
+            downloads: f.downloads,
+            size: f.size,
+          })),
+          licenseStats: licenseAnalytics ? {
+            total: licenseAnalytics.total_licenses || 0,
+            active: licenseAnalytics.active_licenses || 0,
+            expired: licenseAnalytics.expired_licenses || 0,
+            suspended: licenseAnalytics.suspended_licenses || 0,
+          } : undefined,
+        },
+        {
+          format: 'csv',
+          dateRange,
+        }
+      );
+      toast({
+        title: 'Export réussi',
+        description: 'Le rapport CSV a été téléchargé avec succès',
+      });
+    } catch (error) {
+      logger.error('Erreur lors de l\'export CSV', { error });
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'exporter le rapport CSV',
+        variant: 'destructive',
+      });
+    }
+  };
 
   if (analyticsLoading) {
     return (
@@ -70,6 +219,32 @@ export const DigitalAnalyticsDashboard = ({
 
   return (
     <div className="space-y-6">
+      {/* Export Button */}
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <FileDown className="h-4 w-4 mr-2" />
+              Exporter
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleExportPDF}>
+              <FileText className="h-4 w-4 mr-2" />
+              Export PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportExcel}>
+              <FileText className="h-4 w-4 mr-2" />
+              Export Excel
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportCSV}>
+              <FileText className="h-4 w-4 mr-2" />
+              Export CSV
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
