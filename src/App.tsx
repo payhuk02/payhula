@@ -81,6 +81,7 @@ const CustomerMyDownloads = lazy(() => import("./pages/customer/MyDownloads"));
 const CustomerMyCourses = lazy(() => import("./pages/customer/MyCourses"));
 const CustomerMyProfile = lazy(() => import("./pages/customer/MyProfile"));
 const CustomerMyWishlist = lazy(() => import("./pages/customer/CustomerMyWishlist"));
+const CustomerDigitalPortal = lazy(() => import("./pages/customer/CustomerDigitalPortal"));
 const CustomerMyInvoices = lazy(() => import("./pages/customer/CustomerMyInvoices"));
 const CustomerMyReturns = lazy(() => import("./pages/customer/CustomerMyReturns"));
 const CustomerLoyaltyPage = lazy(() => import("./pages/customer/CustomerLoyaltyPage"));
@@ -232,6 +233,7 @@ const AppContent = () => {
           <Route path="/account" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
           <Route path="/account/orders" element={<ProtectedRoute><CustomerMyOrders /></ProtectedRoute>} />
           <Route path="/account/downloads" element={<ProtectedRoute><CustomerMyDownloads /></ProtectedRoute>} />
+          <Route path="/account/digital" element={<ProtectedRoute><CustomerDigitalPortal /></ProtectedRoute>} />
           <Route path="/account/courses" element={<ProtectedRoute><CustomerMyCourses /></ProtectedRoute>} />
           <Route path="/account/profile" element={<ProtectedRoute><CustomerMyProfile /></ProtectedRoute>} />
           <Route path="/account/wishlist" element={<ProtectedRoute><CustomerMyWishlist /></ProtectedRoute>} />

@@ -115,6 +115,11 @@ const menuSections = [
         icon: Download,
       },
       {
+        title: "Mon Portail Digital",
+        url: "/account/digital",
+        icon: Package,
+      },
+      {
         title: "Mes Cours",
         url: "/account/courses",
         icon: GraduationCap,
