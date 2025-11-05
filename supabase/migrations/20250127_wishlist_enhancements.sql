@@ -23,9 +23,7 @@ CREATE TABLE IF NOT EXISTS public.wishlist_shares (
   is_active BOOLEAN DEFAULT true,
   expires_at TIMESTAMP WITH TIME ZONE,
   view_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  
-  CONSTRAINT unique_active_share UNIQUE (user_id, share_token)
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- Index pour wishlist_shares
@@ -98,7 +96,7 @@ BEGIN
   -- Créer le nouveau lien
   INSERT INTO public.wishlist_shares (user_id, share_token, expires_at)
   VALUES (v_user_id, v_token, v_expires_at)
-  ON CONFLICT (user_id, share_token) DO NOTHING;
+  ON CONFLICT (share_token) DO NOTHING;
   
   RETURN v_token;
 END;
