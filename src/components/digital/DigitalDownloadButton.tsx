@@ -22,11 +22,14 @@ import {
   Loader2,
   Clock,
   Lock,
+  RefreshCw,
 } from 'lucide-react';
 import { useGenerateDownloadLink, useTrackDownload } from '@/hooks/digital/useDownloads';
 import { useRemainingDownloads } from '@/hooks/digital/useDigitalProducts';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface DigitalDownloadButtonProps {
   digitalProductId: string;
@@ -55,7 +58,10 @@ export const DigitalDownloadButton = ({
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showDialog, setShowDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isRetrying, setIsRetrying] = useState(false);
 
+  const { toast } = useToast();
   const generateLink = useGenerateDownloadLink();
   const trackDownload = useTrackDownload();
   const { data: remainingData } = useRemainingDownloads(digitalProductId);
@@ -70,13 +76,14 @@ export const DigitalDownloadButton = ({
   };
 
   /**
-   * Handle download
+   * Handle download with retry logic
    */
-  const handleDownload = async () => {
+  const handleDownload = async (retryAttempt: number = 0) => {
     setError(null);
     setIsDownloading(true);
     setShowDialog(true);
     setDownloadProgress(0);
+    setRetryCount(retryAttempt);
 
     try {
       // Check remaining downloads
@@ -84,44 +91,93 @@ export const DigitalDownloadButton = ({
         throw new Error('Limite de téléchargements atteinte');
       }
 
-      // Generate secure download link
+      // Generate secure download link (hook already has retry logic)
+      setDownloadProgress(10);
       const result = await generateLink.mutateAsync({ 
         fileId,
         expiresIn: 3600, // 1 hour
       });
 
-      // Simulate progress (in real app, use proper download with progress)
-      setDownloadProgress(25);
+      setDownloadProgress(30);
 
       // Track download start
-      const tracking = await trackDownload.mutateAsync({
-        digitalProductId,
-        fileId,
-        licenseKey,
-      });
+      try {
+        await trackDownload.mutateAsync({
+          digitalProductId,
+          fileId,
+          licenseKey,
+        });
+        setDownloadProgress(50);
+      } catch (trackError: any) {
+        // Ne pas bloquer le téléchargement si le tracking échoue
+        logger.warn('Download tracking failed', { error: trackError });
+        setDownloadProgress(50);
+      }
 
-      setDownloadProgress(50);
+      // Start actual download with error handling
+      try {
+        const link = document.createElement('a');
+        link.href = result.url;
+        link.download = fileName;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup after a short delay
+        setTimeout(() => {
+          document.body.removeChild(link);
+        }, 100);
 
-      // Start actual download
-      const link = document.createElement('a');
-      link.href = result.url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        setDownloadProgress(100);
 
-      setDownloadProgress(100);
+        // Success notification
+        toast({
+          title: 'Téléchargement démarré',
+          description: `${fileName} est en cours de téléchargement`,
+        });
 
-      // Success
-      setTimeout(() => {
-        setIsDownloading(false);
-        setTimeout(() => setShowDialog(false), 1500);
-      }, 500);
+        // Success
+        setTimeout(() => {
+          setIsDownloading(false);
+          setTimeout(() => setShowDialog(false), 1500);
+        }, 500);
+      } catch (downloadError: any) {
+        logger.error('Error starting download', { error: downloadError });
+        throw new Error('Erreur lors du démarrage du téléchargement. Veuillez réessayer.');
+      }
 
     } catch (err: any) {
-      console.error('Download error:', err);
-      setError(err.message || 'Erreur lors du téléchargement');
+      logger.error('Download error', {
+        error: err.message,
+        fileId,
+        fileName,
+        retryAttempt,
+      });
+
+      const errorMessage = err.message || 'Erreur lors du téléchargement';
+      setError(errorMessage);
       setIsDownloading(false);
+
+      // Show error toast
+      toast({
+        title: 'Erreur de téléchargement',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+
+      // Auto-retry for network errors (max 2 retries)
+      if (retryAttempt < 2 && (
+        errorMessage.includes('réseau') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('timeout') ||
+        errorMessage.includes('fetch')
+      )) {
+        setIsRetrying(true);
+        setTimeout(() => {
+          setIsRetrying(false);
+          handleDownload(retryAttempt + 1);
+        }, 2000 * (retryAttempt + 1)); // Exponential backoff: 2s, 4s
+      }
     }
   };
 
@@ -139,8 +195,8 @@ export const DigitalDownloadButton = ({
           variant={variant}
           size={size}
           className={className}
-          onClick={handleDownload}
-          disabled={isDownloading || !canDownload}
+          onClick={() => handleDownload(0)}
+          disabled={isDownloading || !canDownload || isRetrying}
         >
           {isDownloading ? (
             <>
@@ -201,10 +257,29 @@ export const DigitalDownloadButton = ({
             )}
 
             {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+              <div className="space-y-3">
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+                {isRetrying && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Tentative de nouvelle connexion... ({retryCount + 1}/3)</span>
+                  </div>
+                )}
+                {!isRetrying && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(0)}
+                    className="w-full"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Réessayer
+                  </Button>
+                )}
+              </div>
             )}
 
             {!isDownloading && !error && downloadProgress === 100 && (

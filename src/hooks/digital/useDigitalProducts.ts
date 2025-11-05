@@ -712,15 +712,22 @@ export const useRemainingDownloads = (digitalProductId: string | undefined) => {
 
 /**
  * useHasDownloadAccess - Hook pour vérifier si l'utilisateur a accès au téléchargement
+ * Amélioré avec plusieurs méthodes de vérification pour plus de robustesse
  */
 export const useHasDownloadAccess = (digitalProductId: string | undefined) => {
   return useQuery({
     queryKey: ['digitalProduct', digitalProductId, 'hasAccess'],
     queryFn: async () => {
-      if (!digitalProductId) throw new Error('ID produit manquant');
+      if (!digitalProductId) {
+        logger.warn('Digital product ID missing for access check');
+        return { hasAccess: false, purchaseCount: 0, paymentStatus: 'unknown', method: 'none' };
+      }
 
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Non authentifié');
+      if (!user) {
+        logger.debug('User not authenticated for access check');
+        return { hasAccess: false, purchaseCount: 0, paymentStatus: 'not_authenticated', method: 'none' };
+      }
 
       // Étape 1: Récupérer le product_id depuis digital_products
       const { data: digitalProduct, error: digitalError } = await supabase
@@ -730,42 +737,70 @@ export const useHasDownloadAccess = (digitalProductId: string | undefined) => {
         .single();
 
       if (digitalError || !digitalProduct) {
-        logger.warn('Digital product not found', { digitalProductId });
-        return { hasAccess: false, purchaseCount: 0, paymentStatus: 'unknown' };
+        logger.warn('Digital product not found', { digitalProductId, error: digitalError });
+        return { hasAccess: false, purchaseCount: 0, paymentStatus: 'product_not_found', method: 'none' };
       }
 
-      // Étape 2: Vérifier l'accès via order_items avec vérification explicite du paiement
-      // Vérification par email
-      const { data: orderItemsByEmail, error: emailError } = await supabase
-        .from('order_items')
-        .select(`
-          id,
-          orders!inner (
-            id,
-            payment_status,
-            status,
-            customers!inner (
-              id,
-              email
-            )
-          )
-        `)
-        .eq('product_id', digitalProduct.product_id)
-        .eq('orders.payment_status', 'paid') // ⚠️ CRITIQUE: Vérification explicite paiement
-        .eq('orders.status', 'completed') // Status commande doit être complété
-        .eq('orders.customers.email', user.email)
-        .limit(1);
+      const productId = digitalProduct.product_id;
 
-      // Vérification alternative par customer_id si disponible
-      let orderItemsByCustomer = null;
-      const { data: customer } = await supabase
-        .from('customers')
+      // Étape 2: Méthode 1 - Vérification par customer_id (plus fiable)
+      let hasAccessByCustomer = false;
+      let purchaseCountByCustomer = 0;
+      let paymentStatusByCustomer = 'unknown';
+
+      // Récupérer le customer_id pour ce store
+      const { data: stores } = await supabase
+        .from('stores')
         .select('id')
-        .eq('email', user.email)
+        .eq('user_id', user.id)
         .limit(1);
 
-      if (customer && customer.length > 0) {
-        const { data: orderItemsByCustomerId } = await supabase
+      // Essayer de trouver le customer par email dans tous les stores
+      const { data: customers } = await supabase
+        .from('customers')
+        .select('id, store_id, email')
+        .eq('email', user.email);
+
+      if (customers && customers.length > 0) {
+        // Vérifier l'accès pour chaque customer trouvé
+        for (const customer of customers) {
+          const { data: orderItems, error: customerError } = await supabase
+            .from('order_items')
+            .select(`
+              id,
+              orders!inner (
+                id,
+                payment_status,
+                status,
+                customer_id,
+                store_id
+              )
+            `)
+            .eq('product_id', productId)
+            .eq('orders.payment_status', 'paid')
+            .eq('orders.status', 'completed')
+            .eq('orders.customer_id', customer.id);
+
+          if (!customerError && orderItems && orderItems.length > 0) {
+            hasAccessByCustomer = true;
+            purchaseCountByCustomer = orderItems.length;
+            paymentStatusByCustomer = orderItems[0].orders?.payment_status || 'paid';
+            logger.debug('Access found by customer_id', {
+              customerId: customer.id,
+              purchaseCount: purchaseCountByCustomer,
+            });
+            break;
+          }
+        }
+      }
+
+      // Étape 3: Méthode 2 - Vérification par email (fallback)
+      let hasAccessByEmail = false;
+      let purchaseCountByEmail = 0;
+      let paymentStatusByEmail = 'unknown';
+
+      if (!hasAccessByCustomer) {
+        const { data: orderItemsByEmail, error: emailError } = await supabase
           .from('order_items')
           .select(`
             id,
@@ -773,48 +808,117 @@ export const useHasDownloadAccess = (digitalProductId: string | undefined) => {
               id,
               payment_status,
               status,
-              customer_id
+              customers!inner (
+                id,
+                email
+              )
             )
           `)
-          .eq('product_id', digitalProduct.product_id)
-          .eq('orders.payment_status', 'paid') // ⚠️ CRITIQUE: Vérification explicite paiement
+          .eq('product_id', productId)
+          .eq('orders.payment_status', 'paid')
           .eq('orders.status', 'completed')
-          .eq('orders.customer_id', customer[0].id)
-          .limit(1);
+          .eq('orders.customers.email', user.email);
 
-        orderItemsByCustomer = orderItemsByCustomerId;
+        if (!emailError && orderItemsByEmail && orderItemsByEmail.length > 0) {
+          hasAccessByEmail = true;
+          purchaseCountByEmail = orderItemsByEmail.length;
+          paymentStatusByEmail = orderItemsByEmail[0].orders?.payment_status || 'paid';
+          logger.debug('Access found by email', {
+            email: user.email,
+            purchaseCount: purchaseCountByEmail,
+          });
+        }
       }
 
-      // Utiliser les résultats de l'une ou l'autre vérification
-      const orderItems = orderItemsByEmail || orderItemsByCustomer;
-      const error = emailError;
+      // Étape 4: Méthode 3 - Vérification par user_id dans order_items metadata (si disponible)
+      let hasAccessByUserId = false;
+      let purchaseCountByUserId = 0;
 
-      if (error) {
-        logger.error('Error checking download access', { error, digitalProductId });
-        throw error;
+      if (!hasAccessByCustomer && !hasAccessByEmail) {
+        // Récupérer tous les order_items pour ce produit et filtrer côté client
+        const { data: allOrderItems, error: metadataError } = await supabase
+          .from('order_items')
+          .select(`
+            id,
+            item_metadata,
+            orders!inner (
+              id,
+              payment_status,
+              status
+            )
+          `)
+          .eq('product_id', productId)
+          .eq('orders.payment_status', 'paid')
+          .eq('orders.status', 'completed');
+
+        if (!metadataError && allOrderItems) {
+          // Filtrer côté client pour trouver ceux avec user_id dans metadata
+          const matchingItems = allOrderItems.filter((item: any) => {
+            const metadata = item.item_metadata;
+            return metadata && typeof metadata === 'object' && metadata.user_id === user.id;
+          });
+
+          if (matchingItems.length > 0) {
+            hasAccessByUserId = true;
+            purchaseCountByUserId = matchingItems.length;
+            logger.debug('Access found by user_id in metadata', {
+              userId: user.id,
+              purchaseCount: purchaseCountByUserId,
+            });
+          }
+        }
       }
 
-      const hasAccess = orderItems && orderItems.length > 0;
-      const paymentStatus = orderItems && orderItems.length > 0 
-        ? orderItems[0].orders?.payment_status || 'unknown'
-        : 'not_paid';
+      // Résultat final : utiliser la première méthode qui a trouvé un accès
+      const hasAccess = hasAccessByCustomer || hasAccessByEmail || hasAccessByUserId;
+      const purchaseCount = hasAccessByCustomer 
+        ? purchaseCountByCustomer 
+        : hasAccessByEmail 
+        ? purchaseCountByEmail 
+        : purchaseCountByUserId;
+      const paymentStatus = hasAccessByCustomer 
+        ? paymentStatusByCustomer 
+        : hasAccessByEmail 
+        ? paymentStatusByEmail 
+        : 'paid';
+      const method = hasAccessByCustomer 
+        ? 'customer_id' 
+        : hasAccessByEmail 
+        ? 'email' 
+        : hasAccessByUserId 
+        ? 'user_id_metadata' 
+        : 'none';
 
       // Log pour debugging
       if (!hasAccess) {
         logger.debug('User does not have download access', {
           digitalProductId,
+          productId,
           userId: user.id,
           userEmail: user.email,
+          method: 'none',
+          customerIdsChecked: customers?.map(c => c.id) || [],
+        });
+      } else {
+        logger.debug('User has download access', {
+          digitalProductId,
+          productId,
+          userId: user.id,
+          method,
+          purchaseCount,
           paymentStatus,
         });
       }
 
       return {
         hasAccess,
-        purchaseCount: orderItems?.length || 0,
-        paymentStatus, // Retourner le statut pour debug
+        purchaseCount,
+        paymentStatus,
+        method, // Retourner la méthode utilisée pour debug
       };
     },
     enabled: !!digitalProductId,
+    retry: 1, // Réessayer une fois en cas d'erreur réseau
+    retryDelay: 1000,
   });
 };

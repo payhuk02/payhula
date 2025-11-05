@@ -29,11 +29,13 @@ import {
   HardDrive,
   Clock,
   Lock,
-  Unlock
+  Unlock,
+  Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DigitalDownloadButton } from '@/components/digital/DigitalDownloadButton';
 import { DigitalLicenseCard } from '@/components/digital/DigitalLicenseCard';
+import { DigitalFilePreview } from '@/components/digital/DigitalFilePreview';
 import { useDigitalProduct } from '@/hooks/digital/useDigitalProducts';
 import { useHasDownloadAccess } from '@/hooks/digital/useDigitalProducts';
 import { sanitizeHTML } from '@/lib/html-sanitizer';
@@ -41,8 +43,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ProductReviewsSummary } from '@/components/reviews/ProductReviewsSummary';
 import { ReviewsList } from '@/components/reviews/ReviewsList';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAnalyticsTracking } from '@/hooks/useProductAnalytics';
+import { useCreateDigitalOrder } from '@/hooks/orders/useCreateDigitalOrder';
+import { useAuth } from '@/hooks/useAuth';
+import { logger } from '@/lib/logger';
 
 interface DigitalProductDetailParams {
   productId: string;
@@ -55,6 +60,8 @@ export default function DigitalProductDetail() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   // Fetch digital product with all relations
   const { data: digitalProduct, isLoading, error } = useDigitalProduct(productId || '');
@@ -64,6 +71,9 @@ export default function DigitalProductDetail() {
   
   // Track analytics event
   const { trackView } = useAnalyticsTracking();
+
+  // Hook pour créer une commande
+  const { mutateAsync: createDigitalOrder, isPending: isCreatingOrder } = useCreateDigitalOrder();
 
   // Track product view on mount
   useEffect(() => {
@@ -106,12 +116,124 @@ export default function DigitalProductDetail() {
     }
   }, [productId, trackView, digitalProduct]);
 
+  // Handler pour l'achat
+  const handlePurchase = async () => {
+    if (!digitalProduct || !productId) {
+      toast({
+        title: 'Erreur',
+        description: 'Produit non disponible',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!user?.email) {
+      toast({
+        title: 'Authentification requise',
+        description: 'Veuillez vous connecter pour effectuer un achat',
+        variant: 'destructive',
+      });
+      navigate('/login');
+      return;
+    }
+
+    const product = digitalProduct.product;
+    if (!product?.store_id) {
+      toast({
+        title: 'Erreur',
+        description: 'Boutique non disponible',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setIsPurchasing(true);
+      
+      logger.debug('Initiating digital product purchase', {
+        digitalProductId: digitalProduct.id,
+        productId: product.id,
+        storeId: product.store_id,
+        userEmail: user.email,
+      });
+
+      const result = await createDigitalOrder({
+        digitalProductId: digitalProduct.id,
+        productId: product.id,
+        storeId: product.store_id,
+        customerEmail: user.email,
+        customerName: user.user_metadata?.full_name || user.email.split('@')[0],
+        generateLicense: digitalProduct.license_type !== 'none',
+        licenseType: digitalProduct.license_type === 'single' ? 'single' : 
+                    digitalProduct.license_type === 'multi' ? 'multi' : 'unlimited',
+        maxActivations: digitalProduct.license_type === 'multi' ? digitalProduct.max_licenses : undefined,
+      });
+
+      if (result.checkoutUrl) {
+        logger.info('Redirecting to payment checkout', {
+          orderId: result.orderId,
+          checkoutUrl: result.checkoutUrl,
+        });
+        window.location.href = result.checkoutUrl;
+      } else {
+        throw new Error('URL de paiement non disponible');
+      }
+    } catch (error: any) {
+      logger.error('Error initiating purchase', {
+        error: error.message,
+        digitalProductId: digitalProduct.id,
+        productId: product.id,
+      });
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible d\'initialiser le paiement. Veuillez réessayer.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="animate-pulse space-y-8">
-          <div className="h-96 bg-muted rounded-lg" />
-          <div className="h-64 bg-muted rounded-lg" />
+        <div className="space-y-8">
+          {/* Header skeleton */}
+          <div className="animate-pulse space-y-6">
+            <div className="h-10 w-32 bg-muted rounded" />
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Left: Image skeleton */}
+              <div className="space-y-4">
+                <div className="aspect-video bg-muted rounded-lg" />
+                <div className="space-y-3">
+                  <div className="h-6 bg-muted rounded w-1/3" />
+                  <div className="space-y-2">
+                    <div className="h-16 bg-muted rounded" />
+                    <div className="h-16 bg-muted rounded" />
+                  </div>
+                </div>
+              </div>
+              {/* Right: Info skeleton */}
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="h-8 bg-muted rounded w-3/4" />
+                  <div className="h-4 bg-muted rounded w-full" />
+                  <div className="h-4 bg-muted rounded w-2/3" />
+                  <div className="h-10 bg-muted rounded w-1/2" />
+                </div>
+                <div className="h-24 bg-muted rounded" />
+                <div className="h-32 bg-muted rounded" />
+              </div>
+            </div>
+          </div>
+          {/* Tabs skeleton */}
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 bg-muted rounded w-full" />
+            <div className="space-y-3">
+              <div className="h-48 bg-muted rounded" />
+              <div className="h-48 bg-muted rounded" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -176,28 +298,17 @@ export default function DigitalProductDetail() {
                     <FileText className="h-5 w-5" />
                     Fichiers inclus ({files.length})
                   </CardTitle>
+                  <CardDescription>
+                    {hasAccess ? 'Téléchargez vos fichiers' : 'Aperçu des fichiers disponibles'}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {files.map((file) => (
-                    <div
+                    <DigitalFilePreview
                       key={file.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-4 w-4 text-primary" />
-                        <div>
-                          <p className="font-medium text-sm">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {file.file_type} • {file.file_size_mb.toFixed(2)} MB
-                          </p>
-                        </div>
-                      </div>
-                      {file.is_main && (
-                        <Badge variant="secondary" className="text-xs">
-                          Principal
-                        </Badge>
-                      )}
-                    </div>
+                      file={file}
+                      isLocked={!hasAccess}
+                    />
                   ))}
                 </CardContent>
               </Card>
@@ -284,9 +395,23 @@ export default function DigitalProductDetail() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <Button size="lg" className="w-full">
-                    <Lock className="h-4 w-4 mr-2" />
-                    Acheter maintenant
+                  <Button 
+                    size="lg" 
+                    className="w-full"
+                    onClick={handlePurchase}
+                    disabled={isPurchasing || isCreatingOrder || !digitalProduct || !user || !product.is_active}
+                  >
+                    {isPurchasing || isCreatingOrder ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Traitement...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-4 w-4 mr-2" />
+                        Acheter maintenant
+                      </>
+                    )}
                   </Button>
                 )}
               </div>

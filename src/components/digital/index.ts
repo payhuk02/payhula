@@ -116,6 +116,12 @@ export {
   DigitalDownloadButtonCompact,
 } from './DigitalDownloadButton';
 
+// File Preview
+export {
+  DigitalFilePreview,
+  DigitalFilePreviewCompact,
+} from './DigitalFilePreview';
+
 // Analytics
 export { DigitalAnalyticsDashboard } from './DigitalAnalyticsDashboard';
 
