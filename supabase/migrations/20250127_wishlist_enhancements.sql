@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS public.price_drop_alerts (
   new_price NUMERIC NOT NULL,
   price_drop_percentage NUMERIC NOT NULL,
   alert_sent_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  alert_sent_date DATE NOT NULL DEFAULT CURRENT_DATE,
   email_sent BOOLEAN DEFAULT false
 );
 
@@ -51,9 +52,8 @@ CREATE INDEX IF NOT EXISTS idx_price_drop_alerts_product_id ON public.price_drop
 CREATE INDEX IF NOT EXISTS idx_price_drop_alerts_sent_at ON public.price_drop_alerts(alert_sent_at DESC);
 
 -- Index unique pour empêcher plusieurs alertes par jour pour le même user/product
--- Utilisation de date_trunc qui est immuable (au lieu de DATE() qui ne l'est pas)
 CREATE UNIQUE INDEX IF NOT EXISTS idx_price_drop_alerts_unique_daily 
-ON public.price_drop_alerts(user_id, product_id, date_trunc('day', alert_sent_at));
+ON public.price_drop_alerts(user_id, product_id, alert_sent_date);
 
 -- Fonction pour générer un token de partage unique
 CREATE OR REPLACE FUNCTION public.generate_wishlist_share_token()
