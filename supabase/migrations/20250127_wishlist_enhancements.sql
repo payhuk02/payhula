@@ -51,8 +51,9 @@ CREATE INDEX IF NOT EXISTS idx_price_drop_alerts_product_id ON public.price_drop
 CREATE INDEX IF NOT EXISTS idx_price_drop_alerts_sent_at ON public.price_drop_alerts(alert_sent_at DESC);
 
 -- Index unique pour empêcher plusieurs alertes par jour pour le même user/product
+-- Utilisation de date_trunc qui est immuable (au lieu de DATE() qui ne l'est pas)
 CREATE UNIQUE INDEX IF NOT EXISTS idx_price_drop_alerts_unique_daily 
-ON public.price_drop_alerts(user_id, product_id, DATE(alert_sent_at));
+ON public.price_drop_alerts(user_id, product_id, date_trunc('day', alert_sent_at));
 
 -- Fonction pour générer un token de partage unique
 CREATE OR REPLACE FUNCTION public.generate_wishlist_share_token()
