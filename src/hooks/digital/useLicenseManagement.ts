@@ -338,6 +338,30 @@ export const useLicenseManagement = (productId?: string) => {
         user_agent: navigator.userAgent,
       });
 
+      // Déclencher webhook pour activation de licence (en arrière-plan)
+      if (validation.license?.store_id) {
+        import('@/services/webhooks/digitalProductWebhooks')
+          .then(({ triggerWebhooks }) => {
+            triggerWebhooks(
+              validation.license.store_id,
+              'license_activated',
+              {
+                license_id: validation.license.id,
+                license_key: validation.license.license_key,
+                activation_id: data.id,
+                device_name: options.device_name,
+                user_id: validation.license.user_id,
+              },
+              data.id
+            ).catch((error) => {
+              logger.error('Error triggering license_activated webhook', { error });
+            });
+          })
+          .catch((error) => {
+            logger.error('Error loading webhook service', { error });
+          });
+      }
+
       return { success: true, activation: data };
     },
     onSuccess: () => {

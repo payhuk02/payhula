@@ -360,6 +360,11 @@ const menuSections = [
         icon: Webhook,
       },
       {
+        title: "Webhooks Produits Digitaux",
+        url: "/dashboard/digital-webhooks",
+        icon: Webhook,
+      },
+      {
         title: "Programme de Fidélité",
         url: "/dashboard/loyalty",
         icon: Star,

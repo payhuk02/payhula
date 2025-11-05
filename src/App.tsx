@@ -120,6 +120,7 @@ const AdminAudit = lazy(() => import("./pages/admin/AdminAudit"));
 const AdminTaxManagement = lazy(() => import("./pages/admin/AdminTaxManagement"));
 const AdminReturnManagement = lazy(() => import("./pages/admin/AdminReturnManagement"));
 const AdminWebhookManagement = lazy(() => import("./pages/admin/AdminWebhookManagement"));
+const DigitalProductWebhooks = lazy(() => import("./pages/admin/DigitalProductWebhooks"));
 const AdminLoyaltyManagement = lazy(() => import("./pages/admin/AdminLoyaltyManagement"));
 const AdminGiftCardManagement = lazy(() => import("./pages/admin/AdminGiftCardManagement"));
 const AdminSuppliersManagement = lazy(() => import("./pages/admin/AdminSuppliersManagement"));
@@ -277,6 +278,7 @@ const AppContent = () => {
           <Route path="/dashboard/products/new" element={<ProtectedRoute><CreateProduct /></ProtectedRoute>} />
           <Route path="/dashboard/products/:id/edit" element={<ProtectedRoute><EditProduct /></ProtectedRoute>} />
           <Route path="/dashboard/webhooks" element={<ProtectedRoute><AdminWebhookManagement /></ProtectedRoute>} />
+          <Route path="/dashboard/digital-webhooks" element={<ProtectedRoute><DigitalProductWebhooks /></ProtectedRoute>} />
           <Route path="/dashboard/loyalty" element={<ProtectedRoute><AdminLoyaltyManagement /></ProtectedRoute>} />
           <Route path="/dashboard/gift-cards" element={<ProtectedRoute><AdminGiftCardManagement /></ProtectedRoute>} />
           <Route path="/dashboard/suppliers" element={<ProtectedRoute><AdminSuppliersManagement /></ProtectedRoute>} />

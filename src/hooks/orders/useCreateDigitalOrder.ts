@@ -347,6 +347,7 @@ export const useCreateDigitalOrder = () => {
       });
 
       if (!paymentResult.success || !paymentResult.checkout_url) {
+        // Déclencher webhook pour échec de paiement si nécessaire
         throw new Error('Erreur lors de l\'initialisation du paiement');
       }
 

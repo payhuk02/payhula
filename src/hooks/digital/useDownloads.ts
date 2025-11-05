@@ -192,6 +192,45 @@ export const useTrackDownload = () => {
         .single();
 
       if (error) throw error;
+
+      // Déclencher webhook pour téléchargement (en arrière-plan)
+      if (result) {
+        // Récupérer le store_id depuis le produit digital
+        supabase
+          .from('digital_products')
+          .select('product:products(store_id)')
+          .eq('id', data.digitalProductId)
+          .single()
+          .then(({ data: productData }) => {
+            if (productData?.product?.store_id) {
+              import('@/services/webhooks/digitalProductWebhooks')
+                .then(({ triggerWebhooks }) => {
+                  triggerWebhooks(
+                    productData.product.store_id,
+                    'download',
+                    {
+                      download_id: result.id,
+                      digital_product_id: data.digitalProductId,
+                      file_id: data.fileId,
+                      user_id: user.id,
+                      license_key: data.licenseKey,
+                      file_version: data.fileVersion,
+                    },
+                    result.id
+                  ).catch((error) => {
+                    logger.error('Error triggering download webhook', { error });
+                  });
+                })
+                .catch((error) => {
+                  logger.error('Error loading webhook service', { error });
+                });
+            }
+          })
+          .catch((error) => {
+            logger.error('Error fetching product for webhook', { error });
+          });
+      }
+
       return result;
     },
     onSuccess: (_, variables) => {
