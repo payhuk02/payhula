@@ -187,12 +187,35 @@ CREATE TRIGGER trigger_update_favorite_price
   FOR EACH ROW
   EXECUTE FUNCTION public.update_favorite_price_when_added();
 
+-- Fonction pour mettre à jour alert_sent_date automatiquement
+CREATE OR REPLACE FUNCTION public.update_alert_sent_date()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Mettre à jour alert_sent_date basé sur alert_sent_at
+  NEW.alert_sent_date := DATE(NEW.alert_sent_at);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger pour mettre à jour alert_sent_date lors de l'insertion/mise à jour
+DROP TRIGGER IF EXISTS trigger_update_alert_sent_date ON public.price_drop_alerts;
+CREATE TRIGGER trigger_update_alert_sent_date
+  BEFORE INSERT OR UPDATE OF alert_sent_at ON public.price_drop_alerts
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_alert_sent_date();
+
 -- ================================================================
 -- Row Level Security (RLS)
 -- ================================================================
 
 -- RLS pour wishlist_shares
 ALTER TABLE public.wishlist_shares ENABLE ROW LEVEL SECURITY;
+
+-- Supprimer les politiques existantes si elles existent
+DROP POLICY IF EXISTS "Users can view their own wishlist shares" ON public.wishlist_shares;
+DROP POLICY IF EXISTS "Users can create their own wishlist shares" ON public.wishlist_shares;
+DROP POLICY IF EXISTS "Users can update their own wishlist shares" ON public.wishlist_shares;
+DROP POLICY IF EXISTS "Public can view active shared wishlists" ON public.wishlist_shares;
 
 -- Politique : Les utilisateurs peuvent voir leurs propres liens
 CREATE POLICY "Users can view their own wishlist shares"
@@ -213,13 +236,18 @@ CREATE POLICY "Users can update their own wishlist shares"
   USING (auth.uid() = user_id);
 
 -- Politique : Lecture publique des liens actifs (pour partage)
+-- Note: now() dans RLS est acceptable car évalué au moment de la requête
 CREATE POLICY "Public can view active shared wishlists"
   ON public.wishlist_shares
   FOR SELECT
-  USING (is_active = true AND (expires_at IS NULL OR expires_at > now()));
+  USING (is_active = true AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP));
 
 -- RLS pour price_drop_alerts
 ALTER TABLE public.price_drop_alerts ENABLE ROW LEVEL SECURITY;
+
+-- Supprimer les politiques existantes si elles existent
+DROP POLICY IF EXISTS "Users can view their own price alerts" ON public.price_drop_alerts;
+DROP POLICY IF EXISTS "System can create price alerts" ON public.price_drop_alerts;
 
 -- Politique : Les utilisateurs peuvent voir leurs propres alertes
 CREATE POLICY "Users can view their own price alerts"
