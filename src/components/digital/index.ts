@@ -136,6 +136,14 @@ export {
   YouMightLikeRecommendations,
 } from './DigitalProductRecommendations';
 
+// Dynamic Bundles
+export {
+  DynamicBundleSelector,
+  type DynamicBundleProduct,
+  type DynamicBundleConfig,
+  type DynamicBundleSelectorProps,
+} from './DynamicBundleSelector';
+
 // Analytics
 export { DigitalAnalyticsDashboard } from './DigitalAnalyticsDashboard';
 
