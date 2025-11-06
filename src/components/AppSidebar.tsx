@@ -285,6 +285,11 @@ const menuSections = [
         url: "/dashboard/warehouses",
         icon: Building2,
       },
+      {
+        title: "Gestion Stocks Produits Physiques",
+        url: "/dashboard/physical-inventory",
+        icon: Warehouse,
+      },
     ]
   },
   {
@@ -319,6 +324,11 @@ const menuSections = [
         title: "Promotions",
         url: "/dashboard/promotions",
         icon: Tag,
+      },
+      {
+        title: "Promotions Produits Physiques",
+        url: "/dashboard/physical-promotions",
+        icon: Percent,
       },
       {
         title: "Parrainage",

@@ -1,0 +1,420 @@
+/**
+ * Product Promotions Hooks
+ * Date: 2025-01-28
+ * 
+ * Hooks for managing product promotions and discounts
+ */
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
+
+// =====================================================
+// TYPES
+// =====================================================
+
+export interface ProductPromotion {
+  id: string;
+  store_id: string;
+  name: string;
+  description?: string;
+  code?: string;
+  discount_type: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_shipping';
+  discount_value: number;
+  applies_to: 'all_products' | 'specific_products' | 'categories' | 'collections';
+  product_ids?: string[];
+  category_ids?: string[];
+  collection_ids?: string[];
+  applies_to_variants: boolean;
+  variant_ids?: string[];
+  min_purchase_amount?: number;
+  min_quantity?: number;
+  max_uses?: number;
+  max_uses_per_customer?: number;
+  current_uses: number;
+  starts_at: string;
+  ends_at?: string;
+  is_active: boolean;
+  is_automatic: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromotionUsage {
+  id: string;
+  promotion_id: string;
+  order_id?: string;
+  customer_id?: string;
+  user_id?: string;
+  discount_amount: number;
+  order_total_before_discount: number;
+  order_total_after_discount: number;
+  used_at: string;
+}
+
+export interface PromotionValidationResult {
+  valid: boolean;
+  discount_amount: number;
+  error?: string;
+}
+
+// =====================================================
+// HOOKS: Promotions
+// =====================================================
+
+/**
+ * Get all promotions for a store
+ */
+export const usePromotions = (storeId?: string, activeOnly = false) => {
+  return useQuery({
+    queryKey: ['promotions', storeId, activeOnly],
+    queryFn: async () => {
+      if (!storeId) return [];
+
+      let query = supabase
+        .from('product_promotions')
+        .select('*')
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+
+      if (activeOnly) {
+        query = query
+          .eq('is_active', true)
+          .lte('starts_at', new Date().toISOString())
+          .or(`ends_at.is.null,ends_at.gte.${new Date().toISOString()}`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      return data as ProductPromotion[];
+    },
+    enabled: !!storeId,
+  });
+};
+
+/**
+ * Get a single promotion
+ */
+export const usePromotion = (promotionId?: string) => {
+  return useQuery({
+    queryKey: ['promotion', promotionId],
+    queryFn: async () => {
+      if (!promotionId) return null;
+
+      const { data, error } = await supabase
+        .from('product_promotions')
+        .select('*')
+        .eq('id', promotionId)
+        .single();
+
+      if (error) throw error;
+      return data as ProductPromotion;
+    },
+    enabled: !!promotionId,
+  });
+};
+
+/**
+ * Get active promotions for a product
+ */
+export const useProductPromotions = (productId?: string, variantId?: string) => {
+  return useQuery({
+    queryKey: ['product-promotions', productId, variantId],
+    queryFn: async () => {
+      if (!productId) return [];
+
+      const now = new Date().toISOString();
+
+      const { data, error } = await supabase
+        .from('product_promotions')
+        .select('*')
+        .eq('is_active', true)
+        .lte('starts_at', now)
+        .or(`ends_at.is.null,ends_at.gte.${now}`)
+        .or(`applies_to.eq.all_products,product_ids.cs.{${productId}}`);
+
+      if (error) throw error;
+
+      // Filter promotions that apply to this product/variant
+      const applicablePromotions = (data as ProductPromotion[]).filter((promo) => {
+        if (promo.applies_to === 'all_products') return true;
+        if (promo.applies_to === 'specific_products' && promo.product_ids?.includes(productId)) {
+          if (variantId && promo.variant_ids && promo.variant_ids.length > 0) {
+            return promo.applies_to_variants && promo.variant_ids.includes(variantId);
+          }
+          return true;
+        }
+        return false;
+      });
+
+      return applicablePromotions;
+    },
+    enabled: !!productId,
+  });
+};
+
+/**
+ * Validate promotion code
+ */
+export const useValidatePromotionCode = () => {
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      code,
+      customerId,
+      orderAmount,
+    }: {
+      code: string;
+      customerId?: string;
+      orderAmount?: number;
+    }): Promise<PromotionValidationResult> => {
+      const now = new Date().toISOString();
+
+      // Find promotion by code
+      const { data: promotion, error } = await supabase
+        .from('product_promotions')
+        .select('*')
+        .eq('code', code.toUpperCase())
+        .eq('is_active', true)
+        .lte('starts_at', now)
+        .or(`ends_at.is.null,ends_at.gte.${now}`)
+        .single();
+
+      if (error || !promotion) {
+        return {
+          valid: false,
+          discount_amount: 0,
+          error: 'Code promotionnel invalide ou expiré.',
+        };
+      }
+
+      const promo = promotion as ProductPromotion;
+
+      // Check max uses
+      if (promo.max_uses && promo.current_uses >= promo.max_uses) {
+        return {
+          valid: false,
+          discount_amount: 0,
+          error: 'Ce code promotionnel a atteint sa limite d\'utilisation.',
+        };
+      }
+
+      // Check per customer limit
+      if (customerId && promo.max_uses_per_customer) {
+        const { count } = await supabase
+          .from('promotion_usage')
+          .select('*', { count: 'exact', head: true })
+          .eq('promotion_id', promo.id)
+          .eq('customer_id', customerId);
+
+        if (count && count >= promo.max_uses_per_customer) {
+          return {
+            valid: false,
+            discount_amount: 0,
+            error: 'Vous avez déjà utilisé ce code promotionnel le maximum de fois autorisé.',
+          };
+        }
+      }
+
+      // Check minimum purchase amount
+      if (orderAmount && promo.min_purchase_amount && orderAmount < promo.min_purchase_amount) {
+        return {
+          valid: false,
+          discount_amount: 0,
+          error: `Montant minimum de commande requis: ${promo.min_purchase_amount} XOF`,
+        };
+      }
+
+      // Calculate discount (will be calculated based on order items)
+      return {
+        valid: true,
+        discount_amount: 0, // Will be calculated when applied
+      };
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de valider le code promotionnel.',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * Create promotion
+ */
+export const useCreatePromotion = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (
+      promotion: Omit<ProductPromotion, 'id' | 'created_at' | 'updated_at' | 'current_uses'>
+    ) => {
+      // Uppercase code if provided
+      const promotionData = {
+        ...promotion,
+        code: promotion.code ? promotion.code.toUpperCase() : null,
+      };
+
+      const { data, error } = await supabase
+        .from('product_promotions')
+        .insert(promotionData)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as ProductPromotion;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['promotions', data.store_id] });
+      queryClient.invalidateQueries({ queryKey: ['product-promotions'] });
+      toast({
+        title: 'Promotion créée',
+        description: `La promotion "${data.name}" a été créée avec succès.`,
+      });
+      logger.info('Promotion created', { promotionId: data.id });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de créer la promotion.',
+        variant: 'destructive',
+      });
+      logger.error('Error creating promotion', { error });
+    },
+  });
+};
+
+/**
+ * Update promotion
+ */
+export const useUpdatePromotion = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      ...updates
+    }: Partial<ProductPromotion> & { id: string }) => {
+      // Uppercase code if provided
+      const updateData = {
+        ...updates,
+        code: updates.code ? updates.code.toUpperCase() : undefined,
+      };
+
+      const { data, error } = await supabase
+        .from('product_promotions')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as ProductPromotion;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['promotions', data.store_id] });
+      queryClient.invalidateQueries({ queryKey: ['promotion', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['product-promotions'] });
+      toast({
+        title: 'Promotion mise à jour',
+        description: 'Les modifications ont été enregistrées.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de mettre à jour la promotion.',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * Delete promotion
+ */
+export const useDeletePromotion = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (promotionId: string) => {
+      const { error } = await supabase
+        .from('product_promotions')
+        .delete()
+        .eq('id', promotionId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, promotionId) => {
+      queryClient.invalidateQueries({ queryKey: ['promotions'] });
+      queryClient.invalidateQueries({ queryKey: ['product-promotions'] });
+      toast({
+        title: 'Promotion supprimée',
+        description: 'La promotion a été supprimée avec succès.',
+      });
+      logger.info('Promotion deleted', { promotionId });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de supprimer la promotion.',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * Get promotion usage statistics
+ */
+export const usePromotionUsage = (promotionId?: string) => {
+  return useQuery({
+    queryKey: ['promotion-usage', promotionId],
+    queryFn: async () => {
+      if (!promotionId) return [];
+
+      const { data, error } = await supabase
+        .from('promotion_usage')
+        .select('*')
+        .eq('promotion_id', promotionId)
+        .order('used_at', { ascending: false });
+
+      if (error) throw error;
+      return data as PromotionUsage[];
+    },
+    enabled: !!promotionId,
+  });
+};
+
+/**
+ * Calculate discount amount for an order
+ */
+export const calculateDiscount = (
+  promotion: ProductPromotion,
+  orderItems: Array<{ price: number; quantity: number }>
+): number => {
+  const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  switch (promotion.discount_type) {
+    case 'percentage':
+      return (subtotal * promotion.discount_value) / 100;
+    case 'fixed_amount':
+      return Math.min(promotion.discount_value, subtotal);
+    case 'free_shipping':
+      return 0; // Shipping will be handled separately
+    case 'buy_x_get_y':
+      // This would need more complex logic based on specific rules
+      return 0;
+    default:
+      return 0;
+  }
+};
+
