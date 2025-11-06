@@ -54,6 +54,7 @@ import {
   Layers,
   FileBarChart,
   ShoppingBag,
+  Camera,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -305,6 +306,11 @@ const menuSections = [
         title: "Numéros de Série & Traçabilité",
         url: "/dashboard/physical-serial-tracking",
         icon: Hash,
+      },
+      {
+        title: "Scanner Codes-barres",
+        url: "/dashboard/physical-barcode-scanner",
+        icon: Camera,
       },
     ]
   },

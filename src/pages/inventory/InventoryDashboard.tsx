@@ -29,6 +29,7 @@ import {
   Warehouse,
   TrendingUp,
   Sparkles,
+  Camera,
 } from 'lucide-react';
 import {
   useInventoryItems,
@@ -44,6 +45,15 @@ import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useDebounce } from '@/hooks/useDebounce';
+import { BarcodeScanner } from '@/components/physical/barcode/BarcodeScanner';
+import { BarcodeScanResult } from '@/hooks/physical/useBarcodeScanner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function InventoryDashboard() {
   const { t } = useTranslation();
@@ -57,6 +67,7 @@ export default function InventoryDashboard() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -384,17 +395,29 @@ export default function InventoryDashboard() {
                     className="pl-8 sm:pl-10 pr-8 sm:pr-20 h-9 sm:h-10 text-xs sm:text-sm"
                     aria-label="Rechercher"
                   />
-                  {searchInput && (
+                  <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {searchInput && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        onClick={() => setSearchInput('')}
+                        aria-label="Effacer"
+                      >
+                        <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 sm:h-8 sm:w-8"
-                      onClick={() => setSearchInput('')}
-                      aria-label="Effacer"
+                      className="h-7 w-7 sm:h-8 sm:w-8"
+                      onClick={() => setShowBarcodeScanner(true)}
+                      aria-label="Scanner code-barres"
+                      title="Scanner un code-barres"
                     >
-                      <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
-                  )}
+                  </div>
                   {/* Keyboard shortcut indicator */}
                   <div className="absolute right-2.5 sm:right-10 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center">
                     <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">
@@ -477,6 +500,30 @@ export default function InventoryDashboard() {
         />
       </main>
     </div>
+
+    {/* Dialog Scanner Code-barres */}
+    <Dialog open={showBarcodeScanner} onOpenChange={setShowBarcodeScanner}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Scanner de Code-barres</DialogTitle>
+          <DialogDescription>
+            Scannez un code-barres pour rechercher un produit dans l'inventaire
+          </DialogDescription>
+        </DialogHeader>
+        <BarcodeScanner
+          onScanSuccess={(result: BarcodeScanResult) => {
+            setSearchInput(result.code);
+            setShowBarcodeScanner(false);
+            toast({
+              title: 'Code-barres scanné',
+              description: `Recherche de: ${result.code}`,
+            });
+          }}
+          onClose={() => setShowBarcodeScanner(false)}
+          autoStop={true}
+        />
+      </DialogContent>
+    </Dialog>
   </SidebarProvider>
   );
 }
