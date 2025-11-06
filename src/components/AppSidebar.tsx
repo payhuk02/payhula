@@ -317,6 +317,11 @@ const menuSections = [
         url: "/dashboard/physical-preorders",
         icon: Package,
       },
+      {
+        title: "Backorders",
+        url: "/dashboard/physical-backorders",
+        icon: Package,
+      },
     ]
   },
   {
