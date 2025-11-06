@@ -13,8 +13,6 @@ const CACHE_NAMES = {
 
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
-  '/manifest.json',
   '/offline.html',
 ];
 
@@ -285,16 +283,31 @@ self.addEventListener('fetch', (event) => {
     request.destination === 'font'
   ) {
     // Vérifier que c'est une ressource locale
-    if (url.origin === self.location.origin || url.hostname.includes('supabase.co')) {
+    if (url.origin === self.location.origin) {
       event.respondWith(
-        strategies.cacheFirst(request).catch((error) => {
-          console.warn('[SW] Cache first failed:', error);
-          // Retourner une réponse vide plutôt que throw pour éviter les erreurs
-          return new Response('', {
-            status: 503,
-            statusText: 'Service Unavailable'
-          });
-        })
+        // Pour les chunks Vite, toujours essayer le réseau d'abord
+        fetch(request)
+          .then((response) => {
+            // Si succès, mettre en cache
+            if (response.ok) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAMES.static).then((cache) => {
+                cache.put(request, responseClone).catch(() => {});
+              });
+            }
+            return response;
+          })
+          .catch(() => {
+            // Si échec réseau, essayer le cache
+            return caches.match(request).then((cached) => {
+              if (cached) return cached;
+              // Si pas de cache non plus, retourner erreur silencieuse
+              return new Response('', {
+                status: 404,
+                statusText: 'Not Found'
+              });
+            });
+          })
       );
       return;
     }

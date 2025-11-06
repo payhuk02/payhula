@@ -14,11 +14,14 @@ installConsoleGuard();
 // Setup global error handlers
 setupGlobalErrorHandlers();
 
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
+// Register Service Worker for PWA (production only)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // Silent fail - PWA is optional
+    navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
+      updateViaCache: 'none' // Toujours récupérer la dernière version du SW
+    }).catch((error) => {
+      console.warn('Service Worker registration failed:', error);
     });
   });
 }
