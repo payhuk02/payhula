@@ -16,6 +16,18 @@ export const initSentry = () => {
     return;
   }
 
+  // Valider le format du DSN
+  try {
+    // Vérifier que le DSN est valide (format: https://xxx@xxx.ingest.sentry.io/xxx)
+    if (!SENTRY_DSN.match(/^https:\/\/[a-f0-9]+@[a-z0-9-]+\.ingest\.(sentry\.io|de\.sentry\.io)\/[0-9]+$/)) {
+      logger.error('Invalid Sentry Dsn:', SENTRY_DSN);
+      return;
+    }
+  } catch (error) {
+    logger.error('Erreur lors de la validation du DSN Sentry:', error);
+    return;
+  }
+
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: ENV,
