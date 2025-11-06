@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#0a0f2a",
   "theme_color": "#007bff",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
       "src": "/payhuk-logo.png",
@@ -29,13 +29,45 @@
   ],
   "shortcuts": [
     {
-      "name": "Ouvrir Payhuk",
+      "name": "Accueil",
       "short_name": "Accueil",
-      "url": "/"
+      "url": "/",
+      "icons": [{ "src": "/payhuk-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Marketplace",
+      "short_name": "Marketplace",
+      "url": "/marketplace",
+      "icons": [{ "src": "/payhuk-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/payhuk-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon Compte",
+      "short_name": "Compte",
+      "url": "/account",
+      "icons": [{ "src": "/payhuk-logo.png", "sizes": "192x192" }]
     }
   ],
   "lang": "fr",
   "dir": "ltr",
   "categories": ["shopping", "business", "finance", "productivity"],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "screenshots": [],
+  "related_applications": [],
+  "iarc_rating_id": "",
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

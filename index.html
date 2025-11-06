@@ -10,6 +10,11 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- ✅ Performance optimizations -->
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+    <meta name="format-detection" content="telephone=no" />
+    
     <link rel="manifest" href="/manifest.json" />
 
     <!-- ✅ Favicon et icônes multi-plateformes -->
@@ -27,13 +32,30 @@
     />
     <meta name="author" content="Payhuk" />
 
-    <!-- ✅ Google Fonts -->
+    <!-- ✅ Resource Hints pour améliorer les Core Web Vitals -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    
+    <!-- ✅ Google Fonts avec preconnect optimisé -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+    
+    <!-- ✅ Preload des ressources critiques -->
+    <link rel="preload" href="/src/main.tsx" as="script" />
 
     <!-- ✅ Open Graph (Facebook, WhatsApp, LinkedIn...) -->
     <meta property="og:type" content="website" />
@@ -64,6 +86,11 @@
   </head>
 
   <body>
+    <!-- Skip link pour accessibilité -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg">
+      Aller au contenu principal
+    </a>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

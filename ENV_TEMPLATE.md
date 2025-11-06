@@ -18,8 +18,11 @@
 # ==============================================
 # SUPABASE (OBLIGATOIRE)
 # ==============================================
-VITE_SUPABASE_URL=https://your-project.supabase.co
+# Récupérez ces valeurs depuis : https://app.supabase.com/project/YOUR_PROJECT/settings/api
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
+# Optionnel : Project ID (peut être extrait de l'URL)
+VITE_SUPABASE_PROJECT_ID=your-project-id
 
 # ==============================================
 # PAIEMENTS (OBLIGATOIRE POUR PRODUCTION)
@@ -57,10 +60,28 @@ VITE_SENTRY_PROJECT=payhula
 VITE_SENDGRID_API_KEY=your_sendgrid_api_key
 
 # ==============================================
+# CDN (OPTIONNEL - Phase 1 Optimisations)
+# ==============================================
+VITE_CDN_ENABLED=false
+VITE_CDN_BASE_URL=https://cdn.payhuk.com
+VITE_CDN_PROVIDER=cloudflare
+VITE_CDN_IMAGE_OPTIMIZATION=true
+VITE_CDN_VIDEO_OPTIMIZATION=true
+VITE_CDN_FONT_OPTIMIZATION=true
+
+# ==============================================
+# APM MONITORING (OPTIONNEL - Phase 1 Optimisations)
+# ==============================================
+VITE_APM_ENABLED=true
+VITE_APM_WEB_VITALS=true
+VITE_APM_PERFORMANCE=true
+
+# ==============================================
 # DÉVELOPPEMENT
 # ==============================================
 NODE_ENV=development
 VITE_APP_URL=http://localhost:8080
+VITE_APP_VERSION=1.0.0
 
 # ==============================================
 # PRODUCTION

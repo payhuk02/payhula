@@ -58,32 +58,149 @@ export default defineConfig(({ mode }) => {
     },
   },
   build: {
-    // Code splitting simplifié pour build plus rapide
+    // Code splitting avancé pour optimiser le bundle size
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendors principaux seulement
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-supabase': ['@supabase/supabase-js'],
+        manualChunks: (id) => {
+          // Vendors React core
+          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            return 'vendor-react';
+          }
+          
+          // State management
+          if (id.includes('@tanstack/react-query')) {
+            return 'vendor-query';
+          }
+          
+          // Supabase
+          if (id.includes('@supabase')) {
+            return 'vendor-supabase';
+          }
+          
+          // UI Libraries
+          if (id.includes('@radix-ui') || id.includes('lucide-react')) {
+            return 'vendor-ui';
+          }
+          
+          // Forms
+          if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) {
+            return 'vendor-forms';
+          }
+          
+          // Rich text editor
+          if (id.includes('@tiptap')) {
+            return 'vendor-editor';
+          }
+          
+          // Charts
+          if (id.includes('recharts')) {
+            return 'vendor-charts';
+          }
+          
+          // Animations
+          if (id.includes('framer-motion')) {
+            return 'vendor-animations';
+          }
+          
+          // i18n
+          if (id.includes('i18next') || id.includes('react-i18next')) {
+            return 'vendor-i18n';
+          }
+          
+          // PDF generation
+          if (id.includes('jspdf')) {
+            return 'vendor-pdf';
+          }
+          
+          // Calendar
+          if (id.includes('react-big-calendar') || id.includes('react-day-picker')) {
+            return 'vendor-calendar';
+          }
+          
+          // Digital products components
+          if (id.includes('/digital/')) {
+            return 'chunk-digital';
+          }
+          
+          // Physical products components
+          if (id.includes('/physical/')) {
+            return 'chunk-physical';
+          }
+          
+          // Services components
+          if (id.includes('/service/')) {
+            return 'chunk-services';
+          }
+          
+          // Courses components
+          if (id.includes('/courses/')) {
+            return 'chunk-courses';
+          }
+          
+          // Admin components
+          if (id.includes('/admin/')) {
+            return 'chunk-admin';
+          }
+          
+          // Marketplace components
+          if (id.includes('/marketplace/')) {
+            return 'chunk-marketplace';
+          }
+        },
+        // Optimisation des noms de chunks
+        chunkFileNames: (chunkInfo) => {
+          const facadeModuleId = chunkInfo.facadeModuleId
+            ? chunkInfo.facadeModuleId.split('/').pop()?.replace(/\.[^.]*$/, '')
+            : 'chunk';
+          return `js/${facadeModuleId}-[hash].js`;
+        },
+        entryFileNames: 'js/[name]-[hash].js',
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name?.split('.') || [];
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+            return `images/[name]-[hash][extname]`;
+          }
+          if (/woff2?|eot|ttf|otf/i.test(ext)) {
+            return `fonts/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
         },
       },
     },
     // Optimisations pour vitesse de build
     target: 'es2015',
     minify: 'esbuild', // Plus rapide que terser
-    // Chunk size warnings
-    chunkSizeWarningLimit: 1000, // Plus tolérant
-    reportCompressedSize: false, // Désactivé pour vitesse
+    // Chunk size warnings - plus strict pour optimiser
+    chunkSizeWarningLimit: 500, // Réduit pour forcer l'optimisation
+    reportCompressedSize: true, // Activé pour voir la taille compressée
     sourcemap: isProduction && hasSentryToken, // Seulement si Sentry configuré
+    // Optimisations supplémentaires
+    cssCodeSplit: true, // Split CSS par chunk
+    cssMinify: true, // Minifier le CSS
+    // Tree shaking agressif
+    treeshake: {
+      moduleSideEffects: false,
+      propertyReadSideEffects: false,
+      tryCatchDeoptimization: false,
+    },
   },
-  // Optimisation des dépendances (simplifié)
+  // Optimisation des dépendances (amélioré)
   optimizeDeps: {
     include: [
       'react',
       'react-dom',
+      'react-router-dom',
       '@tanstack/react-query',
+      '@supabase/supabase-js',
+      'lucide-react',
+      'date-fns',
+      'zod',
+      'react-hook-form',
+      '@hookform/resolvers',
     ],
+    // Exclure les dépendances qui causent des problèmes
+    exclude: ['@sentry/react'],
   },
 };
 });

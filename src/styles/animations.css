@@ -106,6 +106,18 @@
   }
 }
 
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  75% {
+    transform: translateY(10px);
+  }
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -161,6 +173,10 @@
   );
   background-size: 1000px 100%;
   animation: shimmer 2s infinite linear;
+}
+
+.animate-wave {
+  animation: wave 1.5s ease-in-out infinite;
 }
 
 /* Animation au scroll */

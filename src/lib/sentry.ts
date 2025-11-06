@@ -20,26 +20,38 @@ export const initSentry = () => {
     dsn: SENTRY_DSN,
     environment: ENV,
     integrations: [
-      Sentry.browserTracingIntegration(),
+      Sentry.browserTracingIntegration({
+        // Trace les navigations
+        enableInp: true, // Interaction to Next Paint
+        enableLongTask: true, // Long tasks
+        enableWebVitalsInstrumentation: true, // Web Vitals
+      }),
       Sentry.replayIntegration({
         maskAllText: false,
         blockAllMedia: false,
+        // Capturer les sessions avec erreurs
+        sessionSampleRate: ENV === 'production' ? 0.1 : 1.0,
+        errorSampleRate: 1.0,
       }),
+      // Note: React Router integration sera ajoutée si nécessaire
+      // Sentry.reactRouterV6BrowserTracingIntegration n'est pas disponible dans cette version
     ],
     
-    // Performance Monitoring
-    tracesSampleRate: ENV === 'production' ? 0.1 : 1.0,
+    // Performance Monitoring - APM amélioré
+    tracesSampleRate: ENV === 'production' ? 0.2 : 1.0, // Augmenté pour plus de données
+    profilesSampleRate: ENV === 'production' ? 0.1 : 1.0, // Profiling pour identifier les bottlenecks
     
     // Session Replay
-    replaysSessionSampleRate: ENV === 'production' ? 0.1 : 0,
+    replaysSessionSampleRate: ENV === 'production' ? 0.1 : 1.0,
     replaysOnErrorSampleRate: 1.0,
     
     // Options avancées
     beforeSend(event, hint) {
       // Filtrer certains types d'erreurs en production
       if (ENV === 'production') {
-        // Ignorer les erreurs réseau
-        if (event.exception?.values?.[0]?.type === 'NetworkError') {
+        // Ignorer les erreurs réseau mineures
+        if (event.exception?.values?.[0]?.type === 'NetworkError' && 
+            event.exception?.values?.[0]?.value?.includes('Failed to fetch')) {
           return null;
         }
         
@@ -47,6 +59,17 @@ export const initSentry = () => {
         if (event.exception?.values?.[0]?.value?.includes('Script error')) {
           return null;
         }
+      }
+      
+      // Ajouter des tags automatiques
+      if (event.tags) {
+        event.tags.environment = ENV;
+        event.tags.platform = 'web';
+      } else {
+        event.tags = {
+          environment: ENV,
+          platform: 'web',
+        };
       }
       
       return event;
@@ -60,7 +83,19 @@ export const initSentry = () => {
       // Erreurs d'extensions de navigateur
       'chrome-extension://',
       'moz-extension://',
+      // Erreurs de réseau courantes
+      'Network request failed',
+      'Failed to fetch',
     ],
+    
+    // Options de release
+    release: import.meta.env.VITE_APP_VERSION || undefined,
+    
+    // Options de transport
+    transportOptions: {
+      // Timeout pour les requêtes
+      timeout: 5000,
+    },
   });
   
   logger.info('Sentry initialisé avec succès', {

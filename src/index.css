@@ -1,6 +1,7 @@
 /* All @import statements must come first */
 /* Google Fonts chargé via <link> dans index.html pour éviter les problèmes CSP */
 @import './styles/animations.css';
+@import './styles/mobile-optimizations.css';
 
 /**
  * Font optimization: font-display: swap
