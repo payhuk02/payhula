@@ -327,6 +327,11 @@ const menuSections = [
         url: "/dashboard/physical-bundles",
         icon: ShoppingBag,
       },
+      {
+        title: "Multi-devises",
+        url: "/dashboard/multi-currency",
+        icon: Globe,
+      },
     ]
   },
   {

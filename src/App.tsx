@@ -140,6 +140,7 @@ const PhysicalBarcodeScanner = lazy(() => import("./pages/admin/PhysicalBarcodeS
 const PhysicalPreOrders = lazy(() => import("./pages/admin/PhysicalPreOrders"));
 const PhysicalBackorders = lazy(() => import("./pages/admin/PhysicalBackorders"));
 const PhysicalBundles = lazy(() => import("./pages/admin/PhysicalBundles"));
+const PhysicalMultiCurrency = lazy(() => import("./pages/admin/PhysicalMultiCurrency"));
 const AdvancedCalendarPage = lazy(() => import("./pages/service/AdvancedCalendarPage"));
 const RecurringBookingsPage = lazy(() => import("./pages/service/RecurringBookingsPage"));
 
@@ -301,6 +302,7 @@ const AppContent = () => {
           <Route path="/dashboard/physical-preorders" element={<ProtectedRoute><PhysicalPreOrders /></ProtectedRoute>} />
           <Route path="/dashboard/physical-backorders" element={<ProtectedRoute><PhysicalBackorders /></ProtectedRoute>} />
           <Route path="/dashboard/physical-bundles" element={<ProtectedRoute><PhysicalBundles /></ProtectedRoute>} />
+          <Route path="/dashboard/multi-currency" element={<ProtectedRoute><PhysicalMultiCurrency /></ProtectedRoute>} />
           <Route path="/dashboard/loyalty" element={<ProtectedRoute><AdminLoyaltyManagement /></ProtectedRoute>} />
           <Route path="/dashboard/gift-cards" element={<ProtectedRoute><AdminGiftCardManagement /></ProtectedRoute>} />
           <Route path="/dashboard/suppliers" element={<ProtectedRoute><AdminSuppliersManagement /></ProtectedRoute>} />
