@@ -44,7 +44,6 @@ import {
   Repeat,
   GanttChart,
   Boxes,
-  TrendingUp,
   DollarSign as DollarSignIcon,
   PackageSearch,
   Factory,
@@ -55,6 +54,7 @@ import {
   FileBarChart,
   ShoppingBag,
   Camera,
+  Globe,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
