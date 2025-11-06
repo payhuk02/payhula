@@ -137,6 +137,7 @@ const PhysicalProductsAnalytics = lazy(() => import("./pages/admin/PhysicalProdu
 const PhysicalProductsLots = lazy(() => import("./pages/admin/PhysicalProductsLots"));
 const PhysicalProductsSerialTracking = lazy(() => import("./pages/admin/PhysicalProductsSerialTracking"));
 const PhysicalBarcodeScanner = lazy(() => import("./pages/admin/PhysicalBarcodeScanner"));
+const PhysicalPreOrders = lazy(() => import("./pages/admin/PhysicalPreOrders"));
 const AdvancedCalendarPage = lazy(() => import("./pages/service/AdvancedCalendarPage"));
 const RecurringBookingsPage = lazy(() => import("./pages/service/RecurringBookingsPage"));
 
@@ -295,6 +296,7 @@ const AppContent = () => {
           <Route path="/dashboard/physical-lots" element={<ProtectedRoute><PhysicalProductsLots /></ProtectedRoute>} />
           <Route path="/dashboard/physical-serial-tracking" element={<ProtectedRoute><PhysicalProductsSerialTracking /></ProtectedRoute>} />
           <Route path="/dashboard/physical-barcode-scanner" element={<ProtectedRoute><PhysicalBarcodeScanner /></ProtectedRoute>} />
+          <Route path="/dashboard/physical-preorders" element={<ProtectedRoute><PhysicalPreOrders /></ProtectedRoute>} />
           <Route path="/dashboard/loyalty" element={<ProtectedRoute><AdminLoyaltyManagement /></ProtectedRoute>} />
           <Route path="/dashboard/gift-cards" element={<ProtectedRoute><AdminGiftCardManagement /></ProtectedRoute>} />
           <Route path="/dashboard/suppliers" element={<ProtectedRoute><AdminSuppliersManagement /></ProtectedRoute>} />

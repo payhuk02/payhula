@@ -312,6 +312,11 @@ const menuSections = [
         url: "/dashboard/physical-barcode-scanner",
         icon: Camera,
       },
+      {
+        title: "Précommandes",
+        url: "/dashboard/physical-preorders",
+        icon: Package,
+      },
     ]
   },
   {

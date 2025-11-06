@@ -30,6 +30,7 @@ import {
   TrendingUp,
   Sparkles,
   Camera,
+  FileSpreadsheet,
 } from 'lucide-react';
 import {
   useInventoryItems,
@@ -47,6 +48,8 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { BarcodeScanner } from '@/components/physical/barcode/BarcodeScanner';
 import { BarcodeScanResult } from '@/hooks/physical/useBarcodeScanner';
+import { InventoryCSVManager } from '@/components/physical/inventory/InventoryCSVManager';
+import { useExportInventoryCSV } from '@/hooks/physical/useInventoryCSV';
 import {
   Dialog,
   DialogContent,
@@ -68,6 +71,7 @@ export default function InventoryDashboard() {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const { exportToCSV: exportInventoryCSV } = useExportInventoryCSV();
 
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -134,73 +138,14 @@ export default function InventoryDashboard() {
 
     setIsExporting(true);
     try {
-      const headers = [
-        'SKU',
-        'Produit',
-        'Quantité Disponible',
-        'Quantité Réservée',
-        'Point de Réapprovisionnement',
-        'Valeur Totale',
-        'Emplacement',
-        'Statut',
-      ];
-
-      const rows = filteredItems.map((item: any) => {
-        const productName =
-          item.physical_product?.product?.name ||
-          item.variant?.physical_product?.product?.name ||
-          'N/A';
-
-        let status = 'Disponible';
-        if (item.quantity_available === 0) {
-          status = 'Rupture';
-        } else if (item.quantity_available <= item.reorder_point) {
-          status = 'Stock Faible';
-        }
-
-        return [
-          item.sku,
-          productName,
-          item.quantity_available,
-          item.quantity_reserved,
-          item.reorder_point,
-          item.total_value || 0,
-          item.warehouse_location || 'N/A',
-          status,
-        ];
-      });
-
-      const csvContent = [
-        headers.join(','),
-        ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))
-      ].join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `inventaire-${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast({
-        title: '✅ Export réussi',
-        description: `${filteredItems.length} article(s) exporté(s) en CSV.`,
-      });
+      await exportInventoryCSV(filteredItems);
       logger.info('Inventory exported to CSV', { count: filteredItems.length });
     } catch (error: any) {
       logger.error('Error exporting inventory', { error: error.message });
-      toast({
-        title: '❌ Erreur',
-        description: 'Impossible d\'exporter l\'inventaire.',
-        variant: 'destructive',
-      });
     } finally {
       setIsExporting(false);
     }
-  }, [filteredItems, toast]);
+  }, [filteredItems, exportInventoryCSV, toast, logger]);
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
@@ -432,6 +377,10 @@ export default function InventoryDashboard() {
             {/* Tabs - Style MyTemplates */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 w-full sm:w-auto">
+                <TabsTrigger value="csv" className="text-xs sm:text-sm">
+                  <FileSpreadsheet className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5" />
+                  CSV
+                </TabsTrigger>
                 <TabsTrigger 
                   value="all" 
                   className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
@@ -488,6 +437,11 @@ export default function InventoryDashboard() {
                     </CardContent>
                   </Card>
                 )}
+              </TabsContent>
+
+              {/* Tab Import/Export CSV */}
+              <TabsContent value="csv" className="space-y-4">
+                <InventoryCSVManager />
               </TabsContent>
             </Tabs>
         </div>
