@@ -133,6 +133,8 @@ const AdminProductKitsManagement = lazy(() => import("./pages/admin/AdminProduct
 const AdminDemandForecasting = lazy(() => import("./pages/admin/AdminDemandForecasting"));
 const AdminCostOptimization = lazy(() => import("./pages/admin/AdminCostOptimization"));
 const AdminBatchShipping = lazy(() => import("./pages/admin/AdminBatchShipping"));
+const PhysicalProductsAnalytics = lazy(() => import("./pages/admin/PhysicalProductsAnalytics"));
+const PhysicalProductsLots = lazy(() => import("./pages/admin/PhysicalProductsLots"));
 const AdvancedCalendarPage = lazy(() => import("./pages/service/AdvancedCalendarPage"));
 const RecurringBookingsPage = lazy(() => import("./pages/service/RecurringBookingsPage"));
 
@@ -287,6 +289,8 @@ const AppContent = () => {
           <Route path="/dashboard/physical-webhooks" element={<ProtectedRoute><PhysicalProductWebhooks /></ProtectedRoute>} />
           <Route path="/dashboard/physical-inventory" element={<ProtectedRoute><PhysicalInventoryManagement /></ProtectedRoute>} />
           <Route path="/dashboard/physical-promotions" element={<ProtectedRoute><PhysicalPromotions /></ProtectedRoute>} />
+          <Route path="/dashboard/physical-analytics" element={<ProtectedRoute><PhysicalProductsAnalytics /></ProtectedRoute>} />
+          <Route path="/dashboard/physical-lots" element={<ProtectedRoute><PhysicalProductsLots /></ProtectedRoute>} />
           <Route path="/dashboard/loyalty" element={<ProtectedRoute><AdminLoyaltyManagement /></ProtectedRoute>} />
           <Route path="/dashboard/gift-cards" element={<ProtectedRoute><AdminGiftCardManagement /></ProtectedRoute>} />
           <Route path="/dashboard/suppliers" element={<ProtectedRoute><AdminSuppliersManagement /></ProtectedRoute>} />

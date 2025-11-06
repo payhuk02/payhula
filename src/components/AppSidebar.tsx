@@ -290,6 +290,16 @@ const menuSections = [
         url: "/dashboard/physical-inventory",
         icon: Warehouse,
       },
+      {
+        title: "Analytics Produits Physiques",
+        url: "/dashboard/physical-analytics",
+        icon: BarChart3,
+      },
+      {
+        title: "Lots & Expiration",
+        url: "/dashboard/physical-lots",
+        icon: Package,
+      },
     ]
   },
   {
