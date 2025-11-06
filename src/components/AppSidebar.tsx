@@ -48,6 +48,7 @@ import {
   DollarSign as DollarSignIcon,
   PackageSearch,
   Factory,
+  Hash,
   Building2,
   BarChart,
   Layers,
@@ -299,6 +300,11 @@ const menuSections = [
         title: "Lots & Expiration",
         url: "/dashboard/physical-lots",
         icon: Package,
+      },
+      {
+        title: "Numéros de Série & Traçabilité",
+        url: "/dashboard/physical-serial-tracking",
+        icon: Hash,
       },
     ]
   },

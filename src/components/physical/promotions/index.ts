@@ -5,3 +5,4 @@
 
 export { PromotionsManager } from './PromotionsManager';
 
+
