@@ -107,7 +107,7 @@ export const useCookiePreferences = (userId: string | undefined) => {
           .from('cookie_preferences')
           .select('*')
           .eq('user_id', userId)
-          .single();
+          .maybeSingle(); // Utiliser maybeSingle au lieu de single pour éviter erreur si pas de ligne
 
         // PGRST116 = aucune ligne trouvée (normal si l'utilisateur n'a pas encore configuré)
         // Ignorer les erreurs 404 et PGRST116
@@ -123,7 +123,10 @@ export const useCookiePreferences = (userId: string | undefined) => {
         
         return data || null;
       } catch (err: any) {
-        // Gérer les erreurs inattendues
+        // Gérer les erreurs inattendues (table n'existe pas, etc.)
+        if (err?.code === '42P01' || err?.message?.includes('does not exist') || err?.message?.includes('404')) {
+          return null; // Table n'existe pas, retourner null silencieusement
+        }
         console.warn('Erreur inattendue lors de la récupération des préférences cookies:', err);
         return null;
       }
@@ -157,9 +160,11 @@ export const useUpdateCookiePreferences = () => {
             user_id: userId,
             ...preferences,
             updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id'
           })
           .select()
-          .single();
+          .maybeSingle(); // Utiliser maybeSingle pour éviter erreur si pas de ligne
 
         // Si la table n'existe pas, sauvegarder en localStorage comme fallback
         if (error && (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('404'))) {
@@ -168,10 +173,21 @@ export const useUpdateCookiePreferences = () => {
           return preferences as any;
         }
 
-        if (error) throw error;
-        return data;
+        if (error) {
+          // Pour les autres erreurs, fallback localStorage
+          console.warn('Erreur lors de la sauvegarde des préférences cookies:', error);
+          localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+          return preferences as any;
+        }
+        
+        return data || preferences as any;
       } catch (err: any) {
         // Fallback: sauvegarder en localStorage si erreur Supabase
+        if (err?.code === '42P01' || err?.message?.includes('does not exist') || err?.message?.includes('404')) {
+          // Table n'existe pas, utiliser localStorage silencieusement
+          localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+          return preferences as any;
+        }
         console.warn('Erreur lors de la sauvegarde des préférences cookies, fallback localStorage:', err);
         localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
         return preferences as any;
