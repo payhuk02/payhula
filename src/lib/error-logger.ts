@@ -5,6 +5,18 @@
 
 import * as Sentry from '@sentry/react';
 
+// Sauvegarder les méthodes originales de la console pour éviter les boucles infinies
+// avec console-guard.ts
+const originalConsole = {
+  log: console.log.bind(console),
+  info: console.info.bind(console),
+  warn: console.warn.bind(console),
+  error: console.error.bind(console),
+  debug: console.debug.bind(console),
+  group: console.group?.bind(console) || (() => {}),
+  groupEnd: console.groupEnd?.bind(console) || (() => {}),
+};
+
 export interface ErrorLogContext {
   userId?: string;
   componentStack?: string;
@@ -43,11 +55,11 @@ export function logError(error: Error, context: ErrorLogContext = {}): void {
 
   // Console en développement
   if (process.env.NODE_ENV === 'development') {
-    console.group('🔴 Error Logged');
-    console.error('Error:', error);
-    console.log('Context:', context);
-    console.log('Full Log:', errorLog);
-    console.groupEnd();
+    originalConsole.group('🔴 Error Logged');
+    originalConsole.error('Error:', error);
+    originalConsole.log('Context:', context);
+    originalConsole.log('Full Log:', errorLog);
+    originalConsole.groupEnd();
   }
 
   // Sentry (production)
@@ -55,7 +67,7 @@ export function logError(error: Error, context: ErrorLogContext = {}): void {
     Sentry.captureException(error, {
       level: context.level === 'app' ? 'fatal' : 'error',
       contexts: {
-        error_context: context,
+        error_context: context as any,
       },
       tags: {
         error_level: context.level || 'component',
@@ -98,14 +110,14 @@ export function logNetworkError(
  */
 export function logWarning(message: string, context: ErrorLogContext = {}): void {
   if (process.env.NODE_ENV === 'development') {
-    console.warn('⚠️ Warning:', message, context);
+    originalConsole.warn('⚠️ Warning:', message, context);
   }
 
   if (process.env.NODE_ENV === 'production') {
     Sentry.captureMessage(message, {
       level: 'warning',
       contexts: {
-        warning_context: context,
+        warning_context: context as any,
       },
     });
   }
@@ -116,7 +128,7 @@ export function logWarning(message: string, context: ErrorLogContext = {}): void
  */
 export function logInfo(message: string, data?: Record<string, any>): void {
   if (process.env.NODE_ENV === 'development') {
-    console.info('ℹ️ Info:', message, data);
+    originalConsole.info('ℹ️ Info:', message, data);
   }
 
   if (process.env.NODE_ENV === 'production' && data) {
@@ -151,7 +163,8 @@ function saveErrorToLocalStorage(errorLog: ErrorLog): void {
     localStorage.setItem(storageKey, JSON.stringify(limitedLogs));
   } catch (e) {
     // Silencieux si LocalStorage est plein ou indisponible
-    console.error('Failed to save error to localStorage:', e);
+    // Utiliser originalConsole pour éviter la boucle infinie
+    originalConsole.error('Failed to save error to localStorage:', e);
   }
 }
 
@@ -164,7 +177,7 @@ export function getErrorLogs(): ErrorLog[] {
     const logsStr = localStorage.getItem(storageKey);
     return logsStr ? JSON.parse(logsStr) : [];
   } catch (e) {
-    console.error('Failed to retrieve error logs:', e);
+    originalConsole.error('Failed to retrieve error logs:', e);
     return [];
   }
 }
@@ -176,7 +189,7 @@ export function clearErrorLogs(): void {
   try {
     localStorage.removeItem('payhuk_error_logs');
   } catch (e) {
-    console.error('Failed to clear error logs:', e);
+    originalConsole.error('Failed to clear error logs:', e);
   }
 }
 
