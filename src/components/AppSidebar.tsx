@@ -322,6 +322,11 @@ const menuSections = [
         url: "/dashboard/physical-backorders",
         icon: Package,
       },
+      {
+        title: "Bundles Produits",
+        url: "/dashboard/physical-bundles",
+        icon: ShoppingBag,
+      },
     ]
   },
   {
