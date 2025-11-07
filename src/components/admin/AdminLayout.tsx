@@ -87,6 +87,8 @@ const menuSections = [
     label: 'Systèmes & Intégrations',
     items: [
       { icon: Webhook, label: 'Webhooks', path: '/admin/webhooks' },
+      { icon: Webhook, label: 'Webhooks Produits Digitaux', path: '/dashboard/digital-webhooks' },
+      { icon: Webhook, label: 'Webhooks Produits Physiques', path: '/dashboard/physical-webhooks' },
       { icon: Star, label: 'Programme de Fidélité', path: '/admin/loyalty' },
       { icon: Gift, label: 'Cartes Cadeaux', path: '/admin/gift-cards' },
     ]
