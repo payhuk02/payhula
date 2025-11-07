@@ -689,38 +689,6 @@ const Marketplace = () => {
               <br />
               <span className="text-blue-400 font-semibold">{t('marketplace.hero.tagline')}</span>
             </p>
-            
-            {/* Statistiques */}
-            <div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8" 
-              role="region" 
-              aria-label={t('marketplace.stats.ariaLabel')}
-            >
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-600">
-                <div className="text-2xl font-bold text-blue-400" aria-label={t('marketplace.stats.ariaProducts', { count: stats.totalProducts })}>
-                  {stats.totalProducts}
-                </div>
-                <div className="text-sm text-slate-300">{t('marketplace.stats.products')}</div>
-              </div>
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-600">
-                <div className="text-2xl font-bold text-green-400" aria-label={t('marketplace.stats.ariaStores', { count: stats.totalStores })}>
-                  {stats.totalStores}
-                </div>
-                <div className="text-sm text-slate-300">{t('marketplace.stats.stores')}</div>
-              </div>
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-600">
-                <div className="text-2xl font-bold text-yellow-400" aria-label={t('marketplace.stats.ariaRating', { rating: stats.averageRating.toFixed(1) })}>
-                  {stats.averageRating.toFixed(1)}
-                </div>
-                <div className="text-sm text-slate-300">{t('marketplace.stats.rating')}</div>
-              </div>
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-600">
-                <div className="text-2xl font-bold text-purple-400" aria-label={t('marketplace.stats.ariaSales', { count: stats.totalSales })}>
-                  {stats.totalSales}
-                </div>
-                <div className="text-sm text-slate-300">{t('marketplace.stats.sales')}</div>
-              </div>
-            </div>
           </div>
 
           {/* Barre de recherche */}
