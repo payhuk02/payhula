@@ -71,10 +71,12 @@ export default defineConfig(({ mode }) => {
       output: {
         manualChunks: (id) => {
           // Éviter les références circulaires en groupant plus intelligemment
-          // Vendors React core - REGROUPER react et react-dom pour éviter les problèmes d'initialisation
-          // IMPORTANT: React doit être chargé en premier, donc dans un chunk séparé mais prioritaire
+          // Vendors React core - CRITIQUE: React doit être dans le chunk principal (index)
+          // pour être chargé en premier et éviter les erreurs createContext/forwardRef
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'vendor-react'; // Chunk séparé mais chargé en premier
+            // Ne pas créer de chunk séparé - laisser dans le chunk principal
+            // Cela garantit que React est chargé AVANT tous les autres chunks
+            return undefined;
           }
           
           if (id.includes('node_modules/react-router')) {
