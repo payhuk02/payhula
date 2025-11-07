@@ -60,26 +60,23 @@ export default defineConfig(({ mode }) => {
     },
     // Préserver les extensions pour éviter les conflits
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
-    // React est externalisé, pas besoin de dedupe
+    // Dédupliquer React pour éviter les problèmes d'initialisation
+    dedupe: ['react', 'react-dom'],
   },
   build: {
     // Code splitting avancé pour optimiser le bundle size
     rollupOptions: {
       // Préserver les signatures d'entrée pour garantir l'ordre de chargement
       preserveEntrySignatures: 'strict',
-      // Externaliser React SEULEMENT en production pour garantir qu'il est chargé en premier via CDN
-      // Cette approche garantit que React est toujours disponible avant tous les autres chunks
-      external: isProduction ? ['react', 'react-dom'] : [],
       output: {
-        // Définir les globals pour React externalisé (seulement en production)
-        globals: isProduction ? {
-          'react': 'React',
-          'react-dom': 'ReactDOM',
-        } : undefined,
         manualChunks: (id) => {
           // Éviter les références circulaires en groupant plus intelligemment
-          // React et React-DOM sont externalisés et chargés via CDN
-          // Ne pas les inclure dans les chunks
+          // CRITIQUE: React doit être dans le chunk principal (index) pour être chargé en premier
+          // Ne pas créer de chunk séparé pour React - laisser dans le chunk principal
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            // Retourner undefined pour garder React dans le chunk principal
+            return undefined;
+          }
           
           if (id.includes('node_modules/react-router')) {
             return 'vendor-react-router';
