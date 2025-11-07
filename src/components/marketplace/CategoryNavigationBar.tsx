@@ -394,17 +394,17 @@ export function CategoryNavigationBar({
                   aria-selected={isActive}
                   aria-controls={`category-${category.value}`}
                 >
-                  {/* Icône avec style amélioré */}
+                  {/* Icône avec style amélioré - style comeup.com */}
                   <div className={cn(
-                    "relative w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center rounded-full transition-all duration-300",
+                    "relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full transition-all duration-300",
                     "transform",
                     isActive 
-                      ? "bg-gray-900 text-white scale-110 shadow-lg" 
-                      : "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 hover:scale-105"
+                      ? "bg-gray-900 text-white scale-110 shadow-lg ring-2 ring-gray-900 ring-offset-2" 
+                      : "bg-gray-50 text-gray-600 border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 hover:scale-105"
                   )}>
                     <Icon className={cn(
-                      "w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300",
-                      isActive ? "fill-current" : ""
+                      "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300",
+                      isActive ? "fill-white stroke-white" : "stroke-current fill-none"
                     )} />
                     
                     {/* Badge "Populaire" pour les catégories populaires */}
