@@ -4,6 +4,7 @@
 
 export { default as DHLService } from './dhl';
 export { default as FedExService } from './fedex';
+export { default as UPSService } from './ups';
 export type {
   DHLRateRequest,
   DHLRate,
@@ -16,4 +17,10 @@ export type {
   FedExLabelRequest,
   FedExLabelResponse,
 } from './fedex';
+export type {
+  UPSRateRequest,
+  UPSRate,
+  UPSLabelRequest,
+  UPSLabelResponse,
+} from './ups';
 
