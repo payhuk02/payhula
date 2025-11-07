@@ -12,6 +12,10 @@
 
 -- Créer la table partitionnée si elle n'existe pas déjà
 DO $$
+DECLARE
+  month_date DATE;
+  partition_name TEXT;
+  i INTEGER;
 BEGIN
   -- Vérifier si la table orders existe et n'est pas déjà partitionnée
   IF EXISTS (
@@ -19,42 +23,54 @@ BEGIN
     WHERE table_schema = 'public' 
     AND table_name = 'orders'
     AND table_type = 'BASE TABLE'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name = 'orders_partitioned'
   ) THEN
-    -- Créer une table temporaire pour stocker les données
-    CREATE TABLE IF NOT EXISTS orders_backup AS SELECT * FROM orders;
+    -- Créer la table partitionnée SANS la contrainte PRIMARY KEY
+    -- (car la PK doit inclure created_at pour les tables partitionnées)
+    -- On crée la table manuellement pour éviter que LIKE copie la PRIMARY KEY
+    EXECUTE '
+      CREATE TABLE IF NOT EXISTS orders_partitioned (
+        id UUID DEFAULT gen_random_uuid(),
+        store_id UUID NOT NULL,
+        customer_id UUID,
+        status TEXT NOT NULL DEFAULT ''pending'',
+        total_amount NUMERIC NOT NULL DEFAULT 0,
+        currency TEXT NOT NULL DEFAULT ''XOF'',
+        payment_status TEXT DEFAULT ''unpaid'',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      ) PARTITION BY RANGE (created_at)
+    ';
     
-    -- Supprimer l'ancienne table (ATTENTION: à faire avec précaution en production)
-    -- DROP TABLE IF EXISTS orders CASCADE;
+    -- Ajouter les contraintes et références
+    EXECUTE 'ALTER TABLE orders_partitioned ADD CONSTRAINT orders_partitioned_store_id_fkey 
+      FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE';
+    EXECUTE 'ALTER TABLE orders_partitioned ADD CONSTRAINT orders_partitioned_customer_id_fkey 
+      FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL';
     
-    -- Créer la table partitionnée
-    CREATE TABLE IF NOT EXISTS orders_partitioned (
-      LIKE orders INCLUDING ALL
-    ) PARTITION BY RANGE (created_at);
+    -- Ajouter une PRIMARY KEY qui inclut created_at (requis pour tables partitionnées)
+    EXECUTE 'ALTER TABLE orders_partitioned ADD PRIMARY KEY (id, created_at)';
     
     -- Créer les partitions pour les 12 derniers mois
-    DO $$
-    DECLARE
-      month_date DATE;
-      partition_name TEXT;
-    BEGIN
-      FOR i IN 0..11 LOOP
-        month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
-        partition_name := 'orders_' || TO_CHAR(month_date, 'YYYY_MM');
-        
-        EXECUTE format('
-          CREATE TABLE IF NOT EXISTS %I PARTITION OF orders_partitioned
-          FOR VALUES FROM %L TO %L
-        ', 
-          partition_name,
-          month_date,
-          month_date + INTERVAL '1 month'
-        );
-      END LOOP;
-    END $$;
+    FOR i IN 0..11 LOOP
+      month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
+      partition_name := 'orders_' || TO_CHAR(month_date, 'YYYY_MM');
+      
+      EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I PARTITION OF orders_partitioned
+        FOR VALUES FROM %L TO %L
+      ', 
+        partition_name,
+        month_date::TIMESTAMPTZ,
+        (month_date + INTERVAL '1 month')::TIMESTAMPTZ
+      );
+    END LOOP;
     
     -- Créer une partition par défaut pour les futures données
-    CREATE TABLE IF NOT EXISTS orders_default PARTITION OF orders_partitioned
-    DEFAULT;
+    EXECUTE 'CREATE TABLE IF NOT EXISTS orders_default PARTITION OF orders_partitioned DEFAULT';
   END IF;
 END $$;
 
@@ -69,42 +85,74 @@ END $$;
 -- =====================================================
 -- Les téléchargements sont partitionnés par mois
 DO $$
+DECLARE
+  month_date DATE;
+  partition_name TEXT;
+  i INTEGER;
 BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
     AND table_name = 'digital_product_downloads'
     AND table_type = 'BASE TABLE'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name = 'digital_product_downloads_partitioned'
   ) THEN
-    -- Créer la table partitionnée
-    CREATE TABLE IF NOT EXISTS digital_product_downloads_partitioned (
-      LIKE digital_product_downloads INCLUDING ALL
-    ) PARTITION BY RANGE (download_date);
+    -- Créer la table partitionnée SANS la contrainte PRIMARY KEY
+    -- On crée la table manuellement pour éviter que LIKE copie la PRIMARY KEY
+    EXECUTE '
+      CREATE TABLE IF NOT EXISTS digital_product_downloads_partitioned (
+        id UUID DEFAULT gen_random_uuid(),
+        digital_product_id UUID NOT NULL,
+        file_id UUID,
+        user_id UUID NOT NULL,
+        download_date TIMESTAMPTZ NOT NULL DEFAULT now(),
+        download_ip TEXT,
+        download_country TEXT,
+        user_agent TEXT,
+        download_method TEXT DEFAULT ''web'',
+        download_duration_seconds INTEGER,
+        download_speed_mbps NUMERIC,
+        download_success BOOLEAN DEFAULT TRUE,
+        error_message TEXT,
+        license_key TEXT,
+        license_id UUID,
+        file_version TEXT,
+        session_id TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      ) PARTITION BY RANGE (download_date)
+    ';
+    
+    -- Ajouter les contraintes et références
+    EXECUTE 'ALTER TABLE digital_product_downloads_partitioned ADD CONSTRAINT digital_downloads_partitioned_product_id_fkey 
+      FOREIGN KEY (digital_product_id) REFERENCES digital_products(id) ON DELETE CASCADE';
+    EXECUTE 'ALTER TABLE digital_product_downloads_partitioned ADD CONSTRAINT digital_downloads_partitioned_file_id_fkey 
+      FOREIGN KEY (file_id) REFERENCES digital_product_files(id) ON DELETE SET NULL';
+    EXECUTE 'ALTER TABLE digital_product_downloads_partitioned ADD CONSTRAINT digital_downloads_partitioned_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE';
+    
+    -- Ajouter une PRIMARY KEY qui inclut download_date (requis pour tables partitionnées)
+    EXECUTE 'ALTER TABLE digital_product_downloads_partitioned ADD PRIMARY KEY (id, download_date)';
     
     -- Créer les partitions pour les 12 derniers mois
-    DO $$
-    DECLARE
-      month_date DATE;
-      partition_name TEXT;
-    BEGIN
-      FOR i IN 0..11 LOOP
-        month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
-        partition_name := 'digital_downloads_' || TO_CHAR(month_date, 'YYYY_MM');
-        
-        EXECUTE format('
-          CREATE TABLE IF NOT EXISTS %I PARTITION OF digital_product_downloads_partitioned
-          FOR VALUES FROM %L TO %L
-        ', 
-          partition_name,
-          month_date,
-          month_date + INTERVAL '1 month'
-        );
-      END LOOP;
-    END $$;
+    FOR i IN 0..11 LOOP
+      month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
+      partition_name := 'digital_downloads_' || TO_CHAR(month_date, 'YYYY_MM');
+      
+      EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I PARTITION OF digital_product_downloads_partitioned
+        FOR VALUES FROM %L TO %L
+      ', 
+        partition_name,
+        month_date::TIMESTAMPTZ,
+        (month_date + INTERVAL '1 month')::TIMESTAMPTZ
+      );
+    END LOOP;
     
     -- Partition par défaut
-    CREATE TABLE IF NOT EXISTS digital_downloads_default PARTITION OF digital_product_downloads_partitioned
-    DEFAULT;
+    EXECUTE 'CREATE TABLE IF NOT EXISTS digital_downloads_default PARTITION OF digital_product_downloads_partitioned DEFAULT';
   END IF;
 END $$;
 
@@ -113,41 +161,55 @@ END $$;
 -- =====================================================
 -- Les logs de transactions sont partitionnés par mois
 DO $$
+DECLARE
+  month_date DATE;
+  partition_name TEXT;
+  i INTEGER;
 BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
     AND table_name = 'transaction_logs'
     AND table_type = 'BASE TABLE'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name = 'transaction_logs_partitioned'
   ) THEN
-    CREATE TABLE IF NOT EXISTS transaction_logs_partitioned (
-      LIKE transaction_logs INCLUDING ALL
-    ) PARTITION BY RANGE (created_at);
+    -- Créer la table partitionnée SANS la contrainte PRIMARY KEY
+    -- On crée la table manuellement pour éviter que LIKE copie la PRIMARY KEY
+    -- Note: Structure basique - ajuster selon la structure réelle de transaction_logs
+    EXECUTE '
+      CREATE TABLE IF NOT EXISTS transaction_logs_partitioned (
+        id UUID DEFAULT gen_random_uuid(),
+        transaction_id UUID,
+        status TEXT,
+        message TEXT,
+        metadata JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      ) PARTITION BY RANGE (created_at)
+    ';
+    
+    -- Ajouter une PRIMARY KEY qui inclut created_at (requis pour tables partitionnées)
+    EXECUTE 'ALTER TABLE transaction_logs_partitioned ADD PRIMARY KEY (id, created_at)';
     
     -- Créer les partitions pour les 12 derniers mois
-    DO $$
-    DECLARE
-      month_date DATE;
-      partition_name TEXT;
-    BEGIN
-      FOR i IN 0..11 LOOP
-        month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
-        partition_name := 'transaction_logs_' || TO_CHAR(month_date, 'YYYY_MM');
-        
-        EXECUTE format('
-          CREATE TABLE IF NOT EXISTS %I PARTITION OF transaction_logs_partitioned
-          FOR VALUES FROM %L TO %L
-        ', 
-          partition_name,
-          month_date,
-          month_date + INTERVAL '1 month'
-        );
-      END LOOP;
-    END $$;
+    FOR i IN 0..11 LOOP
+      month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
+      partition_name := 'transaction_logs_' || TO_CHAR(month_date, 'YYYY_MM');
+      
+      EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I PARTITION OF transaction_logs_partitioned
+        FOR VALUES FROM %L TO %L
+      ', 
+        partition_name,
+        month_date::TIMESTAMPTZ,
+        (month_date + INTERVAL '1 month')::TIMESTAMPTZ
+      );
+    END LOOP;
     
     -- Partition par défaut
-    CREATE TABLE IF NOT EXISTS transaction_logs_default PARTITION OF transaction_logs_partitioned
-    DEFAULT;
+    EXECUTE 'CREATE TABLE IF NOT EXISTS transaction_logs_default PARTITION OF transaction_logs_partitioned DEFAULT';
   END IF;
 END $$;
 
