@@ -57,6 +57,7 @@ import ProductComparison from "@/components/marketplace/ProductComparison";
 import FavoritesManager from "@/components/marketplace/FavoritesManager";
 import ProductCardProfessional from "@/components/marketplace/ProductCardProfessional";
 import { BundleCard } from "@/components/marketplace/BundleCard";
+import { CategoryNavigationBar } from "@/components/marketplace/CategoryNavigationBar";
 import { useActiveBundles } from "@/hooks/digital/useDigitalBundles";
 import { logger } from '@/lib/logger';
 import { Product, FilterState, PaginationState } from '@/types/marketplace';
@@ -188,8 +189,13 @@ const Marketplace = () => {
         .eq("is_draft", false); // Seulement les produits publiés
 
       // Appliquer les filtres
-      if (filters.category !== "all") {
+      if (filters.category !== "all" && filters.category !== "featured") {
         query = query.eq("category", filters.category);
+      }
+      
+      // Filtre pour les produits en vedette
+      if (filters.category === "featured") {
+        query = query.eq("is_featured", true);
       }
       
       if (filters.productType !== "all") {
