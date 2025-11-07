@@ -55,6 +55,10 @@
     </noscript>
     
     <!-- Note: Preload de main.tsx retiré car Vite le gère automatiquement -->
+    
+    <!-- ✅ React via CDN - Chargé en premier pour garantir l'ordre -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
     <!-- ✅ Open Graph (Facebook, WhatsApp, LinkedIn...) -->
     <meta property="og:type" content="website" />
