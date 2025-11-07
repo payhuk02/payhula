@@ -197,6 +197,7 @@ const Dashboard = () => {
             <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-fade-in">
               
               {/* Stats Grid - Responsive et Professionnel */}
+              {stats && (
               <div ref={statsRef} className="dashboard-stats-grid" role="region" aria-label={t('dashboard.stats.ariaLabel', 'Statistiques du tableau de bord')}>
                 <Card className="dashboard-card group">
                   <CardHeader className="flex flex-row items-center justify-between pb-2 dashboard-card-header">
@@ -206,7 +207,7 @@ const Dashboard = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="dashboard-card-content pt-0">
-                    <div className="dashboard-stat-value">{stats.totalProducts}</div>
+                    <div className="dashboard-stat-value">{stats?.totalProducts ?? 0}</div>
                     <p className="dashboard-stat-description">{t('dashboard.stats.products.active', { count: stats.activeProducts })}</p>
                     <Badge variant="default" className="text-xs px-2 py-1">
                       +{stats.trends.productGrowth}%
@@ -484,6 +485,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+              )}
             </div>
           </main>
         </div>
