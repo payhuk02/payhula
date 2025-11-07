@@ -52,6 +52,10 @@ import { logger } from '@/lib/logger';
 import { useAnalyticsTracking } from '@/hooks/useProductAnalytics';
 import { SEOMeta, ProductSchema } from '@/components/seo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  ServiceRecommendations,
+  BookedTogetherRecommendations,
+} from '@/components/service/ServiceRecommendations';
 
 export default function ServiceDetail() {
   const { serviceId } = useParams<{ serviceId: string }>();
@@ -954,6 +958,23 @@ export default function ServiceDetail() {
               </Card>
             </div>
           </div>
+
+          {/* Recommendations Section */}
+          <Separator className="my-12" />
+          
+          <ServiceRecommendations
+            serviceId={serviceId!}
+            category={service?.category}
+            tags={service?.tags}
+            limit={6}
+            variant="grid"
+            title="Services similaires"
+          />
+          
+          <BookedTogetherRecommendations
+            serviceId={serviceId!}
+            limit={4}
+          />
         </main>
       </div>
     </SidebarProvider>

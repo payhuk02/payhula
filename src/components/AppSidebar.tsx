@@ -240,7 +240,11 @@ const menuSections = [
       {
         title: "Calendrier Avancé",
         url: "/dashboard/advanced-calendar",
-        icon: GanttChart,
+      },
+      {
+        title: "Gestion des Services",
+        url: "/dashboard/service-management",
+        icon: Calendar,
       },
       {
         title: "Réservations Récurrentes",
@@ -572,7 +576,11 @@ const adminMenuSections = [
       {
         title: "Calendrier Avancé",
         url: "/dashboard/advanced-calendar",
-        icon: GanttChart,
+      },
+      {
+        title: "Gestion des Services",
+        url: "/dashboard/service-management",
+        icon: Calendar,
       },
       {
         title: "Réservations Récurrentes",

@@ -203,6 +203,7 @@ const PhysicalBackorders = lazy(() => import("./pages/admin/PhysicalBackorders")
 const PhysicalBundles = lazy(() => import("./pages/admin/PhysicalBundles"));
 const PhysicalMultiCurrency = lazy(() => import("./pages/admin/PhysicalMultiCurrency"));
 const AdvancedCalendarPage = lazy(() => import("./pages/service/AdvancedCalendarPage"));
+const ServiceManagementPage = lazy(() => import("./pages/service/ServiceManagementPage"));
 const RecurringBookingsPage = lazy(() => import("./pages/service/RecurringBookingsPage"));
 
 // Pages Affiliation - Lazy loading
@@ -428,6 +429,7 @@ const AppContent = () => {
           <Route path="/dashboard/bookings" element={<ProtectedRoute><BookingsManagement /></ProtectedRoute>} />
           <Route path="/dashboard/advanced-calendar" element={<ProtectedRoute><AdvancedCalendarPage /></ProtectedRoute>} />
           <Route path="/dashboard/recurring-bookings" element={<ProtectedRoute><RecurringBookingsPage /></ProtectedRoute>} />
+          <Route path="/dashboard/service-management" element={<ProtectedRoute><ServiceManagementPage /></ProtectedRoute>} />
 
           {/* --- Routes Product Details (Physical, Services) --- */}
           <Route path="/physical/:productId" element={<PhysicalProductDetail />} />

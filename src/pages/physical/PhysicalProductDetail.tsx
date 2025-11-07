@@ -49,6 +49,10 @@ import { logger } from '@/lib/logger';
 import { useAnalyticsTracking } from '@/hooks/useProductAnalytics';
 import { SEOMeta, ProductSchema } from '@/components/seo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  PhysicalProductRecommendations,
+  BoughtTogetherPhysicalRecommendations,
+} from '@/components/physical/PhysicalProductRecommendations';
 
 export default function PhysicalProductDetail() {
   const { productId } = useParams<{ productId: string }>();
@@ -742,8 +746,22 @@ export default function PhysicalProductDetail() {
             </TabsContent>
           </Tabs>
 
-          {/* Recommendations Section - TODO: Create PhysicalProductRecommendations component */}
+          {/* Recommendations Section */}
           <Separator className="my-12" />
+          
+          <PhysicalProductRecommendations
+            productId={productId!}
+            category={product?.category}
+            tags={product?.tags}
+            limit={6}
+            variant="grid"
+            title="Produits similaires"
+          />
+          
+          <BoughtTogetherPhysicalRecommendations
+            productId={productId!}
+            limit={4}
+          />
           
           {/* Reviews Summary (outside tabs for visibility) */}
           <ProductReviewsSummary productId={productId!} productType="physical" />
