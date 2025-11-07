@@ -176,15 +176,15 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
   );
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300 hover:-translate-y-2 rounded-lg">
-      {/* Image avec overlay et badges */}
-      <div className="product-image-container relative overflow-hidden">
+    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
+      {/* Image avec overlay et badges - 60% de la hauteur de la carte */}
+      <div className="product-image-container relative overflow-hidden flex-[0.6] min-h-[300px] md:min-h-[360px] lg:min-h-[420px]">
         <OptimizedImage
           src={product.image_url || '/placeholder-image.png'}
           alt={product.name}
           width={1280}
           height={720}
-          className="product-image w-full h-[36rem] md:h-[48rem] lg:h-[56rem] object-cover rounded-t-lg"
+          className="product-image w-full h-full object-cover rounded-t-lg"
           priority={false}
         />
         <div className="product-image-overlay" aria-hidden="true"></div>
@@ -252,8 +252,8 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
         </button>
       </div>
 
-      {/* Contenu de la carte */}
-      <CardContent className="p-5">
+      {/* Contenu de la carte - 40% de la hauteur de la carte */}
+      <CardContent className="p-5 flex-[0.4] flex flex-col">
         {/* Titre du produit */}
         <Link to={`/stores/${storeSlug}/products/${product.slug}`}>
           <h3 className="font-semibold text-lg text-gray-900 mb-3 line-clamp-2 leading-tight hover:text-blue-600 transition-colors">

@@ -106,10 +106,10 @@ const ProductCardDashboard = ({
   };
 
   return (
-    <Card className={`group shadow-sm hover:shadow-md transition-all duration-300 border-border/50 hover:border-primary/30 bg-card/50 backdrop-blur-sm ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}>
-      <CardHeader className="p-0 relative overflow-hidden rounded-t-lg">
+    <Card className={`group shadow-sm hover:shadow-md transition-all duration-300 border-border/50 hover:border-primary/30 bg-card/50 backdrop-blur-sm flex flex-col min-h-[400px] md:min-h-[500px] lg:min-h-[600px] ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}>
+      <CardHeader className="p-0 relative overflow-hidden rounded-t-lg flex-[0.6] min-h-[240px] md:min-h-[300px] lg:min-h-[360px]">
         {product.image_url && !imageError ? (
-          <div className="aspect-square rounded-t-lg overflow-hidden bg-muted relative">
+          <div className="h-full w-full rounded-t-lg overflow-hidden bg-muted relative">
             <img
               src={product.image_url}
               alt={product.name}
@@ -152,7 +152,7 @@ const ProductCardDashboard = ({
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         ) : (
-          <div className="aspect-square rounded-t-lg bg-gradient-to-br from-muted via-muted/80 to-muted/50 flex items-center justify-center relative">
+          <div className="h-full w-full rounded-t-lg bg-gradient-to-br from-muted via-muted/80 to-muted/50 flex items-center justify-center relative">
             <div className="text-center">
               <Package className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-2 group-hover:scale-110 transition-transform duration-200" />
               <span className="text-muted-foreground text-xs sm:text-sm">Pas d'image</span>
@@ -193,7 +193,7 @@ const ProductCardDashboard = ({
         )}
       </CardHeader>
       
-      <CardContent className="p-2.5 sm:p-3 lg:p-4 space-y-2 sm:space-y-2.5 lg:space-y-3">
+      <CardContent className="p-2.5 sm:p-3 lg:p-4 space-y-2 sm:space-y-2.5 lg:space-y-3 flex-[0.4] flex flex-col">
         <div className="space-y-1.5 sm:space-y-2">
           <CardTitle className="line-clamp-2 text-sm sm:text-base lg:text-lg leading-tight group-hover:text-primary transition-colors duration-200 font-semibold">
             {product.name}

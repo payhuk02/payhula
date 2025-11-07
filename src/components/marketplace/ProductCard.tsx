@@ -95,17 +95,17 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
 
   return (
     <article 
-      className="group relative flex flex-col rounded-2xl border border-border bg-card overflow-hidden transition-all duration-300 hover:-translate-y-1 product-card product-card-mobile sm:product-card-tablet lg:product-card-desktop"
+      className="group relative flex flex-col rounded-2xl border border-border bg-card overflow-hidden transition-all duration-300 hover:-translate-y-1 product-card product-card-mobile sm:product-card-tablet lg:product-card-desktop min-h-[500px] md:min-h-[600px] lg:min-h-[700px]"
       role="article"
       aria-labelledby={`product-title-${product.id}`}
       aria-describedby={`product-description-${product.id}`}
     >
-      {/* Bannière produit avec ratio 16:9 */}
-      <div className="product-card-container">
+      {/* Bannière produit - 60% de la hauteur de la carte */}
+      <div className="product-card-container flex-[0.6] min-h-[300px] md:min-h-[360px] lg:min-h-[420px] relative overflow-hidden">
         <ProductBanner
           src={product.image_url}
           alt={`Image du produit ${product.name}`}
-          className="w-full product-banner"
+          className="w-full h-full product-banner object-cover"
           fallbackIcon={<ShoppingCart className="h-16 w-16 opacity-20" />}
           badges={
             <div className="flex flex-col gap-1">
@@ -135,7 +135,7 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
         />
       </div>
 
-      <div className="product-card-content">
+      <div className="product-card-content flex-[0.4] flex flex-col">
         <div className="flex-1">
           {product.category && (
             <span className="text-xs font-medium text-primary uppercase tracking-wide mb-2 block" aria-label={`Catégorie: ${product.category}`}>
