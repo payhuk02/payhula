@@ -63,8 +63,14 @@ export default function ServiceDetail() {
   const { toast } = useToast();
   const { user } = useAuth();
   const createServiceOrder = useCreateServiceOrder();
+  // Type pour le créneau horaire sélectionné
+  interface TimeSlot {
+    time: string;
+    availableSpots?: number;
+  }
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<any>(null);
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [participants, setParticipants] = useState(1);
   const [isBooking, setIsBooking] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);

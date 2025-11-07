@@ -53,6 +53,7 @@ import {
   PhysicalProductRecommendations,
   BoughtTogetherPhysicalRecommendations,
 } from '@/components/physical/PhysicalProductRecommendations';
+import type { PhysicalProductVariant } from '@/types/physical-product';
 
 export default function PhysicalProductDetail() {
   const { productId } = useParams<{ productId: string }>();
@@ -60,7 +61,7 @@ export default function PhysicalProductDetail() {
   const { toast } = useToast();
   const { user } = useAuth();
   const { addItem } = useCart();
-  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [selectedVariant, setSelectedVariant] = useState<PhysicalProductVariant | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);

@@ -52,10 +52,10 @@ interface StoreIntegration {
   store_id: string;
   integration_type: string;
   display_name: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   is_active: boolean;
   is_enabled: boolean;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
