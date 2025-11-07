@@ -40,10 +40,11 @@ export default tseslint.config(
           "caughtErrorsIgnorePattern": "^_"
         }
       ],
-      // Bloquer console.* pour forcer l'utilisation du logger
+      // Avertir sur console.* mais ne pas bloquer (console-guard redirige vers logger)
       // IMPORTANT: Utilisez logger.* de @/lib/logger au lieu de console.*
       // Le logger envoie automatiquement les erreurs à Sentry en production
-      "no-console": "error", // Aucun console.* autorisé - utilisez logger.*
+      // Note: console-guard.ts redirige tous les appels console.* vers logger en runtime
+      "no-console": "warn", // Avertir mais ne pas bloquer (console-guard gère la redirection)
     },
   },
   // Exception pour console-guard.ts qui DOIT utiliser console.* pour les remplacer
