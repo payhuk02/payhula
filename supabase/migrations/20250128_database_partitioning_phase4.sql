@@ -59,13 +59,14 @@ BEGIN
       month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
       partition_name := 'orders_' || TO_CHAR(month_date, 'YYYY_MM');
       
+      -- Utiliser le format correct pour les partitions PostgreSQL
       EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I PARTITION OF orders_partitioned
-        FOR VALUES FROM %L TO %L
+        FOR VALUES FROM (%L::TIMESTAMPTZ) TO ((%L)::TIMESTAMPTZ)
       ', 
         partition_name,
-        month_date::TIMESTAMPTZ,
-        (month_date + INTERVAL '1 month')::TIMESTAMPTZ
+        month_date::TEXT,
+        (month_date + INTERVAL '1 month')::TEXT
       );
     END LOOP;
     
@@ -141,13 +142,14 @@ BEGIN
       month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
       partition_name := 'digital_downloads_' || TO_CHAR(month_date, 'YYYY_MM');
       
+      -- Utiliser le format correct pour les partitions PostgreSQL
       EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I PARTITION OF digital_product_downloads_partitioned
-        FOR VALUES FROM %L TO %L
+        FOR VALUES FROM (%L::TIMESTAMPTZ) TO ((%L)::TIMESTAMPTZ)
       ', 
         partition_name,
-        month_date::TIMESTAMPTZ,
-        (month_date + INTERVAL '1 month')::TIMESTAMPTZ
+        month_date::TEXT,
+        (month_date + INTERVAL '1 month')::TEXT
       );
     END LOOP;
     
@@ -198,13 +200,14 @@ BEGIN
       month_date := DATE_TRUNC('month', CURRENT_DATE) - (i || ' months')::INTERVAL;
       partition_name := 'transaction_logs_' || TO_CHAR(month_date, 'YYYY_MM');
       
+      -- Utiliser le format correct pour les partitions PostgreSQL
       EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I PARTITION OF transaction_logs_partitioned
-        FOR VALUES FROM %L TO %L
+        FOR VALUES FROM (%L::TIMESTAMPTZ) TO ((%L)::TIMESTAMPTZ)
       ', 
         partition_name,
-        month_date::TIMESTAMPTZ,
-        (month_date + INTERVAL '1 month')::TIMESTAMPTZ
+        month_date::TEXT,
+        (month_date + INTERVAL '1 month')::TEXT
       );
     END LOOP;
     
@@ -271,8 +274,8 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = partition_name) THEN
       EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I PARTITION OF orders_partitioned
-        FOR VALUES FROM %L TO %L
-      ', partition_name, month_date, month_date + INTERVAL '1 month');
+        FOR VALUES FROM (%L::TIMESTAMPTZ) TO ((%L)::TIMESTAMPTZ)
+      ', partition_name, month_date::TEXT, (month_date + INTERVAL '1 month')::TEXT);
     END IF;
   END IF;
   
@@ -282,8 +285,8 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = partition_name) THEN
       EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I PARTITION OF digital_product_downloads_partitioned
-        FOR VALUES FROM %L TO %L
-      ', partition_name, month_date, month_date + INTERVAL '1 month');
+        FOR VALUES FROM (%L::TIMESTAMPTZ) TO ((%L)::TIMESTAMPTZ)
+      ', partition_name, month_date::TEXT, (month_date + INTERVAL '1 month')::TEXT);
     END IF;
   END IF;
   
@@ -293,8 +296,8 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = partition_name) THEN
       EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I PARTITION OF transaction_logs_partitioned
-        FOR VALUES FROM %L TO %L
-      ', partition_name, month_date, month_date + INTERVAL '1 month');
+        FOR VALUES FROM (%L::TIMESTAMPTZ) TO ((%L)::TIMESTAMPTZ)
+      ', partition_name, month_date::TEXT, (month_date + INTERVAL '1 month')::TEXT);
     END IF;
   END IF;
 END;
