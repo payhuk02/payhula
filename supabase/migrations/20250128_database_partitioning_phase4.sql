@@ -220,36 +220,37 @@ END $$;
 -- 5. INDEXES pour les partitions
 -- =====================================================
 -- Créer des index sur les colonnes fréquemment utilisées dans les partitions
+-- Les index sont créés de manière conditionnelle pour éviter les erreurs si les tables n'existent pas
 
--- Index sur orders_partitioned
-CREATE INDEX IF NOT EXISTS idx_orders_partitioned_customer_id 
-ON orders_partitioned(customer_id);
+-- Index sur orders_partitioned (seulement si la table existe)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'orders_partitioned') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_orders_partitioned_customer_id ON orders_partitioned(customer_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_orders_partitioned_store_id ON orders_partitioned(store_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_orders_partitioned_status ON orders_partitioned(status)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_orders_partitioned_payment_status ON orders_partitioned(payment_status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_orders_partitioned_store_id 
-ON orders_partitioned(store_id);
+-- Index sur digital_product_downloads_partitioned (seulement si la table existe)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'digital_product_downloads_partitioned') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_downloads_partitioned_user_id ON digital_product_downloads_partitioned(user_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_downloads_partitioned_product_id ON digital_product_downloads_partitioned(digital_product_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_downloads_partitioned_success ON digital_product_downloads_partitioned(download_success)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_orders_partitioned_status 
-ON orders_partitioned(status);
-
-CREATE INDEX IF NOT EXISTS idx_orders_partitioned_payment_status 
-ON orders_partitioned(payment_status);
-
--- Index sur digital_product_downloads_partitioned
-CREATE INDEX IF NOT EXISTS idx_digital_downloads_partitioned_user_id 
-ON digital_product_downloads_partitioned(user_id);
-
-CREATE INDEX IF NOT EXISTS idx_digital_downloads_partitioned_product_id 
-ON digital_product_downloads_partitioned(digital_product_id);
-
-CREATE INDEX IF NOT EXISTS idx_digital_downloads_partitioned_success 
-ON digital_product_downloads_partitioned(download_success);
-
--- Index sur transaction_logs_partitioned
-CREATE INDEX IF NOT EXISTS idx_transaction_logs_partitioned_transaction_id 
-ON transaction_logs_partitioned(transaction_id);
-
-CREATE INDEX IF NOT EXISTS idx_transaction_logs_partitioned_status 
-ON transaction_logs_partitioned(status);
+-- Index sur transaction_logs_partitioned (seulement si la table existe)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'transaction_logs_partitioned') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_transaction_logs_partitioned_transaction_id ON transaction_logs_partitioned(transaction_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_transaction_logs_partitioned_status ON transaction_logs_partitioned(status)';
+  END IF;
+END $$;
 
 -- =====================================================
 -- 6. FUNCTION pour créer automatiquement les partitions futures
