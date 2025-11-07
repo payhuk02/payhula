@@ -1,7 +1,4 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
   "rewrites": [
     {
       "source": "/(.*)",
@@ -45,7 +42,5 @@
         }
       ]
     }
-  ],
-  "regions": ["iad1", "sfo1", "fra1"],
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD supabase/"
+  ]
 }
