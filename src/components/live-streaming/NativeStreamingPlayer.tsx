@@ -23,6 +23,26 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Type pour HLS.js (bibliothèque externe)
+interface HlsInstance {
+  loadSource: (url: string) => void;
+  attachMedia: (media: HTMLVideoElement) => void;
+  on: (event: string, callback: () => void) => void;
+  destroy: () => void;
+}
+
+interface HlsConstructor {
+  new (): HlsInstance;
+  Events: {
+    MANIFEST_PARSED: string;
+    ERROR: string;
+  };
+}
+
+interface WindowWithHls extends Window {
+  Hls?: HlsConstructor;
+}
+
 interface NativeStreamingPlayerProps {
   streamingUrl?: string;
   streamingProvider?: 'webrtc' | 'hls' | 'rtmp' | 'mux' | 'agora' | 'custom';
@@ -67,11 +87,13 @@ export const NativeStreamingPlayer = ({
     // Configurer la source vidéo selon le provider
     if (streamingProvider === 'hls' && streamingHlsUrl) {
       // Utiliser HLS.js pour HLS
-      if (typeof window !== 'undefined' && (window as any).Hls) {
-        const hls = new (window as any).Hls();
+      const windowWithHls = window as WindowWithHls;
+      if (typeof window !== 'undefined' && windowWithHls.Hls) {
+        const Hls = windowWithHls.Hls;
+        const hls = new Hls();
         hls.loadSource(streamingHlsUrl);
         hls.attachMedia(video);
-        hls.on((window as any).Hls.Events.MANIFEST_PARSED, () => {
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
           video.play();
         });
       } else {

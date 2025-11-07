@@ -26,6 +26,28 @@ import { PhysicalProductCard } from './PhysicalProductCard';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
+// Type pour les produits recommandés
+interface RecommendedProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  price: number;
+  currency: string;
+  image_url?: string | null;
+  category?: string | null;
+  tags?: string[] | null;
+  sales_count?: number | null;
+  average_rating?: number | null;
+  stores?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  physical_products?: unknown;
+  recommendationScore?: number;
+}
+
 interface RecommendationsProps {
   productId: string;
   category?: string;
@@ -52,7 +74,7 @@ const useProductRecommendations = (
         const { data: { user } } = await supabase.auth.getUser();
 
         // 1. Recommandations basées sur la catégorie
-        let categoryRecommendations: any[] = [];
+        let categoryRecommendations: RecommendedProduct[] = [];
         if (category) {
           const { data: categoryProducts } = await supabase
             .from('products')
@@ -79,7 +101,7 @@ const useProductRecommendations = (
         }
 
         // 2. Recommandations basées sur les tags
-        let tagRecommendations: any[] = [];
+        let tagRecommendations: RecommendedProduct[] = [];
         if (tags && tags.length > 0) {
           // Rechercher produits avec tags similaires
           const { data: tagProducts } = await supabase
@@ -114,7 +136,7 @@ const useProductRecommendations = (
         }
 
         // 3. Recommandations basées sur les achats précédents (si utilisateur connecté)
-        let purchaseBasedRecommendations: any[] = [];
+        let purchaseBasedRecommendations: RecommendedProduct[] = [];
         if (user) {
           // Récupérer les produits achetés par l'utilisateur
           const { data: purchasedProducts } = await supabase
@@ -236,8 +258,9 @@ const useProductRecommendations = (
         return scored
           .sort((a, b) => b.recommendationScore - a.recommendationScore)
           .slice(0, limit);
-      } catch (error: any) {
-        logger.error('Error fetching physical product recommendations', { error });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+        logger.error('Error fetching physical product recommendations', { error: errorMessage });
         return [];
       }
     },

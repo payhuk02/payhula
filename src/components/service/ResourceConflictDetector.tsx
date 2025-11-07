@@ -67,7 +67,7 @@ interface ResourceConflict {
     new_time?: string;
     new_date?: string;
   }>;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 interface Booking {
@@ -213,10 +213,11 @@ export const ResourceConflictDetector = ({
         description: 'Le conflit a été marqué comme résolu',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       toast({
         title: '❌ Erreur',
-        description: error.message || 'Impossible de résoudre le conflit',
+        description: errorMessage || 'Impossible de résoudre le conflit',
         variant: 'destructive',
       });
     },
@@ -245,10 +246,11 @@ export const ResourceConflictDetector = ({
         description: 'Le conflit a été ignoré',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       toast({
         title: '❌ Erreur',
-        description: error.message || 'Impossible d\'ignorer le conflit',
+        description: errorMessage || 'Impossible d\'ignorer le conflit',
         variant: 'destructive',
       });
     },

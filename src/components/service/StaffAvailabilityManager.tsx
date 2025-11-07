@@ -83,6 +83,13 @@ interface CustomHours {
   is_active: boolean;
 }
 
+interface SuggestedAction {
+  action: string;
+  description?: string;
+  priority?: 'low' | 'medium' | 'high';
+  estimated_impact?: string;
+}
+
 interface WorkloadAlert {
   id: string;
   staff_member_id: string;
@@ -94,7 +101,7 @@ interface WorkloadAlert {
   booking_density_percentage: number;
   alert_level: 'info' | 'warning' | 'critical';
   is_resolved: boolean;
-  suggested_actions?: any[];
+  suggested_actions?: SuggestedAction[];
 }
 
 export const StaffAvailabilityManager = ({

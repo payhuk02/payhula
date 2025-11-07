@@ -94,7 +94,14 @@ export const MyOrders = () => {
     }
   };
 
-  const getShipmentStatus = (shipments: any[]) => {
+  interface Shipment {
+    status: string;
+    tracking_number?: string;
+    carrier?: string;
+    estimated_delivery?: string;
+  }
+
+  const getShipmentStatus = (shipments: Shipment[] | null | undefined) => {
     if (!shipments || shipments.length === 0) {
       return { text: 'Non expédié', icon: Package, variant: 'secondary' as const };
     }
