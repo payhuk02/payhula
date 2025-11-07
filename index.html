@@ -56,9 +56,23 @@
     
     <!-- Note: Preload de main.tsx retiré car Vite le gère automatiquement -->
     
-    <!-- ✅ React via CDN - Chargé en premier pour garantir l'ordre -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- ✅ React via CDN - Chargé en premier pour garantir l'ordre (production uniquement) -->
+    <!-- En développement, React est bundlé par Vite -->
+    <script>
+      // Charger React via CDN seulement en production (pas sur localhost)
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const reactScript = document.createElement('script');
+        reactScript.crossOrigin = 'anonymous';
+        reactScript.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
+        reactScript.onload = () => {
+          const reactDomScript = document.createElement('script');
+          reactDomScript.crossOrigin = 'anonymous';
+          reactDomScript.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
+          document.head.appendChild(reactDomScript);
+        };
+        document.head.appendChild(reactScript);
+      }
+    </script>
 
     <!-- ✅ Open Graph (Facebook, WhatsApp, LinkedIn...) -->
     <meta property="og:type" content="website" />
