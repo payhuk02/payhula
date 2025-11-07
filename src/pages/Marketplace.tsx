@@ -697,6 +697,13 @@ const Marketplace = () => {
             </p>
           </div>
 
+          {/* Barre de navigation par catégories */}
+          <CategoryNavigationBar
+            categories={categories}
+            selectedCategory={filters.category}
+            onCategoryChange={(category) => updateFilter({ category })}
+          />
+
           {/* Barre de recherche */}
           <div className="max-w-4xl mx-auto">
             <div className="relative mb-6">
