@@ -262,9 +262,10 @@ const Dashboard = () => {
                     </Badge>
                   </CardContent>
                 </Card>
-                </div>
+              </div>
+              )}
 
-                {/* Quick Actions - Responsive et Professionnel */}
+              {/* Quick Actions - Responsive et Professionnel */}
               <Card ref={actionsRef} className="shadow-soft hover:shadow-lg transition-all duration-300" role="region" aria-labelledby="quick-actions-title">
                 <CardHeader className="pb-3 p-4 sm:p-6">
                   <CardTitle id="quick-actions-title" className="flex items-center gap-2 text-base sm:text-lg">
@@ -485,7 +486,6 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-              )}
             </div>
           </main>
         </div>

@@ -120,7 +120,25 @@ const ErrorFallbackComponent = () => {
 // Pages principales - Lazy loading
 const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Dashboard = lazy(() => 
+  import("./pages/Dashboard").catch((error) => {
+    logger.error('Erreur lors du chargement du Dashboard:', error);
+    // Retourner un composant de fallback en cas d'erreur
+    return {
+      default: () => (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center space-y-4">
+            <h2 className="text-xl font-semibold">Erreur de chargement</h2>
+            <p className="text-muted-foreground">Impossible de charger le tableau de bord</p>
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-primary text-white rounded">
+              Recharger
+            </button>
+          </div>
+        </div>
+      )
+    };
+  })
+);
 const Products = lazy(() => import("./pages/Products"));
 const Store = lazy(() => import("./pages/Store"));
 const Orders = lazy(() => import("./pages/Orders"));
