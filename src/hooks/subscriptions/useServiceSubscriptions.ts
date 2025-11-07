@@ -42,7 +42,7 @@ export interface ServiceSubscription {
   total_payments: number;
   total_amount_paid: number;
   failed_payment_attempts: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }

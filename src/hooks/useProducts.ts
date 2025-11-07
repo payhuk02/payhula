@@ -55,10 +55,11 @@ export const useProducts = (storeId?: string | null) => {
         if (error) throw error;
         
         setProducts(data || []);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la récupération des produits';
         toast({
           title: "Erreur",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
       } finally {
@@ -89,10 +90,11 @@ export const useProducts = (storeId?: string | null) => {
       if (error) throw error;
       
       setProducts(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la récupération des produits';
       toast({
         title: "Erreur",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

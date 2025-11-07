@@ -91,18 +91,20 @@ export const useOrders = (storeId?: string, options: UseOrdersOptions = {}) => {
       setOrders(data || []);
       setTotalCount(count || 0);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error('Erreur inconnue');
+      const errorCode = err && typeof err === 'object' && 'code' in err ? String(err.code) : undefined;
       logger.error('Erreur lors de la récupération des commandes', {
-        error: err.message,
-        code: err.code,
-        filters: { storeId, status, paymentStatus },
+        error: error.message,
+        code: errorCode,
+        filters: { storeId },
       });
-      setError(err);
+      setError(error);
       // Afficher un toast uniquement pour les erreurs critiques
-      if (err.message && !err.message.includes('does not exist')) {
+      if (error.message && !error.message.includes('does not exist')) {
         toast({
           title: "Erreur",
-          description: err.message || "Impossible de charger les commandes",
+          description: error.message || "Impossible de charger les commandes",
           variant: "destructive",
         });
       }

@@ -20,11 +20,11 @@ export interface AdvancedAnalyticsDashboard {
   user_id: string;
   name: string;
   description?: string;
-  layout: Record<string, any>;
+  layout: Record<string, unknown>;
   is_default: boolean;
   is_shared: boolean;
   shared_with_users?: string[];
-  widgets: Array<Record<string, any>>;
+  widgets: Array<Record<string, unknown>>;
   refresh_interval: number;
   auto_refresh: boolean;
   date_range_type: 'today' | 'yesterday' | 'last_7_days' | 'last_30_days' | 'last_90_days' | 'this_month' | 'last_month' | 'this_year' | 'custom';
