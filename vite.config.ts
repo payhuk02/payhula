@@ -273,7 +273,17 @@ export default defineConfig(({ mode }) => {
         // Cela garantit que le plugin ensureChunkOrderPlugin peut le trouver
         entryFileNames: (chunkInfo) => {
           // Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
-          if (chunkInfo.isEntry && chunkInfo.facadeModuleId?.includes('main.tsx')) {
+          // Vérifier plusieurs conditions pour identifier le chunk principal
+          const isMainEntry = 
+            chunkInfo.isEntry && (
+              chunkInfo.facadeModuleId?.includes('main.tsx') ||
+              chunkInfo.facadeModuleId?.includes('main.ts') ||
+              chunkInfo.name === 'main' ||
+              chunkInfo.name === 'index' ||
+              (chunkInfo.facadeModuleId && !chunkInfo.facadeModuleId.includes('node_modules'))
+            );
+          
+          if (isMainEntry) {
             return 'js/index-[hash].js';
           }
           // Les autres entry points gardent leur nom
