@@ -272,15 +272,23 @@ export default defineConfig(({ mode }) => {
         // CRITIQUE: Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
         // Cela garantit que le plugin ensureChunkOrderPlugin peut le trouver
         entryFileNames: (chunkInfo) => {
-          // Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
+          // CRITIQUE: Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
           // Vérifier plusieurs conditions pour identifier le chunk principal
+          // Le chunk principal est celui qui :
+          // 1. Est un entry point (isEntry === true)
+          // 2. N'est pas dans node_modules
+          // 3. Contient "main" dans son nom ou facadeModuleId
           const isMainEntry = 
             chunkInfo.isEntry && (
               chunkInfo.facadeModuleId?.includes('main.tsx') ||
               chunkInfo.facadeModuleId?.includes('main.ts') ||
+              chunkInfo.facadeModuleId?.includes('src/main') ||
+              chunkInfo.facadeModuleId?.includes('/main') ||
               chunkInfo.name === 'main' ||
               chunkInfo.name === 'index' ||
-              (chunkInfo.facadeModuleId && !chunkInfo.facadeModuleId.includes('node_modules'))
+              // Fallback: Si c'est un entry point et pas dans node_modules, c'est probablement le principal
+              (!chunkInfo.facadeModuleId?.includes('node_modules') && 
+               !chunkInfo.facadeModuleId?.includes('chunk'))
             );
           
           if (isMainEntry) {
