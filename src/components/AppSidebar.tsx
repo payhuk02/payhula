@@ -245,6 +245,7 @@ const menuSections = [
       {
         title: "Calendrier Avancé",
         url: "/dashboard/advanced-calendar",
+        icon: Calendar,
       },
       {
         title: "Gestion des Services",
@@ -586,6 +587,7 @@ const adminMenuSections = [
       {
         title: "Calendrier Avancé",
         url: "/dashboard/advanced-calendar",
+        icon: Calendar,
       },
       {
         title: "Gestion des Services",
@@ -819,26 +821,33 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        end={item.url === "/dashboard"}
-                        className={({ isActive }) =>
-                          `transition-all duration-300 ${
-                            isActive
-                              ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
-                              : "!text-black hover:bg-muted hover:translate-x-1"
-                          }`
-                        }
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {section.items.map((item) => {
+                  const IconComponent = item.icon;
+                  if (!IconComponent) {
+                    logger.warn('Menu item missing icon:', item.title);
+                    return null;
+                  }
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          end={item.url === "/dashboard"}
+                          className={({ isActive }) =>
+                            `transition-all duration-300 ${
+                              isActive
+                                ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
+                                : "!text-black hover:bg-muted hover:translate-x-1"
+                            }`
+                          }
+                        >
+                          <IconComponent className="h-4 w-4" />
+                          {!isCollapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -873,25 +882,32 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `transition-all duration-300 ${
-                            isActive
-                              ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
-                              : "!text-black hover:bg-muted hover:translate-x-1"
-                          }`
-                        }
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {section.items.map((item) => {
+                  const IconComponent = item.icon;
+                  if (!IconComponent) {
+                    logger.warn('Menu item missing icon:', item.title);
+                    return null;
+                  }
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={({ isActive }) =>
+                            `transition-all duration-300 ${
+                              isActive
+                                ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
+                                : "!text-black hover:bg-muted hover:translate-x-1"
+                            }`
+                          }
+                        >
+                          <IconComponent className="h-4 w-4" />
+                          {!isCollapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
