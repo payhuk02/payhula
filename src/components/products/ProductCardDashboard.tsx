@@ -106,7 +106,7 @@ const ProductCardDashboard = ({
   };
 
   return (
-    <Card className={`group shadow-sm hover:shadow-md transition-all duration-300 border-border/50 hover:border-primary/30 bg-card/50 backdrop-blur-sm flex flex-col min-h-[400px] md:min-h-[500px] lg:min-h-[600px] ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}>
+    <Card className={`group shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm flex flex-col min-h-[400px] md:min-h-[500px] lg:min-h-[600px] ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}>
       <CardHeader className="p-0 relative overflow-hidden rounded-t-lg flex-[0.6] min-h-[240px] md:min-h-[300px] lg:min-h-[360px]">
         {product.image_url && !imageError ? (
           <div className="h-full w-full rounded-t-lg overflow-hidden bg-muted relative">

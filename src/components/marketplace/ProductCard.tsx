@@ -95,7 +95,7 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
 
   return (
     <article 
-      className="group relative flex flex-col rounded-2xl border border-border bg-card overflow-hidden transition-all duration-300 hover:-translate-y-1 product-card product-card-mobile sm:product-card-tablet lg:product-card-desktop min-h-[500px] md:min-h-[600px] lg:min-h-[700px]"
+      className="group relative flex flex-col rounded-2xl bg-card overflow-hidden transition-all duration-300 hover:-translate-y-1 product-card product-card-mobile sm:product-card-tablet lg:product-card-desktop min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg"
       role="article"
       aria-labelledby={`product-title-${product.id}`}
       aria-describedby={`product-description-${product.id}`}
