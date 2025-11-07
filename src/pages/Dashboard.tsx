@@ -57,9 +57,10 @@ const Dashboard = () => {
       await refetch();
       setLastUpdated(new Date().toISOString());
       logger.info('Dashboard actualisé avec succès');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       logger.error('Erreur lors de l\'actualisation du dashboard:', err);
-      setError(err.message || 'Erreur lors du chargement des données');
+      setError(errorMessage || 'Erreur lors du chargement des données');
     }
   }, [refetch]);
 

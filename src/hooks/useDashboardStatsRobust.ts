@@ -286,9 +286,10 @@ export const useDashboardStats = () => {
 
       logger.info('Dashboard stats loaded successfully');
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       logger.error('Error fetching dashboard stats:', error);
-      setError(error.message || 'Erreur lors du chargement des données');
+      setError(errorMessage || 'Erreur lors du chargement des données');
       
       // Utiliser les données de fallback en cas d'erreur
       setStats(getFallbackStats());

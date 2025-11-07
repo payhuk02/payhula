@@ -7,7 +7,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
-import crypto from 'crypto';
 
 export interface WebhookPayload {
   event: string;
