@@ -309,14 +309,10 @@ export function CategoryNavigationBar({
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
-  // Filtrer les catégories disponibles basées sur les produits réels
+  // Afficher toutes les catégories (pas de filtrage basé sur les produits réels pour avoir toutes les options)
   const availableCategories = useMemo(() => {
-    const available = CATEGORY_CONFIG.filter(cat => {
-      if (cat.value === 'all' || cat.value === 'featured') return true;
-      return categories.includes(cat.value);
-    });
-    return available;
-  }, [categories]);
+    return CATEGORY_CONFIG;
+  }, []);
 
   // Gérer le scroll horizontal
   const handleScroll = () => {
@@ -349,15 +345,15 @@ export function CategoryNavigationBar({
 
   return (
     <div className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="relative max-w-7xl mx-auto">
+      <div className="relative w-full">
         {/* Flèche gauche */}
         {showLeftArrow && (
           <button
             onClick={scrollLeft}
-            className="absolute left-0 top-0 bottom-0 z-10 flex items-center justify-center w-12 bg-gradient-to-r from-white via-white to-transparent hover:from-gray-50 transition-all duration-200"
+            className="absolute left-0 top-0 bottom-0 z-20 flex items-center justify-center w-12 bg-gradient-to-r from-white via-white/95 to-transparent hover:from-gray-50 transition-all duration-200 shadow-sm"
             aria-label="Faire défiler vers la gauche"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-700 hover:text-gray-900" />
           </button>
         )}
 
@@ -365,17 +361,17 @@ export function CategoryNavigationBar({
         {showRightArrow && (
           <button
             onClick={scrollRight}
-            className="absolute right-0 top-0 bottom-0 z-10 flex items-center justify-center w-12 bg-gradient-to-l from-white via-white to-transparent hover:from-gray-50 transition-all duration-200"
+            className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center w-12 bg-gradient-to-l from-white via-white/95 to-transparent hover:from-gray-50 transition-all duration-200 shadow-sm"
             aria-label="Faire défiler vers la droite"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-5 h-5 text-gray-700 hover:text-gray-900" />
           </button>
         )}
 
-        <div className="px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="w-full overflow-hidden">
           <nav 
             ref={scrollContainerRef}
-            className="flex items-center gap-3 sm:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-3 sm:py-4 scroll-smooth"
+            className="flex items-center gap-4 sm:gap-5 lg:gap-6 overflow-x-auto scrollbar-hide py-4 px-4 sm:px-6 lg:px-8 scroll-smooth"
             role="tablist"
             aria-label="Catégories de services"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
