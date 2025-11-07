@@ -153,3 +153,4 @@ Si vous rencontrez des problèmes avec la configuration :
 **Version** : 1.0  
 **Statut** : ✅ Configuration validée
 
+

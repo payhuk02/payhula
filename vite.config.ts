@@ -17,9 +17,7 @@ export default defineConfig(({ mode }) => {
   },
   plugins: [
     react({
-      // Configuration SWC pour gérer les modules CommonJS
-      // Désactiver les plugins qui peuvent causer des problèmes CommonJS
-      jsxRuntime: 'automatic',
+      // Configuration React - jsxRuntime: 'automatic' est la valeur par défaut
     }),
     // Visualizer seulement en dev
     !isProduction && visualizer({
@@ -68,9 +66,18 @@ export default defineConfig(({ mode }) => {
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Vendors React core
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-            return 'vendor-react';
+          // Éviter les références circulaires en groupant plus intelligemment
+          // Vendors React core - séparer react et react-dom pour éviter les problèmes
+          if (id.includes('node_modules/react/') && !id.includes('react-dom')) {
+            return 'vendor-react-core';
+          }
+          
+          if (id.includes('node_modules/react-dom/')) {
+            return 'vendor-react-dom';
+          }
+          
+          if (id.includes('node_modules/react-router')) {
+            return 'vendor-react-router';
           }
           
           // State management
@@ -83,9 +90,13 @@ export default defineConfig(({ mode }) => {
             return 'vendor-supabase';
           }
           
-          // UI Libraries
-          if (id.includes('@radix-ui') || id.includes('lucide-react')) {
-            return 'vendor-ui';
+          // UI Libraries - regrouper Radix UI pour éviter les problèmes
+          if (id.includes('@radix-ui')) {
+            return 'vendor-radix-ui';
+          }
+          
+          if (id.includes('lucide-react')) {
+            return 'vendor-lucide';
           }
           
           // Forms
@@ -152,6 +163,11 @@ export default defineConfig(({ mode }) => {
           if (id.includes('/marketplace/')) {
             return 'chunk-marketplace';
           }
+          
+          // Autres vendors
+          if (id.includes('node_modules')) {
+            return 'vendor-misc';
+          }
         },
         // Optimisation des noms de chunks
         chunkFileNames: (chunkInfo) => {
@@ -184,11 +200,18 @@ export default defineConfig(({ mode }) => {
     // Optimisations supplémentaires
     cssCodeSplit: true, // Split CSS par chunk
     cssMinify: true, // Minifier le CSS
-    // Tree shaking agressif
+    // Tree shaking - moins agressif pour éviter les problèmes de référence circulaire
     treeshake: {
-      moduleSideEffects: false,
+      moduleSideEffects: 'no-external', // Préserver les side effects internes
       propertyReadSideEffects: false,
       tryCatchDeoptimization: false,
+      // Préserver l'ordre d'initialisation pour éviter "Cannot access before initialization"
+      preserveComments: false,
+    },
+    // CommonJS options pour éviter les problèmes de référence circulaire
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      strictRequires: false, // Désactiver pour éviter les problèmes d'ordre
     },
   },
   // Optimisation des dépendances (amélioré)
