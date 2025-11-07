@@ -481,3 +481,4 @@ export class AdvancedAnalytics {
 // Instance singleton
 export const advancedAnalytics = new AdvancedAnalytics();
 
+

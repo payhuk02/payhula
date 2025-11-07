@@ -189,3 +189,4 @@ COMMENT ON FUNCTION invalidate_cache IS
 -- Cette migration documente la configuration et crée les tables/fonctions
 -- nécessaires pour le monitoring multi-région
 
+

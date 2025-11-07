@@ -276,3 +276,4 @@ Supabase scale automatiquement :
 
 **Phase 4 : Scalabilité - ✅ COMPLÉTÉE**
 
+

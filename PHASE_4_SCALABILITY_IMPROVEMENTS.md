@@ -190,3 +190,4 @@ Amélioration du monitoring et de l'observabilité.
 **Note**: Les améliorations de scalabilité sont préparées pour la croissance future. 
 La migration de partitioning est prête mais nécessite une migration manuelle en production.
 
+

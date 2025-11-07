@@ -1,8 +1,9 @@
 /**
- * Physical Product Detail Page
- * Date: 28 octobre 2025
+ * Physical Product Detail Page - Professional
+ * Date: 29 janvier 2025
  * 
- * Page de détail pour produits physiques avec variants, stock, shipping
+ * Page complète de détail pour produits physiques avec variants, stock, shipping
+ * Améliorée avec SEO, analytics, recommandations, partage social et wishlist
  */
 
 import { useParams, useNavigate } from 'react-router-dom';
@@ -16,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
   ShoppingCart,
@@ -28,34 +30,56 @@ import {
   Check,
   X,
   Loader2,
+  AlertCircle,
+  CheckCircle2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { VariantSelector } from '@/components/physical/VariantSelector';
 import { InventoryStockIndicator } from '@/components/physical/InventoryStockIndicator';
 import { ShippingInfoDisplay } from '@/components/physical/ShippingInfoDisplay';
 import { SizeChartDisplay } from '@/components/physical/SizeChartDisplay';
 import { ProductReviewsSummary } from '@/components/reviews/ProductReviewsSummary';
+import { ReviewsList } from '@/components/reviews/ReviewsList';
+import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { ProductImages } from '@/components/shared';
 import { useCart } from '@/hooks/cart/useCart';
+import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
+import { useAnalyticsTracking } from '@/hooks/useProductAnalytics';
+import { SEOMeta, ProductSchema } from '@/components/seo';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function PhysicalProductDetail() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const { addItem } = useCart();
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isCheckingWishlist, setIsCheckingWishlist] = useState(false);
 
-  // Fetch product data
+  // Track analytics event
+  const { trackView } = useAnalyticsTracking();
+
+  // Fetch product data with store
   const { data: product, isLoading } = useQuery({
     queryKey: ['physical-product', productId],
     queryFn: async () => {
       const { data: productData, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          stores (
+            id,
+            name,
+            slug,
+            logo_url
+          )
+        `)
         .eq('id', productId)
         .single();
 
@@ -94,10 +118,179 @@ export default function PhysicalProductDetail() {
         variants: variants || [],
         inventory: inventory || [],
         size_chart_id: sizeChartMapping?.size_chart_id || null,
+        store: productData.stores,
       };
     },
     enabled: !!productId,
   });
+
+  // Check if product is in wishlist
+  useEffect(() => {
+    const checkWishlist = async () => {
+      if (!user?.id || !productId) return;
+      
+      setIsCheckingWishlist(true);
+      try {
+        const { data, error } = await supabase
+          .from('wishlist_items')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('product_id', productId)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+
+        setIsInWishlist(!!data);
+      } catch (error) {
+        logger.error('Erreur lors de la vérification de la wishlist', error);
+      } finally {
+        setIsCheckingWishlist(false);
+      }
+    };
+
+    checkWishlist();
+  }, [user?.id, productId]);
+
+  // Track product view on mount
+  useEffect(() => {
+    if (productId && product) {
+      trackView(productId, {
+        product_type: 'physical',
+        timestamp: new Date().toISOString(),
+      });
+
+      // Track with external pixels (Google Analytics, Facebook, TikTok)
+      if (typeof window !== 'undefined') {
+        // Google Analytics
+        if ((window as any).gtag) {
+          (window as any).gtag('event', 'view_item', {
+            items: [{
+              item_id: productId,
+              item_name: product?.name || 'Physical Product',
+              item_category: 'physical',
+              price: product?.price,
+              currency: product?.currency,
+            }]
+          });
+        }
+
+        // Facebook Pixel
+        if ((window as any).fbq) {
+          (window as any).fbq('track', 'ViewContent', {
+            content_type: 'product',
+            content_ids: [productId],
+            content_category: 'physical',
+            value: product?.price,
+            currency: product?.currency,
+          });
+        }
+
+        // TikTok Pixel
+        if ((window as any).ttq) {
+          (window as any).ttq.track('ViewContent', {
+            content_type: 'product',
+            content_id: productId,
+            value: product?.price,
+            currency: product?.currency,
+          });
+        }
+      }
+    }
+  }, [productId, trackView, product]);
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = async () => {
+    if (!user?.id) {
+      toast({
+        title: 'Authentification requise',
+        description: 'Veuillez vous connecter pour ajouter à la wishlist',
+        variant: 'destructive',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        // Remove from wishlist
+        const { error } = await supabase
+          .from('wishlist_items')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_id', productId);
+
+        if (error) throw error;
+
+        setIsInWishlist(false);
+        toast({
+          title: 'Retiré de la wishlist',
+          description: 'Le produit a été retiré de votre liste de souhaits',
+        });
+      } else {
+        // Add to wishlist
+        const { error } = await supabase
+          .from('wishlist_items')
+          .insert({
+            user_id: user.id,
+            product_id: productId,
+            product_type: 'physical',
+          });
+
+        if (error) throw error;
+
+        setIsInWishlist(true);
+        toast({
+          title: 'Ajouté à la wishlist',
+          description: 'Le produit a été ajouté à votre liste de souhaits',
+        });
+      }
+    } catch (error: any) {
+      logger.error('Erreur lors de la gestion de la wishlist', error);
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de modifier la wishlist',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Handle social share
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = product?.name || 'Produit';
+    const text = product?.short_description || '';
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url,
+        });
+      } catch (error) {
+        // User cancelled or error occurred
+        logger.info('Partage annulé ou erreur', error);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({
+          title: 'Lien copié',
+          description: 'Le lien a été copié dans le presse-papiers',
+        });
+      } catch (error) {
+        logger.error('Erreur lors de la copie', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de copier le lien',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
 
   const handleAddToCart = async () => {
     if (!product) {
@@ -169,29 +362,97 @@ export default function PhysicalProductDetail() {
     }
   };
 
-  const images = product?.images || [product?.image_url] || [];
-  const stockQuantity = selectedVariant
-    ? product?.inventory?.find((inv: any) => inv.variant_id === selectedVariant.id)?.quantity || 0
-    : product?.physical?.total_stock || 0;
-
   if (isLoading) {
     return (
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <main className="flex-1 p-8">
-            <Skeleton className="h-96 w-full" />
+            <div className="space-y-8">
+              <Skeleton className="h-10 w-32" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-96 w-full" />
+              </div>
+            </div>
           </main>
         </div>
       </SidebarProvider>
     );
   }
 
+  if (!product) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <main className="flex-1 p-8">
+            <Card className="border-destructive">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-5 w-5" />
+                  <p>Produit non trouvé</p>
+                </div>
+              </CardContent>
+            </Card>
+          </main>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  const images = product?.images || [product?.image_url] || [];
+  const stockQuantity = selectedVariant
+    ? product?.inventory?.find((inv: any) => inv.variant_id === selectedVariant.id)?.quantity || 0
+    : product?.physical?.total_stock || 0;
+  const availability = stockQuantity > 0 ? 'instock' : 'outofstock';
+  const currentPrice = product?.promotional_price || product?.price;
+  const productUrl = `${window.location.origin}/physical/${productId}`;
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <main className="flex-1 p-8">
+          {/* SEO Meta Tags */}
+          <SEOMeta
+            title={product.name}
+            description={product.short_description || product.description || `${product.name} - Disponible sur Payhuk`}
+            keywords={product.category}
+            url={productUrl}
+            image={images[0]}
+            imageAlt={product.name}
+            type="product"
+            price={currentPrice}
+            currency={product.currency}
+            availability={availability}
+          />
+
+          {/* Product Schema.org */}
+          {product.store && (
+            <ProductSchema
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                description: product.description || product.short_description || '',
+                price: currentPrice,
+                currency: product.currency,
+                image_url: images[0],
+                images: images.map((url: string) => ({ url })),
+                category: product.category,
+                is_active: product.is_active,
+                created_at: product.created_at,
+              }}
+              store={{
+                name: product.store.name,
+                slug: product.store.slug,
+                logo_url: product.store.logo_url,
+              }}
+              url={productUrl}
+            />
+          )}
+
           {/* Back Button */}
           <Button
             variant="ghost"
@@ -304,11 +565,24 @@ export default function PhysicalProductDetail() {
                 </Button>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" className="w-full">
-                    <Heart className="h-4 w-4 mr-2" />
-                    Favori
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleWishlistToggle}
+                    disabled={isCheckingWishlist}
+                  >
+                    {isCheckingWishlist ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Heart className={`h-4 w-4 mr-2 ${isInWishlist ? 'fill-red-500 text-red-500' : ''}`} />
+                    )}
+                    {isInWishlist ? 'Retiré' : 'Favori'}
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleShare}
+                  >
                     <Share2 className="h-4 w-4 mr-2" />
                     Partager
                   </Button>
@@ -356,33 +630,123 @@ export default function PhysicalProductDetail() {
             </div>
           </div>
 
-          {/* Description */}
-          {product?.description && (
-            <Card className="mb-12">
-              <CardHeader>
-                <CardTitle>Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div
-                  className="prose dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(product.description, 'productDescription') }}
-                />
-              </CardContent>
-            </Card>
-          )}
+          {/* Content Tabs */}
+          <Tabs defaultValue="description" className="mt-12 space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="description">Description</TabsTrigger>
+              <TabsTrigger value="specifications">Spécifications</TabsTrigger>
+              <TabsTrigger value="reviews">Avis</TabsTrigger>
+            </TabsList>
 
+            {/* Description Tab */}
+            <TabsContent value="description" className="space-y-6">
+              {product?.description && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>À propos de ce produit</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div
+                      className="prose dark:prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(product.description, 'productDescription') }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Size Chart */}
+              {product?.size_chart_id && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Guide des tailles</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <SizeChartDisplay sizeChartId={product.size_chart_id} />
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* Specifications Tab */}
+            <TabsContent value="specifications" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Spécifications</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {product?.physical && (
+                    <>
+                      {product.physical.weight_kg && (
+                        <div className="flex justify-between py-2 border-b">
+                          <span className="text-muted-foreground">Poids</span>
+                          <span className="font-medium">
+                            {product.physical.weight_kg} kg
+                          </span>
+                        </div>
+                      )}
+                      {product.physical.length_cm && product.physical.width_cm && product.physical.height_cm && (
+                        <div className="flex justify-between py-2 border-b">
+                          <span className="text-muted-foreground">Dimensions</span>
+                          <span className="font-medium">
+                            {product.physical.length_cm} x {product.physical.width_cm} x {product.physical.height_cm} cm
+                          </span>
+                        </div>
+                      )}
+                      {product.physical.sku && (
+                        <div className="flex justify-between py-2 border-b">
+                          <span className="text-muted-foreground">SKU</span>
+                          <span className="font-medium">{product.physical.sku}</span>
+                        </div>
+                      )}
+                      {product.physical.manufacturer && (
+                        <div className="flex justify-between py-2 border-b">
+                          <span className="text-muted-foreground">Fabricant</span>
+                          <span className="font-medium">{product.physical.manufacturer}</span>
+                        </div>
+                      )}
+                      {product.physical.country_of_origin && (
+                        <div className="flex justify-between py-2 border-b">
+                          <span className="text-muted-foreground">Origine</span>
+                          <span className="font-medium">{product.physical.country_of_origin}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="space-y-6">
+              <ProductReviewsSummary productId={productId!} productType="physical" />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Avis des utilisateurs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ReviewsList productId={productId!} productType="physical" />
+                </CardContent>
+              </Card>
+
+              {user && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Donner votre avis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ReviewForm productId={productId!} productType="physical" />
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          {/* Recommendations Section - TODO: Create PhysicalProductRecommendations component */}
           <Separator className="my-12" />
-
-          {/* Size Chart */}
-          {product?.size_chart_id && (
-            <>
-              <SizeChartDisplay sizeChartId={product.size_chart_id} />
-              <Separator className="my-12" />
-            </>
-          )}
-
-          {/* Reviews */}
-          <ProductReviewsSummary productId={productId!} />
+          
+          {/* Reviews Summary (outside tabs for visibility) */}
+          <ProductReviewsSummary productId={productId!} productType="physical" />
         </main>
       </div>
     </SidebarProvider>
