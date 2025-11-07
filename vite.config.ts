@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
   const hasSentryToken = !!env.SENTRY_AUTH_TOKEN;
 
   // Plugin personnalisé pour garantir l'ordre de chargement des chunks
+  // TEMPORAIREMENT DÉSACTIVÉ pour éviter l'erreur forwardRef
   // Le chunk principal (index) doit être chargé et exécuté AVANT tous les autres chunks
   const ensureChunkOrderPlugin = (): Plugin => {
     return {
@@ -19,6 +20,8 @@ export default defineConfig(({ mode }) => {
       transformIndexHtml: {
         order: 'pre',
         handler(html, ctx) {
+          // TEMPORAIREMENT DÉSACTIVÉ - Retourner le HTML tel quel
+          return html;
           if (!isProduction) return html;
           
           // Trouver tous les scripts de chunks
@@ -159,109 +162,20 @@ export default defineConfig(({ mode }) => {
       // Préserver les signatures d'entrée pour garantir l'ordre de chargement
       preserveEntrySignatures: 'strict',
       output: {
-        manualChunks: (id) => {
-          // Éviter les références circulaires en groupant plus intelligemment
-          // CRITIQUE: React doit être dans le chunk principal (index) pour être chargé en premier
-          // Ne pas créer de chunk séparé pour React - laisser dans le chunk principal
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            // Retourner undefined pour garder React dans le chunk principal
-            return undefined;
-          }
-          
-          if (id.includes('node_modules/react-router')) {
-            return 'vendor-react-router';
-          }
-          
-          // State management
-          if (id.includes('@tanstack/react-query')) {
-            return 'vendor-query';
-          }
-          
-          // Supabase
-          if (id.includes('@supabase')) {
-            return 'vendor-supabase';
-          }
-          
-          // UI Libraries - regrouper Radix UI pour éviter les problèmes
-          // Radix UI dépend de React, donc doit être chargé après React
-          if (id.includes('@radix-ui')) {
-            return 'vendor-radix-ui';
-          }
-          
-          if (id.includes('lucide-react')) {
-            return 'vendor-lucide';
-          }
-          
-          // Forms
-          if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) {
-            return 'vendor-forms';
-          }
-          
-          // Rich text editor
-          if (id.includes('@tiptap')) {
-            return 'vendor-editor';
-          }
-          
-          // Charts
-          if (id.includes('recharts')) {
-            return 'vendor-charts';
-          }
-          
-          // Animations
-          if (id.includes('framer-motion')) {
-            return 'vendor-animations';
-          }
-          
-          // i18n
-          if (id.includes('i18next') || id.includes('react-i18next')) {
-            return 'vendor-i18n';
-          }
-          
-          // PDF generation
-          if (id.includes('jspdf')) {
-            return 'vendor-pdf';
-          }
-          
-          // Calendar
-          if (id.includes('react-big-calendar') || id.includes('react-day-picker')) {
-            return 'vendor-calendar';
-          }
-          
-          // Digital products components
-          if (id.includes('/digital/')) {
-            return 'chunk-digital';
-          }
-          
-          // Physical products components
-          if (id.includes('/physical/')) {
-            return 'chunk-physical';
-          }
-          
-          // Services components
-          if (id.includes('/service/')) {
-            return 'chunk-services';
-          }
-          
-          // Courses components
-          if (id.includes('/courses/')) {
-            return 'chunk-courses';
-          }
-          
-          // Admin components
-          if (id.includes('/admin/')) {
-            return 'chunk-admin';
-          }
-          
-          // Marketplace components
-          if (id.includes('/marketplace/')) {
-            return 'chunk-marketplace';
-          }
-          
-          // Autres vendors
-          if (id.includes('node_modules')) {
-            return 'vendor-misc';
-          }
-        },
+        // TEMPORAIREMENT DÉSACTIVÉ - Code splitting simplifié pour éviter l'erreur forwardRef
+        // Tous les modules dans un seul chunk pour garantir l'ordre de chargement
+        manualChunks: undefined,
+        // ANCIEN CODE (désactivé temporairement) :
+        // manualChunks: (id) => {
+        //   // Éviter les références circulaires en groupant plus intelligemment
+        //   // CRITIQUE: React doit être dans le chunk principal (index) pour être chargé en premier
+        //   // Ne pas créer de chunk séparé pour React - laisser dans le chunk principal
+        //   if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+        //     // Retourner undefined pour garder React dans le chunk principal
+        //     return undefined;
+        //   }
+        //   // ... reste du code
+        // },
         // Optimisation des noms de chunks
         chunkFileNames: (chunkInfo) => {
           const facadeModuleId = chunkInfo.facadeModuleId
