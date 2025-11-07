@@ -151,7 +151,6 @@ class DHLService {
    */
   async createLabel(request: DHLLabelRequest): Promise<DHLLabelResponse> {
     try {
-      // TODO: Implémenter appel API DHL réel
       if (this.testMode) {
         return {
           labelNumber: `DHL-${Date.now()}`,
@@ -162,27 +161,111 @@ class DHLService {
         };
       }
 
-      const response = await fetch(`${this.apiUrl}/shipments`, {
+      const accessToken = await this.getAccessToken();
+
+      // Préparer les données pour l'API DHL Shipment
+      const shipment = request.shipment;
+      const packageData = shipment.packages[0];
+
+      const response = await fetch(`${this.apiUrl}/ship/v1/shipments`, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${btoa(`${this.apiKey}:${this.apiSecret}`)}`,
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          plannedShippingDateAndTime: new Date().toISOString(),
+          pickup: {
+            isRequested: false,
+          },
+          productCode: shipment.serviceType,
+          accounts: [
+            {
+              typeCode: 'shipper',
+              number: this.apiKey,
+            },
+          ],
+          valueAddedServices: [],
+          outputImageProperties: {
+            printerDPI: 300,
+            encodingFormat: 'pdf',
+            imageOptions: [
+              {
+                typeCode: 'label',
+                templateName: 'ECOM26_84_001',
+                isRequested: true,
+                hideAccountNumber: false,
+                numberOfCopies: 1,
+              },
+            ],
+          },
+          customerDetails: {
+            shipperDetails: {
+              postalAddress: {
+                postalCode: shipment.shipper.postalCode,
+                cityName: shipment.shipper.city,
+                countryCode: shipment.shipper.countryCode,
+                addressLine1: shipment.shipper.addressLine1,
+                addressLine2: shipment.shipper.addressLine2 || '',
+              },
+              contactInformation: {
+                phone: shipment.shipper.contact?.phone || '',
+                email: shipment.shipper.contact?.email || '',
+                fullName: shipment.shipper.name,
+              },
+            },
+            receiverDetails: {
+              postalAddress: {
+                postalCode: shipment.recipient.postalCode,
+                cityName: shipment.recipient.city || '',
+                countryCode: shipment.recipient.countryCode,
+                addressLine1: shipment.recipient.addressLine1,
+                addressLine2: shipment.recipient.addressLine2 || '',
+              },
+              contactInformation: {
+                phone: shipment.recipient.contact?.phone || '',
+                email: shipment.recipient.contact?.email || '',
+                fullName: shipment.recipient.name,
+              },
+            },
+          },
+          content: {
+            packages: [
+              {
+                weight: packageData.weight,
+                dimensions: {
+                  length: packageData.dimensions.length,
+                  width: packageData.dimensions.width,
+                  height: packageData.dimensions.height,
+                },
+              },
+            ],
+            unitOfMeasurement: 'metric',
+            isCustomsDeclarable: false,
+            declaredValue: 0,
+            declaredValueCurrency: 'XOF',
+          },
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(`DHL API error: ${response.statusText}`);
+        const error = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(`DHL API error: ${error.message || response.statusText}`);
       }
 
       const data = await response.json();
+
+      // Extraire les informations de l'étiquette
+      const shipmentDetails = data.shipmentDetails?.[0];
+      const documents = data.documents?.[0];
+
       return {
-        labelNumber: data.shipmentNumber,
-        trackingNumber: data.trackingNumber,
-        labelUrl: data.labelUrl,
-        labelData: data.labelData,
-        shippingCost: data.shippingCost,
-        currency: data.currency,
+        labelNumber: shipmentDetails?.shipmentTrackingNumber || `DHL-${Date.now()}`,
+        trackingNumber: shipmentDetails?.shipmentTrackingNumber || '',
+        labelUrl: documents?.label?.href || '',
+        labelData: documents?.label?.content || '',
+        shippingCost: parseFloat(shipmentDetails?.totalPrice?.[0]?.price || '0') * 100,
+        currency: shipmentDetails?.totalPrice?.[0]?.currencyCode || 'XOF',
       };
     } catch (error) {
       logger.error('DHL createLabel error', { error, request });
@@ -195,7 +278,6 @@ class DHLService {
    */
   async trackShipment(trackingNumber: string): Promise<any[]> {
     try {
-      // TODO: Implémenter appel API DHL réel
       if (this.testMode) {
         return [
           {
@@ -204,21 +286,52 @@ class DHLService {
             eventLocation: 'Dakar, Sénégal',
             eventTimestamp: new Date().toISOString(),
           },
+          {
+            eventType: 'in_transit',
+            eventDescription: 'Colis en transit',
+            eventLocation: 'Paris, France',
+            eventTimestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          },
         ];
       }
 
-      const response = await fetch(`${this.apiUrl}/tracking/${trackingNumber}`, {
-        headers: {
-          'Authorization': `Basic ${btoa(`${this.apiKey}:${this.apiSecret}`)}`,
-        },
-      });
+      const accessToken = await this.getAccessToken();
+
+      // Appel API DHL Tracking
+      const response = await fetch(
+        `${this.apiUrl}/tracking/v1/shipments?trackingNumber=${trackingNumber}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`DHL API error: ${response.statusText}`);
+        const error = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(`DHL API error: ${error.message || response.statusText}`);
       }
 
       const data = await response.json();
-      return data.events || [];
+
+      // Parser les événements de suivi
+      const events: any[] = [];
+      const shipments = data.shipments || [];
+
+      shipments.forEach((shipment: any) => {
+        const eventsData = shipment.events || [];
+        eventsData.forEach((event: any) => {
+          events.push({
+            eventType: event.eventCode || 'unknown',
+            eventDescription: event.description || '',
+            eventLocation: event.location?.address?.addressLocality || '',
+            eventTimestamp: event.timestamp || new Date().toISOString(),
+          });
+        });
+      });
+
+      return events;
     } catch (error) {
       logger.error('DHL trackShipment error', { error, trackingNumber });
       throw error;
