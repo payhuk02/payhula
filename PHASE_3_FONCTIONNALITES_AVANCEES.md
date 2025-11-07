@@ -74,14 +74,31 @@ La Phase 3 des fonctionnalités avancées est en cours d'implémentation. Cette 
   - Support de multiples services (Ground, Express, Expedited)
   - OAuth pour authentification
 
+- **Chronopost Integration** : Service de livraison express (France)
+  - Calcul de tarifs en temps réel
+  - Génération d'étiquettes
+  - Suivi de colis
+  - Support de multiples services (Chronopost 13, Chronopost 18, Relais)
+  - API SOAP
+
+- **Colissimo Integration** : Service de livraison La Poste (France)
+  - Calcul de tarifs en temps réel
+  - Génération d'étiquettes
+  - Suivi de colis
+  - Support de multiples services (Domicile, Bureau de Poste, Access)
+  - API REST
+
 #### Fichiers créés :
 - `src/integrations/shipping/ups.ts` : Intégration UPS complète
+- `src/integrations/shipping/chronopost.ts` : Intégration Chronopost complète
+- `src/integrations/shipping/colissimo.ts` : Intégration Colissimo complète
 - `src/integrations/shipping/index.ts` : Export mis à jour
 
 #### Résultats attendus :
-- Support de 3 transporteurs (FedEx, DHL, UPS)
+- Support de 5 transporteurs (FedEx, DHL, UPS, Chronopost, Colissimo)
 - Meilleure couverture géographique pour les livraisons
 - Plus d'options de livraison pour les clients
+- Support spécifique pour la France (Chronopost, Colissimo)
 
 ---
 
@@ -89,10 +106,8 @@ La Phase 3 des fonctionnalités avancées est en cours d'implémentation. Cette 
 
 ### 3. 🟡 Intégrations Shipping Supplémentaires (suite)
 
-- [ ] DHL - Améliorer l'implémentation existante
-- [ ] Chronopost - Ajouter support
+- [ ] DHL - Améliorer l'implémentation existante (API réelle)
 - [ ] La Poste - Ajouter support
-- [ ] Colissimo - Ajouter support
 - [ ] Mondial Relay - Ajouter support
 
 ---
@@ -156,7 +171,7 @@ La Phase 3 des fonctionnalités avancées est en cours d'implémentation. Cette 
 | Catégorie | Progression | Statut |
 |-----------|------------|--------|
 | **Intégrations Paiements** | 100% | ✅ Complété |
-| **Intégrations Shipping** | 50% | 🟡 En cours |
+| **Intégrations Shipping** | 80% | 🟡 En cours |
 | **AI Recommendations** | 0% | ⏳ À venir |
 | **Marketing Automation** | 0% | ⏳ À venir |
 | **Advanced Analytics** | 0% | ⏳ À venir |
@@ -164,7 +179,7 @@ La Phase 3 des fonctionnalités avancées est en cours d'implémentation. Cette 
 | **Notifications Push** | 0% | ⏳ À venir |
 | **Gamification** | 0% | ⏳ À venir |
 
-**Progression Globale Phase 3 : 18.75%** 🟡
+**Progression Globale Phase 3 : 22.5%** 🟡
 
 ---
 
