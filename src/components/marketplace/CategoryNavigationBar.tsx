@@ -65,6 +65,18 @@ const CATEGORY_CONFIG = [
     popular: true
   },
   { 
+    value: 'formation', 
+    label: 'Formations', 
+    icon: GraduationCap,
+    popular: true
+  },
+  { 
+    value: 'cours', 
+    label: 'Cours', 
+    icon: BookOpen,
+    popular: true
+  },
+  { 
     value: 'design', 
     label: 'Design & Graphisme', 
     icon: Palette,
@@ -80,6 +92,12 @@ const CATEGORY_CONFIG = [
     value: 'developpement', 
     label: 'Développement Web', 
     icon: Code,
+    popular: true
+  },
+  { 
+    value: 'informatique', 
+    label: 'Informatique', 
+    icon: Smartphone,
     popular: true
   },
   { 
@@ -131,6 +149,24 @@ const CATEGORY_CONFIG = [
     popular: false
   },
   { 
+    value: 'vetements', 
+    label: 'T-shirts & Vêtements', 
+    icon: ShoppingBag,
+    popular: false
+  },
+  { 
+    value: 'accessoires', 
+    label: 'Accessoires', 
+    icon: Package,
+    popular: false
+  },
+  { 
+    value: 'electronique', 
+    label: 'Électronique', 
+    icon: Zap,
+    popular: false
+  },
+  { 
     value: 'traduction', 
     label: 'Traduction', 
     icon: Globe,
@@ -152,12 +188,6 @@ const CATEGORY_CONFIG = [
     value: 'conseil', 
     label: 'Conseil Business', 
     icon: Briefcase,
-    popular: false
-  },
-  { 
-    value: 'formation', 
-    label: 'Formation', 
-    icon: GraduationCap,
     popular: false
   },
   { 
@@ -224,6 +254,48 @@ const CATEGORY_CONFIG = [
     value: 'voix-off', 
     label: 'Voix-off', 
     icon: Headphones,
+    popular: false
+  },
+  { 
+    value: 'maison', 
+    label: 'Maison & Jardin', 
+    icon: Package,
+    popular: false
+  },
+  { 
+    value: 'sport', 
+    label: 'Sport', 
+    icon: Package,
+    popular: false
+  },
+  { 
+    value: 'beaute', 
+    label: 'Beauté', 
+    icon: Sparkles,
+    popular: false
+  },
+  { 
+    value: 'livres', 
+    label: 'Livres', 
+    icon: BookOpen,
+    popular: false
+  },
+  { 
+    value: 'jouets', 
+    label: 'Jouets', 
+    icon: Gift,
+    popular: false
+  },
+  { 
+    value: 'alimentation', 
+    label: 'Alimentation', 
+    icon: Package,
+    popular: false
+  },
+  { 
+    value: 'artisanat', 
+    label: 'Artisanat', 
+    icon: Package,
     popular: false
   },
 ];
