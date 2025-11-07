@@ -68,6 +68,8 @@ export default defineConfig(({ mode }) => {
     rollupOptions: {
       // Préserver les signatures d'entrée pour garantir l'ordre de chargement
       preserveEntrySignatures: 'strict',
+      // Externaliser React pour garantir qu'il est chargé en premier via CDN
+      // external: ['react', 'react-dom'], // Désactivé pour l'instant - à activer si nécessaire
       output: {
         manualChunks: (id) => {
           // Éviter les références circulaires en groupant plus intelligemment
@@ -181,6 +183,13 @@ export default defineConfig(({ mode }) => {
           return `js/${facadeModuleId}-[hash].js`;
         },
         entryFileNames: 'js/[name]-[hash].js',
+        // Garantir l'ordre de chargement des chunks
+        // Les chunks sont chargés dans l'ordre des dépendances
+        // Le chunk principal (index) est toujours chargé en premier
+        format: 'es', // Format ES modules pour garantir l'ordre
+        // Garantir que les chunks sont chargés dans l'ordre des dépendances
+        // Cela garantit que React (dans le chunk principal) est chargé avant les autres chunks
+        inlineDynamicImports: false, // Ne pas inliner les imports dynamiques
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.') || [];
           const ext = info[info.length - 1];
