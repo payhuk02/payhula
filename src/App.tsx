@@ -206,6 +206,7 @@ const AdvancedCalendarPage = lazy(() => import("./pages/service/AdvancedCalendar
 const ServiceManagementPage = lazy(() => import("./pages/service/ServiceManagementPage"));
 const RecurringBookingsPage = lazy(() => import("./pages/service/RecurringBookingsPage"));
 const IntegrationsPage = lazy(() => import("./pages/admin/IntegrationsPage"));
+const GamificationPage = lazy(() => import("./pages/gamification/GamificationPage"));
 
 // Pages Affiliation - Lazy loading
 const StoreAffiliates = lazy(() => import("./pages/StoreAffiliates"));
@@ -431,6 +432,7 @@ const AppContent = () => {
           <Route path="/dashboard/advanced-calendar" element={<ProtectedRoute><AdvancedCalendarPage /></ProtectedRoute>} />
           <Route path="/dashboard/recurring-bookings" element={<ProtectedRoute><RecurringBookingsPage /></ProtectedRoute>} />
           <Route path="/dashboard/service-management" element={<ProtectedRoute><ServiceManagementPage /></ProtectedRoute>} />
+          <Route path="/dashboard/gamification" element={<ProtectedRoute><GamificationPage /></ProtectedRoute>} />
 
           {/* --- Routes Product Details (Physical, Services) --- */}
           <Route path="/physical/:productId" element={<PhysicalProductDetail />} />

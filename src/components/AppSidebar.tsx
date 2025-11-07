@@ -55,6 +55,7 @@ import {
   ShoppingBag,
   Camera,
   Globe,
+  Trophy,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -116,6 +117,11 @@ const menuSections = [
         title: "Mes Téléchargements",
         url: "/account/downloads",
         icon: Download,
+      },
+      {
+        title: "Gamification",
+        url: "/dashboard/gamification",
+        icon: Trophy,
       },
       {
         title: "Mon Portail Digital",
