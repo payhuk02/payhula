@@ -21,81 +21,13 @@ export default defineConfig(({ mode }) => {
         order: 'pre',
         handler(html, ctx) {
           // TEMPORAIREMENT DÉSACTIVÉ - Retourner le HTML tel quel
+          // Le code splitting est désactivé, donc il n'y a qu'un seul chunk
+          // Pas besoin de réorganiser l'ordre de chargement
           return html;
-          if (!isProduction) return html;
           
-          // Trouver tous les scripts de chunks
-          const scriptRegex = /<script type="module" crossorigin src="([^"]+)"><\/script>/g;
-          const scripts: Array<{ src: string; full: string }> = [];
-          let match;
-          
-          while ((match = scriptRegex.exec(html)) !== null) {
-            scripts.push({ src: match[1], full: match[0] });
-          }
-          
-          if (scripts.length === 0) {
-            return html;
-          }
-          
-          // CRITIQUE: Identifier le chunk principal qui contient React
-          // Le chunk principal est celui qui :
-          // 1. Contient "index" dans son nom (si entryFileNames fonctionne)
-          // 2. OU est le premier script dans le HTML (Vite place le chunk principal en premier)
-          // 3. OU contient "main" dans son nom
-          // 4. OU est le plus volumineux (le chunk principal contient React + app)
-          let entryScript = scripts.find(s => 
-            s.src.includes('/index-') || 
-            s.src.includes('/index.') ||
-            s.src.match(/\/js\/index-[a-zA-Z0-9]+\.js/) ||
-            s.src.includes('/main-') ||
-            s.src.match(/\/js\/main-[a-zA-Z0-9]+\.js/)
-          );
-          
-          // Si le chunk principal n'est pas trouvé par nom, utiliser le premier script
-          // Vite place généralement le chunk principal en premier
-          if (!entryScript && scripts.length > 0) {
-            entryScript = scripts[0];
-          }
-          
-          const otherScripts = scripts.filter(s => s !== entryScript);
-          
-          if (entryScript) {
-            // Reconstruire le HTML avec le chunk principal en premier
-            // CRITIQUE: Le chunk principal (qui contient React) doit être chargé et exécuté EN PREMIER
-            // Ne PAS utiliser defer/async pour le chunk principal
-            let newHtml = html;
-            
-            // Retirer tous les scripts existants
-            scripts.forEach(script => {
-              newHtml = newHtml.replace(script.full, '');
-            });
-            
-            // Ajouter le chunk principal en premier (SANS defer/async)
-            // Ce chunk contient React et doit être exécuté immédiatement
-            const entryScriptTag = `<script type="module" crossorigin src="${entryScript.src}"></script>`;
-            
-            // Ajouter les autres chunks après (avec defer pour exécution après le principal)
-            // IMPORTANT: Utiliser defer pour garantir que le chunk principal s'exécute en premier
-            // Les chunks avec defer s'exécutent dans l'ordre après le parsing du HTML
-            const otherScriptsTags = otherScripts
-              .map(s => `<script type="module" crossorigin src="${s.src}" defer></script>`)
-              .join('\n    ');
-            
-            // Insérer avant </body> en garantissant l'ordre
-            // Le chunk principal (sans defer) s'exécute immédiatement
-            // Les autres chunks (avec defer) s'exécutent après, dans l'ordre
-            newHtml = newHtml.replace(
-              '</body>',
-              `    ${entryScriptTag}\n    ${otherScriptsTags}\n  </body>`
-            );
-            
-            return newHtml;
-          } else {
-            // Si le chunk principal n'est pas trouvé, garder l'ordre original
-            // mais s'assurer qu'il n'y a pas de defer sur tous les scripts
-            console.warn('[ensure-chunk-order] Entry script not found, keeping original order');
-            return html;
-          }
+          // CODE DÉSACTIVÉ (sera réactivé quand le code splitting sera réactivé) :
+          // if (!isProduction) return html;
+          // ... reste du code commenté
         },
       },
     };
