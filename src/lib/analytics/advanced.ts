@@ -21,7 +21,7 @@ export interface AnalyticsInsight {
   description: string;
   impact: 'high' | 'medium' | 'low';
   recommendation?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 export interface AnalyticsPrediction {

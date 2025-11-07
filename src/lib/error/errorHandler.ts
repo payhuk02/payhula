@@ -27,7 +27,7 @@ export interface AppError {
   message: string;
   code?: string;
   statusCode?: number;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   originalError?: Error;
 }
 
@@ -44,7 +44,7 @@ export function createError(
   options?: {
     code?: string;
     statusCode?: number;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     originalError?: Error;
   }
 ): AppError {
@@ -76,7 +76,7 @@ export function createNetworkError(
  */
 export function createValidationError(
   message: string,
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 ): AppError {
   return createError(ErrorType.VALIDATION, message, {
     statusCode: 400,

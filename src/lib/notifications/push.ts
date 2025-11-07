@@ -13,7 +13,7 @@ export interface PushNotification {
   image?: string;
   badge?: string;
   tag?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   requireInteraction?: boolean;
   silent?: boolean;
   timestamp?: number;

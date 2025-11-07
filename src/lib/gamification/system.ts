@@ -11,7 +11,7 @@ export interface PointsTransaction {
   amount: number;
   type: 'earn' | 'spend' | 'expire';
   reason: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Badge {

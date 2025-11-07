@@ -21,10 +21,26 @@ import {
 // ============================================================================
 
 export interface TemplateContext {
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   functions?: Record<string, Function>;
-  helpers?: Record<string, any>;
+  helpers?: Record<string, unknown>;
 }
+
+// ============================================================================
+// RENDER RESULT TYPES
+// ============================================================================
+
+export interface RenderResult {
+  success: true;
+  content: unknown;
+}
+
+export interface RenderError {
+  success: false;
+  error: string;
+}
+
+export type RenderOutput = RenderResult | RenderError;
 
 // ============================================================================
 // TEMPLATE ENGINE CLASS
@@ -42,7 +58,7 @@ export class TemplateEngine {
   /**
    * Render a template with the given context
    */
-  render(): any {
+  render(): RenderOutput {
     try {
       const rendered = this.processContent(this.template.content);
       return {

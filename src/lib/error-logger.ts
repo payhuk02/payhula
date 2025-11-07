@@ -21,7 +21,7 @@ export interface ErrorLogContext {
   userId?: string;
   componentStack?: string;
   level?: 'app' | 'page' | 'section' | 'component';
-  extra?: Record<string, any>;
+  extra?: Record<string, unknown>;
 }
 
 export interface ErrorLog {
