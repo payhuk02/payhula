@@ -60,6 +60,8 @@ export default defineConfig(({ mode }) => {
     },
     // Préserver les extensions pour éviter les conflits
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+    // Dédupliquer React pour éviter les problèmes d'initialisation
+    dedupe: ['react', 'react-dom'],
   },
   build: {
     // Code splitting avancé pour optimiser le bundle size
@@ -67,13 +69,9 @@ export default defineConfig(({ mode }) => {
       output: {
         manualChunks: (id) => {
           // Éviter les références circulaires en groupant plus intelligemment
-          // Vendors React core - séparer react et react-dom pour éviter les problèmes
-          if (id.includes('node_modules/react/') && !id.includes('react-dom')) {
-            return 'vendor-react-core';
-          }
-          
-          if (id.includes('node_modules/react-dom/')) {
-            return 'vendor-react-dom';
+          // Vendors React core - REGROUPER react et react-dom pour éviter les problèmes d'initialisation
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'vendor-react'; // Un seul chunk pour React et React-DOM
           }
           
           if (id.includes('node_modules/react-router')) {
