@@ -42,5 +42,13 @@
         }
       ]
     }
-  ]
+  ],
+  "regions": ["iad1", "sfo1", "fra1"],
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 10,
+      "memory": 1024,
+      "regions": ["iad1", "sfo1", "fra1"]
+    }
+  }
 }
