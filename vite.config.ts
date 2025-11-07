@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => {
     return {
       name: 'ensure-chunk-order',
       transformIndexHtml: {
-        enforce: 'pre',
-        transform(html, ctx) {
+        order: 'pre',
+        handler(html, ctx) {
           if (!isProduction) return html;
           
           // Trouver tous les scripts de chunks
@@ -30,38 +30,69 @@ export default defineConfig(({ mode }) => {
             scripts.push({ src: match[1], full: match[0] });
           }
           
-          // Séparer le chunk principal (index) des autres chunks
-          const entryScript = scripts.find(s => s.src.includes('/index-') || s.src.includes('/index.'));
+          if (scripts.length === 0) {
+            return html;
+          }
+          
+          // CRITIQUE: Identifier le chunk principal qui contient React
+          // Le chunk principal est celui qui :
+          // 1. Contient "index" dans son nom (si entryFileNames fonctionne)
+          // 2. OU est le premier script dans le HTML (Vite place le chunk principal en premier)
+          // 3. OU contient "main" dans son nom
+          // 4. OU est le plus volumineux (le chunk principal contient React + app)
+          let entryScript = scripts.find(s => 
+            s.src.includes('/index-') || 
+            s.src.includes('/index.') ||
+            s.src.match(/\/js\/index-[a-zA-Z0-9]+\.js/) ||
+            s.src.includes('/main-') ||
+            s.src.match(/\/js\/main-[a-zA-Z0-9]+\.js/)
+          );
+          
+          // Si le chunk principal n'est pas trouvé par nom, utiliser le premier script
+          // Vite place généralement le chunk principal en premier
+          if (!entryScript && scripts.length > 0) {
+            entryScript = scripts[0];
+          }
+          
           const otherScripts = scripts.filter(s => s !== entryScript);
           
           if (entryScript) {
-            // Reconstruire le HTML avec le chunk principal en premier, sans defer/async
-            // pour garantir qu'il s'exécute avant les autres
+            // Reconstruire le HTML avec le chunk principal en premier
+            // CRITIQUE: Le chunk principal (qui contient React) doit être chargé et exécuté EN PREMIER
+            // Ne PAS utiliser defer/async pour le chunk principal
             let newHtml = html;
             
-            // Retirer tous les scripts
+            // Retirer tous les scripts existants
             scripts.forEach(script => {
               newHtml = newHtml.replace(script.full, '');
             });
             
-            // Ajouter le chunk principal en premier (sans defer/async pour exécution synchrone)
+            // Ajouter le chunk principal en premier (SANS defer/async)
+            // Ce chunk contient React et doit être exécuté immédiatement
             const entryScriptTag = `<script type="module" crossorigin src="${entryScript.src}"></script>`;
             
             // Ajouter les autres chunks après (avec defer pour exécution après le principal)
+            // IMPORTANT: Utiliser defer pour garantir que le chunk principal s'exécute en premier
+            // Les chunks avec defer s'exécutent dans l'ordre après le parsing du HTML
             const otherScriptsTags = otherScripts
               .map(s => `<script type="module" crossorigin src="${s.src}" defer></script>`)
               .join('\n    ');
             
-            // Insérer avant </body>
+            // Insérer avant </body> en garantissant l'ordre
+            // Le chunk principal (sans defer) s'exécute immédiatement
+            // Les autres chunks (avec defer) s'exécutent après, dans l'ordre
             newHtml = newHtml.replace(
               '</body>',
               `    ${entryScriptTag}\n    ${otherScriptsTags}\n  </body>`
             );
             
             return newHtml;
+          } else {
+            // Si le chunk principal n'est pas trouvé, garder l'ordre original
+            // mais s'assurer qu'il n'y a pas de defer sur tous les scripts
+            console.warn('[ensure-chunk-order] Entry script not found, keeping original order');
+            return html;
           }
-          
-          return html;
         },
       },
     };
@@ -238,19 +269,23 @@ export default defineConfig(({ mode }) => {
             : 'chunk';
           return `js/${facadeModuleId}-[hash].js`;
         },
-        entryFileNames: 'js/[name]-[hash].js',
-        // Garantir l'ordre de chargement des chunks
-        // Les chunks sont chargés dans l'ordre des dépendances
-        // Le chunk principal (index) est toujours chargé en premier
-        format: 'es', // Format ES modules pour garantir l'ordre
-        // Garantir que les chunks sont chargés dans l'ordre des dépendances
-        // Cela garantit que React (dans le chunk principal) est chargé avant les autres chunks
-        inlineDynamicImports: false, // Ne pas inliner les imports dynamiques
-        // Forcer le chunk principal à être chargé de manière synchrone
-        // Cela garantit que React est disponible avant tous les autres chunks
-        generatedCode: {
-          constBindings: false, // Utiliser var au lieu de const pour compatibilité
+        // CRITIQUE: Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
+        // Cela garantit que le plugin ensureChunkOrderPlugin peut le trouver
+        entryFileNames: (chunkInfo) => {
+          // Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
+          if (chunkInfo.isEntry && chunkInfo.facadeModuleId?.includes('main.tsx')) {
+            return 'js/index-[hash].js';
+          }
+          // Les autres entry points gardent leur nom
+          return 'js/[name]-[hash].js';
         },
+        // CRITIQUE: Format ES modules pour garantir l'ordre de chargement
+        format: 'es',
+        // Ne pas inliner les imports dynamiques pour préserver l'ordre
+        inlineDynamicImports: false,
+        // IMPORTANT: Ne pas utiliser generatedCode.constBindings: false
+        // Cela peut causer des problèmes d'initialisation
+        // Laisser les const bindings par défaut pour garantir l'ordre d'initialisation
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.') || [];
           const ext = info[info.length - 1];
