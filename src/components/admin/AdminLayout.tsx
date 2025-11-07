@@ -83,10 +83,11 @@ const menuSections = [
       { icon: Scale, label: 'Litiges', path: '/admin/disputes' },
     ]
   },
-  {
-    label: 'Systèmes & Intégrations',
-    items: [
-      { icon: Webhook, label: 'Webhooks', path: '/admin/webhooks' },
+    {
+      label: 'Systèmes & Intégrations',
+      items: [
+        { icon: Settings, label: 'Intégrations', path: '/admin/integrations' },
+        { icon: Webhook, label: 'Webhooks', path: '/admin/webhooks' },
       { icon: Webhook, label: 'Webhooks Produits Digitaux', path: '/dashboard/digital-webhooks' },
       { icon: Webhook, label: 'Webhooks Produits Physiques', path: '/dashboard/physical-webhooks' },
       { icon: Star, label: 'Programme de Fidélité', path: '/admin/loyalty' },

@@ -205,6 +205,7 @@ const PhysicalMultiCurrency = lazy(() => import("./pages/admin/PhysicalMultiCurr
 const AdvancedCalendarPage = lazy(() => import("./pages/service/AdvancedCalendarPage"));
 const ServiceManagementPage = lazy(() => import("./pages/service/ServiceManagementPage"));
 const RecurringBookingsPage = lazy(() => import("./pages/service/RecurringBookingsPage"));
+const IntegrationsPage = lazy(() => import("./pages/admin/IntegrationsPage"));
 
 // Pages Affiliation - Lazy loading
 const StoreAffiliates = lazy(() => import("./pages/StoreAffiliates"));
@@ -466,6 +467,8 @@ const AppContent = () => {
           <Route path="/admin/audit" element={<ProtectedRoute><AdminAudit /></ProtectedRoute>} />
           <Route path="/admin/taxes" element={<ProtectedRoute><AdminTaxManagement /></ProtectedRoute>} />
           <Route path="/admin/returns" element={<ProtectedRoute><AdminReturnManagement /></ProtectedRoute>} />
+          <Route path="/admin/integrations" element={<ProtectedRoute><IntegrationsPage /></ProtectedRoute>} />
+          <Route path="/dashboard/integrations" element={<ProtectedRoute><IntegrationsPage /></ProtectedRoute>} />
           <Route path="/admin/webhooks" element={<ProtectedRoute><AdminWebhookManagement /></ProtectedRoute>} />
           <Route path="/admin/loyalty" element={<ProtectedRoute><AdminLoyaltyManagement /></ProtectedRoute>} />
           <Route path="/admin/gift-cards" element={<ProtectedRoute><AdminGiftCardManagement /></ProtectedRoute>} />

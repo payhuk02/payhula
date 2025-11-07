@@ -413,9 +413,14 @@ const menuSections = [
       },
     ]
   },
-  {
-    label: "Systèmes & Intégrations",
-    items: [
+      {
+        label: "Systèmes & Intégrations",
+        items: [
+      {
+        title: "Intégrations",
+        url: "/dashboard/integrations",
+        icon: Settings,
+      },
       {
         title: "Webhooks",
         url: "/dashboard/webhooks",
@@ -644,9 +649,14 @@ const adminMenuSections = [
       },
     ]
   },
-  {
+    {
     label: "Systèmes & Intégrations",
     items: [
+      {
+        title: "Intégrations",
+        url: "/admin/integrations",
+        icon: Settings,
+      },
       {
         title: "Webhooks",
         url: "/admin/webhooks",
