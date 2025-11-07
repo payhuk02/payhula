@@ -28,7 +28,6 @@ import {
   Calendar,
   FileText,
   Scale,
-  BoxIcon,
   Headphones,
   Palette,
   Layout,
@@ -567,7 +566,7 @@ const adminMenuSections = [
       {
         title: "Commandes",
         url: "/admin/orders",
-        icon: BoxIcon,
+        icon: ShoppingCart,
       },
       {
         title: "Inventaire Global",
