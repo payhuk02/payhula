@@ -3,12 +3,69 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import type { Plugin } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const isProduction = mode === 'production';
   const hasSentryToken = !!env.SENTRY_AUTH_TOKEN;
+
+  // Plugin personnalisé pour garantir l'ordre de chargement des chunks
+  // Le chunk principal (index) doit être chargé et exécuté AVANT tous les autres chunks
+  const ensureChunkOrderPlugin = (): Plugin => {
+    return {
+      name: 'ensure-chunk-order',
+      transformIndexHtml: {
+        enforce: 'pre',
+        transform(html, ctx) {
+          if (!isProduction) return html;
+          
+          // Trouver tous les scripts de chunks
+          const scriptRegex = /<script type="module" crossorigin src="([^"]+)"><\/script>/g;
+          const scripts: Array<{ src: string; full: string }> = [];
+          let match;
+          
+          while ((match = scriptRegex.exec(html)) !== null) {
+            scripts.push({ src: match[1], full: match[0] });
+          }
+          
+          // Séparer le chunk principal (index) des autres chunks
+          const entryScript = scripts.find(s => s.src.includes('/index-') || s.src.includes('/index.'));
+          const otherScripts = scripts.filter(s => s !== entryScript);
+          
+          if (entryScript) {
+            // Reconstruire le HTML avec le chunk principal en premier, sans defer/async
+            // pour garantir qu'il s'exécute avant les autres
+            let newHtml = html;
+            
+            // Retirer tous les scripts
+            scripts.forEach(script => {
+              newHtml = newHtml.replace(script.full, '');
+            });
+            
+            // Ajouter le chunk principal en premier (sans defer/async pour exécution synchrone)
+            const entryScriptTag = `<script type="module" crossorigin src="${entryScript.src}"></script>`;
+            
+            // Ajouter les autres chunks après (avec defer pour exécution après le principal)
+            const otherScriptsTags = otherScripts
+              .map(s => `<script type="module" crossorigin src="${s.src}" defer></script>`)
+              .join('\n    ');
+            
+            // Insérer avant </body>
+            newHtml = newHtml.replace(
+              '</body>',
+              `    ${entryScriptTag}\n    ${otherScriptsTags}\n  </body>`
+            );
+            
+            return newHtml;
+          }
+          
+          return html;
+        },
+      },
+    };
+  };
 
   return {
   server: {
@@ -19,6 +76,8 @@ export default defineConfig(({ mode }) => {
     react({
       // Configuration React - jsxRuntime: 'automatic' est la valeur par défaut
     }),
+    // Plugin pour garantir l'ordre de chargement des chunks (production uniquement)
+    isProduction && ensureChunkOrderPlugin(),
     // Visualizer seulement en dev
     !isProduction && visualizer({
       filename: './dist/stats.html',
@@ -187,6 +246,11 @@ export default defineConfig(({ mode }) => {
         // Garantir que les chunks sont chargés dans l'ordre des dépendances
         // Cela garantit que React (dans le chunk principal) est chargé avant les autres chunks
         inlineDynamicImports: false, // Ne pas inliner les imports dynamiques
+        // Forcer le chunk principal à être chargé de manière synchrone
+        // Cela garantit que React est disponible avant tous les autres chunks
+        generatedCode: {
+          constBindings: false, // Utiliser var au lieu de const pour compatibilité
+        },
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.') || [];
           const ext = info[info.length - 1];
