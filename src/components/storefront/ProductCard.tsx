@@ -261,13 +261,6 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
           </h3>
         </Link>
 
-        {/* Description courte */}
-        {shortDescription && (
-          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-            {shortDescription}
-          </p>
-        )}
-
         {/* Rating et avis */}
         <div className="flex items-center gap-2 mb-3">
           {product.rating > 0 ? (

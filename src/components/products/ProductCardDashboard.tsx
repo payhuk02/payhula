@@ -198,11 +198,6 @@ const ProductCardDashboard = ({
           <CardTitle className="line-clamp-2 text-sm sm:text-base lg:text-lg leading-tight group-hover:text-primary transition-colors duration-200 font-semibold">
             {product.name}
           </CardTitle>
-          {product.description && (
-            <CardDescription className="line-clamp-2 text-[10px] sm:text-xs lg:text-sm leading-relaxed text-muted-foreground">
-              {product.description.replace(/<[^>]*>/g, '')}
-            </CardDescription>
-          )}
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 sm:gap-2 lg:gap-0">

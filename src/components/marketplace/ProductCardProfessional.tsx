@@ -351,13 +351,6 @@ const ProductCardProfessional = ({
           {product.name}
         </h3>
 
-        {/* Description courte */}
-        {shortDescription && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            {shortDescription}
-          </p>
-        )}
-
         {/* Rating et avis */}
         <div className="flex items-center gap-2 mb-4" role="group" aria-label="Évaluation du produit">
           {product.rating ? (
