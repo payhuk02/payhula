@@ -66,12 +66,15 @@ export default defineConfig(({ mode }) => {
   build: {
     // Code splitting avancé pour optimiser le bundle size
     rollupOptions: {
+      // Préserver les signatures d'entrée pour garantir l'ordre de chargement
+      preserveEntrySignatures: 'strict',
       output: {
         manualChunks: (id) => {
           // Éviter les références circulaires en groupant plus intelligemment
           // Vendors React core - REGROUPER react et react-dom pour éviter les problèmes d'initialisation
+          // IMPORTANT: React doit être chargé en premier, donc dans un chunk séparé mais prioritaire
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'vendor-react'; // Un seul chunk pour React et React-DOM
+            return 'vendor-react'; // Chunk séparé mais chargé en premier
           }
           
           if (id.includes('node_modules/react-router')) {
@@ -89,6 +92,7 @@ export default defineConfig(({ mode }) => {
           }
           
           // UI Libraries - regrouper Radix UI pour éviter les problèmes
+          // Radix UI dépend de React, donc doit être chargé après React
           if (id.includes('@radix-ui')) {
             return 'vendor-radix-ui';
           }
