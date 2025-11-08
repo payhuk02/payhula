@@ -57,7 +57,17 @@ export const initiatePayDunyaPayment = async (options: PaymentOptions) => {
 
     if (transactionError) {
       logger.error("Error creating transaction:", transactionError);
-      throw new Error("Impossible de créer la transaction");
+      // Afficher plus de détails sur l'erreur pour le debug
+      const errorDetails = transactionError.message || JSON.stringify(transactionError);
+      console.error("Transaction error details:", {
+        error: transactionError,
+        storeId,
+        customerId,
+        productId,
+        amount,
+        currency,
+      });
+      throw new Error(`Impossible de créer la transaction: ${errorDetails}`);
     }
 
     logger.log("Transaction created:", transaction.id);
