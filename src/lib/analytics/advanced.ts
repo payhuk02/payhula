@@ -432,9 +432,16 @@ export class AdvancedAnalytics {
         .gte('viewed_at', periodStart)
         .lte('viewed_at', periodEnd);
 
+      // Note: product_views peut avoir une colonne store_id, mais on vérifie d'abord
+      // Si la colonne n'existe pas, cette requête échouera silencieusement
       if (storeId) {
-        // Si product_views a une colonne store_id
-        productViewsQuery = (productViewsQuery as any).eq('store_id', storeId);
+        try {
+          // Tenter d'appliquer le filtre store_id si la colonne existe
+          productViewsQuery = productViewsQuery.eq('store_id', storeId);
+        } catch {
+          // Si la colonne n'existe pas, ignorer le filtre
+          logger.debug('product_views.store_id column not available, skipping filter');
+        }
       }
 
       const { data: productViews } = await productViewsQuery;

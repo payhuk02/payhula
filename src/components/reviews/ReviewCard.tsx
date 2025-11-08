@@ -69,11 +69,15 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </div>
 
         {/* Ratings détaillés */}
-        {detailedFields.length > 0 && detailedFields.some(f => (review as any)[f]) && (
+        {detailedFields.length > 0 && detailedFields.some(f => {
+          const reviewWithFields = review as Review & { [key: string]: unknown };
+          return reviewWithFields[f];
+        }) && (
           <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
             {detailedFields.map(field => {
-              const value = (review as any)[field];
-              if (!value) return null;
+              const reviewWithFields = review as Review & { [key: string]: unknown };
+              const value = reviewWithFields[field];
+              if (!value || typeof value !== 'number') return null;
               return (
                 <div key={field} className="flex items-center justify-between">
                   <span className="text-muted-foreground">{getDetailedRatingLabel(field)} :</span>

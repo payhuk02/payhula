@@ -472,18 +472,19 @@ export default function Checkout() {
 
       // Créer automatiquement la facture
       try {
-        const { data: invoiceId, error: invoiceError } = await supabase.rpc('create_invoice_from_order' as any, {
+        const { createInvoiceFromOrder } = await import('@/lib/supabase-rpc');
+        const { data: invoiceResult, error: invoiceError } = await createInvoiceFromOrder({
           p_order_id: order.id,
         });
 
         if (invoiceError) {
-          logger.error('Error creating invoice:', invoiceError as any);
+          logger.error('Error creating invoice:', { error: invoiceError });
           // Ne pas bloquer la commande si la facture échoue
-        } else {
-          logger.info(`Invoice created: ${invoiceId}`);
+        } else if (invoiceResult) {
+          logger.info(`Invoice created: ${invoiceResult.invoice_id}`);
         }
       } catch (invoiceErr) {
-        logger.error('Error in invoice creation:', invoiceErr as any);
+        logger.error('Error in invoice creation:', { error: invoiceErr });
         // Ne pas bloquer la commande
       }
 
@@ -506,38 +507,53 @@ export default function Checkout() {
           }
 
           if (finalCustomerId) {
-            await supabase.rpc('apply_coupon_to_order' as any, {
+            const { applyCouponToOrder } = await import('@/lib/supabase-rpc');
+            const { error: applyError } = await applyCouponToOrder({
               p_coupon_id: appliedCouponCode.id,
               p_order_id: order.id,
               p_customer_id: finalCustomerId,
               p_discount_amount: couponDiscountAmount,
             });
-            logger.info('Coupon applied to order', { couponId: appliedCouponCode.id, orderId: order.id });
+            if (applyError) {
+              logger.error('Error applying coupon:', { error: applyError });
+            } else {
+              logger.info('Coupon applied to order', { couponId: appliedCouponCode.id, orderId: order.id });
+            }
           }
         } catch (couponError) {
-          logger.error('Error applying coupon:', couponError as any);
+          logger.error('Error applying coupon:', { error: couponError });
           // Ne pas bloquer la commande si le coupon échoue
         }
       }
 
       // Enregistrer l'utilisation du coupon legacy si un coupon a été appliqué
-      if (appliedCouponLegacy && (appliedCouponLegacy as any).promotionId) {
+      interface LegacyCoupon {
+        promotionId?: string;
+        discountAmount?: number;
+      }
+      const legacyCoupon = appliedCouponLegacy as LegacyCoupon | null;
+      if (legacyCoupon?.promotionId) {
         try {
           const { data: sessionId } = await supabase.auth.getSession();
-          await supabase.rpc('record_coupon_usage' as any, {
-            promotion_id_param: (appliedCouponLegacy as any).promotionId,
+          const { recordCouponUsage } = await import('@/lib/supabase-rpc');
+          const { error: recordError } = await recordCouponUsage({
+            promotion_id_param: legacyCoupon.promotionId,
             order_id_param: order.id,
-            discount_amount_param: (appliedCouponLegacy as any).discountAmount,
+            discount_amount_param: legacyCoupon.discountAmount || 0,
             original_amount_param: summary.subtotal + taxAmount,
             final_amount_param: finalTotal,
             session_id_param: sessionId?.session?.access_token || null,
           });
 
+          if (recordError) {
+            logger.error('Error recording coupon usage:', { error: recordError });
+          }
+
           // Retirer le coupon après utilisation
           localStorage.removeItem('applied_coupon');
           sessionStorage.removeItem('applied_coupon');
         } catch (couponError) {
-          logger.error('Error recording coupon usage:', couponError as any);
+          logger.error('Error recording coupon usage:', { error: couponError });
           // Ne pas bloquer la commande si l'enregistrement du coupon échoue
         }
       }

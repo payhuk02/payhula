@@ -649,7 +649,12 @@ ALTER TABLE disputes ENABLE ROW LEVEL SECURITY;
                               <ProtectedAction permission="disputes.manage">
                                 <Select
                                   value={dispute.priority || 'normal'}
-                                  onValueChange={(value) => isAAL2 && updateDisputePriority(dispute.id, value as any)}
+                                  onValueChange={(value) => {
+                                    if (isAAL2) {
+                                      const priority = value as 'low' | 'normal' | 'high' | 'urgent';
+                                      updateDisputePriority(dispute.id, priority);
+                                    }
+                                  }}
                                 >
                                   <SelectTrigger className="w-[140px] h-8">
                                     <SelectValue />

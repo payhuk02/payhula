@@ -22,6 +22,10 @@ export interface Product {
   tags?: string[];
   licensing_type?: 'standard' | 'plr' | 'copyrighted' | null;
   license_terms?: string | null;
+  // Champs pour produits physiques
+  free_shipping?: boolean | null;
+  shipping_cost?: number | null;
+  stock_quantity?: number | null;
   stores?: {
     id: string;
     name: string;

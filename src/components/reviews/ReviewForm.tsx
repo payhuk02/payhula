@@ -74,9 +74,25 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
     };
 
     // Ajouter les ratings détaillés selon le type de produit
+    interface ReviewPayload {
+      product_id: string;
+      rating: number;
+      comment?: string;
+      // Ratings détaillés optionnels
+      quality_rating?: number;
+      value_rating?: number;
+      service_rating?: number;
+      delivery_rating?: number;
+      [key: string]: unknown;
+    }
+    const reviewPayload: ReviewPayload = {
+      product_id: data.product_id,
+      rating: data.rating,
+      comment: data.comment,
+    };
     detailedFields.forEach(field => {
       if (data[field]) {
-        (payload as any)[field] = data[field];
+        reviewPayload[field] = data[field];
       }
     });
 

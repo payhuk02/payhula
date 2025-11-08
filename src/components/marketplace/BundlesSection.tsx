@@ -4,13 +4,18 @@ import { ProductGrid } from "@/components/ui/ProductGrid";
 import { BundleCard } from "./BundleCard";
 import { Package, ArrowRight } from "lucide-react";
 
+interface Bundle {
+  id: string;
+  name?: string;
+  description?: string;
+  discount_percentage?: number | null;
+  savings_percentage?: number | null;
+  stores?: { slug?: string } | null;
+  [key: string]: unknown;
+}
+
 interface BundlesSectionProps {
-  bundles: Array<{
-    id: string;
-    stores?: { slug?: string } | null;
-    savings_percentage?: number | null;
-    [key: string]: any;
-  }>;
+  bundles: Bundle[];
 }
 
 export const BundlesSection: React.FC<BundlesSectionProps> = ({ bundles }) => {
@@ -48,7 +53,7 @@ export const BundlesSection: React.FC<BundlesSectionProps> = ({ bundles }) => {
           {bundles.slice(0, 6).map((bundle) => (
             <BundleCard
               key={bundle.id}
-              bundle={bundle as any}
+              bundle={bundle}
               storeSlug={bundle.stores?.slug || 'default'}
             />
           ))}

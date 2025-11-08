@@ -265,7 +265,7 @@ export const verifyTransactionStatus = async (transactionId: string) => {
 
         return { ...transaction, ...updates };
       } catch (verifyError) {
-        console.error("Error verifying with Moneroo:", verifyError);
+        logger.error("Error verifying with Moneroo:", { error: verifyError });
         // Retourner la transaction actuelle si la vérification échoue
         return transaction;
       }
@@ -414,7 +414,7 @@ export const refundMonerooPayment = async (options: RefundOptions): Promise<Refu
         error: monerooError.message,
         code: monerooError.code,
       },
-    }]).catch((err) => console.error("Error logging refund failure:", err));
+    }]).catch((err) => logger.error("Error logging refund failure:", { error: err }));
 
     logger.error("Refund error:", {
       error: monerooError.message,

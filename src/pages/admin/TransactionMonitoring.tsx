@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/currency-converter';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface TransactionStats {
   total: number;
@@ -72,7 +73,7 @@ export default function TransactionMonitoring() {
         setStats(statsData);
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
+      logger.error('Error loading stats:', { error });
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les statistiques',
@@ -88,7 +89,7 @@ export default function TransactionMonitoring() {
       const { data, error } = await supabase.rpc('check_transaction_consistency');
 
       if (error) {
-        console.error('Error checking consistency:', error);
+        logger.error('Error checking consistency:', { error });
         return;
       }
 
@@ -96,7 +97,7 @@ export default function TransactionMonitoring() {
         setConsistencyIssues(data as ConsistencyIssue[]);
       }
     } catch (error) {
-      console.error('Error in consistency check:', error);
+      logger.error('Error in consistency check:', { error });
     }
   };
 
@@ -115,7 +116,7 @@ export default function TransactionMonitoring() {
         description: 'Rapport de cohérence généré avec succès',
       });
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('Error generating report:', { error });
       toast({
         title: 'Erreur',
         description: 'Impossible de générer le rapport',

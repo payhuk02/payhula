@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { CreditCard, Wallet, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
+import { useAuth } from '@/contexts/AuthContext';
 
 export type PaymentProvider = 'moneroo' | 'paydunya';
 
@@ -35,16 +37,7 @@ export function PaymentProviderSelector({
   storeId,
   amount,
 }: PaymentProviderSelectorProps) {
-  const [user, setUser] = useState<any>(null);
-  
-  // Charger l'utilisateur actuel
-  useEffect(() => {
-    const loadUser = async () => {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      setUser(currentUser);
-    };
-    loadUser();
-  }, []);
+  const { user } = useAuth();
 
   const [providers, setProviders] = useState<PaymentProviderOption[]>([
     {
@@ -87,7 +80,7 @@ export function PaymentProviderSelector({
           }
         }
       } catch (error) {
-        console.error('Error loading user preference:', error);
+        logger.error('Error loading user preference:', { error });
       }
     };
 
@@ -116,7 +109,7 @@ export function PaymentProviderSelector({
           })));
         }
       } catch (error) {
-        console.error('Error loading store settings:', error);
+        logger.error('Error loading store settings:', { error });
       }
     };
 
@@ -134,7 +127,7 @@ export function PaymentProviderSelector({
           .update({ payment_provider_preference: provider })
           .eq('user_id', user.id);
       } catch (error) {
-        console.error('Error saving user preference:', error);
+        logger.error('Error saving user preference:', { error });
       }
     }
   };

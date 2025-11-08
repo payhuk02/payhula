@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { DigitalProductBundle } from '@/hooks/digital/useDigitalBundles';
 
 interface BundleCardProps {
-  bundle: DigitalProductBundle | any;
+  bundle: DigitalProductBundle;
   storeSlug: string;
 }
 

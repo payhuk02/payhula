@@ -49,14 +49,12 @@ const ErrorFallbackComponent = () => {
         colno: event.colno,
         error: event.error,
       });
-      console.error('Erreur non capturée:', event.error);
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       logger.error('Promesse rejetée non gérée:', {
         reason: event.reason,
       });
-      console.error('Promesse rejetée:', event.reason);
     };
 
     window.addEventListener('error', handleError);

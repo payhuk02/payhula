@@ -531,7 +531,7 @@ const Marketplace = () => {
     if (!activeBundles || activeBundles.length === 0) return [];
     return activeBundles.map(bundle => ({
       ...bundle,
-      stores: (bundle as any).stores || null,
+      stores: bundle.stores || null,
       savings_percentage: bundle.discount_percentage || null,
     }));
   }, [activeBundles]);
@@ -849,7 +849,12 @@ const Marketplace = () => {
                     <label className="text-sm font-medium text-slate-300 mb-2 block">Licence</label>
                     <select
                       value={filters.licensingType || 'all'}
-                      onChange={(e) => updateFilter({ licensingType: e.target.value as any })}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        updateFilter({ 
+                          licensingType: value === 'all' ? 'all' : value as 'standard' | 'plr' | 'copyrighted' 
+                        });
+                      }}
                       className="w-full p-2 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="all">Toutes</option>
@@ -1092,8 +1097,8 @@ const Marketplace = () => {
                       product={product}
                       storeSlug={product.stores?.slug || 'default'}
                       affiliateCommissionRate={affiliateCommissionRate}
-                      freeShipping={product.product_type === 'physical' ? (product as any).free_shipping : undefined}
-                      shippingCost={product.product_type === 'physical' ? (product as any).shipping_cost : undefined}
+                      freeShipping={product.product_type === 'physical' ? product.free_shipping ?? undefined : undefined}
+                      shippingCost={product.product_type === 'physical' ? product.shipping_cost ?? undefined : undefined}
                     />
                   );
                 })}
