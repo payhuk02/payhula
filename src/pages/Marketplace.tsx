@@ -58,6 +58,7 @@ import FavoritesManager from "@/components/marketplace/FavoritesManager";
 import ProductCardModern from "@/components/marketplace/ProductCardModern";
 import { BundleCard } from "@/components/marketplace/BundleCard";
 import { CategoryNavigationBar } from "@/components/marketplace/CategoryNavigationBar";
+import { PersonalizedRecommendations } from "@/components/marketplace/ProductRecommendations";
 import { useActiveBundles } from "@/hooks/digital/useDigitalBundles";
 import { logger } from '@/lib/logger';
 import { Product, FilterState, PaginationState } from '@/types/marketplace';
@@ -84,11 +85,23 @@ const Marketplace = () => {
     isFavorite,
   } = useMarketplaceFavorites();
   
+  // Récupérer l'utilisateur pour les recommandations personnalisées
+  const [userId, setUserId] = useState<string | null>(null);
+  
   // États principaux
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [purchasing, setPurchasing] = useState<Set<string>>(new Set());
+  
+  // Récupérer l'utilisateur connecté
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
   
   // États des filtres
   const [filters, setFilters] = useState<FilterState>({
@@ -1183,6 +1196,16 @@ const Marketplace = () => {
             </div>
           ) : paginatedProducts.length > 0 ? (
             <>
+              {/* Recommandations personnalisées (si utilisateur connecté et aucun filtre actif) */}
+              {userId && filters.category === 'all' && filters.search === '' && filters.productType === 'all' && (
+                <div className="mb-12">
+                  <PersonalizedRecommendations
+                    userId={userId}
+                    limit={6}
+                  />
+                </div>
+              )}
+
               <ProductGrid>
                 {paginatedProducts.map((product, index) => {
                   // Récupérer le taux de commission d'affiliation

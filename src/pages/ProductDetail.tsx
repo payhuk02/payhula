@@ -30,6 +30,8 @@ import { SEOMeta, ProductSchema, BreadcrumbSchema } from "@/components/seo";
 import { ProductReviewsSummary } from "@/components/reviews";
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { ProductRecommendations, FrequentlyBoughtTogether } from "@/components/marketplace/ProductRecommendations";
+import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
 
 const ProductDetails = () => {
   const { slug, productSlug } = useParams<{ slug: string; productSlug: string }>();
@@ -511,15 +513,29 @@ const ProductDetails = () => {
                   />
                 )}
 
-                <Button size="lg" className="w-full sm:w-auto">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Acheter maintenant
-                  {selectedVariantPrice && selectedVariantPrice !== product.price && (
-                    <span className="ml-2">
-                      ({selectedVariantPrice.toLocaleString()} {product.currency})
-                    </span>
-                  )}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Acheter maintenant
+                    {selectedVariantPrice && selectedVariantPrice !== product.price && (
+                      <span className="ml-2">
+                        ({selectedVariantPrice.toLocaleString()} {product.currency})
+                      </span>
+                    )}
+                  </Button>
+
+                  {/* Boutons d'alerte prix/stock */}
+                  <PriceStockAlertButton
+                    productId={product.id}
+                    productName={product.name}
+                    currentPrice={selectedVariantPrice || product.promotional_price || product.price}
+                    currency={product.currency || 'XOF'}
+                    productType={product.product_type}
+                    stockQuantity={(product as any).stock_quantity}
+                    variant="outline"
+                    size="lg"
+                  />
+                </div>
 
                 {/* 🔒 NOUVEAU: Badges informatifs (Phase 4) */}
                 {(product.password_protected || product.purchase_limit || product.preorder_allowed) && (
@@ -743,10 +759,32 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {/* Produits similaires */}
+            {/* Produits fréquemment achetés ensemble */}
+            {product && (
+              <div className="mb-12">
+                <FrequentlyBoughtTogether
+                  productId={product.id}
+                  limit={4}
+                />
+              </div>
+            )}
+
+            {/* Produits similaires - Recommandations intelligentes */}
+            {product && (
+              <div className="mb-12">
+                <ProductRecommendations
+                  productId={product.id}
+                  productCategory={product.category}
+                  limit={6}
+                  title="Produits similaires"
+                />
+              </div>
+            )}
+
+            {/* Produits similaires (fallback si pas de recommandations) */}
             {relatedProducts.length > 0 && (
-              <div role="region" aria-labelledby="related-products-heading">
-                <h2 id="related-products-heading" className="text-2xl font-bold mb-6">Produits similaires</h2>
+              <div role="region" aria-labelledby="related-products-heading" className="mb-12">
+                <h2 id="related-products-heading" className="text-2xl font-bold mb-6">Autres produits de cette boutique</h2>
                 <ProductGrid>
                   {relatedProducts.map((related, index) => (
                     <div 

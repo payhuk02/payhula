@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { useMarketplaceFavorites } from "@/hooks/useMarketplaceFavorites";
 import { useCart } from "@/hooks/cart/useCart";
+import { PriceStockAlertButton } from "./PriceStockAlertButton";
 
 interface ProductCardModernProps {
   product: {
@@ -76,12 +77,22 @@ const ProductCardModern = ({
   shippingCost
 }: ProductCardModernProps) => {
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const { addItem } = useCart();
   
   // Hook centralisé pour favoris synchronisés
   const { favorites, toggleFavorite } = useMarketplaceFavorites();
   const isFavorite = favorites.has(product.id);
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   const price = product.promotional_price ?? product.price;
   const hasPromo = product.promotional_price !== null && product.promotional_price !== undefined && product.promotional_price < product.price;
@@ -421,42 +432,59 @@ const ProductCardModern = ({
         </div>
 
         {/* Boutons d'action */}
-        <div className="flex gap-2 mt-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 h-9 text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-            asChild
-          >
-            <Link 
-              to={`/stores/${currentStoreSlug}/products/${product.slug}`}
-              aria-label={`Voir les détails de ${product.name}`}
-              className="flex items-center justify-center gap-1.5"
+        <div className="flex flex-col gap-2 mt-auto">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-9 text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+              asChild
             >
-              <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Voir</span>
-            </Link>
-          </Button>
-          
-          <Button
-            onClick={handleBuyNow}
-            disabled={loading}
-            size="sm"
-            className="flex-1 h-9 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-sm hover:shadow-md disabled:opacity-50"
-            aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                <span>Paiement...</span>
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Acheter</span>
-              </>
-            )}
-          </Button>
+              <Link 
+                to={`/stores/${currentStoreSlug}/products/${product.slug}`}
+                aria-label={`Voir les détails de ${product.name}`}
+                className="flex items-center justify-center gap-1.5"
+              >
+                <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Voir</span>
+              </Link>
+            </Button>
+            
+            <Button
+              onClick={handleBuyNow}
+              disabled={loading}
+              size="sm"
+              className="flex-1 h-9 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-sm hover:shadow-md disabled:opacity-50"
+              aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <span>Paiement...</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Acheter</span>
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Boutons d'alerte (si utilisateur connecté) */}
+          {userId && (
+            <PriceStockAlertButton
+              productId={product.id}
+              productName={product.name}
+              currentPrice={price}
+              currency={product.currency || 'XOF'}
+              productType={product.product_type}
+              stockQuantity={(product as any).stock_quantity}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-center"
+            />
+          )}
         </div>
       </div>
     </article>
@@ -464,4 +492,5 @@ const ProductCardModern = ({
 };
 
 export default ProductCardModern;
+export { ProductCardModern };
 

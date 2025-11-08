@@ -168,6 +168,7 @@ const CustomerMyInvoices = lazy(() => import("./pages/customer/CustomerMyInvoice
 const CustomerMyReturns = lazy(() => import("./pages/customer/CustomerMyReturns"));
 const CustomerLoyaltyPage = lazy(() => import("./pages/customer/CustomerLoyaltyPage"));
 const CustomerMyGiftCardsPage = lazy(() => import("./pages/customer/CustomerMyGiftCardsPage"));
+const PriceStockAlerts = lazy(() => import("./pages/customer/PriceStockAlerts"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const KYC = lazy(() => import("./pages/KYC"));
 const AdminKYC = lazy(() => import("./pages/AdminKYC"));
@@ -346,6 +347,7 @@ const AppContent = () => {
           <Route path="/account/courses" element={<ProtectedRoute><CustomerMyCourses /></ProtectedRoute>} />
           <Route path="/account/profile" element={<ProtectedRoute><CustomerMyProfile /></ProtectedRoute>} />
           <Route path="/account/wishlist" element={<ProtectedRoute><CustomerMyWishlist /></ProtectedRoute>} />
+          <Route path="/account/alerts" element={<ProtectedRoute><PriceStockAlerts /></ProtectedRoute>} />
           <Route path="/account/invoices" element={<ProtectedRoute><CustomerMyInvoices /></ProtectedRoute>} />
           <Route path="/account/returns" element={<ProtectedRoute><CustomerMyReturns /></ProtectedRoute>} />
           <Route path="/account/loyalty" element={<ProtectedRoute><CustomerLoyaltyPage /></ProtectedRoute>} />

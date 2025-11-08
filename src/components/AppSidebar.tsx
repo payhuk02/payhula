@@ -154,6 +154,11 @@ const menuSections = [
         icon: Heart,
       },
       {
+        title: "Mes Alertes",
+        url: "/account/alerts",
+        icon: Bell,
+      },
+      {
         title: "Mes Factures",
         url: "/account/invoices",
         icon: Receipt,
