@@ -373,6 +373,7 @@ export default function Checkout() {
             code: appliedGiftCard.code,
             storeId: storeId || undefined, // Si la carte cadeau est spécifique à une boutique
           } : undefined,
+          affiliateInfo: affiliateInfo, // Passer les infos d'affiliation
         });
 
         if (!multiStoreResult.success) {

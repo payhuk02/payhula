@@ -53,6 +53,12 @@ export interface CreateMultiStoreOrderOptions {
   };
   taxRate?: number;
   shippingAmount?: number;
+  affiliateInfo?: {
+    affiliate_link_id: string | null;
+    affiliate_id: string | null;
+    product_id: string | null;
+    tracking_cookie: string | null;
+  };
 }
 
 export interface MultiStoreOrderResult {
@@ -497,9 +503,15 @@ export async function createMultiStoreTransactions(
     customerName: string;
     customerPhone: string;
     metadata?: Record<string, unknown>;
+    affiliateInfo?: {
+      affiliate_link_id: string | null;
+      affiliate_id: string | null;
+      product_id: string | null;
+      tracking_cookie: string | null;
+    };
   }
 ): Promise<MultiStoreOrderResult['transactions']> {
-  const { provider, customerEmail, customerName, customerPhone, metadata = {} } = options;
+  const { provider, customerEmail, customerName, customerPhone, metadata = {}, affiliateInfo } = options;
   const transactions: MultiStoreOrderResult['transactions'] = [];
   const failedOrders: Array<{ order_id: string; order_number: string; error: string }> = [];
 
@@ -510,6 +522,33 @@ export async function createMultiStoreTransactions(
     // Créer les transactions avec gestion d'erreur individuelle
     for (const order of orders) {
       try {
+        // Préparer les metadata avec les infos d'affiliation si disponibles
+        const transactionMetadata: Record<string, unknown> = {
+          ...metadata,
+          order_number: order.order_number,
+          items_count: order.items_count,
+          store_name: order.store_name,
+        };
+
+        // Ajouter les infos d'affiliation si disponibles
+        // Le tracking_cookie est crucial pour que les triggers SQL fonctionnent
+        if (affiliateInfo?.tracking_cookie) {
+          transactionMetadata.tracking_cookie = affiliateInfo.tracking_cookie;
+          if (affiliateInfo.affiliate_link_id) {
+            transactionMetadata.affiliate_link_id = affiliateInfo.affiliate_link_id;
+          }
+          if (affiliateInfo.affiliate_id) {
+            transactionMetadata.affiliate_id = affiliateInfo.affiliate_id;
+          }
+          if (affiliateInfo.product_id) {
+            transactionMetadata.product_id = affiliateInfo.product_id;
+          }
+          logger.log(`Adding affiliate tracking to transaction for order ${order.order_id}`, {
+            tracking_cookie: affiliateInfo.tracking_cookie,
+            affiliate_id: affiliateInfo.affiliate_id,
+          });
+        }
+
         const paymentResult = await initiatePayment({
           storeId: order.store_id,
           orderId: order.order_id,
@@ -521,12 +560,7 @@ export async function createMultiStoreTransactions(
           customerName,
           customerPhone,
           provider,
-          metadata: {
-            ...metadata,
-            order_number: order.order_number,
-            items_count: order.items_count,
-            store_name: order.store_name,
-          },
+          metadata: transactionMetadata,
         });
 
         if (paymentResult.success && paymentResult.transaction_id) {
@@ -622,6 +656,7 @@ export async function processMultiStoreCheckout(
     }
 
     // 4. Créer les transactions de paiement (même si certaines échouent)
+    // Inclure les infos d'affiliation si disponibles
     const transactions = await createMultiStoreTransactions(orderResult.orders, {
       provider: options.paymentProvider,
       customerEmail: options.customerEmail,
@@ -632,6 +667,7 @@ export async function processMultiStoreCheckout(
         multi_store: true,
         total_stores: orderResult.orders.length,
       },
+      affiliateInfo: options.affiliateInfo,
     });
 
     // Si certaines transactions n'ont pas pu être créées, ce n'est pas bloquant

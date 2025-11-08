@@ -65,18 +65,34 @@ export default function MultiStoreSummary() {
     }
 
     try {
+      // 🔒 SÉCURITÉ: Vérifier que l'utilisateur est connecté
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        logger.error('User not authenticated', authError);
+        toast({
+          title: 'Authentification requise',
+          description: 'Veuillez vous connecter pour accéder à vos commandes',
+          variant: 'destructive',
+        });
+        navigate('/auth');
+        return;
+      }
+
+      // 🔒 SÉCURITÉ: Récupérer les commandes et vérifier que toutes appartiennent à l'utilisateur
       const { data: ordersData, error } = await supabase
         .from('orders')
         .select(`
           id,
           order_number,
           store_id,
+          customer_id,
           total_amount,
           payment_status,
           created_at,
           stores!inner(name)
         `)
-        .in('id', orderIds);
+        .in('id', orderIds)
+        .eq('customer_id', user.id); // 🔒 Filtrer uniquement les commandes de l'utilisateur
 
       if (error) {
         logger.error('Error fetching orders:', error);
@@ -85,6 +101,23 @@ export default function MultiStoreSummary() {
           description: 'Impossible de charger les commandes',
           variant: 'destructive',
         });
+        return;
+      }
+
+      // 🔒 SÉCURITÉ: Vérifier que toutes les commandes demandées ont été trouvées
+      // Si certaines commandes n'ont pas été trouvées, c'est qu'elles n'appartiennent pas à l'utilisateur
+      if (!ordersData || ordersData.length !== orderIds.length) {
+        logger.warn('Security: Some orders not found or do not belong to user', {
+          requested: orderIds.length,
+          found: ordersData?.length || 0,
+          userId: user.id,
+        });
+        toast({
+          title: 'Accès refusé',
+          description: 'Vous n\'avez pas accès à certaines commandes demandées',
+          variant: 'destructive',
+        });
+        navigate('/account/orders');
         return;
       }
 
@@ -249,8 +282,8 @@ export default function MultiStoreSummary() {
       // Si la transaction n'existe pas ou n'a pas d'URL, créer une nouvelle transaction
       if (!order.checkout_url) {
         // Récupérer les informations nécessaires pour créer le paiement
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
           toast({
             title: 'Authentification requise',
             description: 'Veuillez vous connecter pour continuer',
@@ -260,28 +293,70 @@ export default function MultiStoreSummary() {
           return;
         }
 
-        // Récupérer les détails de la commande
-        const { data: orderData } = await supabase
+        // 🔒 SÉCURITÉ: Vérifier que la commande appartient à l'utilisateur
+        const { data: orderData, error: orderError } = await supabase
           .from('orders')
           .select('shipping_address, customer_id')
           .eq('id', order.order_id)
+          .eq('customer_id', user.id) // 🔒 Vérifier que la commande appartient à l'utilisateur
           .single();
 
-        if (!orderData) {
-          throw new Error('Commande non trouvée');
+        if (orderError || !orderData) {
+          logger.error('Security: Order not found or does not belong to user', {
+            orderId: order.order_id,
+            userId: user.id,
+            error: orderError,
+          });
+          toast({
+            title: 'Accès refusé',
+            description: 'Vous n\'avez pas accès à cette commande',
+            variant: 'destructive',
+          });
+          navigate('/account/orders');
+          return;
         }
 
         // Créer une nouvelle transaction de paiement
         const { initiatePayment } = await import('@/lib/payment-service');
+        const { getAffiliateInfo } = await import('@/lib/affiliation-tracking');
         
         // Déterminer le provider (par défaut Moneroo)
         const provider = order.provider || 'moneroo';
+
+        // Récupérer les infos d'affiliation si disponibles
+        const affiliateInfo = await getAffiliateInfo();
 
         const shippingAddress = orderData.shipping_address as {
           email?: string;
           full_name?: string;
           phone?: string;
         };
+
+        // Préparer les metadata avec les infos d'affiliation
+        const transactionMetadata: Record<string, unknown> = {
+          order_number: order.order_number,
+          items_count: order.items_count,
+          store_name: order.store_name,
+          multi_store: true,
+        };
+
+        // Ajouter les infos d'affiliation si disponibles
+        if (affiliateInfo?.tracking_cookie) {
+          transactionMetadata.tracking_cookie = affiliateInfo.tracking_cookie;
+          if (affiliateInfo.affiliate_link_id) {
+            transactionMetadata.affiliate_link_id = affiliateInfo.affiliate_link_id;
+          }
+          if (affiliateInfo.affiliate_id) {
+            transactionMetadata.affiliate_id = affiliateInfo.affiliate_id;
+          }
+          if (affiliateInfo.product_id) {
+            transactionMetadata.product_id = affiliateInfo.product_id;
+          }
+          logger.log(`Adding affiliate tracking to transaction for order ${order.order_id}`, {
+            tracking_cookie: affiliateInfo.tracking_cookie,
+            affiliate_id: affiliateInfo.affiliate_id,
+          });
+        }
 
         const paymentResult = await initiatePayment({
           storeId: order.store_id,
@@ -294,12 +369,7 @@ export default function MultiStoreSummary() {
           customerName: shippingAddress?.full_name || user.user_metadata?.full_name || '',
           customerPhone: shippingAddress?.phone || '',
           provider,
-          metadata: {
-            order_number: order.order_number,
-            items_count: order.items_count,
-            store_name: order.store_name,
-            multi_store: true,
-          },
+          metadata: transactionMetadata,
         });
 
         if (paymentResult.success && paymentResult.checkout_url) {
@@ -364,9 +434,9 @@ export default function MultiStoreSummary() {
     setProcessingAllPayments(true);
 
     try {
-      // Créer les transactions pour toutes les commandes en attente
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      // 🔒 SÉCURITÉ: Vérifier que l'utilisateur est connecté
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
         toast({
           title: 'Authentification requise',
           description: 'Veuillez vous connecter pour continuer',
@@ -376,18 +446,28 @@ export default function MultiStoreSummary() {
         return;
       }
 
+      // Récupérer les infos d'affiliation une seule fois pour toutes les commandes
+      const { getAffiliateInfo } = await import('@/lib/affiliation-tracking');
+      const affiliateInfo = await getAffiliateInfo();
+
       const { initiatePayment } = await import('@/lib/payment-service');
       const paymentPromises = pendingOrders.map(async (order) => {
         try {
-          // Récupérer les détails de la commande
-          const { data: orderData } = await supabase
+          // 🔒 SÉCURITÉ: Vérifier que la commande appartient à l'utilisateur
+          const { data: orderData, error: orderError } = await supabase
             .from('orders')
             .select('shipping_address, customer_id')
             .eq('id', order.order_id)
+            .eq('customer_id', user.id) // 🔒 Vérifier que la commande appartient à l'utilisateur
             .single();
 
-          if (!orderData) {
-            throw new Error(`Commande ${order.order_number} non trouvée`);
+          if (orderError || !orderData) {
+            logger.error('Security: Order not found or does not belong to user', {
+              orderId: order.order_id,
+              userId: user.id,
+              error: orderError,
+            });
+            throw new Error(`Commande ${order.order_number} non trouvée ou accès refusé`);
           }
 
           const shippingAddress = orderData.shipping_address as {
@@ -397,6 +477,33 @@ export default function MultiStoreSummary() {
           };
 
           const provider = order.provider || 'moneroo';
+
+          // Préparer les metadata avec les infos d'affiliation
+          const transactionMetadata: Record<string, unknown> = {
+            order_number: order.order_number,
+            items_count: order.items_count,
+            store_name: order.store_name,
+            multi_store: true,
+            grouped_payment: true,
+          };
+
+          // Ajouter les infos d'affiliation si disponibles
+          if (affiliateInfo?.tracking_cookie) {
+            transactionMetadata.tracking_cookie = affiliateInfo.tracking_cookie;
+            if (affiliateInfo.affiliate_link_id) {
+              transactionMetadata.affiliate_link_id = affiliateInfo.affiliate_link_id;
+            }
+            if (affiliateInfo.affiliate_id) {
+              transactionMetadata.affiliate_id = affiliateInfo.affiliate_id;
+            }
+            if (affiliateInfo.product_id) {
+              transactionMetadata.product_id = affiliateInfo.product_id;
+            }
+            logger.log(`Adding affiliate tracking to grouped payment for order ${order.order_id}`, {
+              tracking_cookie: affiliateInfo.tracking_cookie,
+              affiliate_id: affiliateInfo.affiliate_id,
+            });
+          }
 
           const paymentResult = await initiatePayment({
             storeId: order.store_id,
@@ -409,13 +516,7 @@ export default function MultiStoreSummary() {
             customerName: shippingAddress?.full_name || user.user_metadata?.full_name || '',
             customerPhone: shippingAddress?.phone || '',
             provider,
-            metadata: {
-              order_number: order.order_number,
-              items_count: order.items_count,
-              store_name: order.store_name,
-              multi_store: true,
-              grouped_payment: true,
-            },
+            metadata: transactionMetadata,
           });
 
           if (paymentResult.success && paymentResult.checkout_url) {
