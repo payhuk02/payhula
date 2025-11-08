@@ -154,6 +154,8 @@ const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
+const MultiStoreSummary = lazy(() => import("./pages/checkout/MultiStoreSummary"));
+const MultiStoreOrdersHistory = lazy(() => import("./pages/customer/MultiStoreOrdersHistory"));
 const CustomerPortal = lazy(() => import("./pages/customer/CustomerPortal"));
 const CustomerMyOrders = lazy(() => import("./pages/customer/MyOrders"));
 const CustomerMyDownloads = lazy(() => import("./pages/customer/MyDownloads"));
@@ -332,10 +334,12 @@ const AppContent = () => {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/multi-store-summary" element={<ProtectedRoute><MultiStoreSummary /></ProtectedRoute>} />
           
           {/* --- Routes Customer Portal --- */}
           <Route path="/account" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
           <Route path="/account/orders" element={<ProtectedRoute><CustomerMyOrders /></ProtectedRoute>} />
+          <Route path="/account/orders/multi-store" element={<ProtectedRoute><MultiStoreOrdersHistory /></ProtectedRoute>} />
           <Route path="/account/downloads" element={<ProtectedRoute><CustomerMyDownloads /></ProtectedRoute>} />
           <Route path="/account/digital" element={<ProtectedRoute><CustomerDigitalPortal /></ProtectedRoute>} />
           <Route path="/account/physical" element={<ProtectedRoute><CustomerPhysicalPortal /></ProtectedRoute>} />

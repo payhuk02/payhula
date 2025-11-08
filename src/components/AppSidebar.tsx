@@ -113,6 +113,11 @@ const menuSections = [
         icon: ShoppingCart,
       },
       {
+        title: "Commandes Multi-Stores",
+        url: "/account/orders/multi-store",
+        icon: ShoppingBag,
+      },
+      {
         title: "Mes Téléchargements",
         url: "/account/downloads",
         icon: Download,

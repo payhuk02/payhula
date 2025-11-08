@@ -33,6 +33,7 @@ import { logger } from '@/lib/logger';
 import GiftCardInput from '@/components/checkout/GiftCardInput';
 import CouponInput from '@/components/checkout/CouponInput';
 import { PaymentProviderSelector } from '@/components/checkout/PaymentProviderSelector';
+import { processMultiStoreCheckout, groupItemsByStore, type StoreGroup } from '@/lib/multi-store-checkout';
 import {
   ShoppingBag,
   MapPin,
@@ -84,6 +85,11 @@ export default function Checkout() {
   // State pour le provider de paiement sélectionné
   const [selectedPaymentProvider, setSelectedPaymentProvider] = useState<'moneroo' | 'paydunya'>('moneroo');
   
+  // State pour la gestion multi-stores
+  const [isMultiStore, setIsMultiStore] = useState(false);
+  const [storeGroups, setStoreGroups] = useState<Map<string, StoreGroup>>(new Map());
+  const [isCheckingStores, setIsCheckingStores] = useState(false);
+  
   // Récupérer l'utilisateur pour pré-remplir le formulaire
   const { data: user } = useQuery({
     queryKey: ['current-user'],
@@ -93,22 +99,69 @@ export default function Checkout() {
     },
   });
 
-  // Charger le store_id et customer_id du premier produit si disponible
+  // Vérifier si le panier contient des produits de plusieurs boutiques
   useEffect(() => {
-    if (items.length > 0 && !storeId) {
-      supabase
-        .from('products')
-        .select('store_id')
-        .eq('id', items[0].product_id)
-        .single()
-        .then(({ data }) => {
-          if (data?.store_id) {
-            setStoreId(data.store_id);
+    const checkMultiStore = async () => {
+      if (items.length === 0) {
+        setIsMultiStore(false);
+        setStoreGroups(new Map());
+        return;
+      }
+
+      setIsCheckingStores(true);
+      
+      try {
+        // Récupérer tous les store_id des produits du panier
+        const productIds = items.map(item => item.product_id);
+        const { data: products, error } = await supabase
+          .from('products')
+          .select('id, store_id, name')
+          .in('id', productIds);
+
+        if (error) {
+          logger.error('Error checking stores:', error);
+          setIsCheckingStores(false);
+          return;
+        }
+
+        if (products && products.length > 0) {
+          // Compter les stores uniques
+          const uniqueStoreIds = new Set(
+            products
+              .map(p => p.store_id)
+              .filter((id): id is string => id !== null && id !== undefined)
+          );
+
+          const hasMultipleStores = uniqueStoreIds.size > 1;
+          setIsMultiStore(hasMultipleStores);
+
+          if (hasMultipleStores) {
+            // Grouper les items par boutique
+            const groups = await groupItemsByStore(items);
+            setStoreGroups(groups);
+            
+            // Pour la compatibilité, garder le premier store_id
+            const firstStoreId = Array.from(uniqueStoreIds)[0] as string;
+            setStoreId(firstStoreId);
+          } else {
+            // Un seul store, comportement normal
+            const firstStoreId = Array.from(uniqueStoreIds)[0] as string;
+            setStoreId(firstStoreId || null);
+            setStoreGroups(new Map());
           }
-        });
-    }
-    
-    // Charger le customer_id si utilisateur connecté
+        }
+      } catch (error) {
+        logger.error('Error in checkMultiStore:', error);
+      } finally {
+        setIsCheckingStores(false);
+      }
+    };
+
+    checkMultiStore();
+  }, [items]);
+
+  // Charger le customer_id si utilisateur connecté
+  useEffect(() => {
     if (user?.email && !customerId && storeId) {
       supabase
         .from('customers')
@@ -122,7 +175,7 @@ export default function Checkout() {
           }
         });
     }
-  }, [items, storeId, user, customerId]);
+  }, [user, storeId, customerId]);
   
   // Charger la carte cadeau depuis localStorage si disponible
   useEffect(() => {
@@ -290,8 +343,61 @@ export default function Checkout() {
         return;
       }
 
-      // Pour l'instant, utiliser le store_id du premier produit
-      // TODO: Gérer multi-stores dans une commande
+      // 🆕 Vérifier si le panier contient des produits de plusieurs boutiques
+      if (isMultiStore && storeGroups.size > 1) {
+        // Traitement multi-stores
+        logger.log('Multi-store checkout detected', { storeCount: storeGroups.size });
+
+        // Récupérer les infos d'affiliation si disponible
+        const affiliateInfo = await getAffiliateInfo();
+
+        // Traiter le checkout multi-stores
+        const multiStoreResult = await processMultiStoreCheckout(items, {
+          shippingAddress: formData,
+          customerId: user.id,
+          customerEmail: formData.email,
+          customerName: formData.full_name,
+          customerPhone: formData.phone,
+          paymentProvider: selectedPaymentProvider || 'moneroo',
+          taxRate,
+          shippingAmount,
+          appliedCoupon: appliedCouponCode ? {
+            id: appliedCouponCode.id,
+            discountAmount: couponDiscountAmount,
+            code: appliedCouponCode.code,
+            storeId: storeId || undefined, // Si le coupon est spécifique à une boutique
+          } : undefined,
+          appliedGiftCard: appliedGiftCard ? {
+            id: appliedGiftCard.id,
+            balance: appliedGiftCard.balance,
+            code: appliedGiftCard.code,
+            storeId: storeId || undefined, // Si la carte cadeau est spécifique à une boutique
+          } : undefined,
+        });
+
+        if (!multiStoreResult.success) {
+          throw new Error(multiStoreResult.error || 'Erreur lors du traitement multi-stores');
+        }
+
+        // Vérifier que des commandes ont été créées
+        if (multiStoreResult.orders.length === 0) {
+          throw new Error('Aucune commande n\'a été créée');
+        }
+
+        // Afficher un message de succès
+        toast({
+          title: 'Commandes créées avec succès',
+          description: `${multiStoreResult.orders.length} commande(s) créée(s) pour ${multiStoreResult.orders.length} boutique(s) différente(s)`,
+        });
+
+        // Rediriger vers la page de résumé multi-commandes
+        const orderIds = multiStoreResult.orders.map(o => o.order_id).join(',');
+        navigate(`/checkout/multi-store-summary?orders=${orderIds}`);
+
+        return; // Sortir de la fonction
+      }
+
+      // Comportement normal (un seul store ou fallback)
       const firstProduct = items[0];
       const { data: product } = await supabase
         .from('products')
@@ -811,35 +917,137 @@ export default function Checkout() {
               <div className="lg:col-span-1">
                 <Card className="sticky top-4">
                   <CardHeader>
-                    <CardTitle>Récapitulatif</CardTitle>
+                    <CardTitle>
+                      Récapitulatif
+                      {isMultiStore && storeGroups.size > 1 && (
+                        <span className="ml-2 text-sm text-orange-600 font-normal">
+                          ({storeGroups.size} boutique{storeGroups.size > 1 ? 's' : ''})
+                        </span>
+                      )}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* Articles */}
-                    <div className="space-y-3 max-h-64 overflow-y-auto">
-                      {items.map((item) => (
-                        <div key={item.id} className="flex gap-3 text-sm">
-                          <div className="w-12 h-12 rounded border overflow-hidden flex-shrink-0">
-                            <img
-                              src={item.product_image_url || '/placeholder-product.png'}
-                              alt={item.product_name}
-                              className="w-full h-full object-cover"
-                            />
+                    {isCheckingStores ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : isMultiStore && storeGroups.size > 1 ? (
+                      // Affichage multi-stores
+                      <div className="space-y-4">
+                        {Array.from(storeGroups.entries()).map(([storeId, group]) => (
+                          <div key={storeId} className="border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-semibold text-sm">
+                                {group.store_name || `Boutique ${storeId.substring(0, 8)}`}
+                              </h4>
+                              <span className="text-xs text-muted-foreground">
+                                {group.items.length} article{group.items.length > 1 ? 's' : ''}
+                              </span>
+                            </div>
+                            <div className="space-y-2 max-h-48 overflow-y-auto">
+                              {group.items.map((item) => (
+                                <div key={item.id || item.product_id} className="flex gap-2 text-xs">
+                                  <div className="w-8 h-8 rounded border overflow-hidden flex-shrink-0">
+                                    <img
+                                      src={item.product_image_url || '/placeholder-product.png'}
+                                      alt={item.product_name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium truncate text-xs">{item.product_name}</p>
+                                    {item.variant_name && (
+                                      <p className="text-xs text-muted-foreground">{item.variant_name}</p>
+                                    )}
+                                    <p className="text-xs text-muted-foreground">
+                                      {item.quantity} × {item.unit_price.toLocaleString('fr-FR')} XOF
+                                    </p>
+                                  </div>
+                                  <p className="font-medium whitespace-nowrap text-xs">
+                                    {((item.unit_price - (item.discount_amount || 0)) * item.quantity).toLocaleString('fr-FR')} XOF
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                            <Separator />
+                            <div className="space-y-1 text-xs pt-1">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Sous-total:</span>
+                                <span>{group.subtotal.toLocaleString('fr-FR')} XOF</span>
+                              </div>
+                              {group.tax_amount > 0 && (
+                                <div className="flex justify-between text-muted-foreground">
+                                  <span>Taxes:</span>
+                                  <span>{group.tax_amount.toLocaleString('fr-FR')} XOF</span>
+                                </div>
+                              )}
+                              {group.shipping_amount > 0 && (
+                                <div className="flex justify-between text-muted-foreground">
+                                  <span>Livraison:</span>
+                                  <span>{group.shipping_amount.toLocaleString('fr-FR')} XOF</span>
+                                </div>
+                              )}
+                              {group.discount_amount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                  <span>Réduction:</span>
+                                  <span>-{group.discount_amount.toLocaleString('fr-FR')} XOF</span>
+                                </div>
+                              )}
+                              <div className="flex justify-between font-semibold pt-1 border-t">
+                                <span>Total:</span>
+                                <span>{group.total.toLocaleString('fr-FR')} XOF</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{item.product_name}</p>
-                            {item.variant_name && (
-                              <p className="text-xs text-muted-foreground">{item.variant_name}</p>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                              Quantité: {item.quantity}
-                            </p>
-                          </div>
-                          <p className="font-medium whitespace-nowrap">
-                            {((item.unit_price - (item.discount_amount || 0)) * item.quantity).toLocaleString('fr-FR')} XOF
-                          </p>
+                        ))}
+                        <Alert>
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription className="text-xs">
+                            Votre commande sera divisée en {storeGroups.size} commande(s) distincte(s), une par boutique.
+                          </AlertDescription>
+                        </Alert>
+                        <Separator />
+                        <div className="flex justify-between items-center text-lg font-bold pt-2">
+                          <span>Total Général:</span>
+                          <span className="text-2xl text-primary">
+                            {Array.from(storeGroups.values())
+                              .reduce((sum, group) => sum + group.total, 0)
+                              .toLocaleString('fr-FR')} XOF
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                        <p className="text-xs text-muted-foreground text-center">
+                          Réparti sur {storeGroups.size} commande{storeGroups.size > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    ) : (
+                      // Affichage normal (un seul store)
+                      <>
+                        {/* Articles */}
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          {items.map((item) => (
+                            <div key={item.id} className="flex gap-3 text-sm">
+                              <div className="w-12 h-12 rounded border overflow-hidden flex-shrink-0">
+                                <img
+                                  src={item.product_image_url || '/placeholder-product.png'}
+                                  alt={item.product_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{item.product_name}</p>
+                                {item.variant_name && (
+                                  <p className="text-xs text-muted-foreground">{item.variant_name}</p>
+                                )}
+                                <p className="text-xs text-muted-foreground">
+                                  Quantité: {item.quantity}
+                                </p>
+                              </div>
+                              <p className="font-medium whitespace-nowrap">
+                                {((item.unit_price - (item.discount_amount || 0)) * item.quantity).toLocaleString('fr-FR')} XOF
+                              </p>
+                            </div>
+                          ))}
+                        </div>
 
                     <Separator />
 
@@ -895,7 +1103,7 @@ export default function Checkout() {
                     {/* Bouton checkout */}
                     <Button
                       onClick={handleCheckout}
-                      disabled={isProcessing || items.length === 0}
+                      disabled={isProcessing || items.length === 0 || isCheckingStores}
                       className="w-full"
                       size="lg"
                     >
@@ -904,10 +1112,21 @@ export default function Checkout() {
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Traitement...
                         </>
+                      ) : isCheckingStores ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Vérification des boutiques...
+                        </>
                       ) : (
                         <>
                           <CreditCard className="mr-2 h-4 w-4" />
-                          Payer {finalTotal.toLocaleString('fr-FR')} XOF
+                          Payer{' '}
+                          {isMultiStore && storeGroups.size > 1
+                            ? Array.from(storeGroups.values())
+                                .reduce((sum, group) => sum + group.total, 0)
+                                .toLocaleString('fr-FR')
+                            : finalTotal.toLocaleString('fr-FR')}{' '}
+                          XOF
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </>
                       )}
