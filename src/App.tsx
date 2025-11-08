@@ -187,6 +187,8 @@ const AdminActivity = lazy(() => import("./pages/admin/AdminActivity"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminCommissionSettings = lazy(() => import("./pages/admin/AdminCommissionSettings"));
 const AdminCommissionPayments = lazy(() => import("./pages/admin/AdminCommissionPayments"));
+const MonerooAnalytics = lazy(() => import("./pages/admin/MonerooAnalytics"));
+const MonerooReconciliation = lazy(() => import("./pages/admin/MonerooReconciliation"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 const AdminDisputes = lazy(() => import("./pages/admin/AdminDisputes"));
 const AdminAffiliates = lazy(() => import("./pages/admin/AdminAffiliates"));
@@ -477,6 +479,8 @@ const AppContent = () => {
           <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
           <Route path="/admin/commission-settings" element={<ProtectedRoute><AdminCommissionSettings /></ProtectedRoute>} />
           <Route path="/admin/commission-payments" element={<ProtectedRoute><AdminCommissionPayments /></ProtectedRoute>} />
+          <Route path="/admin/moneroo-analytics" element={<ProtectedRoute><MonerooAnalytics /></ProtectedRoute>} />
+          <Route path="/admin/moneroo-reconciliation" element={<ProtectedRoute><MonerooReconciliation /></ProtectedRoute>} />
           <Route path="/admin/notifications" element={<ProtectedRoute><AdminNotifications /></ProtectedRoute>} />
           <Route path="/admin/revenue" element={<ProtectedRoute><PlatformRevenue /></ProtectedRoute>} />
           <Route path="/admin/kyc" element={<ProtectedRoute><AdminKYC /></ProtectedRoute>} />

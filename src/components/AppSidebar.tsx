@@ -659,6 +659,16 @@ const adminMenuSections = [
         url: "/admin/disputes",
         icon: Scale,
       },
+      {
+        title: "Statistiques Moneroo",
+        url: "/admin/moneroo-analytics",
+        icon: BarChart3,
+      },
+      {
+        title: "Réconciliation Moneroo",
+        url: "/admin/moneroo-reconciliation",
+        icon: RotateCcw,
+      },
     ]
   },
     {

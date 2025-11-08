@@ -81,6 +81,8 @@ const menuSections = [
       { icon: CreditCard, label: 'Paiements', path: '/admin/payments' },
       { icon: Percent, label: 'Taxes', path: '/admin/taxes' },
       { icon: Scale, label: 'Litiges', path: '/admin/disputes' },
+      { icon: BarChart3, label: 'Statistiques Moneroo', path: '/admin/moneroo-analytics' },
+      { icon: RotateCcw, label: 'Réconciliation Moneroo', path: '/admin/moneroo-reconciliation' },
     ]
   },
     {
