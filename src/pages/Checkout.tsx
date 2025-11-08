@@ -160,8 +160,9 @@ export default function Checkout() {
             setStoreGroups(new Map());
           }
         }
-      } catch (error) {
-        logger.error('Error in checkMultiStore:', error);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error('Error in checkMultiStore:', { error: errorMessage });
       } finally {
         setIsCheckingStores(false);
       }

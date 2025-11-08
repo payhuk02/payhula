@@ -35,7 +35,6 @@ export interface ShippingAddress {
 }
 
 export interface CreateMultiStoreOrderOptions {
-  items: CartItem[];
   shippingAddress: ShippingAddress;
   customerId: string;
   customerEmail: string;
