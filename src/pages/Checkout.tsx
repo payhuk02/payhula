@@ -27,7 +27,7 @@ import { useCart } from '@/hooks/cart/useCart';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { initiatePayment } from '@/lib/payment-service';
-import { createAffiliateCommission, getAffiliateInfo } from '@/lib/affiliation-tracking';
+import { getAffiliateInfo } from '@/lib/affiliation-tracking';
 import { safeRedirect } from '@/lib/url-validator';
 import { logger } from '@/lib/logger';
 import GiftCardInput from '@/components/checkout/GiftCardInput';
