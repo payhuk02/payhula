@@ -1,6 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import { monerooClient, MonerooCheckoutData } from "./moneroo-client";
 import { logger } from './logger';
+import {
+  parseMonerooError,
+  MonerooError,
+  MonerooValidationError,
+} from "./moneroo-errors";
 
 export interface PaymentOptions {
   storeId: string;
@@ -13,7 +18,22 @@ export interface PaymentOptions {
   customerEmail?: string;
   customerName?: string;
   customerPhone?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
+}
+
+export interface RefundOptions {
+  transactionId: string;
+  amount?: number; // Si non spécifié, remboursement total
+  reason?: string;
+}
+
+export interface RefundResult {
+  success: boolean;
+  refund_id?: string;
+  amount?: number;
+  currency?: string;
+  status?: string;
+  error?: string;
 }
 
 /**
@@ -122,9 +142,15 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       checkout_url: monerooResponse.checkout_url,
       moneroo_transaction_id: monerooResponse.transaction_id || monerooResponse.id,
     };
-  } catch (error: any) {
-    logger.error("Payment initiation error:", error);
-    throw error;
+  } catch (error: unknown) {
+    const monerooError = parseMonerooError(error);
+    logger.error("Payment initiation error:", {
+      error: monerooError.message,
+      code: monerooError.code,
+      statusCode: monerooError.statusCode,
+      details: monerooError.details,
+    });
+    throw monerooError;
   }
 };
 
@@ -202,8 +228,145 @@ export const verifyTransactionStatus = async (transactionId: string) => {
     }
 
     return transaction;
-  } catch (error: any) {
-    console.error("Transaction verification error:", error);
-    throw error;
+  } catch (error: unknown) {
+    const monerooError = parseMonerooError(error);
+    logger.error("Transaction verification error:", {
+      error: monerooError.message,
+      code: monerooError.code,
+      transactionId,
+    });
+    throw monerooError;
+  }
+};
+
+/**
+ * Rembourse un paiement Moneroo
+ */
+export const refundMonerooPayment = async (options: RefundOptions): Promise<RefundResult> => {
+  const { transactionId, amount, reason } = options;
+
+  try {
+    // Validation
+    if (!transactionId) {
+      throw new MonerooValidationError("Transaction ID is required");
+    }
+
+    // Récupérer la transaction
+    const { data: transaction, error: fetchError } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("id", transactionId)
+      .single();
+
+    if (fetchError || !transaction) {
+      throw new MonerooValidationError("Transaction not found");
+    }
+
+    // Vérifier que la transaction est complétée
+    if (transaction.status !== "completed") {
+      throw new MonerooValidationError(
+        `Cannot refund transaction with status: ${transaction.status}`
+      );
+    }
+
+    // Vérifier que c'est une transaction Moneroo
+    if (transaction.payment_provider !== "moneroo" || !transaction.moneroo_transaction_id) {
+      throw new MonerooValidationError("Transaction is not a Moneroo payment");
+    }
+
+    // Vérifier le montant
+    const refundAmount = amount || transaction.amount;
+    if (refundAmount > transaction.amount) {
+      throw new MonerooValidationError("Refund amount cannot exceed transaction amount");
+    }
+
+    // Log de début de remboursement
+    await supabase.from("transaction_logs").insert([{
+      transaction_id: transactionId,
+      event_type: "refund_initiated",
+      status: "processing",
+      request_data: { amount: refundAmount, reason },
+    }]);
+
+    // Appeler l'API Moneroo pour le remboursement
+    const refundResponse = await monerooClient.refundPayment({
+      paymentId: transaction.moneroo_transaction_id,
+      amount: refundAmount,
+      reason: reason || "Customer request",
+    });
+
+    // Mettre à jour la transaction avec les infos de remboursement
+    const { error: updateError } = await supabase
+      .from("transactions")
+      .update({
+        status: "refunded",
+        moneroo_refund_id: refundResponse.refund_id,
+        moneroo_refund_amount: refundResponse.amount,
+        moneroo_refund_reason: reason || "Customer request",
+        refunded_at: new Date().toISOString(),
+        metadata: {
+          ...(transaction.metadata as Record<string, unknown> || {}),
+          refund: {
+            refund_id: refundResponse.refund_id,
+            amount: refundResponse.amount,
+            currency: refundResponse.currency,
+            status: refundResponse.status,
+            created_at: refundResponse.created_at,
+            reason,
+          },
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", transactionId);
+
+    if (updateError) {
+      logger.error("Error updating transaction with refund:", updateError);
+    }
+
+    // Log de remboursement complété
+    await supabase.from("transaction_logs").insert([{
+      transaction_id: transactionId,
+      event_type: "refund_completed",
+      status: "completed",
+      response_data: refundResponse,
+    }]);
+
+    logger.log("Refund completed:", {
+      transactionId,
+      refundId: refundResponse.refund_id,
+      amount: refundResponse.amount,
+    });
+
+    return {
+      success: true,
+      refund_id: refundResponse.refund_id,
+      amount: refundResponse.amount,
+      currency: refundResponse.currency,
+      status: refundResponse.status,
+    };
+  } catch (error: unknown) {
+    const monerooError = parseMonerooError(error);
+    
+    // Log de l'erreur
+    await supabase.from("transaction_logs").insert([{
+      transaction_id: transactionId,
+      event_type: "refund_failed",
+      status: "failed",
+      error_data: {
+        error: monerooError.message,
+        code: monerooError.code,
+      },
+    }]).catch((err) => console.error("Error logging refund failure:", err));
+
+    logger.error("Refund error:", {
+      error: monerooError.message,
+      code: monerooError.code,
+      transactionId,
+    });
+
+    return {
+      success: false,
+      error: monerooError.message,
+    };
   }
 };

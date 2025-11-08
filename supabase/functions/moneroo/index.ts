@@ -60,6 +60,22 @@ serve(async (req) => {
         body = null;
         break;
       
+      case 'refund_payment':
+        endpoint = `/payments/${data.paymentId}/refund`;
+        method = 'POST';
+        // Si amount n'est pas spécifié, c'est un remboursement total
+        body = {
+          ...(data.amount && { amount: data.amount }),
+          reason: data.reason || 'Customer request',
+        };
+        break;
+      
+      case 'cancel_payment':
+        endpoint = `/payments/${data.paymentId}/cancel`;
+        method = 'POST';
+        body = null;
+        break;
+      
       default:
         return new Response(
           JSON.stringify({ error: 'Action non supportée' }),

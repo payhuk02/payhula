@@ -1,4 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
+import {
+  parseMonerooError,
+  MonerooNetworkError,
+  MonerooAPIError,
+  MonerooTimeoutError,
+  MonerooValidationError,
+  MonerooAuthenticationError,
+} from "./moneroo-errors";
 
 export interface MonerooPaymentData {
   amount: number;
@@ -9,7 +17,7 @@ export interface MonerooPaymentData {
     name?: string;
     phone?: string;
   };
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   return_url?: string;
   cancel_url?: string;
 }
@@ -22,26 +30,69 @@ export interface MonerooCheckoutData {
   customer_name?: string;
   return_url: string;
   cancel_url?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
+}
+
+export interface MonerooRefundData {
+  paymentId: string;
+  amount?: number; // Si non spécifié, remboursement total
+  reason?: string;
+}
+
+export interface MonerooRefundResponse {
+  refund_id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  created_at: string;
 }
 
 class MonerooClient {
-  private async callFunction(action: string, data: Record<string, any>) {
-    const { data: response, error } = await supabase.functions.invoke("moneroo", {
-      body: { action, data },
-    });
+  private async callFunction(action: string, data: Record<string, unknown>) {
+    try {
+      const { data: response, error } = await supabase.functions.invoke("moneroo", {
+        body: { action, data },
+      });
 
-    if (error) {
-      console.error(`[MonerooClient] Supabase function error:`, error);
-      throw new Error(error.message || "Erreur de communication avec le serveur.");
+      if (error) {
+        // Erreur de communication Supabase
+        if (error.message?.includes('timeout') || error.message?.includes('TIMEOUT')) {
+          throw new MonerooTimeoutError(error.message);
+        }
+        if (error.message?.includes('network') || error.message?.includes('fetch')) {
+          throw new MonerooNetworkError(error.message);
+        }
+        throw parseMonerooError(error);
+      }
+
+      if (!response?.success) {
+        // Erreur API Moneroo
+        const statusCode = (response as { statusCode?: number })?.statusCode || 500;
+        const errorMessage = (response as { error?: string })?.error || "Erreur lors de la requête Moneroo.";
+        
+        if (statusCode === 401) {
+          throw new MonerooAuthenticationError(errorMessage);
+        }
+        if (statusCode === 400) {
+          throw new MonerooValidationError(errorMessage);
+        }
+        
+        throw new MonerooAPIError(errorMessage, statusCode, response);
+      }
+
+      return response.data;
+    } catch (error) {
+      // Si c'est déjà une MonerooError, la relancer
+      if (error instanceof MonerooNetworkError || 
+          error instanceof MonerooAPIError ||
+          error instanceof MonerooTimeoutError ||
+          error instanceof MonerooValidationError ||
+          error instanceof MonerooAuthenticationError) {
+        throw error;
+      }
+      // Sinon, parser l'erreur
+      throw parseMonerooError(error);
     }
-
-    if (!response?.success) {
-      console.error(`[MonerooClient] Moneroo API error:`, response);
-      throw new Error(response?.error || "Erreur lors de la requête Moneroo.");
-    }
-
-    return response.data;
   }
 
   /** 🔹 Créer un paiement direct */
@@ -49,7 +100,7 @@ class MonerooClient {
     return this.callFunction("create_payment", paymentData);
   }
 
-  /** 🔹 Récupérer les détails d’un paiement */
+  /** 🔹 Récupérer les détails d'un paiement */
   async getPayment(paymentId: string) {
     return this.callFunction("get_payment", { paymentId });
   }
@@ -59,9 +110,19 @@ class MonerooClient {
     return this.callFunction("create_checkout", checkoutData);
   }
 
-  /** 🔹 Vérifier le statut d’un paiement */
+  /** 🔹 Vérifier le statut d'un paiement */
   async verifyPayment(paymentId: string) {
     return this.callFunction("verify_payment", { paymentId });
+  }
+
+  /** 🔹 Rembourser un paiement */
+  async refundPayment(refundData: MonerooRefundData): Promise<MonerooRefundResponse> {
+    return this.callFunction("refund_payment", refundData) as Promise<MonerooRefundResponse>;
+  }
+
+  /** 🔹 Annuler un paiement */
+  async cancelPayment(paymentId: string) {
+    return this.callFunction("cancel_payment", { paymentId });
   }
 }
 

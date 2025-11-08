@@ -6,6 +6,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import {
+  notifyCommissionApproved,
+  notifyCommissionRejected,
+  notifyPaymentRequestApproved,
+  notifyPaymentRequestRejected,
+  notifyPaymentRequestProcessed,
+} from '@/lib/commission-notifications';
 
 export interface StoreAffiliate {
   id: string;
@@ -272,6 +279,13 @@ export const useStoreAffiliates = (storeId: string) => {
   // Approuver un affilié
   const approveAffiliate = useMutation({
     mutationFn: async (affiliateId: string) => {
+      // Récupérer les infos de l'affilié avant la mise à jour
+      const { data: affiliate } = await supabase
+        .from('affiliates')
+        .select('user_id')
+        .eq('id', affiliateId)
+        .single();
+
       const { error } = await supabase
         .from('affiliates')
         .update({ status: 'active', updated_at: new Date().toISOString() })
@@ -279,10 +293,19 @@ export const useStoreAffiliates = (storeId: string) => {
         .eq('store_id', storeId);
 
       if (error) throw error;
+
+      // Notifier l'affilié (via trigger SQL, mais on peut aussi le faire ici pour plus de contrôle)
+      return { affiliate_id: affiliateId, user_id: affiliate?.user_id };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['store-affiliates', storeId] });
       queryClient.invalidateQueries({ queryKey: ['store-affiliate-stats', storeId] });
+      
+      if (data?.user_id) {
+        // La notification sera créée par le trigger SQL, mais on peut aussi l'envoyer ici
+        // pour s'assurer qu'elle est bien envoyée
+      }
+
       toast({
         title: '✅ Affilié approuvé',
         description: 'L\'affilié a été approuvé avec succès',
@@ -359,16 +382,42 @@ export const useStoreAffiliates = (storeId: string) => {
   // Approuver une commission
   const approveCommission = useMutation({
     mutationFn: async (commissionId: string) => {
+      // Récupérer les infos de la commission avant la mise à jour
+      const { data: commission } = await supabase
+        .from('affiliate_commissions')
+        .select('affiliate_id, commission_amount, order_id, affiliates(user_id), orders(order_number)')
+        .eq('id', commissionId)
+        .single();
+
       const { error } = await supabase
         .from('affiliate_commissions')
         .update({ status: 'approved', updated_at: new Date().toISOString() })
         .eq('id', commissionId);
 
       if (error) throw error;
+
+      // La notification sera créée par le trigger SQL, mais on peut aussi l'envoyer ici
+      return {
+        commission_id: commissionId,
+        affiliate_user_id: (commission as any)?.affiliates?.user_id,
+        amount: commission?.commission_amount,
+        order_number: (commission as any)?.orders?.order_number,
+      };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['store-affiliate-commissions', storeId] });
       queryClient.invalidateQueries({ queryKey: ['store-affiliate-stats', storeId] });
+      
+      // Notifier l'affilié (le trigger SQL le fait déjà, mais on peut aussi l'envoyer ici pour plus de contrôle)
+      if (data?.affiliate_user_id && data?.amount) {
+        await notifyCommissionApproved(data.affiliate_user_id, {
+          commission_id: data.commission_id,
+          amount: data.amount,
+          currency: 'XOF',
+          order_number: data.order_number,
+        });
+      }
+
       toast({
         title: '✅ Commission approuvée',
         description: 'La commission a été approuvée avec succès',
@@ -387,16 +436,42 @@ export const useStoreAffiliates = (storeId: string) => {
   // Rejeter une commission
   const rejectCommission = useMutation({
     mutationFn: async (commissionId: string) => {
+      // Récupérer les infos de la commission avant la mise à jour
+      const { data: commission } = await supabase
+        .from('affiliate_commissions')
+        .select('affiliate_id, commission_amount, order_id, affiliates(user_id), orders(order_number)')
+        .eq('id', commissionId)
+        .single();
+
       const { error } = await supabase
         .from('affiliate_commissions')
         .update({ status: 'rejected', updated_at: new Date().toISOString() })
         .eq('id', commissionId);
 
       if (error) throw error;
+
+      // La notification sera créée par le trigger SQL, mais on peut aussi l'envoyer ici
+      return {
+        commission_id: commissionId,
+        affiliate_user_id: (commission as any)?.affiliates?.user_id,
+        amount: commission?.commission_amount,
+        order_number: (commission as any)?.orders?.order_number,
+      };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['store-affiliate-commissions', storeId] });
       queryClient.invalidateQueries({ queryKey: ['store-affiliate-stats', storeId] });
+      
+      // Notifier l'affilié (le trigger SQL le fait déjà, mais on peut aussi l'envoyer ici pour plus de contrôle)
+      if (data?.affiliate_user_id && data?.amount) {
+        await notifyCommissionRejected(data.affiliate_user_id, {
+          commission_id: data.commission_id,
+          amount: data.amount,
+          currency: 'XOF',
+          order_number: data.order_number,
+        });
+      }
+
       toast({
         title: '✅ Commission rejetée',
         description: 'La commission a été rejetée',

@@ -11,6 +11,79 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
+/**
+ * Calcule la signature HMAC-SHA256 d'un payload
+ */
+async function calculateHMACSignature(payload: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const messageData = encoder.encode(payload);
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signature = await crypto.subtle.sign('HMAC', key, messageData);
+  const hashArray = Array.from(new Uint8Array(signature));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Compare deux strings de manière constante dans le temps
+ */
+function constantTimeEquals(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+/**
+ * Extrait la signature depuis l'en-tête HTTP
+ */
+function extractSignatureFromHeader(headers: Headers): string | null {
+  const signature = headers.get('x-moneroo-signature') || 
+                   headers.get('X-Moneroo-Signature') ||
+                   headers.get('moneroo-signature');
+  
+  if (!signature) {
+    return null;
+  }
+
+  // La signature peut être au format "sha256=signature" ou juste "signature"
+  const match = signature.match(/sha256=(.+)/i);
+  return match ? match[1] : signature;
+}
+
+/**
+ * Vérifie la signature d'un webhook Moneroo
+ */
+async function verifyWebhookSignature(
+  payload: string,
+  signature: string,
+  secret: string
+): Promise<boolean> {
+  if (!signature || !secret) {
+    return false;
+  }
+
+  try {
+    const calculatedSignature = await calculateHMACSignature(payload, secret);
+    return constantTimeEquals(calculatedSignature, signature);
+  } catch (error) {
+    console.error('Error verifying webhook signature:', error);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -21,7 +94,56 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const payload = await req.json();
+    // Récupérer le secret webhook depuis les variables d'environnement
+    const webhookSecret = Deno.env.get('MONEROO_WEBHOOK_SECRET');
+    
+    // Récupérer le payload brut pour la vérification de signature
+    const rawPayload = await req.text();
+    
+    // Vérifier la signature si le secret est configuré
+    if (webhookSecret) {
+      const signature = extractSignatureFromHeader(req.headers);
+      
+      if (!signature) {
+        console.error('Webhook signature missing');
+        return new Response(
+          JSON.stringify({ error: 'Webhook signature missing' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const isValid = await verifyWebhookSignature(rawPayload, signature, webhookSecret);
+      
+      if (!isValid) {
+        console.error('Invalid webhook signature');
+        // Log de sécurité (sans révéler la signature complète)
+        await supabase.from('transaction_logs').insert({
+          event_type: 'webhook_signature_failed',
+          status: 'failed',
+          request_data: {
+            ip: req.headers.get('x-forwarded-for') || 'unknown',
+            user_agent: req.headers.get('user-agent') || 'unknown',
+            timestamp: new Date().toISOString(),
+          },
+          error_data: {
+            error: 'Invalid webhook signature',
+            signature_preview: signature.substring(0, 20) + '...',
+          },
+        }).catch(err => console.error('Error logging failed webhook:', err));
+
+        return new Response(
+          JSON.stringify({ error: 'Invalid webhook signature' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      console.log('Webhook signature verified successfully');
+    } else {
+      console.warn('MONEROO_WEBHOOK_SECRET not configured - webhook signature verification disabled');
+    }
+
+    // Parser le payload JSON
+    const payload = JSON.parse(rawPayload);
     console.log('Moneroo webhook received:', payload);
 
     // Extract transaction data from Moneroo webhook

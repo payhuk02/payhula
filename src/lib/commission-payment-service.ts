@@ -4,6 +4,12 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "./logger";
+import {
+  notifyPaymentRequestCreated,
+  notifyPaymentRequestApproved,
+  notifyPaymentRequestRejected,
+  notifyPaymentRequestProcessed,
+} from "./commission-notifications";
 
 export interface CommissionPaymentRequest {
   commission_ids: string[]; // IDs des commissions à payer
@@ -167,6 +173,13 @@ export const createCommissionPaymentRequest = async (
       amount: request.amount,
     });
 
+    // Notifier l'utilisateur
+    await notifyPaymentRequestCreated(userId, {
+      payment_id: payment.id,
+      amount: request.amount,
+      currency: request.currency || 'XOF',
+    });
+
     return {
       success: true,
       payment_id: payment.id,
@@ -209,6 +222,26 @@ export const approveCommissionPayment = async (
       };
     }
 
+    // Récupérer les infos du paiement pour la notification
+    const { data: paymentData } = await supabase
+      .from(type === 'affiliate' ? 'affiliate_withdrawals' : 'commission_payments')
+      .select(type === 'affiliate' ? 'affiliate_id, amount, currency, affiliates(user_id)' : 'referrer_id, amount, currency')
+      .eq('id', paymentId)
+      .single();
+
+    // Notifier l'utilisateur
+    const userId = type === 'affiliate' 
+      ? (paymentData as any)?.affiliates?.user_id 
+      : (paymentData as any)?.referrer_id;
+
+    if (userId && paymentData) {
+      await notifyPaymentRequestApproved(userId, {
+        payment_id: paymentId,
+        amount: (paymentData as any).amount,
+        currency: (paymentData as any).currency || 'XOF',
+      });
+    }
+
     logger.log('Commission payment approved', { payment_id: paymentId, admin_id: adminId });
     return { success: true };
   } catch (error: unknown) {
@@ -249,6 +282,27 @@ export const processCommissionPayment = async (
         success: false,
         error: error.message,
       };
+    }
+
+    // Récupérer les infos du paiement pour la notification
+    const { data: paymentData } = await supabase
+      .from(type === 'affiliate' ? 'affiliate_withdrawals' : 'commission_payments')
+      .select(type === 'affiliate' ? 'affiliate_id, amount, currency, affiliates(user_id)' : 'referrer_id, amount, currency')
+      .eq('id', paymentId)
+      .single();
+
+    // Notifier l'utilisateur (le trigger SQL le fait déjà, mais on peut aussi l'envoyer ici)
+    const userId = type === 'affiliate' 
+      ? (paymentData as any)?.affiliates?.user_id 
+      : (paymentData as any)?.referrer_id;
+
+    if (userId && paymentData) {
+      await notifyPaymentRequestProcessed(userId, {
+        payment_id: paymentId,
+        amount: (paymentData as any).amount,
+        currency: (paymentData as any).currency || 'XOF',
+        transaction_reference: transactionReference,
+      });
     }
 
     logger.log('Commission payment processed', {
