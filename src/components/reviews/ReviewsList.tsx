@@ -66,6 +66,7 @@ export const ReviewsList: React.FC<ReviewsListProps> = ({
             onVote={(isHelpful) => handleVote(review.id, isHelpful)}
             onReply={onReplyToReview ? () => onReplyToReview(review.id) : undefined}
             currentUserVote={review.user_vote}
+            isLoading={voteReview.isPending}
           />
         ))}
       </div>

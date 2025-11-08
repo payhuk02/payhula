@@ -154,28 +154,47 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
             )}
           </div>
 
-          {/* Upload photos/vidéos */}
+          {/* Upload photos/vidéos amélioré */}
           <div className="space-y-2">
             <Label>Photos ou vidéos (max 5)</Label>
             <div className="grid grid-cols-5 gap-2">
-              {mediaPreviews.map((preview, index) => (
-                <div key={index} className="relative aspect-square">
-                  <img
-                    src={preview}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeMedia(index)}
-                    className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1 hover:bg-destructive/90"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
+              {mediaPreviews.map((preview, index) => {
+                const file = mediaFiles[index];
+                const isVideo = file?.type.startsWith('video/');
+                return (
+                  <div key={index} className="relative aspect-square group">
+                    {isVideo ? (
+                      <div className="w-full h-full bg-black rounded-md flex items-center justify-center relative">
+                        <video
+                          src={preview}
+                          className="w-full h-full object-cover rounded-md opacity-70"
+                          muted
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-white/90 rounded-full p-2">
+                            <Upload className="w-4 h-4 text-black" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeMedia(index)}
+                      className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1 hover:bg-destructive/90 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })}
               {mediaFiles.length < 5 && (
-                <label className="aspect-square border-2 border-dashed rounded-md flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
+                <label className="aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors bg-muted/50">
                   <input
                     type="file"
                     accept="image/*,video/*"
@@ -183,10 +202,16 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                     className="hidden"
                     onChange={handleMediaUpload}
                   />
-                  <Upload className="w-6 h-6 text-muted-foreground" />
+                  <Upload className="w-5 h-5 text-muted-foreground mb-1" />
+                  <span className="text-xs text-muted-foreground text-center px-1">
+                    Ajouter
+                  </span>
                 </label>
               )}
             </div>
+            <p className="text-xs text-muted-foreground">
+              Formats acceptés : JPG, PNG, GIF, MP4, WebM (max 10MB par fichier)
+            </p>
           </div>
         </CardContent>
 
