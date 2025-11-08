@@ -215,10 +215,13 @@ Créer un fichier `.env` à la racine :
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Paiements (Configuré dans Supabase Edge Functions - voir guide ci-dessous)
-# NOTE: Les clés API PayDunya et Moneroo sont configurées dans Supabase Dashboard
+# Paiements (⚠️ IMPORTANT: Configuré dans Supabase Edge Functions)
+# ❌ NE PAS mettre les clés API PayDunya/Moneroo ici - elles sont dans Supabase
+# Les clés API doivent être configurées dans Supabase Dashboard:
 # Settings → Edge Functions → Secrets (pas dans ce fichier .env)
-# Voir: VERIFICATION_API_PAYDUNYA_MONEROO.md pour la configuration
+# Voir: MIGRATION_CLES_API_VERS_SUPABASE.md pour la migration
+# Voir: GUIDE_CONFIGURATION_PAYDUNYA_KEYS.md pour la configuration PayDunya
+# Voir: GUIDE_CONFIGURATION_SUPABASE_EDGE_FUNCTIONS.md pour la configuration complète
 
 # Shipping
 VITE_FEDEX_API_KEY=your_fedex_key
