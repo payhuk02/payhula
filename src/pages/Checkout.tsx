@@ -1018,6 +1018,40 @@ export default function Checkout() {
                         <p className="text-xs text-muted-foreground text-center">
                           Réparti sur {storeGroups.size} commande{storeGroups.size > 1 ? 's' : ''}
                         </p>
+
+                        {/* Bouton checkout pour multi-stores */}
+                        <Button
+                          onClick={handleCheckout}
+                          disabled={isProcessing || items.length === 0 || isCheckingStores}
+                          className="w-full mt-4"
+                          size="lg"
+                        >
+                          {isProcessing ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Traitement...
+                            </>
+                          ) : isCheckingStores ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Vérification des boutiques...
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="mr-2 h-4 w-4" />
+                              Payer{' '}
+                              {Array.from(storeGroups.values())
+                                .reduce((sum, group) => sum + group.total, 0)
+                                .toLocaleString('fr-FR')}{' '}
+                              XOF
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </>
+                          )}
+                        </Button>
+
+                        <p className="text-xs text-center text-muted-foreground mt-2">
+                          {items.length} {items.length > 1 ? 'articles' : 'article'}
+                        </p>
                       </div>
                     ) : (
                       // Affichage normal (un seul store)
@@ -1049,92 +1083,88 @@ export default function Checkout() {
                           ))}
                         </div>
 
-                    <Separator />
+                        <Separator />
 
-                    {/* Détails prix */}
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Sous-total</span>
-                        <span>{summary.subtotal.toLocaleString('fr-FR')} XOF</span>
-                      </div>
+                        {/* Détails prix */}
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Sous-total</span>
+                            <span>{summary.subtotal.toLocaleString('fr-FR')} XOF</span>
+                          </div>
 
-                      {summary.discount_amount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Remise panier</span>
-                          <span>-{summary.discount_amount.toLocaleString('fr-FR')} XOF</span>
+                          {summary.discount_amount > 0 && (
+                            <div className="flex justify-between text-green-600">
+                              <span>Remise panier</span>
+                              <span>-{summary.discount_amount.toLocaleString('fr-FR')} XOF</span>
+                            </div>
+                          )}
+
+                          {appliedCouponCode && couponDiscountAmount > 0 && (
+                            <div className="flex justify-between text-green-600">
+                              <span>Code promo ({appliedCouponCode.code})</span>
+                              <span>-{couponDiscountAmount.toLocaleString('fr-FR')} XOF</span>
+                            </div>
+                          )}
+
+                          {appliedGiftCard && giftCardAmount > 0 && (
+                            <div className="flex justify-between text-green-600">
+                              <span>Carte cadeau ({appliedGiftCard.code})</span>
+                              <span>-{giftCardAmount.toLocaleString('fr-FR')} XOF</span>
+                            </div>
+                          )}
+
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Livraison</span>
+                            <span>{shippingAmount.toLocaleString('fr-FR')} XOF</span>
+                          </div>
+
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Taxes (TVA 18% - BF)</span>
+                            <span>{taxAmount.toLocaleString('fr-FR')} XOF</span>
+                          </div>
                         </div>
-                      )}
 
-                      {appliedCouponCode && couponDiscountAmount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Code promo ({appliedCouponCode.code})</span>
-                          <span>-{couponDiscountAmount.toLocaleString('fr-FR')} XOF</span>
+                        <Separator />
+
+                        {/* Total */}
+                        <div className="flex justify-between items-center text-lg font-bold">
+                          <span>Total</span>
+                          <span className="text-2xl text-primary">
+                            {finalTotal.toLocaleString('fr-FR')} XOF
+                          </span>
                         </div>
-                      )}
 
-                      {appliedGiftCard && giftCardAmount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Carte cadeau ({appliedGiftCard.code})</span>
-                          <span>-{giftCardAmount.toLocaleString('fr-FR')} XOF</span>
-                        </div>
-                      )}
+                        {/* Bouton checkout */}
+                        <Button
+                          onClick={handleCheckout}
+                          disabled={isProcessing || items.length === 0 || isCheckingStores}
+                          className="w-full"
+                          size="lg"
+                        >
+                          {isProcessing ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Traitement...
+                            </>
+                          ) : isCheckingStores ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Vérification des boutiques...
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="mr-2 h-4 w-4" />
+                              Payer {finalTotal.toLocaleString('fr-FR')} XOF
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </>
+                          )}
+                        </Button>
 
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Livraison</span>
-                        <span>{shippingAmount.toLocaleString('fr-FR')} XOF</span>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Taxes (TVA 18% - BF)</span>
-                        <span>{taxAmount.toLocaleString('fr-FR')} XOF</span>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Total */}
-                    <div className="flex justify-between items-center text-lg font-bold">
-                      <span>Total</span>
-                      <span className="text-2xl text-primary">
-                        {finalTotal.toLocaleString('fr-FR')} XOF
-                      </span>
-                    </div>
-
-                    {/* Bouton checkout */}
-                    <Button
-                      onClick={handleCheckout}
-                      disabled={isProcessing || items.length === 0 || isCheckingStores}
-                      className="w-full"
-                      size="lg"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Traitement...
-                        </>
-                      ) : isCheckingStores ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Vérification des boutiques...
-                        </>
-                      ) : (
-                        <>
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          Payer{' '}
-                          {isMultiStore && storeGroups.size > 1
-                            ? Array.from(storeGroups.values())
-                                .reduce((sum, group) => sum + group.total, 0)
-                                .toLocaleString('fr-FR')
-                            : finalTotal.toLocaleString('fr-FR')}{' '}
-                          XOF
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </>
-                      )}
-                    </Button>
-
-                    <p className="text-xs text-center text-muted-foreground">
-                      {summary.item_count} {summary.item_count > 1 ? 'articles' : 'article'}
-                    </p>
+                        <p className="text-xs text-center text-muted-foreground">
+                          {summary.item_count} {summary.item_count > 1 ? 'articles' : 'article'}
+                        </p>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </div>
