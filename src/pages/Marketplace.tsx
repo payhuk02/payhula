@@ -64,6 +64,8 @@ import { logger } from '@/lib/logger';
 import { Product, FilterState, PaginationState } from '@/types/marketplace';
 import { useMarketplaceFavorites } from '@/hooks/useMarketplaceFavorites';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useProductSearch, useSaveSearchHistory } from '@/hooks/useProductSearch';
+import { SearchAutocomplete } from '@/components/marketplace/SearchAutocomplete';
 import '@/styles/marketplace-professional.css';
 import { SEOMeta, WebsiteSchema, BreadcrumbSchema, ItemListSchema } from '@/components/seo';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -123,15 +125,43 @@ const Marketplace = () => {
   // État local pour l'input de recherche (non debounced)
   const [searchInput, setSearchInput] = useState("");
   
-  // Valeur debounced pour éviter trop d'appels API
-  const debouncedSearch = useDebounce(searchInput, 500);
-  
   // État de pagination
   const [pagination, setPagination] = useState<PaginationState>({
     currentPage: 1,
     itemsPerPage: 12,
     totalItems: 0
   });
+  
+  // Valeur debounced pour éviter trop d'appels API
+  const debouncedSearch = useDebounce(searchInput, 500);
+  
+  // Recherche full-text serveur
+  const hasSearchQuery = debouncedSearch && debouncedSearch.trim().length > 0;
+  const searchFilters = {
+    category: filters.category !== "all" && filters.category !== "featured" ? filters.category : null,
+    product_type: filters.productType !== "all" ? filters.productType : null,
+    min_price: filters.priceRange !== "all" ? (() => {
+      const [min] = filters.priceRange.split("-").map(Number);
+      return min || null;
+    })() : null,
+    max_price: filters.priceRange !== "all" ? (() => {
+      const parts = filters.priceRange.split("-");
+      return parts.length > 1 && parts[1] ? Number(parts[1]) : null;
+    })() : null,
+    min_rating: filters.rating !== "all" ? Number(filters.rating) : null,
+  };
+  
+  const { data: searchResults, isLoading: searchLoading } = useProductSearch(
+    debouncedSearch,
+    searchFilters,
+    {
+      limit: pagination.itemsPerPage,
+      offset: (pagination.currentPage - 1) * pagination.itemsPerPage,
+      enabled: !!hasSearchQuery && debouncedSearch.trim().length > 0,
+    }
+  );
+  
+  const saveSearchHistory = useSaveSearchHistory();
   
   // États des modales et UI
   const [showFilters, setShowFilters] = useState(false);
@@ -176,6 +206,13 @@ const Marketplace = () => {
   useEffect(() => {
     setFilters(prev => ({ ...prev, search: debouncedSearch }));
   }, [debouncedSearch]);
+  
+  // Enregistrer l'historique de recherche
+  useEffect(() => {
+    if (hasSearchQuery && searchResults && Array.isArray(searchResults)) {
+      saveSearchHistory(debouncedSearch, searchResults.length);
+    }
+  }, [debouncedSearch, searchResults, hasSearchQuery, saveSearchHistory]);
 
   // Chargement des produits avec pagination côté serveur
   const fetchProducts = useCallback(async () => {
@@ -254,10 +291,13 @@ const Marketplace = () => {
         throw error;
       }
       
-      logger.info(`${data?.length || 0} produits chargés (page ${pagination.currentPage}/${Math.ceil((count || 0) / pagination.itemsPerPage)})`);
-      setProducts((data || []) as unknown as Product[]);
-      setPagination(prev => ({ ...prev, totalItems: count || 0 }));
-      setError(null); // Réinitialiser l'erreur en cas de succès
+      // Ne charger les produits que si pas de recherche active
+      if (!hasSearchQuery) {
+        logger.info(`${data?.length || 0} produits chargés (page ${pagination.currentPage}/${Math.ceil((count || 0) / pagination.itemsPerPage)})`);
+        setProducts((data || []) as unknown as Product[]);
+        setPagination(prev => ({ ...prev, totalItems: count || 0 }));
+        setError(null); // Réinitialiser l'erreur en cas de succès
+      }
       
     } catch (error: any) {
       logger.error("❌ Erreur lors du chargement des produits :", error);
@@ -271,7 +311,7 @@ const Marketplace = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.currentPage, pagination.itemsPerPage, toast]);
+  }, [filters, pagination.currentPage, pagination.itemsPerPage, toast, hasSearchQuery]);
 
   // Abonnement temps réel
   useEffect(() => {
@@ -311,45 +351,56 @@ const Marketplace = () => {
     };
   }, [fetchProducts]);
 
-  // Filtrage des produits (côté client pour recherche textuelle et tags)
-  // Note: La pagination est maintenant gérée côté serveur
-  const filteredProducts = useMemo(() => {
-    let filtered = products;
-
-    // Recherche textuelle (côté client car nécessite full-text search)
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(product => {
-        const nameMatch = product.name.toLowerCase().includes(searchLower);
-        const descMatch = product.description?.toLowerCase().includes(searchLower);
-        const storeMatch = product.stores?.name.toLowerCase().includes(searchLower);
-        const categoryMatch = product.category?.toLowerCase().includes(searchLower);
-        const tagsMatch = product.tags?.some(tag => tag.toLowerCase().includes(searchLower));
-        
-        return nameMatch || descMatch || storeMatch || categoryMatch || tagsMatch;
-      });
+  // Utiliser les résultats de recherche full-text si une recherche est active
+  // Sinon, utiliser les produits chargés normalement
+  const displayProducts = useMemo(() => {
+    // Si recherche active, utiliser les résultats de recherche full-text
+    if (hasSearchQuery && searchResults && Array.isArray(searchResults)) {
+      // Convertir les résultats de recherche en format Product
+      return searchResults.map((result: any) => ({
+        id: result.id,
+        name: result.name,
+        slug: result.slug,
+        description: result.description,
+        short_description: result.description?.substring(0, 150) || null,
+        image_url: result.image_url,
+        price: result.price,
+        promotional_price: result.promotional_price,
+        currency: result.currency,
+        category: result.category,
+        product_type: result.product_type,
+        rating: result.rating,
+        reviews_count: result.reviews_count || 0,
+        purchases_count: result.purchases_count || 0,
+        store_id: result.store_id,
+        stores: {
+          id: result.store_id,
+          name: result.store_name,
+          slug: result.store_slug,
+          logo_url: result.store_logo_url,
+          created_at: new Date().toISOString(),
+        },
+        tags: [],
+        is_active: true,
+        is_draft: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })) as unknown as Product[];
     }
-
-    // Filtrage par tags (côté client car complexe avec arrays)
+    
+    // Sinon, utiliser les produits chargés normalement
+    // Filtrage par tags côté client (complexe avec arrays)
+    let filtered = products;
     if (filters.tags.length > 0) {
       filtered = filtered.filter(product => 
         filters.tags.some(tag => product.tags?.includes(tag))
       );
     }
-
     return filtered;
-  }, [products, filters.search, filters.tags]);
-
-  // Les produits sont déjà paginés côté serveur, mais on applique
-  // le filtrage client (recherche textuelle et tags) si nécessaire
-  const paginatedProducts = useMemo(() => {
-    // Si recherche ou tags actifs, utiliser filteredProducts
-    // Sinon, utiliser directement products (déjà paginés par le serveur)
-    if (filters.search || filters.tags.length > 0) {
-      return filteredProducts;
-    }
-    return products;
-  }, [products, filteredProducts, filters.search, filters.tags]);
+  }, [hasSearchQuery, searchResults, products, filters.tags]);
+  
+  // Gérer le loading
+  const isLoadingProducts = hasSearchQuery ? searchLoading : loading;
 
   // Catégories et types dynamiques
   const categories = useMemo(() => {
@@ -608,7 +659,7 @@ const Marketplace = () => {
 
   // Items pour ItemListSchema (premiers produits visibles)
   const itemListItems = useMemo(() => {
-    return paginatedProducts.slice(0, 20).map(product => ({
+    return displayProducts.slice(0, 20).map(product => ({
       id: product.id,
       name: product.name,
       url: `/stores/${product.stores?.slug || 'default'}/products/${product.slug}`,
@@ -618,7 +669,7 @@ const Marketplace = () => {
       currency: product.currency || 'XOF',
       rating: product.rating
     }));
-  }, [paginatedProducts]);
+  }, [displayProducts]);
 
   // Animations au scroll
   const heroRef = useScrollAnimation<HTMLDivElement>();
@@ -721,26 +772,20 @@ const Marketplace = () => {
             onCategoryChange={(category) => updateFilter({ category })}
           />
 
-          {/* Barre de recherche */}
-          <div className="max-w-4xl mx-auto">
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" aria-hidden="true" />
-              <Input
-                type="search"
-                placeholder={t('marketplace.searchPlaceholder')}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-12 pr-4 py-4 text-lg bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500 transition-all duration-300"
-                aria-label={t('marketplace.searchPlaceholder')}
-              />
-              {searchInput && searchInput !== debouncedSearch && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                    <span>{t('common.loading')}</span>
-                  </div>
-                </div>
-              )}
+          {/* Barre de recherche avancée avec auto-complétion */}
+          <div className="max-w-4xl mx-auto mb-6">
+            <SearchAutocomplete
+              value={searchInput}
+              onChange={setSearchInput}
+              onSearch={(query) => {
+                setSearchInput(query);
+                // Réinitialiser la pagination lors d'une nouvelle recherche
+                setPagination(prev => ({ ...prev, currentPage: 1 }));
+              }}
+              placeholder={t('marketplace.searchPlaceholder') || 'Rechercher des produits...'}
+              className="w-full"
+              showSuggestions={true}
+            />
           </div>
 
             {/* Filtres actifs (tags) */}
@@ -1074,7 +1119,7 @@ const Marketplace = () => {
               </Badge>
               {filters.search || filters.tags.length > 0 ? (
                 <Badge variant="secondary" className="bg-blue-600 text-white">
-                  {paginatedProducts.length} résultat{paginatedProducts.length !== 1 ? "s" : ""} affiché{paginatedProducts.length !== 1 ? "s" : ""}
+                  {displayProducts.length} résultat{displayProducts.length !== 1 ? "s" : ""} affiché{displayProducts.length !== 1 ? "s" : ""}
                 </Badge>
               ) : null}
             </div>
@@ -1137,7 +1182,7 @@ const Marketplace = () => {
                   Bundles Exclusifs
                 </h2>
                 <p className="text-muted-foreground mt-1">
-                  Offres groupées à prix réduit - Économisez jusqu'à {activeBundles.length > 0 ? Math.max(...activeBundles.map(b => b.savings_percentage || 0)) : 0}%
+                  Offres groupées à prix réduit - Économisez jusqu'à {activeBundles.length > 0 ? Math.max(...activeBundles.map((b: any) => (b as any).savings_percentage || 0)) : 0}%
                 </p>
               </div>
               <Link to="/marketplace?type=bundle">
@@ -1169,8 +1214,10 @@ const Marketplace = () => {
         aria-label={t('marketplace.productList.ariaLabel')}
       >
         <div className="w-full mx-auto max-w-7xl px-0 sm:px-4">
-          {loading ? (
-            <ProductGrid loading={true} skeletonCount={pagination.itemsPerPage} />
+          {isLoadingProducts ? (
+            <ProductGrid loading={true} skeletonCount={pagination.itemsPerPage}>
+              {null}
+            </ProductGrid>
           ) : error ? (
             <div className="text-center py-16" role="alert" aria-live="polite">
               <div className="h-20 w-20 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
@@ -1194,7 +1241,7 @@ const Marketplace = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
-          ) : paginatedProducts.length > 0 ? (
+          ) : displayProducts.length > 0 ? (
             <>
               {/* Recommandations personnalisées (si utilisateur connecté et aucun filtre actif) */}
               {userId && filters.category === 'all' && filters.search === '' && filters.productType === 'all' && (
@@ -1207,7 +1254,7 @@ const Marketplace = () => {
               )}
 
               <ProductGrid>
-                {paginatedProducts.map((product, index) => {
+                {displayProducts.map((product, index) => {
                   // Récupérer le taux de commission d'affiliation
                   const affiliateSettings = (product as any).product_affiliate_settings;
                   const affiliateCommissionRate = affiliateSettings?.[0]?.affiliate_enabled 
