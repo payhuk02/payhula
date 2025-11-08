@@ -5,7 +5,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useProductReviews } from "@/hooks/useReviews";
 import StoreHeader from "@/components/storefront/StoreHeader";
 import StoreTabs from "@/components/storefront/StoreTabs";
-import ProductCard from "@/components/storefront/ProductCard";
+import ProductCardModern from "@/components/marketplace/ProductCardModern";
 import ProductFilters from "@/components/storefront/ProductFilters";
 import StoreFooter from "@/components/storefront/StoreFooter";
 import ContactForm from "@/components/storefront/ContactForm";
@@ -266,14 +266,25 @@ const Storefront = () => {
                   ) : filteredProducts.length > 0 ? (
                     <div ref={productsRef}>
                       <ProductGrid>
-                        {filteredProducts.map((product, index) => (
-                          <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
-                            <ProductCard
-                              product={product}
-                              storeSlug={store.slug}
-                            />
-                          </div>
-                        ))}
+                        {filteredProducts.map((product, index) => {
+                          // Récupérer le taux de commission d'affiliation
+                          const affiliateSettings = (product as any).product_affiliate_settings;
+                          const affiliateCommissionRate = affiliateSettings?.[0]?.affiliate_enabled 
+                            ? affiliateSettings[0].commission_rate 
+                            : undefined;
+                          
+                          return (
+                            <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
+                              <ProductCardModern
+                                product={product}
+                                storeSlug={store.slug}
+                                affiliateCommissionRate={affiliateCommissionRate}
+                                freeShipping={product.product_type === 'physical' ? (product as any).free_shipping : undefined}
+                                shippingCost={product.product_type === 'physical' ? (product as any).shipping_cost : undefined}
+                              />
+                            </div>
+                          );
+                        })}
                       </ProductGrid>
                     </div>
                   ) : (

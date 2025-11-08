@@ -43,7 +43,13 @@ export const useProducts = (storeId?: string | null) => {
         setLoading(true);
         let query = supabase
           .from('products')
-          .select('*')
+          .select(`
+            *,
+            product_affiliate_settings!left (
+              commission_rate,
+              affiliate_enabled
+            )
+          `)
           .order('created_at', { ascending: false });
 
         if (storeId) {
@@ -78,7 +84,13 @@ export const useProducts = (storeId?: string | null) => {
       setLoading(true);
       let query = supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_affiliate_settings!left (
+            commission_rate,
+            affiliate_enabled
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (storeId) {

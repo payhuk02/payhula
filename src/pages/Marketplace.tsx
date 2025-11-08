@@ -55,7 +55,7 @@ import MarketplaceFooter from "@/components/marketplace/MarketplaceFooter";
 import AdvancedFilters from "@/components/marketplace/AdvancedFilters";
 import ProductComparison from "@/components/marketplace/ProductComparison";
 import FavoritesManager from "@/components/marketplace/FavoritesManager";
-import ProductCardProfessional from "@/components/marketplace/ProductCardProfessional";
+import ProductCardModern from "@/components/marketplace/ProductCardModern";
 import { BundleCard } from "@/components/marketplace/BundleCard";
 import { CategoryNavigationBar } from "@/components/marketplace/CategoryNavigationBar";
 import { useActiveBundles } from "@/hooks/digital/useDigitalBundles";
@@ -183,6 +183,10 @@ const Marketplace = () => {
             slug,
             logo_url,
             created_at
+          ),
+          product_affiliate_settings!left (
+            commission_rate,
+            affiliate_enabled
           )
         `, { count: 'exact' }) // Obtenir le count total
         .eq("is_active", true)
@@ -1180,15 +1184,24 @@ const Marketplace = () => {
           ) : paginatedProducts.length > 0 ? (
             <>
               <ProductGrid>
-                {paginatedProducts.map((product, index) => (
-                  <ProductCardProfessional
-                    key={product.id}
-                    product={product}
-                    storeSlug={product.stores?.slug || 'default'}
-                    onAddToComparison={() => addToComparison(product)}
-                    isInComparison={!!comparisonProducts.find(p => p.id === product.id)}
-                  />
-                ))}
+                {paginatedProducts.map((product, index) => {
+                  // Récupérer le taux de commission d'affiliation
+                  const affiliateSettings = (product as any).product_affiliate_settings;
+                  const affiliateCommissionRate = affiliateSettings?.[0]?.affiliate_enabled 
+                    ? affiliateSettings[0].commission_rate 
+                    : undefined;
+                  
+                  return (
+                    <ProductCardModern
+                      key={product.id}
+                      product={product}
+                      storeSlug={product.stores?.slug || 'default'}
+                      affiliateCommissionRate={affiliateCommissionRate}
+                      freeShipping={product.product_type === 'physical' ? (product as any).free_shipping : undefined}
+                      shippingCost={product.product_type === 'physical' ? (product as any).shipping_cost : undefined}
+                    />
+                  );
+                })}
               </ProductGrid>
 
               {/* Pagination */}

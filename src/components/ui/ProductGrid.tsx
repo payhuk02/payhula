@@ -72,8 +72,8 @@ export const ProductGrid = ({
         ref={gridRef}
         className={cn(
           "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
-          // Responsive: 1 produit mobile, 3 produits tablette, 2 produits desktop
-          "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full max-w-full",
+          // Responsive: 1 produit mobile, 4 produits tablette, 3 produits desktop
+          "grid grid-cols-1 md:grid-cols-4 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 w-full max-w-full",
           className
         )}
       >
@@ -89,8 +89,8 @@ export const ProductGrid = ({
       ref={gridRef}
       className={cn(
         "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
-        // Responsive: 1 produit mobile, 3 produits tablette, 2 produits desktop
-        "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full max-w-full",
+        // Responsive: 1 produit mobile, 4 produits tablette, 3 produits desktop
+        "grid grid-cols-1 md:grid-cols-4 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 w-full max-w-full",
         className
       )}
     >
