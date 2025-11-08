@@ -185,20 +185,36 @@ export class PushNotificationService {
         return;
       }
 
-      const subscriptionData = {
-        user_id: user.id,
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
-          auth: this.arrayBufferToBase64(subscription.getKey('auth')!),
-        },
+      const keys = {
+        p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
+        auth: this.arrayBufferToBase64(subscription.getKey('auth')!),
       };
 
-      await supabase.from('push_subscriptions').upsert(subscriptionData, {
-        onConflict: 'user_id',
+      // Obtenir les informations du navigateur
+      const userAgent = navigator.userAgent;
+      const deviceInfo = {
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        onLine: navigator.onLine,
+      };
+
+      // Utiliser la fonction SQL pour sauvegarder
+      const { error } = await supabase.rpc('save_push_subscription', {
+        p_endpoint: subscription.endpoint,
+        p_keys: keys,
+        p_user_agent: userAgent,
+        p_device_info: deviceInfo,
       });
+
+      if (error) {
+        throw error;
+      }
+
+      logger.info('Push subscription saved', { endpoint: subscription.endpoint });
     } catch (error) {
       logger.error('PushNotificationService.saveSubscription error', { error });
+      throw error;
     }
   }
 
@@ -212,9 +228,19 @@ export class PushNotificationService {
         return;
       }
 
-      await supabase.from('push_subscriptions').delete().eq('user_id', user.id);
+      // Utiliser la fonction SQL pour supprimer
+      const { error } = await supabase.rpc('delete_push_subscription', {
+        p_endpoint: subscription.endpoint,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      logger.info('Push subscription removed', { endpoint: subscription.endpoint });
     } catch (error) {
       logger.error('PushNotificationService.removeSubscription error', { error });
+      throw error;
     }
   }
 
@@ -224,14 +250,20 @@ export class PushNotificationService {
   private async logNotification(notification: PushNotification, type: 'local' | 'in-app' | 'push'): Promise<void> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return;
+      }
 
-      await supabase.from('notification_logs').insert({
-        user_id: user?.id,
-        type,
-        title: notification.title,
-        body: notification.body,
-        data: notification.data,
-        status: 'sent',
+      // Utiliser la fonction SQL pour logger
+      await supabase.rpc('log_notification', {
+        p_user_id: user.id,
+        p_type: type === 'push' ? 'push' : type === 'local' ? 'push' : 'in-app',
+        p_title: notification.title,
+        p_body: notification.body,
+        p_data: notification.data || {},
+        p_channel: 'web-push',
+        p_provider: 'vapid',
+        p_status: 'sent',
       });
     } catch (error) {
       logger.error('PushNotificationService.logNotification error', { error });

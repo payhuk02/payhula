@@ -166,3 +166,108 @@ self.addEventListener('message', (event) => {
     );
   }
 });
+
+// ============================================================
+// PUSH NOTIFICATIONS
+// ============================================================
+
+// Écouter les notifications push
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received:', event);
+  
+  let notificationData = {
+    title: 'Payhula',
+    body: 'Vous avez une nouvelle notification',
+    icon: '/icon-192x192.png',
+    badge: '/badge-72x72.png',
+    tag: 'default',
+    data: {},
+  };
+  
+  // Essayer de parser les données de la notification
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = {
+        title: data.title || notificationData.title,
+        body: data.body || notificationData.body,
+        icon: data.icon || notificationData.icon,
+        badge: data.badge || notificationData.badge,
+        tag: data.tag || notificationData.tag,
+        data: data.data || notificationData.data,
+        requireInteraction: data.requireInteraction || false,
+        silent: data.silent || false,
+        vibrate: data.vibrate || [200, 100, 200],
+        actions: data.actions || [],
+      };
+    } catch (error) {
+      console.warn('[SW] Error parsing push data:', error);
+      // Utiliser les données textuelles si le JSON échoue
+      if (event.data.text()) {
+        notificationData.body = event.data.text();
+      }
+    }
+  }
+  
+  // Afficher la notification
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      tag: notificationData.tag,
+      data: notificationData.data,
+      requireInteraction: notificationData.requireInteraction,
+      silent: notificationData.silent,
+      vibrate: notificationData.vibrate,
+      actions: notificationData.actions,
+    })
+  );
+});
+
+// Gérer les clics sur les notifications
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked:', event);
+  
+  event.notification.close();
+  
+  // Ouvrir ou focaliser la fenêtre
+  const urlToOpen = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true,
+    }).then((clientList) => {
+      // Chercher une fenêtre ouverte
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      
+      // Ouvrir une nouvelle fenêtre si aucune n'est ouverte
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
+  
+  // Gérer les actions de notification
+  if (event.action) {
+    console.log('[SW] Notification action clicked:', event.action);
+    const actionUrl = event.notification.data?.actions?.[event.action]?.url;
+    if (actionUrl) {
+      event.waitUntil(
+        clients.openWindow(actionUrl)
+      );
+    }
+  }
+});
+
+// Gérer la fermeture des notifications
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification closed:', event);
+  // Ici on pourrait envoyer un événement au serveur pour tracking
+});
