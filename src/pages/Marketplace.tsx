@@ -800,7 +800,6 @@ const Marketplace = () => {
               </Button>
             </div>
           </div>
-        </div>
       </section>
 
       {/* Filtres avancés */}
