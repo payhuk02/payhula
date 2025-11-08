@@ -32,6 +32,7 @@ import { safeRedirect } from '@/lib/url-validator';
 import { logger } from '@/lib/logger';
 import GiftCardInput from '@/components/checkout/GiftCardInput';
 import CouponInput from '@/components/checkout/CouponInput';
+import { PaymentProviderSelector } from '@/components/checkout/PaymentProviderSelector';
 import {
   ShoppingBag,
   MapPin,
@@ -79,6 +80,9 @@ export default function Checkout() {
   // State pour charger le store_id (nécessaire pour la carte cadeau et coupon)
   const [storeId, setStoreId] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string | null>(null);
+  
+  // State pour le provider de paiement sélectionné
+  const [selectedPaymentProvider, setSelectedPaymentProvider] = useState<'moneroo' | 'paydunya'>('moneroo');
   
   // Récupérer l'utilisateur pour pré-remplir le formulaire
   const { data: user } = useQuery({
@@ -449,8 +453,8 @@ export default function Checkout() {
       const affiliateInfo = await getAffiliateInfo();
       const hasAffiliate = affiliateInfo.affiliate_link_id && affiliateInfo.product_id;
 
-      // Initier le paiement (Moneroo par défaut, peut être changé)
-      const paymentProvider = 'moneroo'; // TODO: Ajouter sélection du provider dans l'UI
+      // Initier le paiement avec le provider sélectionné
+      const paymentProvider = selectedPaymentProvider || 'moneroo';
       const paymentResult = await initiatePayment({
         storeId: product.store_id,
         orderId: order.id,
@@ -795,28 +799,12 @@ export default function Checkout() {
                 </Card>
 
                 {/* Méthode de paiement */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      Méthode de paiement
-                    </CardTitle>
-                    <CardDescription>
-                      Le paiement sera effectué via Moneroo
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3 p-4 border rounded-lg bg-muted/50">
-                      <CreditCard className="h-6 w-6 text-primary" />
-                      <div>
-                        <p className="font-medium">Moneroo Payment</p>
-                        <p className="text-sm text-muted-foreground">
-                          Cartes bancaires, Mobile Money, et plus
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PaymentProviderSelector
+                  value={selectedPaymentProvider}
+                  onChange={setSelectedPaymentProvider}
+                  storeId={storeId || undefined}
+                  amount={finalTotal}
+                />
               </div>
 
               {/* Récapitulatif (1/3) */}
