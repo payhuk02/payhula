@@ -137,8 +137,18 @@ export default function Checkout() {
 
           if (hasMultipleStores) {
             // Grouper les items par boutique
-            const groups = await groupItemsByStore(items);
+            const { storeGroups: groups, skippedItems } = await groupItemsByStore(items);
             setStoreGroups(groups);
+            
+            // Afficher un avertissement si des produits ont été ignorés
+            if (skippedItems.length > 0) {
+              const productNames = skippedItems.map(item => `${item.product_name} (x${item.quantity})`).join(', ');
+              toast({
+                title: 'Produits ignorés',
+                description: `${skippedItems.length} produit(s) ignoré(s) car ils n'ont pas de boutique associée : ${productNames}`,
+                variant: 'default',
+              });
+            }
             
             // Pour la compatibilité, garder le premier store_id
             const firstStoreId = Array.from(uniqueStoreIds)[0] as string;
@@ -390,6 +400,15 @@ export default function Checkout() {
           title: 'Commandes créées avec succès',
           description: `${multiStoreResult.orders.length} commande(s) créée(s) pour ${multiStoreResult.orders.length} boutique(s) différente(s)`,
         });
+
+        // Afficher un avertissement si des produits ont été ignorés ou si des transactions n'ont pas pu être créées
+        if (multiStoreResult.warning) {
+          toast({
+            title: 'Avertissement',
+            description: multiStoreResult.warning,
+            variant: 'default',
+          });
+        }
 
         // Rediriger vers la page de résumé multi-commandes
         const orderIds = multiStoreResult.orders.map(o => o.order_id).join(',');

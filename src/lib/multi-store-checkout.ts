@@ -84,12 +84,26 @@ export interface MultiStoreOrderResult {
 }
 
 /**
+ * Résultat du groupement par boutique
+ */
+export interface GroupItemsByStoreResult {
+  storeGroups: Map<string, StoreGroup>;
+  skippedItems: Array<{
+    product_id: string;
+    product_name: string;
+    quantity: number;
+  }>;
+}
+
+/**
  * Groupe les items du panier par boutique
+ * Retourne aussi les produits ignorés (sans store_id)
  */
 export async function groupItemsByStore(
   items: CartItem[]
-): Promise<Map<string, StoreGroup>> {
+): Promise<GroupItemsByStoreResult> {
   const storeGroups = new Map<string, StoreGroup>();
+  const skippedItems: GroupItemsByStoreResult['skippedItems'] = [];
 
   // Récupérer les store_id pour chaque produit
   const productIds = items.map(item => item.product_id);
@@ -106,7 +120,10 @@ export async function groupItemsByStore(
 
   // Créer un map product_id -> store_id
   const productStoreMap = new Map<string, { store_id: string; name: string }>();
+  const productNameMap = new Map<string, string>();
+  
   products?.forEach(product => {
+    productNameMap.set(product.id, product.name || 'Produit inconnu');
     if (product.store_id) {
       productStoreMap.set(product.id, {
         store_id: product.store_id,
@@ -120,7 +137,19 @@ export async function groupItemsByStore(
     const productInfo = productStoreMap.get(item.product_id);
     
     if (!productInfo) {
-      logger.warn(`Product ${item.product_id} has no store_id, skipping`);
+      // Produit sans store_id - ajouter à la liste des produits ignorés
+      const productName = productNameMap.get(item.product_id) || item.product_name || 'Produit inconnu';
+      logger.warn(`Product ${item.product_id} (${productName}) has no store_id, skipping`, {
+        product_id: item.product_id,
+        product_name: productName,
+        quantity: item.quantity,
+      });
+      
+      skippedItems.push({
+        product_id: item.product_id,
+        product_name: productName,
+        quantity: item.quantity,
+      });
       continue;
     }
 
@@ -150,7 +179,10 @@ export async function groupItemsByStore(
     group.subtotal += itemSubtotal;
   }
 
-  return storeGroups;
+  return {
+    storeGroups,
+    skippedItems,
+  };
 }
 
 /**
@@ -629,15 +661,36 @@ export async function processMultiStoreCheckout(
 ): Promise<MultiStoreOrderResult> {
   try {
     // 1. Grouper les items par boutique
-    const storeGroups = await groupItemsByStore(items);
+    const { storeGroups, skippedItems } = await groupItemsByStore(items);
 
+    // Si tous les produits ont été ignorés
     if (storeGroups.size === 0) {
+      if (skippedItems.length > 0) {
+        const productNames = skippedItems.map(item => item.product_name).join(', ');
+        return {
+          success: false,
+          orders: [],
+          transactions: [],
+          error: `Aucun produit valide trouvé. Les produits suivants n'ont pas de boutique associée : ${productNames}`,
+        };
+      }
       return {
         success: false,
         orders: [],
         transactions: [],
         error: 'Aucun produit valide trouvé',
       };
+    }
+
+    // Si certains produits ont été ignorés, créer un avertissement
+    let warningMessage: string | undefined;
+    if (skippedItems.length > 0) {
+      const productNames = skippedItems.map(item => `${item.product_name} (x${item.quantity})`).join(', ');
+      warningMessage = `${skippedItems.length} produit(s) ignoré(s) car ils n'ont pas de boutique associée : ${productNames}. Veuillez contacter le support si vous pensez que c'est une erreur.`;
+      logger.warn('Some products were skipped during multi-store checkout', {
+        skippedCount: skippedItems.length,
+        skippedProducts: skippedItems,
+      });
     }
 
     // 2. Calculer les totaux pour chaque boutique
@@ -678,9 +731,20 @@ export async function processMultiStoreCheckout(
       transactions,
     };
 
+    // Combiner les avertissements si nécessaire
+    const warnings: string[] = [];
+    
+    if (warningMessage) {
+      warnings.push(warningMessage);
+    }
+    
     if (transactions.length < orderResult.orders.length) {
-      result.warning = `${orderResult.orders.length - transactions.length} transaction(s) n'a/n'ont pas pu être créée(s). Vous pourrez les créer depuis la page de résumé.`;
+      warnings.push(`${orderResult.orders.length - transactions.length} transaction(s) n'a/n'ont pas pu être créée(s). Vous pourrez les créer depuis la page de résumé.`);
       logger.warn(`Partial transaction creation: ${transactions.length}/${orderResult.orders.length} transactions created`);
+    }
+
+    if (warnings.length > 0) {
+      result.warning = warnings.join(' | ');
     }
 
     return result;

@@ -93,23 +93,67 @@ serve(async (req) => {
       }
     }
 
-    // 🆕 Valider le montant si amount est fourni
+    // 🔒 SÉCURITÉ: Valider le montant avant de mettre à jour la transaction
     if (amount && transaction.order_id) {
-      try {
-        const { data: amountValid } = await supabase.rpc('validate_transaction_amount', {
-          p_transaction_id: transaction.id,
-          p_amount: amount,
-        });
+      // Récupérer le montant de la commande
+      const { data: orderData } = await supabase
+        .from('orders')
+        .select('total_amount, currency')
+        .eq('id', transaction.order_id)
+        .single();
 
-        if (amountValid === false) {
-          console.warn('Amount mismatch detected', {
+      if (orderData) {
+        const webhookAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+        const orderAmount = typeof orderData.total_amount === 'string' 
+          ? parseFloat(orderData.total_amount) 
+          : orderData.total_amount;
+
+        // Tolérance de 1 XOF pour les arrondis
+        const tolerance = 1;
+        const amountDifference = Math.abs(webhookAmount - orderAmount);
+
+        if (amountDifference > tolerance) {
+          console.error('🚨 SECURITY ALERT: Amount mismatch detected', {
             transaction_id: transaction.id,
-            webhook_amount: amount,
-            transaction_amount: transaction.amount,
+            order_id: transaction.order_id,
+            webhook_amount: webhookAmount,
+            order_amount: orderAmount,
+            difference: amountDifference,
+            tolerance,
           });
+
+          // Logger l'alerte de sécurité
+          await supabase.from('transaction_logs').insert({
+            event_type: 'webhook_amount_mismatch',
+            status: 'failed',
+            transaction_id: transaction.id,
+            request_data: {
+              webhook_amount: webhookAmount,
+              order_amount: orderAmount,
+              difference: amountDifference,
+              timestamp: new Date().toISOString(),
+            },
+            error_data: {
+              error: 'Amount mismatch - possible fraud attempt',
+              severity: 'high',
+            },
+          }).catch(err => console.error('Error logging amount mismatch:', err));
+
+          // Rejeter le webhook si la différence est significative (> 10 XOF)
+          if (amountDifference > 10) {
+            return new Response(
+              JSON.stringify({ 
+                error: 'Amount mismatch - transaction rejected',
+                webhook_amount: webhookAmount,
+                expected_amount: orderAmount,
+              }),
+              { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+
+          // Si la différence est petite mais > tolérance, logger mais continuer
+          console.warn('Amount mismatch within tolerance, proceeding with caution');
         }
-      } catch (rpcError) {
-        console.warn('validate_transaction_amount function not available, continuing:', rpcError);
       }
     }
 
@@ -197,6 +241,19 @@ serve(async (req) => {
               },
               p_store_id: order.store_id,
             }).catch((err) => console.error('Payment webhook error:', err));
+          }
+
+          // 🆕 Vérifier si toutes les commandes du groupe multi-stores sont payées
+          // La fonction SQL check_and_notify_multi_store_group_completion sera appelée
+          // automatiquement par le trigger, mais on peut aussi l'appeler manuellement pour être sûr
+          if (order.metadata && typeof order.metadata === 'object' && 
+              (order.metadata as any).multi_store === true && 
+              (order.metadata as any).group_id) {
+            await supabase.rpc('check_and_notify_multi_store_group_completion', {
+              p_order_id: order.id,
+            }).catch((err) => {
+              console.error('Error checking multi-store group completion:', err);
+            });
           }
         }
       }
