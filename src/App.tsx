@@ -279,6 +279,7 @@ const PayBalance = lazy(() => import("./pages/payments/PayBalance"));
 const PayBalanceList = lazy(() => import("./pages/payments/PayBalanceList"));
 const ShippingDashboard = lazy(() => import("./pages/shipping/ShippingDashboard"));
 const InventoryDashboard = lazy(() => import("./pages/inventory/InventoryDashboard"));
+const StoreAffiliateManagement = lazy(() => import("./pages/dashboard/StoreAffiliateManagement"));
 
 // Pages Produits Physiques & Services - Détails
 const PhysicalProductDetail = lazy(() => import("./pages/physical/PhysicalProductDetail"));
@@ -360,7 +361,7 @@ const AppContent = () => {
           <Route path="/payment/cancel" element={<PaymentCancel />} />
 
           {/* --- Routes utilisateur (protégées) --- */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
           <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
           <Route path="/dashboard/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
@@ -400,6 +401,7 @@ const AppContent = () => {
           <Route path="/dashboard/batch-shipping" element={<ProtectedRoute><AdminBatchShipping /></ProtectedRoute>} />
 
           {/* --- Routes Affiliation --- */}
+          <Route path="/dashboard/store-affiliates" element={<ProtectedRoute><StoreAffiliateManagement /></ProtectedRoute>} />
           <Route path="/dashboard/affiliates" element={<ProtectedRoute><StoreAffiliates /></ProtectedRoute>} />
           <Route path="/affiliate/dashboard" element={<ProtectedRoute><AffiliateDashboard /></ProtectedRoute>} />
           <Route path="/affiliate/courses" element={<ProtectedRoute><AffiliateCoursesDashboard /></ProtectedRoute>} />

@@ -629,6 +629,11 @@ const adminMenuSections = [
         url: "/dashboard/warehouses",
         icon: Building2,
       },
+      {
+        title: "Gestion des Affiliés",
+        url: "/dashboard/store-affiliates",
+        icon: TrendingUp,
+      },
     ]
   },
   {
