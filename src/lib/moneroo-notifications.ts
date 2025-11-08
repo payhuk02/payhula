@@ -63,6 +63,13 @@ export const notifyPaymentSuccess = async (data: PaymentNotificationData): Promi
       });
     }
 
+    // Notification SMS (optionnel, si numéro de téléphone disponible)
+    if (data.customerPhone) {
+      await sendPaymentSuccessSMS(data).catch((err) => {
+        logger.warn('Error sending payment success SMS:', err);
+      });
+    }
+
     logger.log('Payment success notification sent:', {
       transactionId: data.transactionId,
       userId: data.userId,
@@ -114,6 +121,13 @@ export const notifyPaymentFailed = async (data: PaymentNotificationData): Promis
         },
       }).catch((err) => {
         logger.warn('Error sending payment failed email:', err);
+      });
+    }
+
+    // Notification SMS (optionnel)
+    if (data.customerPhone) {
+      await sendPaymentFailedSMS(data).catch((err) => {
+        logger.warn('Error sending payment failed SMS:', err);
       });
     }
 
@@ -170,6 +184,13 @@ export const notifyPaymentCancelled = async (data: PaymentNotificationData): Pro
       });
     }
 
+    // Notification SMS (optionnel)
+    if (data.customerPhone) {
+      await sendPaymentCancelledSMS(data).catch((err) => {
+        logger.warn('Error sending payment cancelled SMS:', err);
+      });
+    }
+
     logger.log('Payment cancelled notification sent:', {
       transactionId: data.transactionId,
       userId: data.userId,
@@ -223,6 +244,13 @@ export const notifyPaymentRefunded = async (data: PaymentNotificationData): Prom
       });
     }
 
+    // Notification SMS (optionnel)
+    if (data.customerPhone) {
+      await sendPaymentRefundedSMS(data).catch((err) => {
+        logger.warn('Error sending payment refunded SMS:', err);
+      });
+    }
+
     logger.log('Payment refunded notification sent:', {
       transactionId: data.transactionId,
       userId: data.userId,
@@ -268,7 +296,7 @@ export const notifyPaymentPending = async (data: PaymentNotificationData): Promi
 
 /**
  * Helper pour envoyer des emails de paiement
- * Utilise Supabase Edge Function ou service externe (Resend, SendGrid, etc.)
+ * Utilise Supabase Edge Function (send-email) avec Resend API
  */
 async function sendPaymentEmail(params: {
   to: string;
@@ -276,36 +304,156 @@ async function sendPaymentEmail(params: {
   template: string;
   data: Record<string, unknown>;
 }): Promise<void> {
-  // TODO: Implémenter l'envoi d'email via Supabase Edge Function ou service externe
-  // Pour l'instant, on log juste l'intention
-  logger.log('Email notification (not implemented yet):', {
-    to: params.to,
-    subject: params.subject,
-    template: params.template,
-  });
+  try {
+    const { data, error } = await supabase.functions.invoke('send-email', {
+      body: {
+        to: params.to,
+        subject: params.subject,
+        template: params.template,
+        data: params.data,
+      },
+    });
 
-  // Exemple d'implémentation future avec Supabase Edge Function
-  // await supabase.functions.invoke('send-email', {
-  //   body: {
-  //     to: params.to,
-  //     subject: params.subject,
-  //     template: params.template,
-  //     data: params.data,
-  //   },
-  // });
+    if (error) {
+      logger.error('Error invoking send-email function:', error);
+      throw error;
+    }
+
+    logger.log('Email sent successfully:', {
+      to: params.to,
+      subject: params.subject,
+      template: params.template,
+      messageId: data?.messageId,
+    });
+  } catch (error: any) {
+    logger.error('Error sending payment email:', {
+      error: error.message,
+      to: params.to,
+      template: params.template,
+    });
+    // Ne pas faire échouer l'opération principale si l'email échoue
+  }
 }
 
 /**
  * Helper pour envoyer des SMS (optionnel)
+ * Utilise Supabase Edge Function (send-sms) avec Twilio API
  */
 export async function sendPaymentSMS(params: {
   to: string;
-  message: string;
+  template: string;
+  data: Record<string, unknown>;
 }): Promise<void> {
-  // TODO: Implémenter l'envoi de SMS via service externe (Twilio, etc.)
-  logger.log('SMS notification (not implemented yet):', {
-    to: params.to,
-    message: params.message,
-  });
+  try {
+    const { data, error } = await supabase.functions.invoke('send-sms', {
+      body: {
+        to: params.to,
+        template: params.template,
+        data: params.data,
+      },
+    });
+
+    if (error) {
+      logger.error('Error invoking send-sms function:', error);
+      throw error;
+    }
+
+    logger.log('SMS sent successfully:', {
+      to: params.to,
+      template: params.template,
+      messageId: data?.messageId,
+    });
+  } catch (error: any) {
+    logger.error('Error sending payment SMS:', {
+      error: error.message,
+      to: params.to,
+      template: params.template,
+    });
+    // Ne pas faire échouer l'opération principale si le SMS échoue
+  }
 }
+
+/**
+ * Envoie une notification SMS pour un paiement réussi
+ */
+export const sendPaymentSuccessSMS = async (data: PaymentNotificationData): Promise<void> => {
+  if (!data.customerPhone) {
+    return;
+  }
+
+  await sendPaymentSMS({
+    to: data.customerPhone,
+    template: 'payment_success',
+    data: {
+      customerName: data.customerName,
+      amount: data.amount,
+      currency: data.currency,
+      orderNumber: data.orderNumber,
+      transactionId: data.transactionId,
+    },
+  });
+};
+
+/**
+ * Envoie une notification SMS pour un paiement échoué
+ */
+export const sendPaymentFailedSMS = async (data: PaymentNotificationData): Promise<void> => {
+  if (!data.customerPhone) {
+    return;
+  }
+
+  await sendPaymentSMS({
+    to: data.customerPhone,
+    template: 'payment_failed',
+    data: {
+      customerName: data.customerName,
+      amount: data.amount,
+      currency: data.currency,
+      reason: data.reason,
+      transactionId: data.transactionId,
+    },
+  });
+};
+
+/**
+ * Envoie une notification SMS pour un paiement annulé
+ */
+export const sendPaymentCancelledSMS = async (data: PaymentNotificationData): Promise<void> => {
+  if (!data.customerPhone) {
+    return;
+  }
+
+  await sendPaymentSMS({
+    to: data.customerPhone,
+    template: 'payment_cancelled',
+    data: {
+      customerName: data.customerName,
+      amount: data.amount,
+      currency: data.currency,
+      reason: data.reason,
+      transactionId: data.transactionId,
+    },
+  });
+};
+
+/**
+ * Envoie une notification SMS pour un remboursement
+ */
+export const sendPaymentRefundedSMS = async (data: PaymentNotificationData): Promise<void> => {
+  if (!data.customerPhone) {
+    return;
+  }
+
+  await sendPaymentSMS({
+    to: data.customerPhone,
+    template: 'payment_refunded',
+    data: {
+      customerName: data.customerName,
+      amount: data.amount,
+      currency: data.currency,
+      reason: data.reason,
+      transactionId: data.transactionId,
+    },
+  });
+};
 

@@ -611,7 +611,20 @@ export default function Checkout() {
       }
 
       // Marquer le panier comme récupéré (pour abandoned cart recovery)
-      // TODO: Implémenter markCartRecovered si nécessaire
+      try {
+        const { error: recoveryError } = await (supabase.rpc as any)('mark_cart_recovered', {
+          p_user_id: user?.id || null,
+          p_session_id: null, // Session ID pourrait être récupéré si nécessaire
+        });
+        
+        if (recoveryError) {
+          logger.warn('Failed to mark cart as recovered', { error: recoveryError });
+          // Ne pas bloquer le processus si l'erreur survient
+        }
+      } catch (recoveryError: any) {
+        logger.warn('Error marking cart as recovered', { error: recoveryError });
+        // Ne pas bloquer le processus si l'erreur survient
+      }
       
       // Rediriger vers le provider de paiement
       safeRedirect(paymentResult.checkout_url, () => {
