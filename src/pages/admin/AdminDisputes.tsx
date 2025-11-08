@@ -84,24 +84,57 @@ const AdminDisputes = () => {
     setPage(1); // Reset à la page 1 lors du tri
   }, [sortByColumn, sortDir]);
 
-  // Fonction pour exporter les litiges en CSV
-  const handleExportCSV = useCallback(() => {
+  // Fonction pour exporter les litiges en CSV (TOUS les litiges filtrés, pas seulement la page actuelle)
+  const handleExportCSV = useCallback(async () => {
     try {
-      if (disputes.length === 0) {
+      setLoading(true);
+      logger.info('Début de l\'export CSV de tous les litiges filtrés');
+      
+      // Récupérer TOUS les litiges avec les filtres appliqués (sans pagination)
+      let query = supabase
+        .from("disputes")
+        .select("*")
+        .order(sortByColumn, { ascending: sortDir === 'asc' });
+
+      // Appliquer les mêmes filtres que pour l'affichage
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
+      }
+      if (initiatorFilter !== "all") {
+        query = query.eq("initiator_type", initiatorFilter);
+      }
+      if (priorityFilter !== "all") {
+        query = query.eq("priority", priorityFilter);
+      }
+
+      // Recherche textuelle
+      if (debouncedSearch.trim()) {
+        const searchTerm = debouncedSearch.trim();
+        query = query.or(`subject.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,order_id.ilike.%${searchTerm}%`);
+      }
+
+      const { data: allDisputes, error: queryError } = await query;
+
+      if (queryError) {
+        throw queryError;
+      }
+
+      if (!allDisputes || allDisputes.length === 0) {
         logger.warn('Export CSV: aucun litige à exporter');
         toast({
           title: "Aucune donnée",
-          description: "Il n'y a aucun litige à exporter",
+          description: "Il n'y a aucun litige à exporter avec les filtres appliqués",
           variant: "destructive",
         });
         return;
       }
-      logger.info(`Export CSV de ${disputes.length} litiges`);
-      exportDisputesToCSV(disputes);
+
+      logger.info(`Export CSV de ${allDisputes.length} litiges`);
+      exportDisputesToCSV(allDisputes);
       logger.info('Export CSV réussi');
       toast({
         title: "Export réussi",
-        description: `${disputes.length} litige(s) exporté(s) en CSV`,
+        description: `${allDisputes.length} litige(s) exporté(s) en CSV`,
       });
     } catch (error: any) {
       logger.error('Erreur lors de l\'export CSV:', error);
@@ -110,8 +143,10 @@ const AdminDisputes = () => {
         description: error.message || "Impossible d'exporter les litiges",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-  }, [disputes, toast]);
+  }, [statusFilter, initiatorFilter, priorityFilter, debouncedSearch, sortByColumn, sortDir, toast]);
 
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
