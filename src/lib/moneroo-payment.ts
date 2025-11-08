@@ -105,8 +105,35 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       .single();
 
     if (transactionError) {
-      logger.error("Error creating transaction:", transactionError);
-      throw new Error("Impossible de créer la transaction");
+      logger.error("Error creating transaction:", {
+        error: transactionError,
+        code: transactionError.code,
+        message: transactionError.message,
+        details: transactionError.details,
+        hint: transactionError.hint,
+        storeId,
+        customerId: currentUserId,
+        productId,
+        amount,
+        currency,
+      });
+      
+      // Afficher un message d'erreur plus détaillé
+      const errorMessage = transactionError.message || "Erreur inconnue";
+      const errorHint = transactionError.hint || "";
+      const errorDetails = transactionError.details || "";
+      
+      console.error("Transaction error details:", {
+        error: transactionError,
+        storeId,
+        customerId: currentUserId,
+        productId,
+        transactionData,
+      });
+      
+      throw new Error(
+        `Impossible de créer la transaction: ${errorMessage}${errorHint ? ` (${errorHint})` : ""}${errorDetails ? ` - ${errorDetails}` : ""}`
+      );
     }
 
     logger.log("Transaction created:", transaction.id);
