@@ -21,6 +21,7 @@ DECLARE
   v_order_count INTEGER := 0;
   v_paid_count INTEGER := 0;
   v_order_numbers TEXT[];
+  v_first_store_id UUID;
 BEGIN
   -- Récupérer la commande et ses metadata
   SELECT 
@@ -141,6 +142,61 @@ BEGIN
         ),
         false
       );
+
+      -- 🆕 Déclencher le webhook multi_store_group.completed
+      -- Récupérer le premier store_id du groupe pour le webhook
+      BEGIN
+        SELECT store_id INTO v_first_store_id
+        FROM orders
+        WHERE metadata->>'group_id' = v_group_id
+          AND customer_id = v_order.customer_id
+        LIMIT 1;
+
+        IF v_first_store_id IS NOT NULL THEN
+          -- Utiliser order.completed comme type d'événement (le nouveau type sera ajouté via migration)
+          -- Les métadonnées indiqueront qu'il s'agit d'un groupe multi-stores
+          BEGIN
+            PERFORM public.trigger_webhook(
+              'multi_store_group.completed'::webhook_event_type,
+              v_group_id,
+              jsonb_build_object(
+                'group_id', v_group_id,
+                'customer_id', v_order.customer_id,
+                'order_count', v_order_count,
+                'total_amount', v_total_amount,
+                'order_numbers', v_order_numbers,
+                'orders', v_group_orders,
+                'completed_at', NOW(),
+                'multi_store', true
+              ),
+              v_first_store_id
+            );
+          EXCEPTION
+            WHEN invalid_parameter_value THEN
+              -- Si le type d'événement n'existe pas encore, utiliser order.completed comme fallback
+              PERFORM public.trigger_webhook(
+                'order.completed'::webhook_event_type,
+                v_group_id,
+                jsonb_build_object(
+                  'event_type', 'multi_store_group.completed',
+                  'group_id', v_group_id,
+                  'customer_id', v_order.customer_id,
+                  'order_count', v_order_count,
+                  'total_amount', v_total_amount,
+                  'order_numbers', v_order_numbers,
+                  'orders', v_group_orders,
+                  'completed_at', NOW(),
+                  'multi_store', true
+                ),
+                v_first_store_id
+              );
+          END;
+        END IF;
+      EXCEPTION
+        WHEN OTHERS THEN
+          -- Logger l'erreur mais ne pas bloquer
+          RAISE WARNING 'Error triggering multi_store_group.completed webhook: %', SQLERRM;
+      END;
     END IF;
   END IF;
 END;

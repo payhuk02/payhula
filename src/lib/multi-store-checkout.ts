@@ -361,10 +361,23 @@ export async function createMultiStoreOrders(
 
         if (itemsError) {
           logger.error(`Error creating order items for order ${order.id}:`, itemsError);
-          // Rollback: supprimer la commande créée
+          // Rollback: supprimer la commande créée et les données associées
           if (currentOrderId) {
-            await supabase.from('orders').delete().eq('id', currentOrderId);
-            createdOrderIds.pop();
+            try {
+              // Supprimer les order_items s'ils ont été partiellement créés
+              await supabase
+                .from('order_items')
+                .delete()
+                .eq('order_id', currentOrderId)
+                .catch((err) => logger.warn(`Error deleting order items for ${currentOrderId}:`, err));
+
+              // Supprimer la commande
+              await supabase.from('orders').delete().eq('id', currentOrderId);
+              createdOrderIds.pop();
+              logger.log(`Rolled back order ${currentOrderId} due to order items error`);
+            } catch (rollbackError) {
+              logger.error(`Failed to rollback order ${currentOrderId}:`, rollbackError);
+            }
           }
           throw new Error(`Impossible de créer les articles de commande pour ${orderNumber}`);
         }
@@ -462,11 +475,28 @@ export async function createMultiStoreOrders(
         // Si on a créé la commande mais pas les items, rollback
         if (orderCreated && currentOrderId) {
           try {
+            // Supprimer les order_items s'ils existent
+            await supabase
+              .from('order_items')
+              .delete()
+              .eq('order_id', currentOrderId)
+              .catch((err) => logger.warn(`Error deleting order items for ${currentOrderId}:`, err));
+
+            // Supprimer les transactions associées (non complétées)
+            await supabase
+              .from('transactions')
+              .delete()
+              .eq('order_id', currentOrderId)
+              .neq('status', 'completed')
+              .catch((err) => logger.warn(`Error deleting transactions for ${currentOrderId}:`, err));
+
+            // Supprimer la commande
             await supabase.from('orders').delete().eq('id', currentOrderId);
             createdOrderIds.pop();
             logger.log(`Rolled back order ${currentOrderId} for store ${storeId}`);
           } catch (rollbackError) {
             logger.error(`Failed to rollback order ${currentOrderId}:`, rollbackError);
+            // Ne pas pop si le rollback a échoué, pour permettre un nettoyage ultérieur
           }
         }
 
@@ -503,11 +533,88 @@ export async function createMultiStoreOrders(
     // En cas d'erreur critique, rollback toutes les commandes créées
     if (createdOrderIds.length > 0) {
       logger.warn(`Rolling back ${createdOrderIds.length} order(s) due to critical error`);
+      
       try {
-        await supabase.from('orders').delete().in('id', createdOrderIds);
-        logger.log(`Rolled back ${createdOrderIds.length} order(s)`);
+        // 🆕 Utiliser la fonction SQL de nettoyage si disponible (plus efficace)
+        // Sinon, fallback sur la suppression manuelle
+        if (groupId) {
+          try {
+            const { data: cleanupResult, error: cleanupError } = await supabase.rpc(
+              'cleanup_multi_store_group',
+              {
+                p_group_id: groupId,
+                p_customer_id: customerId,
+              }
+            );
+
+            if (!cleanupError && cleanupResult) {
+              const cleaned = cleanupResult[0];
+              logger.log(`Rolled back group ${groupId}: ${cleaned.cleaned_orders_count} orders, ${cleaned.cleaned_order_items_count} items, ${cleaned.cleaned_transactions_count} transactions`);
+            } else {
+              throw cleanupError; // Fallback sur la méthode manuelle
+            }
+          } catch (cleanupError) {
+            // Fallback: suppression manuelle
+            logger.warn('SQL cleanup function failed, using manual rollback:', cleanupError);
+            
+            // Supprimer les order_items en premier (contrainte FK)
+            await supabase
+              .from('order_items')
+              .delete()
+              .in('order_id', createdOrderIds)
+              .catch((err) => logger.error('Error deleting order items:', err));
+
+            // Supprimer les transactions associées (non complétées)
+            await supabase
+              .from('transactions')
+              .delete()
+              .in('order_id', createdOrderIds)
+              .neq('status', 'completed')
+              .catch((err) => logger.error('Error deleting transactions:', err));
+
+            // Supprimer les commandes
+            await supabase
+              .from('orders')
+              .delete()
+              .in('id', createdOrderIds)
+              .catch((err) => logger.error('Error deleting orders:', err));
+
+            logger.log(`Manually rolled back ${createdOrderIds.length} order(s)`);
+          }
+        } else {
+          // Pas de group_id, suppression manuelle
+          // Supprimer les order_items en premier
+          await supabase
+            .from('order_items')
+            .delete()
+            .in('order_id', createdOrderIds)
+            .catch((err) => logger.error('Error deleting order items:', err));
+
+          // Supprimer les transactions associées (non complétées)
+          await supabase
+            .from('transactions')
+            .delete()
+            .in('order_id', createdOrderIds)
+            .neq('status', 'completed')
+            .catch((err) => logger.error('Error deleting transactions:', err));
+
+          // Supprimer les commandes
+          await supabase
+            .from('orders')
+            .delete()
+            .in('id', createdOrderIds)
+            .catch((err) => logger.error('Error deleting orders:', err));
+
+          logger.log(`Manually rolled back ${createdOrderIds.length} order(s)`);
+        }
       } catch (rollbackError) {
         logger.error('Failed to rollback orders:', rollbackError);
+        // Logger pour nettoyage manuel ultérieur
+        logger.error('Orders that need manual cleanup:', {
+          order_ids: createdOrderIds,
+          group_id: groupId,
+          customer_id: customerId,
+        });
         // Ne pas throw, on a déjà une erreur principale
       }
     }
