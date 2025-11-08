@@ -48,6 +48,7 @@ import {
   Factory,
   Hash,
   Building2,
+  AlertCircle,
   BarChart,
   Layers,
   FileBarChart,
