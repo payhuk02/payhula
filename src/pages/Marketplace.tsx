@@ -526,6 +526,16 @@ const Marketplace = () => {
   const heroRef = useScrollAnimation<HTMLDivElement>();
   const productsRef = useScrollAnimation<HTMLDivElement>();
 
+  // Préparer les bundles pour l'affichage
+  const bundlesToDisplay = useMemo(() => {
+    if (!activeBundles || activeBundles.length === 0) return [];
+    return activeBundles.map(bundle => ({
+      ...bundle,
+      stores: (bundle as any).stores || null,
+      savings_percentage: bundle.discount_percentage || null,
+    }));
+  }, [activeBundles]);
+
   return (
     <>
       {/* SEO Meta Tags */}
@@ -1019,20 +1029,7 @@ const Marketplace = () => {
       </section>
 
       {/* Section Bundles (si disponibles) */}
-      {(() => {
-        if (!activeBundles || activeBundles.length === 0) {
-          return null;
-        }
-        return (
-          <BundlesSection 
-            bundles={activeBundles.map(bundle => ({
-              ...bundle,
-              stores: (bundle as any).stores || null,
-              savings_percentage: bundle.discount_percentage || null,
-            }))} 
-          />
-        );
-      })()}
+      {bundlesToDisplay.length > 0 && <BundlesSection bundles={bundlesToDisplay} />}
 
       {/* Liste des produits */}
       <section 

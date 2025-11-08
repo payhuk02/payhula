@@ -18,7 +18,10 @@ export const BundlesSection: React.FC<BundlesSectionProps> = ({ bundles }) => {
     return null;
   }
 
-  const savingsPercentages = bundles.map((b) => (b.savings_percentage || 0) as number);
+  const savingsPercentages = bundles.map((b) => {
+    // Support à la fois savings_percentage et discount_percentage
+    return (b.savings_percentage || b.discount_percentage || 0) as number;
+  });
   const maxSavings = savingsPercentages.length > 0 ? Math.max(...savingsPercentages) : 0;
 
   return (
