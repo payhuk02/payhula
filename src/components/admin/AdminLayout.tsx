@@ -124,6 +124,7 @@ const menuSections = [
     label: 'Configuration',
     items: [
       { icon: Settings, label: 'Paramètres', path: '/admin/settings' },
+      { icon: Percent, label: 'Commissions', path: '/admin/commission-settings' },
     ]
   },
 ];

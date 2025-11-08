@@ -185,6 +185,7 @@ const AdminSales = lazy(() => import("./pages/admin/AdminSales"));
 const AdminReferrals = lazy(() => import("./pages/admin/AdminReferrals"));
 const AdminActivity = lazy(() => import("./pages/admin/AdminActivity"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminCommissionSettings = lazy(() => import("./pages/admin/AdminCommissionSettings"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 const AdminDisputes = lazy(() => import("./pages/admin/AdminDisputes"));
 const AdminAffiliates = lazy(() => import("./pages/admin/AdminAffiliates"));
@@ -471,6 +472,7 @@ const AppContent = () => {
           <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
           <Route path="/admin/activity" element={<ProtectedRoute><AdminActivity /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
+          <Route path="/admin/commission-settings" element={<ProtectedRoute><AdminCommissionSettings /></ProtectedRoute>} />
           <Route path="/admin/notifications" element={<ProtectedRoute><AdminNotifications /></ProtectedRoute>} />
           <Route path="/admin/revenue" element={<ProtectedRoute><PlatformRevenue /></ProtectedRoute>} />
           <Route path="/admin/kyc" element={<ProtectedRoute><AdminKYC /></ProtectedRoute>} />

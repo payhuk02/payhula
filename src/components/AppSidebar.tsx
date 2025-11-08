@@ -754,6 +754,11 @@ const adminMenuSections = [
         url: "/admin/settings",
         icon: Settings,
       },
+      {
+        title: "Commissions",
+        url: "/admin/commission-settings",
+        icon: Percent,
+      },
     ]
   },
 ];
