@@ -11,9 +11,6 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-/**
- * Calcule la signature HMAC-SHA256 d'un payload
- */
 async function calculateHMACSignature(payload: string, secret: string): Promise<string> {
   const encoder = new TextEncoder();
   const keyData = encoder.encode(secret);
@@ -32,9 +29,6 @@ async function calculateHMACSignature(payload: string, secret: string): Promise<
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-/**
- * Compare deux strings de manière constante dans le temps
- */
 function constantTimeEquals(a: string, b: string): boolean {
   if (a.length !== b.length) {
     return false;
@@ -46,26 +40,19 @@ function constantTimeEquals(a: string, b: string): boolean {
   return result === 0;
 }
 
-/**
- * Extrait la signature depuis l'en-tête HTTP
- */
 function extractSignatureFromHeader(headers: Headers): string | null {
   const signature = headers.get('x-moneroo-signature') || 
-                   headers.get('X-Moneroo-Signature') ||
-                   headers.get('moneroo-signature');
+                    headers.get('X-Moneroo-Signature') ||
+                    headers.get('moneroo-signature');
   
   if (!signature) {
     return null;
   }
 
-  // La signature peut être au format "sha256=signature" ou juste "signature"
   const match = signature.match(/sha256=(.+)/i);
   return match ? match[1] : signature;
 }
 
-/**
- * Vérifie la signature d'un webhook Moneroo
- */
 async function verifyWebhookSignature(
   payload: string,
   signature: string,
@@ -94,13 +81,10 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Récupérer le secret webhook depuis les variables d'environnement
     const webhookSecret = Deno.env.get('MONEROO_WEBHOOK_SECRET');
     
-    // Récupérer le payload brut pour la vérification de signature
     const rawPayload = await req.text();
     
-    // Vérifier la signature si le secret est configuré
     if (webhookSecret) {
       const signature = extractSignatureFromHeader(req.headers);
       
@@ -116,7 +100,6 @@ serve(async (req) => {
       
       if (!isValid) {
         console.error('Invalid webhook signature');
-        // Log de sécurité (sans révéler la signature complète)
         await supabase.from('transaction_logs').insert({
           event_type: 'webhook_signature_failed',
           status: 'failed',
@@ -142,11 +125,9 @@ serve(async (req) => {
       console.warn('MONEROO_WEBHOOK_SECRET not configured - webhook signature verification disabled');
     }
 
-    // Parser le payload JSON
     const payload = JSON.parse(rawPayload);
     console.log('Moneroo webhook received:', payload);
 
-    // Extract transaction data from Moneroo webhook
     const { transaction_id, status, amount, currency, metadata } = payload;
 
     if (!transaction_id) {
@@ -172,15 +153,54 @@ serve(async (req) => {
       'failed': 'failed',
       'pending': 'processing',
       'cancelled': 'cancelled',
+      'refunded': 'refunded',
     };
 
     const mappedStatus = statusMap[status?.toLowerCase()] || 'processing';
+
+    // 🆕 Vérifier l'idempotence (éviter les webhooks dupliqués)
+    if (mappedStatus === transaction.status) {
+      // Si le statut est identique, vérifier si le webhook a déjà été traité
+      const { data: alreadyProcessed } = await supabase.rpc('is_webhook_already_processed', {
+        p_transaction_id: transaction.id,
+        p_status: mappedStatus,
+        p_provider: 'moneroo',
+      });
+
+      if (alreadyProcessed) {
+        console.log('Webhook already processed, ignoring duplicate');
+        return new Response(
+          JSON.stringify({ success: true, message: 'Webhook already processed' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // 🆕 Valider le montant si amount est fourni
+    if (amount && transaction.order_id) {
+      const { data: amountValid } = await supabase.rpc('validate_transaction_amount', {
+        p_transaction_id: transaction.id,
+        p_amount: amount,
+      });
+
+      if (!amountValid) {
+        console.warn('Amount mismatch detected', {
+          transaction_id: transaction.id,
+          webhook_amount: amount,
+          transaction_amount: transaction.amount,
+        });
+        // Ne pas bloquer le webhook, mais logger l'alerte
+      }
+    }
 
     // Update transaction
     const updates: any = {
       status: mappedStatus,
       moneroo_response: payload,
       updated_at: new Date().toISOString(),
+      webhook_processed_at: new Date().toISOString(),
+      webhook_attempts: (transaction.webhook_attempts || 0) + 1,
+      last_webhook_payload: payload,
     };
 
     if (mappedStatus === 'completed') {
@@ -201,7 +221,6 @@ serve(async (req) => {
         if (paymentError) {
           console.error('Error updating payment:', paymentError);
         } else if (payment) {
-          // Déclencher webhook payment.completed
           await supabase.rpc('trigger_webhook', {
             p_event_type: 'payment.completed',
             p_event_id: payment.id,
@@ -213,7 +232,7 @@ serve(async (req) => {
                 amount: transaction.amount,
                 currency: transaction.currency,
                 status: 'completed',
-                payment_method: transaction.payment_method || 'moneroo',
+                payment_method: transaction.moneroo_payment_method || 'moneroo',
                 created_at: payment.created_at,
               },
             },
@@ -239,7 +258,6 @@ serve(async (req) => {
           console.error('Error updating order:', orderError);
         } else {
           order = orderData;
-          // Déclencher webhook order.completed
           await supabase.rpc('trigger_webhook', {
             p_event_type: 'order.completed',
             p_event_id: order.id,
@@ -314,6 +332,29 @@ serve(async (req) => {
           is_read: false,
         }).catch((err) => console.error('Error creating notification:', err));
       }
+    } else if (mappedStatus === 'refunded') {
+      updates.refunded_at = new Date().toISOString();
+      updates.moneroo_refund_id = payload.refund_id;
+      updates.moneroo_refund_amount = payload.amount;
+      updates.moneroo_refund_reason = payload.reason;
+
+      // Create refund notification
+      if (transaction.customer_id) {
+        await supabase.from('notifications').insert({
+          user_id: transaction.customer_id,
+          type: 'payment_refunded',
+          title: '🔄 Paiement remboursé',
+          message: `Votre paiement de ${payload.amount} ${payload.currency} a été remboursé.`,
+          metadata: {
+            transaction_id: transaction.id,
+            refund_id: payload.refund_id,
+            amount: payload.amount,
+            currency: payload.currency,
+            reason: payload.reason,
+          },
+          is_read: false,
+        }).catch((err) => console.error('Error creating refund notification:', err));
+      }
     }
 
     const { error: updateError } = await supabase
@@ -326,7 +367,6 @@ serve(async (req) => {
       throw updateError;
     }
 
-    // Log the webhook event
     await supabase.from('transaction_logs').insert({
       transaction_id: transaction.id,
       event_type: 'webhook_received',
