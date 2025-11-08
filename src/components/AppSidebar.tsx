@@ -759,6 +759,11 @@ const adminMenuSections = [
         url: "/admin/commission-settings",
         icon: Percent,
       },
+      {
+        title: "Paiements Commissions",
+        url: "/admin/commission-payments",
+        icon: DollarSign,
+      },
     ]
   },
 ];

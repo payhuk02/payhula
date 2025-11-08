@@ -10,3 +10,4 @@ CREATE INDEX IF NOT EXISTS idx_products_is_featured ON public.products(is_featur
 -- Ajouter un commentaire pour la documentation
 COMMENT ON COLUMN public.products.is_featured IS 'Indique si le produit est mis en vedette sur le marketplace';
 
+

@@ -26,7 +26,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useCart } from '@/hooks/cart/useCart';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { initiateMonerooPayment } from '@/lib/moneroo-payment';
+import { initiatePayment } from '@/lib/payment-service';
+import { createAffiliateCommission, getAffiliateInfo } from '@/lib/affiliation-tracking';
 import { safeRedirect } from '@/lib/url-validator';
 import { logger } from '@/lib/logger';
 import GiftCardInput from '@/components/checkout/GiftCardInput';
@@ -444,8 +445,13 @@ export default function Checkout() {
         }
       }
 
-      // Initier le paiement Moneroo
-      const paymentResult = await initiateMonerooPayment({
+      // Récupérer les infos d'affiliation si disponible
+      const affiliateInfo = await getAffiliateInfo();
+      const hasAffiliate = affiliateInfo.affiliate_link_id && affiliateInfo.product_id;
+
+      // Initier le paiement (Moneroo par défaut, peut être changé)
+      const paymentProvider = 'moneroo'; // TODO: Ajouter sélection du provider dans l'UI
+      const paymentResult = await initiatePayment({
         storeId: product.store_id,
         orderId: order.id,
         customerId: user.id,
@@ -455,21 +461,28 @@ export default function Checkout() {
         customerEmail: formData.email,
         customerName: formData.full_name,
         customerPhone: formData.phone,
+        provider: paymentProvider,
         metadata: {
           order_number: orderNumber,
           item_count: items.length,
           shipping_address: formData,
+          // Inclure les infos d'affiliation dans les métadonnées
+          ...(hasAffiliate && {
+            affiliate_link_id: affiliateInfo.affiliate_link_id,
+            affiliate_id: affiliateInfo.affiliate_id,
+            tracking_cookie: affiliateInfo.tracking_cookie,
+          }),
         },
       });
 
       if (!paymentResult.success || !paymentResult.checkout_url) {
-        throw new Error('Impossible d\'initialiser le paiement');
+        throw new Error(paymentResult.error || 'Impossible d\'initialiser le paiement');
       }
 
       // Marquer le panier comme récupéré (pour abandoned cart recovery)
       // TODO: Implémenter markCartRecovered si nécessaire
       
-      // Rediriger vers Moneroo
+      // Rediriger vers le provider de paiement
       safeRedirect(paymentResult.checkout_url, () => {
         toast({
           title: 'Erreur de paiement',

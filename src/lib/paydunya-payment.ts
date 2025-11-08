@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { monerooClient, MonerooCheckoutData } from "./moneroo-client";
+import { paydunyaClient, PayDunyaCheckoutData } from "./paydunya-client";
 import { logger } from './logger';
 
 export interface PaymentOptions {
@@ -13,13 +13,13 @@ export interface PaymentOptions {
   customerEmail?: string;
   customerName?: string;
   customerPhone?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
- * Initie un paiement Moneroo complet avec tracking dans la base de données
+ * Initie un paiement PayDunya complet avec tracking dans la base de données
  */
-export const initiateMonerooPayment = async (options: PaymentOptions) => {
+export const initiatePayDunyaPayment = async (options: PaymentOptions) => {
   const {
     storeId,
     productId,
@@ -50,7 +50,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         customer_name: customerName,
         customer_phone: customerPhone,
         metadata,
-        payment_provider: "moneroo", // Indiquer que c'est Moneroo
+        payment_provider: "paydunya", // Indiquer que c'est PayDunya
       })
       .select()
       .single();
@@ -70,8 +70,8 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       request_data: JSON.parse(JSON.stringify(options)),
     }]);
 
-    // 3. Initialiser le paiement Moneroo
-    const checkoutData: MonerooCheckoutData = {
+    // 3. Initialiser le paiement PayDunya
+    const checkoutData: PayDunyaCheckoutData = {
       amount,
       currency,
       description,
@@ -86,19 +86,19 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       },
     };
 
-    logger.log("Initiating Moneroo checkout:", checkoutData);
+    logger.log("Initiating PayDunya checkout:", checkoutData);
 
-    const monerooResponse = await monerooClient.createCheckout(checkoutData);
+    const paydunyaResponse = await paydunyaClient.createCheckout(checkoutData);
 
-    logger.log("Moneroo response:", monerooResponse);
+    logger.log("PayDunya response:", paydunyaResponse);
 
-    // 4. Mettre à jour la transaction avec les infos Moneroo
+    // 4. Mettre à jour la transaction avec les infos PayDunya
     const { error: updateError } = await supabase
       .from("transactions")
       .update({
-        moneroo_transaction_id: monerooResponse.transaction_id || monerooResponse.id,
-        moneroo_checkout_url: monerooResponse.checkout_url,
-        moneroo_response: monerooResponse,
+        paydunya_transaction_id: paydunyaResponse.transaction_id || paydunyaResponse.id,
+        paydunya_checkout_url: paydunyaResponse.checkout_url,
+        paydunya_response: paydunyaResponse,
         status: "processing",
       })
       .eq("id", transaction.id);
@@ -112,26 +112,27 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       transaction_id: transaction.id,
       event_type: "payment_initiated",
       status: "processing",
-      response_data: monerooResponse,
+      response_data: paydunyaResponse,
     }]);
 
     // 6. Retourner les données pour redirection
     return {
       success: true,
       transaction_id: transaction.id,
-      checkout_url: monerooResponse.checkout_url,
-      moneroo_transaction_id: monerooResponse.transaction_id || monerooResponse.id,
+      checkout_url: paydunyaResponse.checkout_url,
+      paydunya_transaction_id: paydunyaResponse.transaction_id || paydunyaResponse.id,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error("Payment initiation error:", error);
-    throw error;
+    throw new Error(errorMessage);
   }
 };
 
 /**
- * Vérifie le statut d'une transaction et met à jour la base de données
+ * Vérifie le statut d'une transaction PayDunya et met à jour la base de données
  */
-export const verifyTransactionStatus = async (transactionId: string) => {
+export const verifyPayDunyaTransactionStatus = async (transactionId: string) => {
   try {
     // Récupérer la transaction
     const { data: transaction, error: fetchError } = await supabase
@@ -149,14 +150,14 @@ export const verifyTransactionStatus = async (transactionId: string) => {
       return transaction;
     }
 
-    // Vérifier auprès de Moneroo si on a un ID de transaction
-    if (transaction.moneroo_transaction_id) {
+    // Vérifier auprès de PayDunya si on a un ID de transaction
+    if (transaction.paydunya_transaction_id) {
       try {
-        const monerooStatus = await monerooClient.verifyPayment(
-          transaction.moneroo_transaction_id
+        const paydunyaStatus = await paydunyaClient.verifyPayment(
+          transaction.paydunya_transaction_id
         );
 
-        // Mettre à jour selon le statut Moneroo
+        // Mettre à jour selon le statut PayDunya
         const statusMap: Record<string, string> = {
           completed: "completed",
           success: "completed",
@@ -165,19 +166,19 @@ export const verifyTransactionStatus = async (transactionId: string) => {
           cancelled: "cancelled",
         };
 
-        const newStatus = statusMap[monerooStatus.status] || "processing";
+        const newStatus = statusMap[paydunyaStatus.status] || "processing";
 
-        const updates: any = {
+        const updates: Record<string, unknown> = {
           status: newStatus,
-          moneroo_payment_method: monerooStatus.payment_method,
-          moneroo_response: monerooStatus,
+          paydunya_payment_method: paydunyaStatus.payment_method,
+          paydunya_response: paydunyaStatus,
         };
 
         if (newStatus === "completed") {
           updates.completed_at = new Date().toISOString();
         } else if (newStatus === "failed") {
           updates.failed_at = new Date().toISOString();
-          updates.error_message = monerooStatus.error_message || "Paiement échoué";
+          updates.error_message = paydunyaStatus.error_message || "Paiement échoué";
         }
 
         await supabase
@@ -190,20 +191,22 @@ export const verifyTransactionStatus = async (transactionId: string) => {
           transaction_id: transactionId,
           event_type: "status_updated",
           status: newStatus,
-          response_data: monerooStatus,
+          response_data: paydunyaStatus,
         }]);
 
         return { ...transaction, ...updates };
       } catch (verifyError) {
-        console.error("Error verifying with Moneroo:", verifyError);
+        console.error("Error verifying with PayDunya:", verifyError);
         // Retourner la transaction actuelle si la vérification échoue
         return transaction;
       }
     }
 
     return transaction;
-  } catch (error: any) {
-    console.error("Transaction verification error:", error);
-    throw error;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    console.error("Transaction verification error:", errorMessage);
+    throw new Error(errorMessage);
   }
 };
+

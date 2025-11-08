@@ -125,6 +125,7 @@ const menuSections = [
     items: [
       { icon: Settings, label: 'Paramètres', path: '/admin/settings' },
       { icon: Percent, label: 'Commissions', path: '/admin/commission-settings' },
+      { icon: DollarSign, label: 'Paiements Commissions', path: '/admin/commission-payments' },
     ]
   },
 ];
