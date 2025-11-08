@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { CreditCard, Wallet, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { supabase } from '@/integrations/supabase/client';
 
 export type PaymentProvider = 'moneroo' | 'paydunya';
 
