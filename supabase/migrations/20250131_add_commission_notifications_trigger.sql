@@ -147,69 +147,62 @@ CREATE TRIGGER trigger_notify_affiliate_commission_status_changed
   EXECUTE FUNCTION public.notify_affiliate_commission_status_changed();
 
 -- Fonction pour notifier la création d'une commission de parrainage
--- Créer la fonction seulement si la table referral_commissions existe
+CREATE OR REPLACE FUNCTION public.notify_referral_commission_created()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_order_number TEXT;
+BEGIN
+  -- Récupérer le numéro de commande
+  SELECT order_number INTO v_order_number
+  FROM public.orders
+  WHERE id = NEW.order_id;
+
+  -- Créer la notification pour le parrain
+  INSERT INTO public.notifications (
+    user_id,
+    type,
+    title,
+    message,
+    metadata,
+    is_read
+  ) VALUES (
+    NEW.referrer_id,
+    'commission_created',
+    '🎉 Nouvelle commission de parrainage !',
+    'Une commission de ' || NEW.commission_amount::TEXT || ' XOF a été créée pour la commande ' || COALESCE(v_order_number, 'N/A'),
+    jsonb_build_object(
+      'commission_id', NEW.id,
+      'referrer_id', NEW.referrer_id,
+      'referred_id', NEW.referred_id,
+      'amount', NEW.commission_amount,
+      'currency', 'XOF',
+      'order_id', NEW.order_id,
+      'order_number', v_order_number
+    ),
+    false
+  );
+
+  RETURN NEW;
+END;
+$$;
+
+-- Trigger pour notifier la création d'une commission de parrainage (seulement si la table existe)
 DO $$
 BEGIN
-  -- Vérifier si la table referral_commissions existe
   IF EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
     AND table_name = 'referral_commissions'
   ) THEN
-    -- Créer la fonction
-    EXECUTE '
-    CREATE OR REPLACE FUNCTION public.notify_referral_commission_created()
-    RETURNS TRIGGER
-    LANGUAGE plpgsql
-    SECURITY DEFINER
-    SET search_path = public
-    AS $func$
-    DECLARE
-      v_order_number TEXT;
-    BEGIN
-      -- Récupérer le numéro de commande
-      SELECT order_number INTO v_order_number
-      FROM public.orders
-      WHERE id = NEW.order_id;
-
-      -- Créer la notification pour le parrain
-      INSERT INTO public.notifications (
-        user_id,
-        type,
-        title,
-        message,
-        metadata,
-        is_read
-      ) VALUES (
-        NEW.referrer_id,
-        ''commission_created'',
-        ''🎉 Nouvelle commission de parrainage !'',
-        ''Une commission de '' || NEW.commission_amount::TEXT || '' XOF a été créée pour la commande '' || COALESCE(v_order_number, ''N/A''),
-        jsonb_build_object(
-          ''commission_id'', NEW.id,
-          ''referrer_id'', NEW.referrer_id,
-          ''referred_id'', NEW.referred_id,
-          ''amount'', NEW.commission_amount,
-          ''currency'', ''XOF'',
-          ''order_id'', NEW.order_id,
-          ''order_number'', v_order_number
-        ),
-        false
-      );
-
-      RETURN NEW;
-    END;
-    $func$;
-    ';
-
-    -- Créer le trigger
     DROP TRIGGER IF EXISTS trigger_notify_referral_commission_created ON public.referral_commissions;
     CREATE TRIGGER trigger_notify_referral_commission_created
       AFTER INSERT ON public.referral_commissions
       FOR EACH ROW
       EXECUTE FUNCTION public.notify_referral_commission_created();
-  ELSE
-    RAISE NOTICE 'Table referral_commissions does not exist. Skipping trigger creation.';
   END IF;
 END $$;
 
@@ -315,9 +308,43 @@ BEGIN
   END IF;
 END $$;
 
--- Commentaires
-COMMENT ON FUNCTION public.notify_affiliate_commission_created() IS 'Notifie l''affilié lorsqu''une commission est créée';
-COMMENT ON FUNCTION public.notify_affiliate_commission_status_changed() IS 'Notifie l''affilié lorsqu''une commission est approuvée ou rejetée';
-COMMENT ON FUNCTION public.notify_referral_commission_created() IS 'Notifie le parrain lorsqu''une commission de parrainage est créée';
-COMMENT ON FUNCTION public.notify_commission_payment_processed() IS 'Notifie l''utilisateur lorsqu''un paiement de commission est traité';
+-- Commentaires (seulement si les fonctions existent)
+DO $$
+BEGIN
+  -- Commentaire pour notify_affiliate_commission_created
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON p.pronamespace = n.oid
+    WHERE n.nspname = 'public' AND p.proname = 'notify_affiliate_commission_created'
+  ) THEN
+    COMMENT ON FUNCTION public.notify_affiliate_commission_created() IS 'Notifie l''affilié lorsqu''une commission est créée';
+  END IF;
+
+  -- Commentaire pour notify_affiliate_commission_status_changed
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON p.pronamespace = n.oid
+    WHERE n.nspname = 'public' AND p.proname = 'notify_affiliate_commission_status_changed'
+  ) THEN
+    COMMENT ON FUNCTION public.notify_affiliate_commission_status_changed() IS 'Notifie l''affilié lorsqu''une commission est approuvée ou rejetée';
+  END IF;
+
+  -- Commentaire pour notify_referral_commission_created
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON p.pronamespace = n.oid
+    WHERE n.nspname = 'public' AND p.proname = 'notify_referral_commission_created'
+  ) THEN
+    COMMENT ON FUNCTION public.notify_referral_commission_created() IS 'Notifie le parrain lorsqu''une commission de parrainage est créée';
+  END IF;
+
+  -- Commentaire pour notify_commission_payment_processed
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON p.pronamespace = n.oid
+    WHERE n.nspname = 'public' AND p.proname = 'notify_commission_payment_processed'
+  ) THEN
+    COMMENT ON FUNCTION public.notify_commission_payment_processed() IS 'Notifie l''utilisateur lorsqu''un paiement de commission est traité';
+  END IF;
+END $$;
 
