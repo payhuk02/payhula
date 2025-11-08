@@ -7,9 +7,9 @@ import { Package, ArrowRight } from "lucide-react";
 interface BundlesSectionProps {
   bundles: Array<{
     id: string;
-    stores?: { slug?: string };
-    savings_percentage?: number;
-    [key: string]: unknown;
+    stores?: { slug?: string } | null;
+    savings_percentage?: number | null;
+    [key: string]: any;
   }>;
 }
 

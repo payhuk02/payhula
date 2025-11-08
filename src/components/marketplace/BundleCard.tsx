@@ -10,10 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Package, ShoppingBag, TrendingDown, Star } from 'lucide-react';
 import { useCart } from '@/hooks/cart/useCart';
 import { useToast } from '@/hooks/use-toast';
-import type { DigitalBundle } from '@/hooks/digital/useDigitalBundles';
+import type { DigitalProductBundle } from '@/hooks/digital/useDigitalBundles';
 
 interface BundleCardProps {
-  bundle: DigitalBundle;
+  bundle: DigitalProductBundle | any;
   storeSlug: string;
 }
 
@@ -65,11 +65,11 @@ export function BundleCard({ bundle, storeSlug }: BundleCardProps) {
       </div>
 
       {/* Badge Économie */}
-      {bundle.savings_percentage > 0 && (
+      {(bundle.savings_percentage || bundle.discount_percentage) && (bundle.savings_percentage || bundle.discount_percentage || 0) > 0 && (
         <div className="absolute top-3 right-3 z-10">
           <Badge variant="destructive" className="flex items-center gap-1">
             <TrendingDown className="h-3 w-3" />
-            -{bundle.savings_percentage.toFixed(0)}%
+            -{((bundle.savings_percentage || bundle.discount_percentage || 0) as number).toFixed(0)}%
           </Badge>
         </div>
       )}

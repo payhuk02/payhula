@@ -1019,14 +1019,20 @@ const Marketplace = () => {
       </section>
 
       {/* Section Bundles (si disponibles) */}
-      {activeBundles && activeBundles.length > 0 && (
-        <BundlesSection bundles={activeBundles as Array<{
-          id: string;
-          stores?: { slug?: string };
-          savings_percentage?: number;
-          [key: string]: unknown;
-        }>} />
-      )}
+      {(() => {
+        if (!activeBundles || activeBundles.length === 0) {
+          return null;
+        }
+        return (
+          <BundlesSection 
+            bundles={activeBundles.map(bundle => ({
+              ...bundle,
+              stores: (bundle as any).stores || null,
+              savings_percentage: bundle.discount_percentage || null,
+            }))} 
+          />
+        );
+      })()}
 
       {/* Liste des produits */}
       <section 
