@@ -1,7 +1,11 @@
 /**
  * Service de conversion de devises
  * Supporte la conversion entre différentes devises pour Moneroo
+ * Utilise une API de taux de change en temps réel avec fallback sur taux statiques
  */
+
+import { updateExchangeRates as fetchRatesFromAPI } from './currency-exchange-api';
+import { logger } from './logger';
 
 export type Currency = 'XOF' | 'EUR' | 'USD' | 'GBP' | 'NGN' | 'GHS' | 'KES' | 'ZAR';
 
@@ -13,10 +17,10 @@ export interface CurrencyRate {
 }
 
 /**
- * Taux de change de base (peuvent être récupérés depuis une API)
- * Note: En production, utiliser une API de taux de change en temps réel
+ * Taux de change de base (fallback si l'API n'est pas disponible)
+ * Ces taux sont utilisés en cas d'erreur API ou lors du premier chargement
  */
-const BASE_RATES: Record<string, number> = {
+const FALLBACK_RATES: Record<string, number> = {
   // XOF (Franc CFA) comme devise de base
   'XOF_EUR': 0.00152, // 1 XOF = 0.00152 EUR
   'XOF_USD': 0.00167, // 1 XOF = 0.00167 USD
@@ -45,7 +49,93 @@ const BASE_RATES: Record<string, number> = {
 };
 
 /**
+ * Taux de change dynamiques (mis à jour depuis l'API)
+ * Sera mis à jour automatiquement lors du premier appel
+ */
+let DYNAMIC_RATES: Record<string, number> | null = null;
+
+/**
+ * Indique si les taux ont été initialisés
+ */
+let ratesInitialized = false;
+
+/**
+ * Initialise les taux de change depuis l'API (appelé automatiquement au premier usage)
+ */
+async function initializeRates(): Promise<void> {
+  if (ratesInitialized) {
+    return;
+  }
+
+  try {
+    // Récupérer les taux depuis l'API
+    const apiRates = await fetchRatesFromAPI();
+    
+    if (apiRates) {
+      DYNAMIC_RATES = apiRates;
+      logger.info('Exchange rates initialized from API', {
+        ratesCount: Object.keys(apiRates).length,
+      });
+    } else {
+      logger.warn('Failed to fetch rates from API, using fallback rates');
+      DYNAMIC_RATES = FALLBACK_RATES;
+    }
+  } catch (error: any) {
+    logger.error('Error initializing exchange rates', { error: error.message });
+    DYNAMIC_RATES = FALLBACK_RATES;
+  } finally {
+    ratesInitialized = true;
+  }
+}
+
+/**
+ * Récupère le taux de change entre deux devises (priorité: API > Fallback)
+ */
+function getRate(from: Currency, to: Currency): number {
+  const rateKey = `${from}_${to}`;
+  
+  // Essayer d'abord les taux dynamiques (API)
+  if (DYNAMIC_RATES && DYNAMIC_RATES[rateKey]) {
+    return DYNAMIC_RATES[rateKey];
+  }
+  
+  // Fallback sur les taux statiques
+  if (FALLBACK_RATES[rateKey]) {
+    return FALLBACK_RATES[rateKey];
+  }
+  
+  // Si pas de taux direct, essayer de calculer via une devise intermédiaire (EUR)
+  if (from !== 'EUR' && to !== 'EUR') {
+    const fromToEurKey = `${from}_EUR`;
+    const eurToToKey = `EUR_${to}`;
+    
+    let fromToEur: number | undefined;
+    let eurToTo: number | undefined;
+    
+    // Essayer depuis les taux dynamiques
+    if (DYNAMIC_RATES) {
+      fromToEur = DYNAMIC_RATES[fromToEurKey];
+      eurToTo = DYNAMIC_RATES[eurToToKey];
+    }
+    
+    // Si pas trouvé, essayer depuis les taux de fallback
+    if (!fromToEur) fromToEur = FALLBACK_RATES[fromToEurKey];
+    if (!eurToTo) eurToTo = FALLBACK_RATES[eurToToKey];
+    
+    // Si on a les deux taux, calculer le taux de conversion
+    if (fromToEur && eurToTo) {
+      return fromToEur * eurToTo;
+    }
+  }
+  
+  // Si toujours pas de taux, retourner 1 (pas de conversion)
+  logger.warn(`Exchange rate not found for ${from} to ${to}, using 1:1`);
+  return 1;
+}
+
+/**
  * Convertit un montant d'une devise à une autre
+ * Utilise les taux de l'API si disponibles, sinon les taux de fallback
  */
 export function convertCurrency(
   amount: number,
@@ -56,14 +146,14 @@ export function convertCurrency(
     return amount;
   }
 
-  const rateKey = `${from}_${to}`;
-  const rate = BASE_RATES[rateKey];
-
-  if (!rate) {
-    console.warn(`Exchange rate not found for ${from} to ${to}, returning original amount`);
-    return amount;
+  // Initialiser les taux si ce n'est pas déjà fait (de façon asynchrone)
+  if (!ratesInitialized) {
+    initializeRates().catch((error) => {
+      logger.error('Failed to initialize rates', { error });
+    });
   }
 
+  const rate = getRate(from, to);
   return amount * rate;
 }
 
@@ -115,33 +205,60 @@ export function getSupportedCurrencies(): Currency[] {
 
 /**
  * Récupère le taux de change entre deux devises
+ * Utilise les taux de l'API si disponibles, sinon les taux de fallback
  */
 export function getExchangeRate(from: Currency, to: Currency): number {
   if (from === to) {
     return 1;
   }
 
-  const rateKey = `${from}_${to}`;
-  const rate = BASE_RATES[rateKey];
-
-  if (!rate) {
-    console.warn(`Exchange rate not found for ${from} to ${to}`);
-    return 1;
+  // Initialiser les taux si ce n'est pas déjà fait (de façon asynchrone)
+  if (!ratesInitialized) {
+    initializeRates().catch((error) => {
+      logger.error('Failed to initialize rates', { error });
+    });
   }
 
-  return rate;
+  return getRate(from, to);
 }
 
 /**
  * Met à jour les taux de change depuis une API externe
- * TODO: Implémenter l'intégration avec une API de taux de change (ex: ExchangeRate-API, Fixer.io)
+ * Force un nouveau fetch des taux depuis l'API et met à jour le cache
  */
 export async function updateExchangeRates(): Promise<void> {
-  // TODO: Implémenter la récupération des taux depuis une API
-  // Exemple:
-  // const response = await fetch('https://api.exchangerate-api.com/v4/latest/XOF');
-  // const data = await response.json();
-  // Mettre à jour BASE_RATES avec les nouveaux taux
-  console.log('Exchange rates update not implemented yet');
+  try {
+    logger.info('Updating exchange rates from API...');
+    
+    // Forcer un nouveau fetch (le cache sera ignoré)
+    const apiRates = await fetchRatesFromAPI();
+    
+    if (apiRates) {
+      DYNAMIC_RATES = apiRates;
+      ratesInitialized = true;
+      logger.info('Exchange rates updated successfully', {
+        ratesCount: Object.keys(apiRates).length,
+      });
+    } else {
+      logger.warn('Failed to update rates from API, keeping existing rates');
+    }
+  } catch (error: any) {
+    logger.error('Error updating exchange rates', { error: error.message });
+    throw error;
+  }
+}
+
+/**
+ * Récupère les taux de change actuels (depuis l'API ou fallback)
+ */
+export function getCurrentRates(): Record<string, number> {
+  return DYNAMIC_RATES || FALLBACK_RATES;
+}
+
+/**
+ * Vérifie si les taux proviennent de l'API ou du fallback
+ */
+export function areRatesFromAPI(): boolean {
+  return DYNAMIC_RATES !== null && DYNAMIC_RATES !== FALLBACK_RATES;
 }
 
