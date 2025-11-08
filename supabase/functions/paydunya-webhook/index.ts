@@ -71,11 +71,56 @@ serve(async (req) => {
 
     const mappedStatus = statusMap[status?.toLowerCase()] || 'processing';
 
+    // 🆕 Vérifier l'idempotence (éviter les webhooks dupliqués)
+    if (mappedStatus === transaction.status) {
+      try {
+        const { data: alreadyProcessed } = await supabase.rpc('is_webhook_already_processed', {
+          p_transaction_id: transaction.id,
+          p_status: mappedStatus,
+          p_provider: 'paydunya',
+        });
+
+        if (alreadyProcessed) {
+          console.log('Webhook already processed, ignoring duplicate');
+          return new Response(
+            JSON.stringify({ success: true, message: 'Webhook already processed' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      } catch (rpcError) {
+        // Si la fonction n'existe pas encore, continuer (pour compatibilité)
+        console.warn('is_webhook_already_processed function not available, continuing:', rpcError);
+      }
+    }
+
+    // 🆕 Valider le montant si amount est fourni
+    if (amount && transaction.order_id) {
+      try {
+        const { data: amountValid } = await supabase.rpc('validate_transaction_amount', {
+          p_transaction_id: transaction.id,
+          p_amount: amount,
+        });
+
+        if (amountValid === false) {
+          console.warn('Amount mismatch detected', {
+            transaction_id: transaction.id,
+            webhook_amount: amount,
+            transaction_amount: transaction.amount,
+          });
+        }
+      } catch (rpcError) {
+        console.warn('validate_transaction_amount function not available, continuing:', rpcError);
+      }
+    }
+
     // Prepare updates
     const updates: Record<string, unknown> = {
       status: mappedStatus,
       paydunya_response: payload,
       updated_at: new Date().toISOString(),
+      webhook_processed_at: new Date().toISOString(),
+      webhook_attempts: ((transaction.webhook_attempts as number) || 0) + 1,
+      last_webhook_payload: payload,
     };
 
     if (paymentMethod) {
