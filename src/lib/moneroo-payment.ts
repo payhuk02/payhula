@@ -70,23 +70,37 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
   }
 
   try {
+    // Récupérer l'utilisateur actuel pour l'ajouter dans metadata
+    const { data: { user } } = await supabase.auth.getUser();
+    const currentUserId = customerId || user?.id;
+
     // 1. Créer la transaction dans la base de données
+    const transactionData: Record<string, unknown> = {
+      store_id: storeId,
+      product_id: productId,
+      order_id: orderId,
+      amount,
+      currency,
+      status: "pending",
+      customer_email: customerEmail,
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      metadata: {
+        ...metadata,
+        // Ajouter userId dans metadata pour faciliter l'identification RLS
+        userId: currentUserId,
+      },
+      payment_provider: "moneroo", // Indiquer que c'est Moneroo
+    };
+
+    // Ajouter customer_id seulement s'il est fourni (peut ne pas exister dans la table)
+    if (customerId) {
+      transactionData.customer_id = customerId;
+    }
+
     const { data: transaction, error: transactionError } = await supabase
       .from("transactions")
-      .insert({
-        store_id: storeId,
-        product_id: productId,
-        order_id: orderId,
-        customer_id: customerId,
-        amount,
-        currency,
-        status: "pending",
-        customer_email: customerEmail,
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        metadata,
-        payment_provider: "moneroo", // Indiquer que c'est Moneroo
-      })
+      .insert([transactionData])
       .select()
       .single();
 
