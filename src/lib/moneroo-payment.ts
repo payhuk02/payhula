@@ -6,6 +6,7 @@ import {
   MonerooError,
   MonerooValidationError,
 } from "./moneroo-errors";
+import { Currency, isSupportedCurrency } from "./currency-converter";
 
 export interface PaymentOptions {
   storeId: string;
@@ -13,7 +14,7 @@ export interface PaymentOptions {
   orderId?: string;
   customerId?: string;
   amount: number;
-  currency?: string;
+  currency?: Currency;
   description: string;
   customerEmail?: string;
   customerName?: string;
@@ -36,6 +37,10 @@ export interface RefundResult {
   error?: string;
 }
 
+// Export cancellation functions
+export { cancelMonerooPayment, canCancelPayment } from './moneroo-cancellation';
+export type { CancelPaymentOptions, CancelPaymentResult } from './moneroo-cancellation';
+
 /**
  * Initie un paiement Moneroo complet avec tracking dans la base de données
  */
@@ -46,13 +51,23 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
     orderId,
     customerId,
     amount,
-    currency = "XOF",
+    currency: requestedCurrency = "XOF",
     description,
     customerEmail,
     customerName,
     customerPhone,
     metadata = {},
   } = options;
+
+  // Valider la devise
+  const currency: Currency = isSupportedCurrency(requestedCurrency) 
+    ? requestedCurrency 
+    : "XOF";
+
+  // Valider le montant
+  if (amount <= 0) {
+    throw new MonerooValidationError("Amount must be greater than 0");
+  }
 
   try {
     // 1. Créer la transaction dans la base de données
@@ -219,6 +234,35 @@ export const verifyTransactionStatus = async (transactionId: string) => {
           response_data: monerooStatus,
         }]);
 
+        // Envoyer des notifications si le statut a changé
+        if (newStatus === "completed") {
+          const { notifyPaymentSuccess } = await import('./moneroo-notifications');
+          await notifyPaymentSuccess({
+            transactionId,
+            userId: transaction.customer_id,
+            customerEmail: transaction.customer_email || undefined,
+            customerName: transaction.customer_name || undefined,
+            amount: transaction.amount,
+            currency: transaction.currency || 'XOF',
+            status: 'completed',
+            paymentMethod: transaction.moneroo_payment_method || undefined,
+            orderId: transaction.order_id || undefined,
+          }).catch((err) => logger.warn('Error sending payment success notification:', err));
+        } else if (newStatus === "failed") {
+          const { notifyPaymentFailed } = await import('./moneroo-notifications');
+          await notifyPaymentFailed({
+            transactionId,
+            userId: transaction.customer_id,
+            customerEmail: transaction.customer_email || undefined,
+            customerName: transaction.customer_name || undefined,
+            amount: transaction.amount,
+            currency: transaction.currency || 'XOF',
+            status: 'failed',
+            reason: updates.error_message,
+            orderId: transaction.order_id || undefined,
+          }).catch((err) => logger.warn('Error sending payment failed notification:', err));
+        }
+
         return { ...transaction, ...updates };
       } catch (verifyError) {
         console.error("Error verifying with Moneroo:", verifyError);
@@ -336,6 +380,20 @@ export const refundMonerooPayment = async (options: RefundOptions): Promise<Refu
       refundId: refundResponse.refund_id,
       amount: refundResponse.amount,
     });
+
+    // Envoyer une notification de remboursement
+    const { notifyPaymentRefunded } = await import('./moneroo-notifications');
+    await notifyPaymentRefunded({
+      transactionId,
+      userId: transaction.customer_id,
+      customerEmail: transaction.customer_email || undefined,
+      customerName: transaction.customer_name || undefined,
+      amount: refundResponse.amount,
+      currency: refundResponse.currency,
+      status: 'refunded',
+      reason: reason || "Customer request",
+      orderId: transaction.order_id || undefined,
+    }).catch((err) => logger.warn('Error sending refund notification:', err));
 
     return {
       success: true,

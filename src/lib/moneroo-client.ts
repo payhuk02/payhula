@@ -7,10 +7,11 @@ import {
   MonerooValidationError,
   MonerooAuthenticationError,
 } from "./moneroo-errors";
+import { Currency } from "./currency-converter";
 
 export interface MonerooPaymentData {
   amount: number;
-  currency?: string;
+  currency?: Currency;
   description?: string;
   customer?: {
     email?: string;
@@ -24,7 +25,7 @@ export interface MonerooPaymentData {
 
 export interface MonerooCheckoutData {
   amount: number;
-  currency?: string;
+  currency?: Currency;
   description?: string;
   customer_email?: string;
   customer_name?: string;

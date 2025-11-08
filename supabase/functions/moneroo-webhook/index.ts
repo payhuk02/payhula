@@ -223,8 +223,9 @@ serve(async (req) => {
       }
 
       // Update associated order if exists
+      let order = null;
       if (transaction.order_id) {
-        const { data: order, error: orderError } = await supabase
+        const { data: orderData, error: orderError } = await supabase
           .from('orders')
           .update({
             payment_status: 'paid',
@@ -236,7 +237,8 @@ serve(async (req) => {
 
         if (orderError) {
           console.error('Error updating order:', orderError);
-        } else if (order) {
+        } else {
+          order = orderData;
           // Déclencher webhook order.completed
           await supabase.rpc('trigger_webhook', {
             p_event_type: 'order.completed',
@@ -258,6 +260,24 @@ serve(async (req) => {
           }).catch((err) => console.error('Webhook error:', err));
         }
       }
+
+      // Créer une notification de paiement réussi
+      if (transaction.customer_id) {
+        await supabase.from('notifications').insert({
+          user_id: transaction.customer_id,
+          type: 'payment_completed',
+          title: '✅ Paiement réussi !',
+          message: `Votre paiement de ${transaction.amount} ${transaction.currency} a été confirmé avec succès.${order?.order_number ? ` Commande #${order.order_number}` : ''}`,
+          metadata: {
+            transaction_id: transaction.id,
+            order_id: transaction.order_id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            payment_method: transaction.moneroo_payment_method || 'moneroo',
+          },
+          is_read: false,
+        }).catch((err) => console.error('Error creating notification:', err));
+      }
     } else if (mappedStatus === 'failed') {
       updates.failed_at = new Date().toISOString();
       updates.error_message = payload.error_message || 'Payment failed';
@@ -275,6 +295,24 @@ serve(async (req) => {
           .from('orders')
           .update({ payment_status: 'failed' })
           .eq('id', transaction.order_id);
+      }
+
+      // Créer une notification de paiement échoué
+      if (transaction.customer_id) {
+        await supabase.from('notifications').insert({
+          user_id: transaction.customer_id,
+          type: 'payment_failed',
+          title: '❌ Paiement échoué',
+          message: `Votre paiement de ${transaction.amount} ${transaction.currency} a échoué. Veuillez réessayer.`,
+          metadata: {
+            transaction_id: transaction.id,
+            order_id: transaction.order_id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            error_message: payload.error_message,
+          },
+          is_read: false,
+        }).catch((err) => console.error('Error creating notification:', err));
       }
     }
 
