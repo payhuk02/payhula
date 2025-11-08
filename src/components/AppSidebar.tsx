@@ -669,6 +669,11 @@ const adminMenuSections = [
         url: "/admin/moneroo-reconciliation",
         icon: RotateCcw,
       },
+      {
+        title: "Monitoring Transactions",
+        url: "/admin/transaction-monitoring",
+        icon: AlertCircle,
+      },
     ]
   },
     {

@@ -83,6 +83,7 @@ const menuSections = [
       { icon: Scale, label: 'Litiges', path: '/admin/disputes' },
       { icon: BarChart3, label: 'Statistiques Moneroo', path: '/admin/moneroo-analytics' },
       { icon: RotateCcw, label: 'Réconciliation Moneroo', path: '/admin/moneroo-reconciliation' },
+      { icon: AlertCircle, label: 'Monitoring Transactions', path: '/admin/transaction-monitoring' },
     ]
   },
     {
