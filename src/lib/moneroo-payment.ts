@@ -132,11 +132,15 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       let userFriendlyMessage = `Impossible de créer la transaction: ${errorMessage}`;
       
       if (isColumnMissingError) {
-        userFriendlyMessage += "\n\n💡 SOLUTION: Veuillez exécuter la migration SQL dans Supabase Dashboard → SQL Editor:\n";
-        userFriendlyMessage += "Fichier: supabase/migrations/20250201_fix_transactions_currency_immediate.sql";
-        userFriendlyMessage += "\n\nOu exécutez cette requête SQL directement:\n";
+        userFriendlyMessage += "\n\n💡 SOLUTION RAPIDE:\n";
+        userFriendlyMessage += "1. Ouvrez Supabase Dashboard → SQL Editor\n";
+        userFriendlyMessage += "2. Copiez et exécutez ce script SQL:\n\n";
         userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'XOF';\n";
-        userFriendlyMessage += "ALTER TABLE public.transactions ALTER COLUMN currency SET NOT NULL;";
+        userFriendlyMessage += "UPDATE public.transactions SET currency = 'XOF' WHERE currency IS NULL;\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ALTER COLUMN currency SET NOT NULL;\n\n";
+        userFriendlyMessage += "3. Rafraîchissez le cache: Settings → API → Refresh schema cache\n";
+        userFriendlyMessage += "4. Videz le cache du navigateur (Ctrl+Shift+R)\n\n";
+        userFriendlyMessage += "📁 Fichier complet: FIX_CURRENCY_COLUMN.sql dans le projet";
       }
       
       if (errorHint) {
