@@ -51,111 +51,195 @@ export interface MonerooRefundResponse {
 class MonerooClient {
   private async callFunction(action: string, data: Record<string, unknown>) {
     try {
-      console.log('[MonerooClient] Calling Edge Function:', { action, hasData: !!data });
+      // Vérifier l'authentification avant d'appeler l'Edge Function
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      const { data: response, error } = await supabase.functions.invoke("moneroo", {
-        body: { action, data },
+      if (authError) {
+        console.warn('[MonerooClient] Auth check warning:', authError);
+      }
+      
+      console.log('[MonerooClient] Calling Edge Function:', { 
+        action, 
+        hasData: !!data,
+        isAuthenticated: !!user,
+        userId: user?.id,
       });
-
-      if (error) {
-        // Erreur de communication Supabase
-        const errorMessage = error.message || 'Erreur inconnue';
-        console.error('[MonerooClient] Supabase function error:', {
-          error,
-          message: errorMessage,
-          context: (error as any)?.context,
-          data: (error as any)?.data,
-          name: error.name,
-          stack: (error as any)?.stack,
+      
+      // Vérifier que Supabase est configuré
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl) {
+        throw new MonerooNetworkError(
+          'VITE_SUPABASE_URL n\'est pas configuré. Vérifiez vos variables d\'environnement.'
+        );
+      }
+      
+      console.log('[MonerooClient] Supabase URL:', supabaseUrl);
+      console.log('[MonerooClient] Edge Function URL:', `${supabaseUrl}/functions/v1/moneroo`);
+      
+      // Appel à l'Edge Function avec timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes timeout
+      
+      try {
+        const { data: response, error } = await supabase.functions.invoke("moneroo", {
+          body: { action, data },
+          signal: controller.signal,
         });
         
-        // Gérer l'erreur "Failed to fetch" spécifiquement
-        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
-          throw new MonerooNetworkError(
-            `Impossible de se connecter à l'Edge Function Moneroo. ` +
-            `Vérifiez que l'Edge Function est déployée et accessible. ` +
-            `Erreur: ${errorMessage}`,
-            { originalError: error, action, data }
-          );
-        }
+        clearTimeout(timeoutId);
         
-        // Vérifier si c'est une erreur Edge Function (non-2xx)
-        if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
-          // Essayer d'extraire les détails de l'erreur
-          // Supabase peut retourner les détails dans différentes propriétés
-          let errorDetails: any = {};
-          let detailedMessage = errorMessage;
+        if (error) {
+          // Erreur de communication Supabase
+          const errorMessage = error.message || 'Erreur inconnue';
+          console.error('[MonerooClient] Supabase function error:', {
+            error,
+            message: errorMessage,
+            context: (error as any)?.context,
+            data: (error as any)?.data,
+            name: error.name,
+            stack: (error as any)?.stack,
+          });
           
-          // Essayer plusieurs emplacements pour les détails
-          if ((error as any)?.context) {
-            errorDetails = (error as any).context;
-          } else if ((error as any)?.data) {
-            errorDetails = (error as any).data;
-          } else if ((error as any)?.body) {
-            try {
-              errorDetails = typeof (error as any).body === 'string' 
-                ? JSON.parse((error as any).body) 
-                : (error as any).body;
-            } catch {
-              errorDetails = { raw: (error as any).body };
-            }
-          }
-          
-          // Extraire le message détaillé
-          if (errorDetails.message) {
-            detailedMessage = errorDetails.message;
-          } else if (errorDetails.error) {
-            detailedMessage = typeof errorDetails.error === 'string' 
-              ? errorDetails.error 
-              : errorDetails.error?.message || errorMessage;
-          } else if (errorDetails.hint) {
-            detailedMessage = `${errorMessage}. ${errorDetails.hint}`;
-          }
-          
-          // Vérifier si c'est une erreur de configuration API
-          if (detailedMessage.includes('Configuration API manquante') || 
-              detailedMessage.includes('n\'est pas configurée') ||
-              detailedMessage.includes('MONEROO_API_KEY')) {
-            throw new MonerooAuthenticationError(
-              `Configuration API manquante: ${detailedMessage}. ` +
-              `Veuillez configurer MONEROO_API_KEY dans Supabase Dashboard → Edge Functions → Secrets`
+          // Gérer l'erreur "Failed to fetch" spécifiquement
+          if (errorMessage.includes('Failed to fetch') || 
+              errorMessage.includes('fetch') ||
+              errorMessage.includes('NetworkError') ||
+              errorMessage.includes('network') ||
+              errorMessage.toLowerCase().includes('network request failed')) {
+            
+            console.error('[MonerooClient] Network error details:', {
+              errorMessage,
+              error,
+              supabaseUrl,
+              edgeFunctionUrl: `${supabaseUrl}/functions/v1/moneroo`,
+              action,
+              timestamp: new Date().toISOString(),
+            });
+            
+            throw new MonerooNetworkError(
+              `Erreur de connexion: Impossible de se connecter à l'Edge Function Moneroo.\n\n` +
+              `💡 Vérifiez:\n` +
+              `1. Votre connexion Internet\n` +
+              `2. Que l'Edge Function 'moneroo' est déployée dans Supabase Dashboard\n` +
+              `3. Que l'Edge Function est accessible: ${supabaseUrl}/functions/v1/moneroo\n` +
+              `4. Les logs Supabase Edge Functions → Logs → moneroo pour plus de détails\n\n` +
+              `Erreur technique: ${errorMessage}`,
+              { originalError: error, action, data, supabaseUrl }
             );
           }
           
-          // Créer un message d'erreur plus informatif
-          const fullErrorMessage = errorDetails.hint 
-            ? `${detailedMessage}\n\n💡 ${errorDetails.hint}`
-            : detailedMessage;
+          // Vérifier si c'est une erreur Edge Function (non-2xx)
+          if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
+            // Essayer d'extraire les détails de l'erreur
+            // Supabase peut retourner les détails dans différentes propriétés
+            let errorDetails: any = {};
+            let detailedMessage = errorMessage;
+            
+            // Essayer plusieurs emplacements pour les détails
+            if ((error as any)?.context) {
+              errorDetails = (error as any).context;
+            } else if ((error as any)?.data) {
+              errorDetails = (error as any).data;
+            } else if ((error as any)?.body) {
+              try {
+                errorDetails = typeof (error as any).body === 'string' 
+                  ? JSON.parse((error as any).body) 
+                  : (error as any).body;
+              } catch {
+                errorDetails = { raw: (error as any).body };
+              }
+            }
+            
+            // Extraire le message détaillé
+            if (errorDetails.message) {
+              detailedMessage = errorDetails.message;
+            } else if (errorDetails.error) {
+              detailedMessage = typeof errorDetails.error === 'string' 
+                ? errorDetails.error 
+                : errorDetails.error?.message || errorMessage;
+            } else if (errorDetails.hint) {
+              detailedMessage = `${errorMessage}. ${errorDetails.hint}`;
+            }
+            
+            // Vérifier si c'est une erreur de configuration API
+            if (detailedMessage.includes('Configuration API manquante') || 
+                detailedMessage.includes('n\'est pas configurée') ||
+                detailedMessage.includes('MONEROO_API_KEY')) {
+              throw new MonerooAuthenticationError(
+                `Configuration API manquante: ${detailedMessage}. ` +
+                `Veuillez configurer MONEROO_API_KEY dans Supabase Dashboard → Edge Functions → Secrets`
+              );
+            }
+            
+            // Créer un message d'erreur plus informatif
+            const fullErrorMessage = errorDetails.hint 
+              ? `${detailedMessage}\n\n💡 ${errorDetails.hint}`
+              : detailedMessage;
+            
+            throw new MonerooAPIError(fullErrorMessage, errorDetails.status || 500, errorDetails);
+          }
           
-          throw new MonerooAPIError(fullErrorMessage, errorDetails.status || 500, errorDetails);
+          if (errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT')) {
+            throw new MonerooTimeoutError(errorMessage);
+          }
+          if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+            throw new MonerooNetworkError(errorMessage);
+          }
+          throw parseMonerooError(error);
         }
-        
-        if (errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT')) {
-          throw new MonerooTimeoutError(errorMessage);
-        }
-        if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-          throw new MonerooNetworkError(errorMessage);
-        }
-        throw parseMonerooError(error);
-      }
 
-      if (!response?.success) {
-        // Erreur API Moneroo
-        const responseError = response as { error?: string; message?: string; details?: unknown; status?: number };
-        const statusCode = responseError.status || 500;
-        const errorMessage = responseError.message || responseError.error || "Erreur lors de la requête Moneroo.";
-        
-        if (statusCode === 401) {
-          throw new MonerooAuthenticationError(errorMessage);
+        if (!response?.success) {
+          // Erreur API Moneroo
+          const responseError = response as { error?: string; message?: string; details?: unknown; status?: number };
+          const statusCode = responseError.status || 500;
+          const errorMessage = responseError.message || responseError.error || "Erreur lors de la requête Moneroo.";
+          
+          if (statusCode === 401) {
+            throw new MonerooAuthenticationError(errorMessage);
+          }
+          if (statusCode === 400) {
+            throw new MonerooValidationError(errorMessage);
+          }
+          
+          throw new MonerooAPIError(errorMessage, statusCode, responseError.details || response);
         }
-        if (statusCode === 400) {
-          throw new MonerooValidationError(errorMessage);
-        }
-        
-        throw new MonerooAPIError(errorMessage, statusCode, responseError.details || response);
-      }
 
-      return response.data;
+        return response.data;
+      } catch (invokeError: any) {
+        clearTimeout(timeoutId);
+        
+        // Si c'est une erreur d'abort (timeout), gérer spécifiquement
+        if (invokeError?.name === 'AbortError' || invokeError?.message?.includes('aborted')) {
+          throw new MonerooTimeoutError(
+            'Timeout: L\'Edge Function Moneroo n\'a pas répondu dans les 30 secondes. ' +
+            'Vérifiez que l\'Edge Function est déployée et fonctionne correctement.'
+          );
+        }
+        
+        // Si c'est déjà une MonerooError, la relancer
+        if (invokeError instanceof MonerooNetworkError || 
+            invokeError instanceof MonerooAPIError ||
+            invokeError instanceof MonerooTimeoutError ||
+            invokeError instanceof MonerooValidationError ||
+            invokeError instanceof MonerooAuthenticationError) {
+          throw invokeError;
+        }
+        
+        // Vérifier si c'est une erreur réseau générique
+        const errorMessage = invokeError instanceof Error ? invokeError.message : String(invokeError);
+        if (errorMessage.includes('Failed to fetch') || 
+            errorMessage.includes('NetworkError') ||
+            errorMessage.includes('network request failed')) {
+          throw new MonerooNetworkError(
+            `Erreur de connexion réseau: ${errorMessage}\n\n` +
+            `💡 Vérifiez votre connexion Internet et que l'Edge Function est déployée.`,
+            { originalError: invokeError }
+          );
+        }
+        
+        // Sinon, parser l'erreur
+        throw parseMonerooError(invokeError);
+      }
     } catch (error) {
       // Si c'est déjà une MonerooError, la relancer
       if (error instanceof MonerooNetworkError || 
@@ -165,6 +249,7 @@ class MonerooClient {
           error instanceof MonerooAuthenticationError) {
         throw error;
       }
+      
       // Sinon, parser l'erreur
       throw parseMonerooError(error);
     }
