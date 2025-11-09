@@ -37,3 +37,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 COMMENT ON FUNCTION public.increment_affiliate_link_clicks(UUID) IS 'Incrémente le compteur de clics d''un lien d''affiliation';
 COMMENT ON FUNCTION public.increment_affiliate_link_sales(UUID, NUMERIC, NUMERIC) IS 'Incrémente les statistiques de ventes d''un lien d''affiliation';
 
+
+

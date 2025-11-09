@@ -117,3 +117,4 @@ Si vous voyez :
 3. **Vérifiez que les secrets sont correctement configurés**
 4. **Redéployez les Edge Functions** si nécessaire
 
+

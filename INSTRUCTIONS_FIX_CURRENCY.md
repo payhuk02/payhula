@@ -119,3 +119,4 @@ currency    | text      | NO          | 'XOF'::text
 
 **⚠️ IMPORTANT** : Cette correction doit être faite dans Supabase Dashboard. Les changements de code ne suffisent pas, la base de données doit être modifiée.
 
+

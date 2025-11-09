@@ -190,3 +190,4 @@ curl -X POST https://api.moneroo.io/v1/checkout \
 
 **Le redéploiement est nécessaire** pour que les corrections soient prises en compte. Sans redéploiement, l'Edge Function continuera d'utiliser l'ancien code avec l'endpoint `/checkout/initialize` qui n'existe pas.
 
+

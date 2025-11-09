@@ -47,3 +47,5 @@ const { data, error } = await supabase.functions.invoke('send-email', {
 - `payment_refunded`: Email de notification de remboursement
 - `payment_pending`: Email de notification de paiement en attente
 
+
+

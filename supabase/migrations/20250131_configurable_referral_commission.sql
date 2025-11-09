@@ -108,3 +108,5 @@ WHERE referral_commission_rate IS NULL;
 -- Commentaire
 COMMENT ON FUNCTION public.calculate_referral_commission() IS 'Calcule automatiquement la commission de parrainage en utilisant le taux configurable dans platform_settings';
 
+
+

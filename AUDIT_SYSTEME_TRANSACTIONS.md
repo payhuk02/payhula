@@ -472,3 +472,5 @@ Le système de transactions est **bien intégré** dans l'application avec :
 **Date de création** : 31 Janvier 2025  
 **Dernière mise à jour** : 31 Janvier 2025
 
+
+

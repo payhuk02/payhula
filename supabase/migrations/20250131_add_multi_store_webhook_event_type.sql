@@ -20,3 +20,5 @@ END $$;
 COMMENT ON TYPE webhook_event_type IS 
 'Types d''événements webhook disponibles, incluant maintenant multi_store_group.completed pour les groupes multi-stores';
 
+
+

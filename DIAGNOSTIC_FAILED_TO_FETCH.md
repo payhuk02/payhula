@@ -127,3 +127,4 @@ Après résolution, le paiement devrait fonctionner et l'erreur "Failed to fetch
 - **Dashboard Supabase** : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions
 - **Guide Redéploiement** : `DEPLOIEMENT_DASHBOARD_ETAPE_PAR_ETAPE.md`
 
+

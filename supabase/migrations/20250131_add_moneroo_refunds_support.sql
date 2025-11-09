@@ -44,3 +44,5 @@ COMMENT ON COLUMN public.transactions.moneroo_refund_amount IS 'Montant rembours
 COMMENT ON COLUMN public.transactions.moneroo_refund_reason IS 'Raison du remboursement';
 COMMENT ON COLUMN public.transactions.refunded_at IS 'Date et heure du remboursement';
 
+
+

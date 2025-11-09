@@ -59,3 +59,4 @@ INFO Moneroo API response: { status: 200, ... }
 ✅ Le paiement devrait fonctionner
 ✅ Les logs devraient montrer l'endpoint `/checkout` correct
 
+

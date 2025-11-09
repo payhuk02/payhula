@@ -54,3 +54,5 @@ Les numéros de téléphone sont automatiquement formatés pour Twilio:
 - Par défaut, le préfixe `+221` (Sénégal) est ajouté si absent
 - Les caractères non numériques sont supprimés
 
+
+

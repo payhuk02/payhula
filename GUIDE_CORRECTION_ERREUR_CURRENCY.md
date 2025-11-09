@@ -163,3 +163,4 @@ Si l'erreur persiste après avoir exécuté la migration :
 - [Documentation Supabase - RLS](https://supabase.com/docs/guides/auth/row-level-security)
 - [Documentation PostgreSQL - ALTER TABLE](https://www.postgresql.org/docs/current/sql-altertable.html)
 
+

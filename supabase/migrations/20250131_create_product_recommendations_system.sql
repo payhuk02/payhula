@@ -438,3 +438,5 @@ COMMENT ON FUNCTION public.get_user_product_recommendations(UUID, INTEGER) IS
 COMMENT ON FUNCTION public.get_frequently_bought_together(UUID, INTEGER) IS 
 'Retourne les produits fréquemment achetés ensemble avec le produit spécifié';
 
+
+

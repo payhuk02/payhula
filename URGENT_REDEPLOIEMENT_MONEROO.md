@@ -114,3 +114,4 @@ INFO Moneroo API response: { status: 200, ... }
 
 **Redéployer l'Edge Function `moneroo` maintenant** pour résoudre l'erreur "The route v1/checkout/initialize could not be found".
 
+

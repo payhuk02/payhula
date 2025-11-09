@@ -44,3 +44,5 @@ WHERE payment_provider_preference IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_stores_enabled_payment_providers 
 ON public.stores USING GIN(enabled_payment_providers);
 
+
+

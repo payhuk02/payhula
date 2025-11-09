@@ -196,3 +196,5 @@ CREATE TRIGGER trigger_create_affiliate_commission_on_transaction
 -- Commentaire
 COMMENT ON FUNCTION public.create_affiliate_commission_on_transaction() IS 'Crée automatiquement une commission d''affiliation lorsqu''une transaction est complétée et qu''un cookie d''affiliation est présent dans les métadonnées';
 
+
+

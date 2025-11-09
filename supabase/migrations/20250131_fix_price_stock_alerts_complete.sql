@@ -407,3 +407,5 @@ COMMENT ON FUNCTION public.check_price_alerts() IS 'Vérifie les alertes de prix
 COMMENT ON FUNCTION public.check_stock_alerts() IS 'Vérifie les alertes de stock et retourne celles qui doivent être notifiées';
 COMMENT ON FUNCTION public.record_price_history() IS 'Enregistre l''historique des prix lors des changements';
 
+
+

@@ -631,3 +631,5 @@ src/components/products/ARPreview.tsx
 
 **Note:** Ces estimations sont basées sur les meilleures pratiques e-commerce et les analyses du code existant. L'impact réel peut varier selon le marché et les utilisateurs.
 
+
+

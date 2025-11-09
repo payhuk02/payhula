@@ -127,3 +127,5 @@ EXECUTE FUNCTION public.calculate_referral_commission_on_transaction();
 -- Commentaires
 COMMENT ON FUNCTION public.calculate_referral_commission_on_transaction() IS 'Calcule automatiquement la commission de parrainage lorsqu''une transaction est complétée. Récompense le parrain lorsqu''un acheteur achète le produit de son filleul (vendeur).';
 
+
+

@@ -104,3 +104,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 COMMENT ON TABLE public.commission_payments IS 'Paiements de commissions de parrainage';
 COMMENT ON FUNCTION public.get_pending_commission_total(UUID) IS 'Calcule le montant total des commissions en attente de paiement pour un utilisateur';
 
+
+

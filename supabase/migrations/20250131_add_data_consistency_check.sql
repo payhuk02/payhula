@@ -172,3 +172,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 COMMENT ON FUNCTION public.check_transaction_consistency IS 'Vérifie la cohérence des données entre transactions, orders et payments';
 COMMENT ON FUNCTION public.generate_consistency_report IS 'Génère un rapport JSON de toutes les incohérences détectées';
 
+
+

@@ -92,3 +92,5 @@ CREATE INDEX IF NOT EXISTS idx_stock_alerts_product_id ON public.stock_alerts(pr
 CREATE INDEX IF NOT EXISTS idx_stock_alerts_notified ON public.stock_alerts(notified) WHERE notified = false;
 CREATE INDEX IF NOT EXISTS idx_stock_alerts_created_at ON public.stock_alerts(created_at);
 
+
+

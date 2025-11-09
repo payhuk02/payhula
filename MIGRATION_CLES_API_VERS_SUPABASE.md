@@ -239,3 +239,5 @@ Dans **Settings** → **Edge Functions** → **Secrets**, vous devriez voir :
 **Date de création** : 31 Janvier 2025  
 **Dernière mise à jour** : 31 Janvier 2025
 
+
+
