@@ -8,7 +8,9 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-const MONEROO_API_URL = 'https://api.moneroo.io/v1';
+// URL de base de l'API Moneroo
+// Vérifier la documentation officielle pour l'URL correcte
+const MONEROO_API_URL = Deno.env.get('MONEROO_API_URL') || 'https://api.moneroo.io/v1';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -77,8 +79,21 @@ serve(async (req) => {
         break;
       
       case 'create_checkout':
-        endpoint = '/checkout/initialize';
+        // Essayer d'abord l'endpoint standard /checkout
+        // Si cela ne fonctionne pas, essayer /payments ou selon la documentation Moneroo
+        endpoint = '/checkout';
         method = 'POST';
+        // Formater les données selon le format attendu par Moneroo
+        body = {
+          amount: data.amount,
+          currency: data.currency || 'XOF',
+          description: data.description,
+          customer_email: data.customer_email,
+          customer_name: data.customer_name,
+          return_url: data.return_url,
+          cancel_url: data.cancel_url,
+          metadata: data.metadata || {},
+        };
         break;
       
       case 'verify_payment':
