@@ -94,6 +94,10 @@ export const initiatePayDunyaPayment = async (options: PaymentOptions) => {
                                    (errorMessage.includes("does not exist") || 
                                     errorMessage.includes("schema cache"));
       
+      // Vérifier si l'erreur concerne des permissions RLS
+      const isPermissionError = errorMessage.includes("permission denied") || 
+                                errorMessage.includes("permission denied for table");
+      
       let userFriendlyMessage = `Impossible de créer la transaction: ${errorMessage}`;
       
       if (isColumnMissingError) {
@@ -109,6 +113,14 @@ export const initiatePayDunyaPayment = async (options: PaymentOptions) => {
         userFriendlyMessage += "3. Rafraîchissez le cache: Settings → API → Refresh schema cache\n";
         userFriendlyMessage += "4. Videz le cache du navigateur (Ctrl+Shift+R)\n\n";
         userFriendlyMessage += "📁 Fichier complet: FIX_ALL_TRANSACTIONS_COLUMNS.sql dans le projet";
+      } else if (isPermissionError) {
+        userFriendlyMessage += "\n\n💡 SOLUTION PERMISSIONS RLS:\n";
+        userFriendlyMessage += "1. Ouvrez Supabase Dashboard → SQL Editor\n";
+        userFriendlyMessage += "2. Exécutez le script: FIX_RLS_PERMISSIONS.sql\n";
+        userFriendlyMessage += "   (Ce script corrige les permissions RLS)\n\n";
+        userFriendlyMessage += "3. Rafraîchissez le cache: Settings → API → Refresh schema cache\n";
+        userFriendlyMessage += "4. Videz le cache du navigateur (Ctrl+Shift+R)\n\n";
+        userFriendlyMessage += "📁 Fichier complet: FIX_RLS_PERMISSIONS.sql dans le projet";
       }
       
       if (errorHint) {
