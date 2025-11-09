@@ -263,6 +263,20 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         throw new Error(enhancedMessage);
       }
       
+      // Gérer l'erreur "Failed to fetch" spécifiquement
+      if (monerooError.message.includes('Failed to fetch') || 
+          monerooError.message.includes('connexion réseau') ||
+          monerooError.message.includes('network') ||
+          monerooError.message.includes('se connecter à l\'Edge Function')) {
+        const enhancedMessage = `Erreur de connexion: ${monerooError.message}\n\n` +
+          `💡 Vérifiez:\n` +
+          `1. Votre connexion Internet\n` +
+          `2. Que l'Edge Function 'moneroo' est déployée dans Supabase Dashboard\n` +
+          `3. Que l'Edge Function est accessible: https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo\n` +
+          `4. Les logs Supabase Edge Functions → Logs → moneroo pour plus de détails`;
+        throw new Error(enhancedMessage);
+      }
+      
       throw monerooError;
     }
 };
