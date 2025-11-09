@@ -242,16 +242,29 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       checkout_url: monerooResponse.checkout_url,
       moneroo_transaction_id: monerooResponse.transaction_id || monerooResponse.id,
     };
-  } catch (error: unknown) {
-    const monerooError = parseMonerooError(error);
-    logger.error("Payment initiation error:", {
-      error: monerooError.message,
-      code: monerooError.code,
-      statusCode: monerooError.statusCode,
-      details: monerooError.details,
-    });
-    throw monerooError;
-  }
+    } catch (error: unknown) {
+      const monerooError = parseMonerooError(error);
+      logger.error("Payment initiation error:", {
+        error: monerooError.message,
+        code: monerooError.code,
+        statusCode: monerooError.statusCode,
+        details: monerooError.details,
+        fullError: error,
+      });
+      
+      // Améliorer le message d'erreur pour les erreurs Edge Function
+      if (monerooError.message.includes('non-2xx') || 
+          monerooError.message.includes('Edge Function')) {
+        const enhancedMessage = `Erreur Edge Function: ${monerooError.message}\n\n` +
+          `💡 Vérifiez:\n` +
+          `1. Les logs Supabase Edge Functions → Logs → moneroo\n` +
+          `2. Que MONEROO_API_KEY est configuré dans Supabase Dashboard → Edge Functions → Secrets\n` +
+          `3. Que l'Edge Function 'moneroo' est déployée`;
+        throw new Error(enhancedMessage);
+      }
+      
+      throw monerooError;
+    }
 };
 
 /**

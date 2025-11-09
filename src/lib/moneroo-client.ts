@@ -58,23 +58,62 @@ class MonerooClient {
       if (error) {
         // Erreur de communication Supabase
         const errorMessage = error.message || 'Erreur inconnue';
+        console.error('[MonerooClient] Supabase function error:', {
+          error,
+          message: errorMessage,
+          context: (error as any)?.context,
+          data: (error as any)?.data,
+        });
         
         // Vérifier si c'est une erreur Edge Function (non-2xx)
         if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
-          // L'erreur contient probablement des détails dans error.context ou error.data
-          const errorDetails = (error as any)?.context || (error as any)?.data || {};
-          const detailedMessage = errorDetails.message || errorDetails.error || errorMessage;
+          // Essayer d'extraire les détails de l'erreur
+          // Supabase peut retourner les détails dans différentes propriétés
+          let errorDetails: any = {};
+          let detailedMessage = errorMessage;
+          
+          // Essayer plusieurs emplacements pour les détails
+          if ((error as any)?.context) {
+            errorDetails = (error as any).context;
+          } else if ((error as any)?.data) {
+            errorDetails = (error as any).data;
+          } else if ((error as any)?.body) {
+            try {
+              errorDetails = typeof (error as any).body === 'string' 
+                ? JSON.parse((error as any).body) 
+                : (error as any).body;
+            } catch {
+              errorDetails = { raw: (error as any).body };
+            }
+          }
+          
+          // Extraire le message détaillé
+          if (errorDetails.message) {
+            detailedMessage = errorDetails.message;
+          } else if (errorDetails.error) {
+            detailedMessage = typeof errorDetails.error === 'string' 
+              ? errorDetails.error 
+              : errorDetails.error?.message || errorMessage;
+          } else if (errorDetails.hint) {
+            detailedMessage = `${errorMessage}. ${errorDetails.hint}`;
+          }
           
           // Vérifier si c'est une erreur de configuration API
           if (detailedMessage.includes('Configuration API manquante') || 
-              detailedMessage.includes('n\'est pas configurée')) {
+              detailedMessage.includes('n\'est pas configurée') ||
+              detailedMessage.includes('MONEROO_API_KEY')) {
             throw new MonerooAuthenticationError(
               `Configuration API manquante: ${detailedMessage}. ` +
               `Veuillez configurer MONEROO_API_KEY dans Supabase Dashboard → Edge Functions → Secrets`
             );
           }
           
-          throw new MonerooAPIError(detailedMessage, 500, errorDetails);
+          // Créer un message d'erreur plus informatif
+          const fullErrorMessage = errorDetails.hint 
+            ? `${detailedMessage}\n\n💡 ${errorDetails.hint}`
+            : detailedMessage;
+          
+          throw new MonerooAPIError(fullErrorMessage, errorDetails.status || 500, errorDetails);
         }
         
         if (errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT')) {
