@@ -57,19 +57,40 @@ class MonerooClient {
 
       if (error) {
         // Erreur de communication Supabase
-        if (error.message?.includes('timeout') || error.message?.includes('TIMEOUT')) {
-          throw new MonerooTimeoutError(error.message);
+        const errorMessage = error.message || 'Erreur inconnue';
+        
+        // Vérifier si c'est une erreur Edge Function (non-2xx)
+        if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
+          // L'erreur contient probablement des détails dans error.context ou error.data
+          const errorDetails = (error as any)?.context || (error as any)?.data || {};
+          const detailedMessage = errorDetails.message || errorDetails.error || errorMessage;
+          
+          // Vérifier si c'est une erreur de configuration API
+          if (detailedMessage.includes('Configuration API manquante') || 
+              detailedMessage.includes('n\'est pas configurée')) {
+            throw new MonerooAuthenticationError(
+              `Configuration API manquante: ${detailedMessage}. ` +
+              `Veuillez configurer MONEROO_API_KEY dans Supabase Dashboard → Edge Functions → Secrets`
+            );
+          }
+          
+          throw new MonerooAPIError(detailedMessage, 500, errorDetails);
         }
-        if (error.message?.includes('network') || error.message?.includes('fetch')) {
-          throw new MonerooNetworkError(error.message);
+        
+        if (errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT')) {
+          throw new MonerooTimeoutError(errorMessage);
+        }
+        if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+          throw new MonerooNetworkError(errorMessage);
         }
         throw parseMonerooError(error);
       }
 
       if (!response?.success) {
         // Erreur API Moneroo
-        const statusCode = (response as { statusCode?: number })?.statusCode || 500;
-        const errorMessage = (response as { error?: string })?.error || "Erreur lors de la requête Moneroo.";
+        const responseError = response as { error?: string; message?: string; details?: unknown; status?: number };
+        const statusCode = responseError.status || 500;
+        const errorMessage = responseError.message || responseError.error || "Erreur lors de la requête Moneroo.";
         
         if (statusCode === 401) {
           throw new MonerooAuthenticationError(errorMessage);
@@ -78,7 +99,7 @@ class MonerooClient {
           throw new MonerooValidationError(errorMessage);
         }
         
-        throw new MonerooAPIError(errorMessage, statusCode, response);
+        throw new MonerooAPIError(errorMessage, statusCode, responseError.details || response);
       }
 
       return response.data;

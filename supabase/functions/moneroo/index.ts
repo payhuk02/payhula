@@ -17,18 +17,47 @@ serve(async (req) => {
   }
 
   try {
+    // Vérifier les clés API
     const monerooApiKey = Deno.env.get('MONEROO_API_KEY');
     
     if (!monerooApiKey) {
       console.error('MONEROO_API_KEY is not configured');
       return new Response(
-        JSON.stringify({ error: 'Configuration API manquante' }),
+        JSON.stringify({ 
+          error: 'Configuration API manquante',
+          message: 'La clé API Moneroo n\'est pas configurée dans Supabase Edge Functions Secrets',
+          hint: 'Veuillez configurer MONEROO_API_KEY dans Supabase Dashboard → Edge Functions → Secrets'
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { action, data } = await req.json();
-    console.log('Moneroo request:', { action });
+    // Parser le JSON de la requête
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (jsonError) {
+      console.error('Error parsing request JSON:', jsonError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Requête invalide',
+          message: 'Le corps de la requête n\'est pas un JSON valide',
+          details: jsonError instanceof Error ? jsonError.message : 'Unknown error'
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { action, data } = requestBody;
+    
+    if (!action) {
+      return new Response(
+        JSON.stringify({ error: 'Action manquante', message: 'Le paramètre "action" est requis' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Moneroo request:', { action, hasData: !!data });
 
     let endpoint = '';
     let method = 'POST';
@@ -91,12 +120,40 @@ serve(async (req) => {
       body: body ? JSON.stringify(body) : null,
     });
 
-    const responseData = await monerooResponse.json();
+    // Parser la réponse JSON
+    let responseData;
+    try {
+      const responseText = await monerooResponse.text();
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (parseError) {
+      console.error('Error parsing Moneroo response:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Erreur de réponse Moneroo',
+          message: 'Impossible de parser la réponse de l\'API Moneroo',
+          status: monerooResponse.status,
+          statusText: monerooResponse.statusText
+        }),
+        { 
+          status: monerooResponse.status || 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
     
     if (!monerooResponse.ok) {
-      console.error('Moneroo API error:', responseData);
+      console.error('Moneroo API error:', {
+        status: monerooResponse.status,
+        statusText: monerooResponse.statusText,
+        response: responseData
+      });
       return new Response(
-        JSON.stringify({ error: 'Erreur Moneroo', details: responseData }),
+        JSON.stringify({ 
+          error: 'Erreur Moneroo API',
+          message: responseData.message || responseData.error || 'Erreur lors de l\'appel à l\'API Moneroo',
+          details: responseData,
+          status: monerooResponse.status
+        }),
         { 
           status: monerooResponse.status, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -111,10 +168,22 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error: any) {
-    console.error('Error in moneroo function:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur interne inconnue';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    console.error('Error in moneroo function:', {
+      message: errorMessage,
+      stack: errorStack,
+      error: error
+    });
+    
     return new Response(
-      JSON.stringify({ error: error.message || 'Erreur interne' }),
+      JSON.stringify({ 
+        error: 'Erreur interne Edge Function',
+        message: errorMessage,
+        hint: 'Vérifiez les logs Supabase Edge Functions pour plus de détails'
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

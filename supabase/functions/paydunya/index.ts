@@ -18,20 +18,54 @@ serve(async (req) => {
   }
 
   try {
+    // Vérifier les clés API
     const paydunyaMasterKey = Deno.env.get('PAYDUNYA_MASTER_KEY');
     const paydunyaPrivateKey = Deno.env.get('PAYDUNYA_PRIVATE_KEY');
     const paydunyaToken = Deno.env.get('PAYDUNYA_TOKEN');
     
     if (!paydunyaMasterKey || !paydunyaPrivateKey || !paydunyaToken) {
       console.error('PayDunya credentials are not configured');
+      const missingKeys = [];
+      if (!paydunyaMasterKey) missingKeys.push('PAYDUNYA_MASTER_KEY');
+      if (!paydunyaPrivateKey) missingKeys.push('PAYDUNYA_PRIVATE_KEY');
+      if (!paydunyaToken) missingKeys.push('PAYDUNYA_TOKEN');
+      
       return new Response(
-        JSON.stringify({ error: 'Configuration API PayDunya manquante' }),
+        JSON.stringify({ 
+          error: 'Configuration API PayDunya manquante',
+          message: `Les clés API PayDunya suivantes ne sont pas configurées: ${missingKeys.join(', ')}`,
+          hint: 'Veuillez configurer les clés API dans Supabase Dashboard → Edge Functions → Secrets'
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { action, data } = await req.json();
-    console.log('PayDunya request:', { action });
+    // Parser le JSON de la requête
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (jsonError) {
+      console.error('Error parsing request JSON:', jsonError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Requête invalide',
+          message: 'Le corps de la requête n\'est pas un JSON valide',
+          details: jsonError instanceof Error ? jsonError.message : 'Unknown error'
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { action, data } = requestBody;
+    
+    if (!action) {
+      return new Response(
+        JSON.stringify({ error: 'Action manquante', message: 'Le paramètre "action" est requis' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('PayDunya request:', { action, hasData: !!data });
 
     let endpoint = '';
     let method = 'POST';
@@ -111,12 +145,40 @@ serve(async (req) => {
       body: body ? JSON.stringify(body) : null,
     });
 
-    const responseData = await paydunyaResponse.json();
+    // Parser la réponse JSON
+    let responseData;
+    try {
+      const responseText = await paydunyaResponse.text();
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (parseError) {
+      console.error('Error parsing PayDunya response:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Erreur de réponse PayDunya',
+          message: 'Impossible de parser la réponse de l\'API PayDunya',
+          status: paydunyaResponse.status,
+          statusText: paydunyaResponse.statusText
+        }),
+        { 
+          status: paydunyaResponse.status || 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
     
     if (!paydunyaResponse.ok) {
-      console.error('PayDunya API error:', responseData);
+      console.error('PayDunya API error:', {
+        status: paydunyaResponse.status,
+        statusText: paydunyaResponse.statusText,
+        response: responseData
+      });
       return new Response(
-        JSON.stringify({ error: 'Erreur PayDunya', details: responseData }),
+        JSON.stringify({ 
+          error: 'Erreur PayDunya API',
+          message: responseData.message || responseData.error || 'Erreur lors de l\'appel à l\'API PayDunya',
+          details: responseData,
+          status: paydunyaResponse.status
+        }),
         { 
           status: paydunyaResponse.status, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -140,10 +202,21 @@ serve(async (req) => {
     );
 
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Erreur interne';
-    console.error('Error in paydunya function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur interne inconnue';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    console.error('Error in paydunya function:', {
+      message: errorMessage,
+      stack: errorStack,
+      error: error
+    });
+    
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        error: 'Erreur interne Edge Function',
+        message: errorMessage,
+        hint: 'Vérifiez les logs Supabase Edge Functions pour plus de détails'
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

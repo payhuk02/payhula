@@ -33,12 +33,34 @@ class PayDunyaClient {
 
     if (error) {
       console.error(`[PayDunyaClient] Supabase function error:`, error);
-      throw new Error(error.message || "Erreur de communication avec le serveur.");
+      const errorMessage = error.message || 'Erreur inconnue';
+      
+      // Vérifier si c'est une erreur Edge Function (non-2xx)
+      if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
+        // L'erreur contient probablement des détails dans error.context ou error.data
+        const errorDetails = (error as any)?.context || (error as any)?.data || {};
+        const detailedMessage = errorDetails.message || errorDetails.error || errorMessage;
+        
+        // Vérifier si c'est une erreur de configuration API
+        if (detailedMessage.includes('Configuration API') || 
+            detailedMessage.includes('n\'est pas configurée')) {
+          throw new Error(
+            `${detailedMessage}. ` +
+            `Veuillez configurer les clés API PayDunya dans Supabase Dashboard → Edge Functions → Secrets`
+          );
+        }
+        
+        throw new Error(detailedMessage || errorMessage);
+      }
+      
+      throw new Error(errorMessage);
     }
 
     if (!response?.success) {
       console.error(`[PayDunyaClient] PayDunya API error:`, response);
-      throw new Error(response?.error || "Erreur lors de la requête PayDunya.");
+      const responseError = response as { error?: string; message?: string; details?: unknown };
+      const errorMessage = responseError.message || responseError.error || "Erreur lors de la requête PayDunya.";
+      throw new Error(errorMessage);
     }
 
     return response.data;
@@ -66,4 +88,5 @@ class PayDunyaClient {
 }
 
 export const paydunyaClient = new PayDunyaClient();
+
 
