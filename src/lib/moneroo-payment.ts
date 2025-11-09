@@ -116,6 +116,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         productId,
         amount,
         currency,
+        transactionData,
       });
       
       // Afficher un message d'erreur plus détaillé
@@ -123,17 +124,41 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       const errorHint = transactionError.hint || "";
       const errorDetails = transactionError.details || "";
       
-      console.error("Transaction error details:", {
+      // Vérifier si l'erreur concerne une colonne manquante
+      const isColumnMissingError = errorMessage.includes("column") && 
+                                   (errorMessage.includes("does not exist") || 
+                                    errorMessage.includes("schema cache"));
+      
+      let userFriendlyMessage = `Impossible de créer la transaction: ${errorMessage}`;
+      
+      if (isColumnMissingError) {
+        userFriendlyMessage += "\n\n💡 SOLUTION: Veuillez exécuter la migration SQL dans Supabase Dashboard → SQL Editor:\n";
+        userFriendlyMessage += "Fichier: supabase/migrations/20250201_fix_transactions_currency_immediate.sql";
+        userFriendlyMessage += "\n\nOu exécutez cette requête SQL directement:\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'XOF';\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ALTER COLUMN currency SET NOT NULL;";
+      }
+      
+      if (errorHint) {
+        userFriendlyMessage += `\n\n💡 Indice: ${errorHint}`;
+      }
+      
+      if (errorDetails) {
+        userFriendlyMessage += `\n\n📋 Détails: ${errorDetails}`;
+      }
+      
+      console.error("❌ Transaction error details:", {
         error: transactionError,
+        code: transactionError.code,
+        message: transactionError.message,
         storeId,
         customerId: currentUserId,
         productId,
         transactionData,
+        isColumnMissingError,
       });
       
-      throw new Error(
-        `Impossible de créer la transaction: ${errorMessage}${errorHint ? ` (${errorHint})` : ""}${errorDetails ? ` - ${errorDetails}` : ""}`
-      );
+      throw new Error(userFriendlyMessage);
     }
 
     logger.log("Transaction created:", transaction.id);

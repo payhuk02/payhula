@@ -4,6 +4,15 @@
 
 DO $$
 BEGIN
+  -- Vérifier si la table transactions existe
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name = 'transactions'
+  ) THEN
+    RAISE EXCEPTION 'La table transactions n''existe pas. Veuillez d''abord exécuter la migration initiale.';
+  END IF;
+
   -- Vérifier et ajouter la colonne currency si elle n'existe pas
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns 
@@ -11,9 +20,42 @@ BEGIN
     AND table_name = 'transactions' 
     AND column_name = 'currency'
   ) THEN
+    -- Ajouter d'abord comme nullable avec valeur par défaut
     ALTER TABLE public.transactions 
-    ADD COLUMN currency TEXT NOT NULL DEFAULT 'XOF';
+    ADD COLUMN currency TEXT DEFAULT 'XOF';
+    
+    -- Mettre à jour les valeurs NULL existantes
+    UPDATE public.transactions 
+    SET currency = 'XOF' 
+    WHERE currency IS NULL;
+    
+    -- Maintenant rendre la colonne NOT NULL
+    ALTER TABLE public.transactions 
+    ALTER COLUMN currency SET NOT NULL,
+    ALTER COLUMN currency SET DEFAULT 'XOF';
+    
     RAISE NOTICE 'Colonne currency ajoutée à la table transactions';
+  ELSE
+    -- Si la colonne existe mais peut être NULL, s'assurer qu'elle a une valeur par défaut
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' 
+      AND table_name = 'transactions' 
+      AND column_name = 'currency'
+      AND is_nullable = 'YES'
+    ) THEN
+      -- Mettre à jour les valeurs NULL
+      UPDATE public.transactions 
+      SET currency = 'XOF' 
+      WHERE currency IS NULL;
+      
+      -- Rendre NOT NULL si nécessaire
+      ALTER TABLE public.transactions 
+      ALTER COLUMN currency SET NOT NULL,
+      ALTER COLUMN currency SET DEFAULT 'XOF';
+      
+      RAISE NOTICE 'Colonne currency mise à jour (NOT NULL avec DEFAULT)';
+    END IF;
   END IF;
 
   -- Vérifier et ajouter la colonne payment_provider si elle n'existe pas
