@@ -132,15 +132,18 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       let userFriendlyMessage = `Impossible de créer la transaction: ${errorMessage}`;
       
       if (isColumnMissingError) {
-        userFriendlyMessage += "\n\n💡 SOLUTION RAPIDE:\n";
+        userFriendlyMessage += "\n\n💡 SOLUTION COMPLÈTE:\n";
         userFriendlyMessage += "1. Ouvrez Supabase Dashboard → SQL Editor\n";
-        userFriendlyMessage += "2. Copiez et exécutez ce script SQL:\n\n";
-        userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'XOF';\n";
-        userFriendlyMessage += "UPDATE public.transactions SET currency = 'XOF' WHERE currency IS NULL;\n";
-        userFriendlyMessage += "ALTER TABLE public.transactions ALTER COLUMN currency SET NOT NULL;\n\n";
+        userFriendlyMessage += "2. Exécutez le script: FIX_ALL_TRANSACTIONS_COLUMNS.sql\n";
+        userFriendlyMessage += "   (Ce script ajoute TOUTES les colonnes manquantes)\n\n";
+        userFriendlyMessage += "OU exécutez cette requête SQL directement:\n\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS order_id UUID;\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS store_id UUID;\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS product_id UUID;\n";
+        userFriendlyMessage += "ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'XOF';\n\n";
         userFriendlyMessage += "3. Rafraîchissez le cache: Settings → API → Refresh schema cache\n";
         userFriendlyMessage += "4. Videz le cache du navigateur (Ctrl+Shift+R)\n\n";
-        userFriendlyMessage += "📁 Fichier complet: FIX_CURRENCY_COLUMN.sql dans le projet";
+        userFriendlyMessage += "📁 Fichier complet: FIX_ALL_TRANSACTIONS_COLUMNS.sql dans le projet";
       }
       
       if (errorHint) {
