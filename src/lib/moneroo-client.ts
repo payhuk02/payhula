@@ -51,6 +51,8 @@ export interface MonerooRefundResponse {
 class MonerooClient {
   private async callFunction(action: string, data: Record<string, unknown>) {
     try {
+      console.log('[MonerooClient] Calling Edge Function:', { action, hasData: !!data });
+      
       const { data: response, error } = await supabase.functions.invoke("moneroo", {
         body: { action, data },
       });
@@ -63,7 +65,19 @@ class MonerooClient {
           message: errorMessage,
           context: (error as any)?.context,
           data: (error as any)?.data,
+          name: error.name,
+          stack: (error as any)?.stack,
         });
+        
+        // Gérer l'erreur "Failed to fetch" spécifiquement
+        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
+          throw new MonerooNetworkError(
+            `Impossible de se connecter à l'Edge Function Moneroo. ` +
+            `Vérifiez que l'Edge Function est déployée et accessible. ` +
+            `Erreur: ${errorMessage}`,
+            { originalError: error, action, data }
+          );
+        }
         
         // Vérifier si c'est une erreur Edge Function (non-2xx)
         if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
