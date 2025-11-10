@@ -89,139 +89,31 @@ export default defineConfig(({ mode }) => {
     dedupe: ['react', 'react-dom'],
   },
   build: {
-    // Code splitting avancé pour optimiser le bundle size
+    // Code splitting désactivé pour éviter les erreurs MIME type et forwardRef sur Vercel
     rollupOptions: {
-      // Préserver les signatures d'entrée pour garantir l'ordre de chargement
-      preserveEntrySignatures: 'strict',
+      // Préserver les signatures d'entrée (même avec code splitting désactivé)
+      preserveEntrySignatures: 'allow-extension',
       output: {
-        // Code splitting optimisé pour réduire les bundle sizes
-        manualChunks: (id) => {
-          // React et React DOM dans le chunk principal (chargé en premier)
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return undefined; // Garder dans le chunk principal
-          }
-          
-          // Vendor chunks pour les grandes bibliothèques
-          if (id.includes('node_modules')) {
-            // Supabase
-            if (id.includes('@supabase') || id.includes('supabase')) {
-              return 'vendor-supabase';
-            }
-            
-            // React Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'vendor-react-query';
-            }
-            
-            // Sentry
-            if (id.includes('@sentry')) {
-              return 'vendor-sentry';
-            }
-            
-            // UI Libraries (Radix UI, etc.)
-            if (id.includes('@radix-ui') || id.includes('radix-ui')) {
-              return 'vendor-ui';
-            }
-            
-            // Router
-            if (id.includes('react-router')) {
-              return 'vendor-router';
-            }
-            
-            // Form libraries
-            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
-              return 'vendor-forms';
-            }
-            
-            // Icons
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            
-            // Date libraries
-            if (id.includes('date-fns')) {
-              return 'vendor-date';
-            }
-            
-            // Autres vendor
-            return 'vendor';
-          }
-          
-          // Chunks par feature pour le code applicatif
-          if (id.includes('src/pages/admin')) {
-            return 'pages-admin';
-          }
-          
-          if (id.includes('src/pages/customer')) {
-            return 'pages-customer';
-          }
-          
-          if (id.includes('src/pages/dashboard')) {
-            return 'pages-dashboard';
-          }
-          
-          if (id.includes('src/components/marketplace')) {
-            return 'components-marketplace';
-          }
-          
-          if (id.includes('src/components/products')) {
-            return 'components-products';
-          }
-          
-          if (id.includes('src/components/physical')) {
-            return 'components-physical';
-          }
-          
-          if (id.includes('src/components/digital')) {
-            return 'components-digital';
-          }
-          
-          if (id.includes('src/components/service')) {
-            return 'components-service';
-          }
-          
-          // Par défaut, garder dans le chunk principal
-          return undefined;
-        },
-        // Optimisation des noms de chunks
-        chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId
-            ? chunkInfo.facadeModuleId.split('/').pop()?.replace(/\.[^.]*$/, '')
-            : 'chunk';
-          return `js/${facadeModuleId}-[hash].js`;
-        },
-        // CRITIQUE: Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
-        // Cela garantit que le plugin ensureChunkOrderPlugin peut le trouver
-        entryFileNames: (chunkInfo) => {
-          // CRITIQUE: Le chunk principal (main.tsx) doit être nommé "index" pour être identifiable
-          // Vérifier plusieurs conditions pour identifier le chunk principal
-          // Le chunk principal est celui qui :
-          // 1. Est un entry point (isEntry === true)
-          // 2. N'est pas dans node_modules
-          // 3. Contient "main" dans son nom ou facadeModuleId
-          const isMainEntry = 
-            chunkInfo.isEntry && (
-              chunkInfo.facadeModuleId?.includes('main.tsx') ||
-              chunkInfo.facadeModuleId?.includes('main.ts') ||
-              chunkInfo.facadeModuleId?.includes('src/main') ||
-              chunkInfo.facadeModuleId?.includes('/main') ||
-              chunkInfo.name === 'main' ||
-              chunkInfo.name === 'index' ||
-              // Fallback: Si c'est un entry point et pas dans node_modules, c'est probablement le principal
-              (!chunkInfo.facadeModuleId?.includes('node_modules') && 
-               !chunkInfo.facadeModuleId?.includes('chunk'))
-            );
-          
-          if (isMainEntry) {
-            return 'js/index-[hash].js';
-          }
-          // Les autres entry points gardent leur nom
-          return 'js/[name]-[hash].js';
-        },
-        // CRITIQUE: Format ES modules pour garantir l'ordre de chargement
+        // TEMPORAIREMENT DÉSACTIVÉ - Code splitting désactivé pour éviter les erreurs MIME type et forwardRef sur Vercel
+        // Les chunks sont servis avec un mauvais MIME type (text/html au lieu de application/javascript)
+        // Cela cause des erreurs "Failed to load module script" et "Cannot read properties of undefined (reading 'forwardRef')"
+        // Solution : Désactiver le code splitting jusqu'à ce que Vercel serve correctement les chunks
+        manualChunks: undefined,
+        // ANCIEN CODE (désactivé temporairement) :
+        // manualChunks: (id) => {
+        //   // React et React DOM dans le chunk principal (chargé en premier)
+        //   if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+        //     return undefined; // Garder dans le chunk principal
+        //   }
+        //   // ... reste du code commenté
+        // },
+        // Optimisation des noms de chunks (simplifié car code splitting désactivé)
+        chunkFileNames: 'js/[name]-[hash].js',
+        entryFileNames: 'js/index-[hash].js',
+        // Format ES modules
         format: 'es',
-        // Ne pas inliner les imports dynamiques pour préserver l'ordre
-        inlineDynamicImports: false,
+        // Inliner les imports dynamiques car un seul chunk
+        inlineDynamicImports: true,
         // IMPORTANT: Ne pas utiliser generatedCode.constBindings: false
         // Cela peut causer des problèmes d'initialisation
         // Laisser les const bindings par défaut pour garantir l'ordre d'initialisation
@@ -241,8 +133,8 @@ export default defineConfig(({ mode }) => {
     // Optimisations pour vitesse de build
     target: 'es2015',
     minify: 'esbuild', // Plus rapide que terser
-    // Chunk size warnings - plus strict pour optimiser
-    chunkSizeWarningLimit: 500, // Réduit pour forcer l'optimisation
+    // Chunk size warnings - augmenté car code splitting désactivé (volontaire)
+    chunkSizeWarningLimit: 10000, // Augmenté car un seul chunk (code splitting désactivé pour éviter erreurs Vercel)
     reportCompressedSize: true, // Activé pour voir la taille compressée
     sourcemap: isProduction && hasSentryToken, // Seulement si Sentry configuré
     // Optimisations supplémentaires
