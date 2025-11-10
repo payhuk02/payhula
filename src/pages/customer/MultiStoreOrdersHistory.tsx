@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,8 @@ import {
   ArrowRight,
   Eye,
   Download,
+  Menu,
+  AlertCircle,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -58,6 +60,35 @@ interface MultiStoreOrderGroup {
   has_pending: boolean;
 }
 
+// Composant interne pour utiliser useSidebar
+function MobileHeader() {
+  const { toggleSidebar } = useSidebar();
+  
+  return (
+    <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+      <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+        {/* Hamburger Menu - Très visible */}
+        <button
+          onClick={toggleSidebar}
+          className="touch-manipulation h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] p-0 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700 transition-colors border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg"
+          aria-label="Ouvrir le menu"
+          type="button"
+        >
+          <Menu className="h-6 w-6 sm:h-7 sm:w-7 text-gray-900 dark:text-gray-50" aria-hidden="true" />
+        </button>
+        
+        {/* Titre avec Icône */}
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" aria-hidden="true" />
+          <h1 className="text-sm sm:text-base font-bold truncate text-gray-900 dark:text-gray-50">
+            Commandes Multi-Stores
+          </h1>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export default function MultiStoreOrdersHistory() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -65,6 +96,7 @@ export default function MultiStoreOrdersHistory() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed' | 'failed'>('all');
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month' | 'year'>('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [orderGroups, setOrderGroups] = useState<MultiStoreOrderGroup[]>([]);
 
   // Récupérer l'utilisateur actuel
@@ -80,14 +112,17 @@ export default function MultiStoreOrdersHistory() {
   const fetchMultiStoreOrders = async () => {
     if (!user?.id) {
       setLoading(false);
+      setError(null);
       return;
     }
 
     try {
       setLoading(true);
+      setError(null);
 
       // Récupérer toutes les commandes de l'utilisateur avec metadata multi_store
-      const { data: ordersData, error } = await supabase
+      // Utiliser une jointure LEFT pour éviter les erreurs si certaines commandes n'ont pas de store
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
           id,
@@ -97,32 +132,58 @@ export default function MultiStoreOrdersHistory() {
           payment_status,
           created_at,
           metadata,
-          stores!inner(name)
+          stores(name)
         `)
         .eq('customer_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        logger.error('Error fetching multi-store orders:', error);
+      if (ordersError) {
+        logger.error('Error fetching multi-store orders:', ordersError);
+        setError('Impossible de charger les commandes. Veuillez réessayer plus tard.');
         toast({
           title: 'Erreur',
           description: 'Impossible de charger les commandes',
           variant: 'destructive',
         });
+        setOrderGroups([]);
+        return;
+      }
+
+      if (!ordersData || ordersData.length === 0) {
+        setOrderGroups([]);
+        setError(null);
         return;
       }
 
       // Filtrer les commandes multi-stores (celles avec metadata.multi_store = true)
-      const multiStoreOrders = (ordersData || []).filter((order: any) => {
-        const metadata = order.metadata;
-        return metadata?.multi_store === true || 
-               metadata?.multi_store === 'true' ||
-               (typeof metadata === 'string' && JSON.parse(metadata)?.multi_store === true);
+      const multiStoreOrders = ordersData.filter((order: any) => {
+        try {
+          let metadata = order.metadata;
+          
+          // Parser les metadata si c'est une string
+          if (typeof metadata === 'string') {
+            try {
+              metadata = JSON.parse(metadata);
+            } catch (e) {
+              // Si le parsing échoue, ce n'est probablement pas une commande multi-store
+              return false;
+            }
+          }
+          
+          // Vérifier si c'est une commande multi-store
+          return metadata?.multi_store === true || 
+                 metadata?.multi_store === 'true' ||
+                 metadata?.is_multi_store === true ||
+                 metadata?.is_multi_store === 'true';
+        } catch (e) {
+          logger.warn('Error parsing metadata for order:', order.id, e);
+          return false;
+        }
       });
 
       if (multiStoreOrders.length === 0) {
         setOrderGroups([]);
-        setLoading(false);
+        setError(null);
         return;
       }
 
@@ -217,13 +278,17 @@ export default function MultiStoreOrdersHistory() {
       );
 
       setOrderGroups(groups);
+      setError(null);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors du chargement';
       logger.error('Error in fetchMultiStoreOrders:', error);
+      setError(errorMessage);
       toast({
         title: 'Erreur',
-        description: 'Une erreur est survenue lors du chargement',
+        description: errorMessage,
         variant: 'destructive',
       });
+      setOrderGroups([]);
     } finally {
       setLoading(false);
     }
@@ -328,17 +393,33 @@ export default function MultiStoreOrdersHistory() {
   if (loading) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <div className="max-w-6xl mx-auto space-y-6">
-              <Skeleton className="h-10 w-64" />
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map(i => (
-                  <Skeleton key={i} className="h-32" />
-                ))}
+          <main className="flex-1 flex flex-col min-w-0">
+            {/* Mobile Header - Loading State */}
+            <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+              <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+                <div className="h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse border border-gray-300 dark:border-gray-600" />
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <div className="h-5 w-5 sm:h-6 sm:w-6 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  <Skeleton className="h-5 w-40 sm:w-48" />
+                </div>
               </div>
-              <Skeleton className="h-96" />
+            </header>
+            <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
+              <div className="max-w-6xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+                {/* Header - Desktop seulement */}
+                <div className="hidden lg:block space-y-2">
+                  <Skeleton className="h-10 w-80" />
+                  <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <Skeleton key={i} className="h-32" />
+                  ))}
+                </div>
+                <Skeleton className="h-96" />
+              </div>
             </div>
           </main>
         </div>
@@ -350,114 +431,132 @@ export default function MultiStoreOrdersHistory() {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
-            {/* Header */}
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <ShoppingBag className="h-8 w-8" />
-                Historique des commandes multi-stores
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Consultez toutes vos commandes multi-boutiques
-              </p>
-            </div>
+        <main className="flex-1 flex flex-col min-w-0">
+          {/* Mobile Header avec Hamburger et Icône */}
+          <MobileHeader />
+          
+          {/* Contenu principal */}
+          <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
+            <div className="max-w-6xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+              {/* Header - Desktop seulement */}
+              <div className="hidden lg:block space-y-2">
+                <h1 className="text-3xl lg:text-4xl font-bold flex items-center gap-3 text-gray-900 dark:text-gray-50">
+                  <ShoppingBag className="h-8 w-8 lg:h-10 lg:w-10 text-primary flex-shrink-0" aria-hidden="true" />
+                  <span>Historique des commandes multi-stores</span>
+                </h1>
+                <p className="text-base text-gray-600 dark:text-gray-400">
+                  Consultez toutes vos commandes multi-boutiques
+                </p>
+              </div>
 
-            {/* Statistiques */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Total groupes</CardDescription>
-                  <CardTitle className="text-2xl">{stats.total}</CardTitle>
-                </CardHeader>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Montant total</CardDescription>
-                  <CardTitle className="text-2xl">{stats.totalAmount.toLocaleString('fr-FR')} XOF</CardTitle>
-                </CardHeader>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Payées</CardDescription>
-                  <CardTitle className="text-2xl text-green-600">{stats.completed}</CardTitle>
-                </CardHeader>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>En attente</CardDescription>
-                  <CardTitle className="text-2xl text-orange-600">{stats.pending}</CardTitle>
-                </CardHeader>
-              </Card>
-            </div>
+              {/* Message d'erreur */}
+              {error && (
+                <Alert variant="destructive" className="border-red-500 bg-red-50 dark:bg-red-900/20">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="font-medium">
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              )}
 
-            {/* Filtres et recherche */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Filter className="h-5 w-5" />
-                  Filtres
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Recherche</label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Rechercher par numéro de commande ou boutique..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                      />
+              {/* Statistiques */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+                <Card className="border shadow-sm">
+                  <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-4">
+                    <CardDescription className="text-xs sm:text-sm">Total groupes</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl text-gray-900 dark:text-gray-50">{stats.total}</CardTitle>
+                  </CardHeader>
+                </Card>
+                <Card className="border shadow-sm">
+                  <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-4">
+                    <CardDescription className="text-xs sm:text-sm">Montant total</CardDescription>
+                    <CardTitle className="text-lg sm:text-2xl text-gray-900 dark:text-gray-50 break-words">
+                      {stats.totalAmount.toLocaleString('fr-FR')} XOF
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
+                <Card className="border shadow-sm">
+                  <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-4">
+                    <CardDescription className="text-xs sm:text-sm">Payées</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl text-green-600 dark:text-green-400">{stats.completed}</CardTitle>
+                  </CardHeader>
+                </Card>
+                <Card className="border shadow-sm">
+                  <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-4">
+                    <CardDescription className="text-xs sm:text-sm">En attente</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl text-orange-600 dark:text-orange-400">{stats.pending}</CardTitle>
+                  </CardHeader>
+                </Card>
+              </div>
+
+              {/* Filtres et recherche */}
+              <Card className="border shadow-sm">
+                <CardHeader className="pb-3 px-3 sm:px-6 pt-4 sm:pt-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-gray-900 dark:text-gray-50">
+                    <Filter className="h-5 w-5 text-primary" />
+                    Filtres
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Recherche</label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                        <Input
+                          placeholder="Rechercher par numéro de commande ou boutique..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-9 sm:pl-10 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Statut</label>
+                      <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+                        <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base touch-manipulation">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Tous les statuts</SelectItem>
+                          <SelectItem value="pending">En attente</SelectItem>
+                          <SelectItem value="completed">Payées</SelectItem>
+                          <SelectItem value="failed">Échouées</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Période</label>
+                      <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
+                        <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base touch-manipulation">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Toutes les périodes</SelectItem>
+                          <SelectItem value="today">Aujourd'hui</SelectItem>
+                          <SelectItem value="week">7 derniers jours</SelectItem>
+                          <SelectItem value="month">30 derniers jours</SelectItem>
+                          <SelectItem value="year">Cette année</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Statut</label>
-                    <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tous les statuts</SelectItem>
-                        <SelectItem value="pending">En attente</SelectItem>
-                        <SelectItem value="completed">Payées</SelectItem>
-                        <SelectItem value="failed">Échouées</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Période</label>
-                    <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Toutes les périodes</SelectItem>
-                        <SelectItem value="today">Aujourd'hui</SelectItem>
-                        <SelectItem value="week">7 derniers jours</SelectItem>
-                        <SelectItem value="month">30 derniers jours</SelectItem>
-                        <SelectItem value="year">Cette année</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Liste des groupes de commandes */}
-            {filteredGroups.length === 0 ? (
-              <Alert>
-                <AlertDescription>
-                  {orderGroups.length === 0
-                    ? "Vous n'avez aucune commande multi-stores pour le moment."
-                    : "Aucune commande ne correspond à vos critères de recherche."}
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <div className="space-y-6">
-                {filteredGroups.map((group) => (
+              {/* Liste des groupes de commandes */}
+              {error ? null : filteredGroups.length === 0 ? (
+                <Alert className="border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                  <Package className="h-4 w-4" />
+                  <AlertDescription className="text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                    {orderGroups.length === 0
+                      ? "Vous n'avez aucune commande multi-stores pour le moment."
+                      : "Aucune commande ne correspond à vos critères de recherche."}
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                  {filteredGroups.map((group) => (
                   <Card key={group.id} className="overflow-hidden">
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -545,9 +644,10 @@ export default function MultiStoreOrdersHistory() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </main>
       </div>
