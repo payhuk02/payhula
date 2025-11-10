@@ -48,21 +48,18 @@ export const initSentry = () => {
       Sentry.replayIntegration({
         maskAllText: false,
         blockAllMedia: false,
-        // Capturer les sessions avec erreurs
-        sessionSampleRate: ENV === 'production' ? 0.1 : 1.0,
-        errorSampleRate: 1.0,
+        // Capturer les sessions avec erreurs - Réduit pour éviter 429
+        sessionSampleRate: ENV === 'production' ? 0.05 : 0.5,
+        errorSampleRate: ENV === 'production' ? 0.5 : 1.0,
       }),
       // Note: React Router integration sera ajoutée si nécessaire
       // Sentry.reactRouterV6BrowserTracingIntegration n'est pas disponible dans cette version
     ],
     
     // Performance Monitoring - APM amélioré
-    tracesSampleRate: ENV === 'production' ? 0.2 : 1.0, // Augmenté pour plus de données
-    profilesSampleRate: ENV === 'production' ? 0.1 : 1.0, // Profiling pour identifier les bottlenecks
-    
-    // Session Replay
-    replaysSessionSampleRate: ENV === 'production' ? 0.1 : 1.0,
-    replaysOnErrorSampleRate: 1.0,
+    // Réduire les sample rates pour éviter les erreurs 429
+    tracesSampleRate: ENV === 'production' ? 0.1 : 0.5, // Réduit pour éviter le rate limiting
+    profilesSampleRate: ENV === 'production' ? 0.05 : 0.5, // Réduit pour éviter le rate limiting
     
     // Options avancées
     beforeSend(event, hint) {
@@ -77,6 +74,25 @@ export const initSentry = () => {
         // Ignorer les erreurs de script cross-origin
         if (event.exception?.values?.[0]?.value?.includes('Script error')) {
           return null;
+        }
+        
+        // Ignorer les erreurs Sentry rate limiting (429)
+        if (event.exception?.values?.[0]?.value?.includes('429') ||
+            event.exception?.values?.[0]?.value?.includes('Too Many Requests')) {
+          return null;
+        }
+        
+        // Ignorer les erreurs HTTP 429 dans les breadcrumbs
+        if (event.breadcrumbs) {
+          event.breadcrumbs = event.breadcrumbs.filter(breadcrumb => {
+            if (breadcrumb.category === 'fetch' && breadcrumb.data) {
+              const status = (breadcrumb.data as any).status_code;
+              if (status === 429) {
+                return false;
+              }
+            }
+            return true;
+          });
         }
       }
       
@@ -94,6 +110,10 @@ export const initSentry = () => {
       return event;
     },
     
+    // Rate limiting pour éviter les erreurs 429
+    // Réduire la fréquence d'envoi en développement
+    maxBreadcrumbs: ENV === 'production' ? 50 : 30,
+    
     // Ignorer certaines erreurs
     ignoreErrors: [
       // Erreurs du navigateur
@@ -105,6 +125,12 @@ export const initSentry = () => {
       // Erreurs de réseau courantes
       'Network request failed',
       'Failed to fetch',
+      // Erreurs Sentry rate limiting
+      '429',
+      'Too Many Requests',
+      // Erreurs de requêtes HTTP 429
+      /429/,
+      /Too Many Requests/i,
     ],
     
     // Options de release
@@ -115,11 +141,28 @@ export const initSentry = () => {
       // Timeout pour les requêtes
       timeout: 5000,
     },
+    
+    // Rate limiting - Limiter le nombre d'événements par seconde
+    // Cela aide à éviter les erreurs 429 de Sentry
+    maxQueueSize: 30, // Limiter la taille de la queue
+    beforeBreadcrumb(breadcrumb, hint) {
+      // Filtrer les breadcrumbs qui peuvent causer des problèmes
+      // Ignorer les breadcrumbs de fetch pour les requêtes Sentry
+      if (breadcrumb.category === 'fetch' && breadcrumb.data) {
+        const url = (breadcrumb.data as any).url;
+        if (url && url.includes('sentry.io')) {
+          return null; // Ne pas logger les requêtes vers Sentry
+        }
+      }
+      return breadcrumb;
+    },
   });
   
   logger.info('Sentry initialisé avec succès', {
     environment: ENV,
-    tracesSampleRate: ENV === 'production' ? 0.1 : 1.0,
+    tracesSampleRate: ENV === 'production' ? 0.1 : 0.5,
+    profilesSampleRate: ENV === 'production' ? 0.05 : 0.5,
+    replaySampleRate: ENV === 'production' ? 0.05 : 0.5,
   });
 };
 
