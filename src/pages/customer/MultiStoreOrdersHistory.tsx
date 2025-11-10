@@ -3,7 +3,7 @@
  * Affiche toutes les commandes multi-stores de l'utilisateur
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
@@ -35,6 +35,7 @@ import {
   Download,
   Menu,
   AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -109,7 +110,7 @@ export default function MultiStoreOrdersHistory() {
   });
 
   // Récupérer les commandes multi-stores de l'utilisateur
-  const fetchMultiStoreOrders = async () => {
+  const fetchMultiStoreOrders = useCallback(async () => {
     if (!user?.id) {
       setLoading(false);
       setError(null);
@@ -120,8 +121,8 @@ export default function MultiStoreOrdersHistory() {
       setLoading(true);
       setError(null);
 
-      // Récupérer toutes les commandes de l'utilisateur avec metadata multi_store
-      // Utiliser une jointure LEFT pour éviter les erreurs si certaines commandes n'ont pas de store
+      // Récupérer toutes les commandes de l'utilisateur SANS jointure pour éviter les erreurs
+      // On récupérera les stores séparément si nécessaire
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -132,20 +133,46 @@ export default function MultiStoreOrdersHistory() {
           payment_status,
           created_at,
           metadata,
-          stores(name)
+          status
         `)
         .eq('customer_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(1000); // Limiter pour éviter les timeouts
 
       if (ordersError) {
-        logger.error('Error fetching multi-store orders:', ordersError);
-        setError('Impossible de charger les commandes. Veuillez réessayer plus tard.');
+        logger.error('Error fetching orders:', ordersError);
+        
+        // Ne pas afficher d'erreur si c'est juste qu'il n'y a pas de commandes
+        // PGRST116 = No rows returned
+        // 42P01 = relation does not exist (table n'existe pas)
+        if (
+          ordersError.code === 'PGRST116' || 
+          ordersError.message?.includes('No rows') ||
+          ordersError.message?.includes('no rows')
+        ) {
+          setOrderGroups([]);
+          setError(null);
+          setLoading(false);
+          return;
+        }
+        
+        // Pour les autres erreurs, logger et afficher un message d'erreur
+        const errorMessage = ordersError.message || ordersError.code || 'Erreur inconnue';
+        logger.error('Failed to fetch orders:', {
+          error: ordersError,
+          code: ordersError.code,
+          message: errorMessage,
+          details: ordersError.details,
+        });
+        
+        setError(`Impossible de charger les commandes. ${errorMessage}`);
         toast({
           title: 'Erreur',
-          description: 'Impossible de charger les commandes',
+          description: `Impossible de charger les commandes: ${errorMessage}`,
           variant: 'destructive',
         });
         setOrderGroups([]);
+        setLoading(false);
         return;
       }
 
@@ -155,26 +182,65 @@ export default function MultiStoreOrdersHistory() {
         return;
       }
 
+      // Récupérer les stores pour les commandes qui ont un store_id
+      const storeIds = [...new Set(ordersData.map((o: any) => o.store_id).filter(Boolean))];
+      const storeNameMap = new Map<string, string>();
+      
+      if (storeIds.length > 0) {
+        try {
+          const { data: storesData } = await supabase
+            .from('stores')
+            .select('id, name')
+            .in('id', storeIds);
+          
+          if (storesData) {
+            storesData.forEach(store => {
+              storeNameMap.set(store.id, store.name);
+            });
+          }
+        } catch (storeError) {
+          // Si on ne peut pas récupérer les stores, on continue sans les noms
+          logger.warn('Could not fetch store names:', storeError);
+        }
+      }
+
       // Filtrer les commandes multi-stores (celles avec metadata.multi_store = true)
       const multiStoreOrders = ordersData.filter((order: any) => {
         try {
+          // Si metadata est null ou undefined, ce n'est pas une commande multi-store
+          if (!order.metadata) {
+            return false;
+          }
+
           let metadata = order.metadata;
           
           // Parser les metadata si c'est une string
           if (typeof metadata === 'string') {
             try {
+              // Si c'est une chaîne vide, ce n'est pas une commande multi-store
+              if (!metadata.trim()) {
+                return false;
+              }
               metadata = JSON.parse(metadata);
             } catch (e) {
               // Si le parsing échoue, ce n'est probablement pas une commande multi-store
+              // Ne pas logger en debug pour éviter le bruit dans les logs
               return false;
             }
           }
           
+          // Si metadata n'est pas un objet après parsing, ce n'est pas une commande multi-store
+          if (typeof metadata !== 'object' || metadata === null) {
+            return false;
+          }
+          
           // Vérifier si c'est une commande multi-store
-          return metadata?.multi_store === true || 
-                 metadata?.multi_store === 'true' ||
-                 metadata?.is_multi_store === true ||
-                 metadata?.is_multi_store === 'true';
+          const isMultiStore = metadata?.multi_store === true || 
+                               metadata?.multi_store === 'true' ||
+                               metadata?.is_multi_store === true ||
+                               metadata?.is_multi_store === 'true';
+          
+          return isMultiStore;
         } catch (e) {
           logger.warn('Error parsing metadata for order:', order.id, e);
           return false;
@@ -187,27 +253,48 @@ export default function MultiStoreOrdersHistory() {
         return;
       }
 
-      // Récupérer les transactions associées
+      // Récupérer les transactions associées (optionnel, ne bloque pas si échoue)
       const orderIds = multiStoreOrders.map((o: any) => o.id);
-      const { data: transactionsData } = await supabase
-        .from('transactions')
-        .select('id, order_id, status, payment_provider')
-        .in('order_id', orderIds);
+      const transactionMap = new Map();
+      
+      if (orderIds.length > 0) {
+        try {
+          const { data: transactionsData } = await supabase
+            .from('transactions')
+            .select('id, order_id, status, payment_provider')
+            .in('order_id', orderIds);
+          
+          if (transactionsData) {
+            transactionsData.forEach(t => {
+              transactionMap.set(t.order_id, t);
+            });
+          }
+        } catch (transactionError) {
+          logger.warn('Could not fetch transactions:', transactionError);
+          // On continue sans les transactions
+        }
+      }
 
-      const transactionMap = new Map(
-        transactionsData?.map(t => [t.order_id, t]) || []
-      );
-
-      // Récupérer le nombre d'items pour chaque commande
-      const { data: orderItemsData } = await supabase
-        .from('order_items')
-        .select('order_id')
-        .in('order_id', orderIds);
-
+      // Récupérer le nombre d'items pour chaque commande (optionnel)
       const itemsCountMap = new Map<string, number>();
-      orderItemsData?.forEach(item => {
-        itemsCountMap.set(item.order_id, (itemsCountMap.get(item.order_id) || 0) + 1);
-      });
+      
+      if (orderIds.length > 0) {
+        try {
+          const { data: orderItemsData } = await supabase
+            .from('order_items')
+            .select('order_id')
+            .in('order_id', orderIds);
+          
+          if (orderItemsData) {
+            orderItemsData.forEach(item => {
+              itemsCountMap.set(item.order_id, (itemsCountMap.get(item.order_id) || 0) + 1);
+            });
+          }
+        } catch (orderItemsError) {
+          logger.warn('Could not fetch order items:', orderItemsError);
+          // On continue sans le compte d'items
+        }
+      }
 
       // Grouper les commandes par date (même jour) ou par metadata.group_id si disponible
       const groupsMap = new Map<string, MultiStoreOrderGroup>();
@@ -248,10 +335,10 @@ export default function MultiStoreOrdersHistory() {
           order_id: order.id,
           order_number: order.order_number,
           store_id: order.store_id,
-          store_name: order.stores?.name,
-          total_amount: order.total_amount,
+          store_name: storeNameMap.get(order.store_id) || `Boutique ${order.store_id?.substring(0, 8) || 'N/A'}`,
+          total_amount: order.total_amount || 0,
           items_count: itemsCountMap.get(order.id) || 0,
-          payment_status: order.payment_status,
+          payment_status: order.payment_status || 'pending',
           created_at: order.created_at,
           transaction_id: transaction?.id,
           provider: transaction?.payment_provider as 'moneroo' | 'paydunya' | undefined,
@@ -292,11 +379,13 @@ export default function MultiStoreOrdersHistory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, toast]);
 
   useEffect(() => {
-    fetchMultiStoreOrders();
-  }, [user?.id, toast]);
+    if (user?.id) {
+      fetchMultiStoreOrders();
+    }
+  }, [user?.id, fetchMultiStoreOrders]);
 
   // Filtrer et rechercher
   const filteredGroups = useMemo(() => {
@@ -453,8 +542,20 @@ export default function MultiStoreOrdersHistory() {
               {error && (
                 <Alert variant="destructive" className="border-red-500 bg-red-50 dark:bg-red-900/20">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="font-medium">
-                    {error}
+                  <AlertDescription className="font-medium space-y-3">
+                    <p>{error}</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setError(null);
+                        fetchMultiStoreOrders();
+                      }}
+                      className="mt-2 gap-2"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Réessayer
+                    </Button>
                   </AlertDescription>
                 </Alert>
               )}
