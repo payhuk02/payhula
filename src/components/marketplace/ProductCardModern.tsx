@@ -265,6 +265,8 @@ const ProductCardModern = ({
             height={300}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             priority={false}
+            preset="productImage"
+            responsive={true}
           />
         </Link>
         

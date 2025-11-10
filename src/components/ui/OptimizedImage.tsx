@@ -1,15 +1,18 @@
 /**
- * Composant OptimizedImage avec support WebP et lazy loading
+ * Composant OptimizedImage avec support WebP, srcset responsive et lazy loading
  * Affiche automatiquement la version WebP si disponible
+ * Génère des srcSet responsive pour optimiser le chargement
  * 
  * Usage:
  * <OptimizedImage src="/image.jpg" alt="Description" width={400} height={300} />
+ * <OptimizedImage src="/image.jpg" alt="Description" responsive sizes={{ mobile: 400, tablet: 768, desktop: 1200 }} />
  */
 
 import { useState, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
+import { getOptimizedImageUrl, getResponsiveSrcSet, getImageAttributesForPreset, IMAGE_PRESETS, isSupabaseStorageUrl } from '@/lib/image-transform';
 
-interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet' | 'sizes'> {
   src: string;
   alt: string;
   width?: number;
@@ -17,6 +20,15 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   className?: string;
   fallback?: string;
   priority?: boolean; // Si true, ne pas lazy load
+  responsive?: boolean; // Si true, génère un srcSet responsive
+  sizes?: {
+    mobile?: number;    // 300-400px
+    tablet?: number;    // 600-768px
+    desktop?: number;   // 900-1200px
+    large?: number;     // 1600px+ (optionnel)
+  };
+  preset?: keyof typeof IMAGE_PRESETS; // Preset prédéfini (productImage, storeLogo, etc.)
+  quality?: number; // Qualité de l'image (1-100)
 }
 
 export const OptimizedImage = ({
@@ -27,38 +39,90 @@ export const OptimizedImage = ({
   className,
   fallback = '/placeholder-image.png',
   priority = false,
+  responsive = false,
+  sizes,
+  preset,
+  quality = 85,
   ...props
 }: OptimizedImageProps) => {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Convertir l'URL en WebP si possible
-  const getWebPUrl = (url: string): string => {
-    if (!url || error) return fallback;
-    
-    // Si l'image est déjà en WebP, retourner tel quel
-    if (url.endsWith('.webp')) return url;
-    
-    // Si c'est une URL Supabase Storage, on peut demander WebP via transformation
-    if (url.includes('supabase.co/storage')) {
-      // Supabase supporte les transformations d'images
-      // Format: {url}?width={width}&quality=80&format=webp
-      const separator = url.includes('?') ? '&' : '?';
-      const params = new URLSearchParams();
-      
-      if (width) params.append('width', width.toString());
-      params.append('quality', '80');
-      params.append('format', 'webp');
-      
-      return `${url}${separator}${params.toString()}`;
+  // Utiliser un preset si spécifié
+  const imageAttrs = preset 
+    ? getImageAttributesForPreset(src, preset)
+    : null;
+
+  // Générer les URLs optimisées
+  const getOptimizedUrls = () => {
+    if (error || !src) {
+      return {
+        webpSrc: fallback,
+        originalSrc: fallback,
+        srcSet: undefined,
+        sizesAttr: undefined,
+      };
     }
-    
-    // Sinon, retourner l'URL originale
-    return url;
+
+    // Si c'est une URL Supabase Storage, utiliser les transformations
+    if (isSupabaseStorageUrl(src)) {
+      // Si preset est utilisé, utiliser les attributs du preset
+      if (imageAttrs) {
+        return {
+          webpSrc: imageAttrs.src || src,
+          originalSrc: src,
+          srcSet: imageAttrs.srcSet,
+          sizesAttr: imageAttrs.sizes,
+        };
+      }
+
+      // Si responsive est activé, générer un srcSet
+      if (responsive && sizes) {
+        const srcSet = getResponsiveSrcSet(src, sizes, { quality, format: 'webp' });
+        const sizesAttr = sizes.mobile && sizes.tablet && sizes.desktop
+          ? `(max-width: 640px) ${sizes.mobile}px, (max-width: 1024px) ${sizes.tablet}px, ${sizes.desktop}px`
+          : undefined;
+
+        // URL WebP par défaut (desktop)
+        const webpSrc = getOptimizedImageUrl(src, {
+          width: sizes.desktop || width,
+          quality,
+          format: 'webp',
+        }) || src;
+
+        return {
+          webpSrc,
+          originalSrc: src,
+          srcSet,
+          sizesAttr,
+        };
+      }
+
+      // URL WebP simple
+      const webpSrc = getOptimizedImageUrl(src, {
+        width,
+        quality,
+        format: 'webp',
+      }) || src;
+
+      return {
+        webpSrc,
+        originalSrc: src,
+        srcSet: undefined,
+        sizesAttr: undefined,
+      };
+    }
+
+    // Pour les URLs non-Supabase, retourner tel quel
+    return {
+      webpSrc: src,
+      originalSrc: src,
+      srcSet: undefined,
+      sizesAttr: undefined,
+    };
   };
 
-  const webpSrc = getWebPUrl(src);
-  const originalSrc = error ? fallback : src;
+  const { webpSrc, originalSrc, srcSet, sizesAttr } = getOptimizedUrls();
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -70,19 +134,37 @@ export const OptimizedImage = ({
     setIsLoading(false);
   };
 
+  // Déterminer si on doit utiliser WebP
+  const useWebP = !error && isSupabaseStorageUrl(src) && webpSrc !== originalSrc;
+
   return (
     <picture className={cn('relative', className)}>
-      {/* Source WebP */}
-      {!error && webpSrc !== originalSrc && (
-        <source srcSet={webpSrc} type="image/webp" />
+      {/* Source WebP avec srcSet si disponible */}
+      {useWebP && (
+        <source 
+          srcSet={srcSet || webpSrc} 
+          type="image/webp"
+          sizes={sizesAttr}
+        />
+      )}
+      
+      {/* Source fallback (JPEG/PNG) avec srcSet si disponible */}
+      {srcSet && !useWebP && (
+        <source 
+          srcSet={srcSet} 
+          type="image/jpeg"
+          sizes={sizesAttr}
+        />
       )}
       
       {/* Image fallback */}
       <img
-        src={originalSrc}
+        src={error ? fallback : originalSrc}
         alt={alt}
         width={width}
         height={height}
+        srcSet={srcSet && !useWebP ? srcSet : undefined}
+        sizes={sizesAttr}
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
         onLoad={handleLoad}
@@ -101,6 +183,7 @@ export const OptimizedImage = ({
         <div
           className="absolute inset-0 animate-pulse bg-muted rounded"
           style={{ width, height }}
+          aria-hidden="true"
         />
       )}
     </picture>

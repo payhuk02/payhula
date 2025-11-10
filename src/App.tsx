@@ -301,6 +301,7 @@ const MyTemplates = lazy(() => import("./pages/MyTemplates"));
 const AdminTemplates = lazy(() => import("./pages/admin/AdminTemplates"));
 const AdminTemplatesPremium = lazy(() => import("./pages/admin/AdminTemplatesPremium"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminErrorMonitoring = lazy(() => import("./pages/admin/AdminErrorMonitoring"));
 
 // Page de test i18n (à supprimer en production)
 const I18nTest = lazy(() => import("./pages/I18nTest"));
@@ -309,10 +310,17 @@ const AppContent = () => {
   useScrollRestoration();
   useDarkMode(); // Active le mode sombre globalement
 
-  // Initialiser Sentry et Web Vitals au montage
+  // Initialiser Sentry, Web Vitals et Performance Monitoring au montage
   useEffect(() => {
     initSentry();
     initWebVitals();
+    
+    // Initialiser le monitoring de performance
+    if (import.meta.env.PROD) {
+      import('@/lib/performance-monitor').then(({ initPerformanceMonitoring }) => {
+        initPerformanceMonitoring();
+      });
+    }
   }, []);
 
   return (
@@ -519,6 +527,7 @@ const AppContent = () => {
           <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
           <Route path="/admin/templates" element={<ProtectedRoute><AdminTemplates /></ProtectedRoute>} />
           <Route path="/admin/templates-premium" element={<ProtectedRoute><AdminTemplatesPremium /></ProtectedRoute>} />
+          <Route path="/admin/error-monitoring" element={<ProtectedRoute><AdminErrorMonitoring /></ProtectedRoute>} />
 
           {/* --- Route de fallback --- */}
           <Route path="*" element={<NotFound />} />

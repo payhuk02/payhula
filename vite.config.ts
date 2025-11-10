@@ -94,20 +94,95 @@ export default defineConfig(({ mode }) => {
       // Préserver les signatures d'entrée pour garantir l'ordre de chargement
       preserveEntrySignatures: 'strict',
       output: {
-        // TEMPORAIREMENT DÉSACTIVÉ - Code splitting simplifié pour éviter l'erreur forwardRef
-        // Tous les modules dans un seul chunk pour garantir l'ordre de chargement
-        manualChunks: undefined,
-        // ANCIEN CODE (désactivé temporairement) :
-        // manualChunks: (id) => {
-        //   // Éviter les références circulaires en groupant plus intelligemment
-        //   // CRITIQUE: React doit être dans le chunk principal (index) pour être chargé en premier
-        //   // Ne pas créer de chunk séparé pour React - laisser dans le chunk principal
-        //   if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-        //     // Retourner undefined pour garder React dans le chunk principal
-        //     return undefined;
-        //   }
-        //   // ... reste du code
-        // },
+        // Code splitting optimisé pour réduire les bundle sizes
+        manualChunks: (id) => {
+          // React et React DOM dans le chunk principal (chargé en premier)
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return undefined; // Garder dans le chunk principal
+          }
+          
+          // Vendor chunks pour les grandes bibliothèques
+          if (id.includes('node_modules')) {
+            // Supabase
+            if (id.includes('@supabase') || id.includes('supabase')) {
+              return 'vendor-supabase';
+            }
+            
+            // React Query
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-react-query';
+            }
+            
+            // Sentry
+            if (id.includes('@sentry')) {
+              return 'vendor-sentry';
+            }
+            
+            // UI Libraries (Radix UI, etc.)
+            if (id.includes('@radix-ui') || id.includes('radix-ui')) {
+              return 'vendor-ui';
+            }
+            
+            // Router
+            if (id.includes('react-router')) {
+              return 'vendor-router';
+            }
+            
+            // Form libraries
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
+              return 'vendor-forms';
+            }
+            
+            // Icons
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            
+            // Date libraries
+            if (id.includes('date-fns')) {
+              return 'vendor-date';
+            }
+            
+            // Autres vendor
+            return 'vendor';
+          }
+          
+          // Chunks par feature pour le code applicatif
+          if (id.includes('src/pages/admin')) {
+            return 'pages-admin';
+          }
+          
+          if (id.includes('src/pages/customer')) {
+            return 'pages-customer';
+          }
+          
+          if (id.includes('src/pages/dashboard')) {
+            return 'pages-dashboard';
+          }
+          
+          if (id.includes('src/components/marketplace')) {
+            return 'components-marketplace';
+          }
+          
+          if (id.includes('src/components/products')) {
+            return 'components-products';
+          }
+          
+          if (id.includes('src/components/physical')) {
+            return 'components-physical';
+          }
+          
+          if (id.includes('src/components/digital')) {
+            return 'components-digital';
+          }
+          
+          if (id.includes('src/components/service')) {
+            return 'components-service';
+          }
+          
+          // Par défaut, garder dans le chunk principal
+          return undefined;
+        },
         // Optimisation des noms de chunks
         chunkFileNames: (chunkInfo) => {
           const facadeModuleId = chunkInfo.facadeModuleId

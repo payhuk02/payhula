@@ -256,10 +256,64 @@ select {
     will-change: auto;
   }
   
+  /* Réduire la durée des animations sur mobile */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+  
   /* Désactiver les animations complexes sur mobile */
-  .reduce-motion-mobile * {
+  .reduce-motion-mobile *,
+  .reduce-motion-mobile *::before,
+  .reduce-motion-mobile *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  
+  /* Désactiver les animations de hover sur mobile (pas de hover sur tactile) */
+  @media (hover: none) {
+    *:hover {
+      transform: none !important;
+      transition: none !important;
+    }
+    
+    .hover-lift:hover,
+    .hover-scale:hover,
+    .hover-glow:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  }
+  
+  /* Optimiser les animations de scroll sur mobile */
+  .animate-on-scroll {
+    animation-duration: 0.3s !important;
+  }
+  
+  /* Réduire les animations de skeleton */
+  .skeleton,
+  .skeleton-dark {
+    animation-duration: 1s !important;
+  }
+  
+  /* Réduire les animations de pulse */
+  .animate-pulse {
+    animation-duration: 2s !important;
+  }
+  
+  /* Optimiser les transitions de modales sur mobile */
+  .modal-content-enter-active,
+  .modal-content-exit-active {
+    transition-duration: 0.2s !important;
+  }
+  
+  /* Optimiser les transitions de toasts sur mobile */
+  .toast-enter-active,
+  .toast-exit-active {
+    transition-duration: 0.2s !important;
   }
 }
 
