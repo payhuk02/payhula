@@ -25,7 +25,17 @@ import { fr } from 'date-fns/locale';
 
 export const GamificationDashboard = () => {
   // Utiliser useAuth normalement comme dans les autres composants
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+
+  // Si l'utilisateur n'est pas encore chargé, afficher un skeleton
+  if (authLoading || !user) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
 
   const { data: gamification, isLoading } = useUserGamification();
   const { data: badges = [] } = useUserBadges();

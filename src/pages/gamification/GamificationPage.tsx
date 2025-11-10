@@ -5,14 +5,13 @@
  * Page complète pour la gamification (points, badges, achievements, leaderboard)
  */
 
-import { Component, ErrorInfo, ReactNode } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { GamificationDashboard } from '@/components/gamification/GamificationDashboard';
-import { Trophy, Menu, AlertCircle } from 'lucide-react';
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { Trophy, Menu, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 
 // Composant interne pour utiliser useSidebar
 function MobileHeader() {
@@ -43,77 +42,6 @@ function MobileHeader() {
   );
 }
 
-// ErrorBoundary simple pour la page Gamification
-interface ErrorBoundaryProps {
-  children: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class GamificationErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
-  }
-
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return {
-      hasError: true,
-      error,
-    };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Gamification Error:', error, errorInfo);
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo);
-    }
-  }
-
-  handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-    });
-    window.location.reload();
-  };
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <Alert variant="destructive" className="m-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Erreur</AlertTitle>
-          <AlertDescription className="mt-2 space-y-3">
-            <p>Une erreur s'est produite lors du chargement de la page de gamification.</p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <pre className="text-xs overflow-auto max-h-32 bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                {this.state.error.message}
-              </pre>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={this.handleReset}
-              className="gap-2"
-            >
-              Réessayer
-            </Button>
-          </AlertDescription>
-        </Alert>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 export default function GamificationPage() {
   return (
@@ -138,10 +66,29 @@ export default function GamificationPage() {
                 </p>
               </div>
 
-              {/* ErrorBoundary pour capturer les erreurs */}
-              <GamificationErrorBoundary>
+              {/* ErrorBoundary pour capturer les erreurs avec fallback simple */}
+              <ErrorBoundary
+                level="section"
+                fallback={
+                  <Alert variant="destructive" className="m-4">
+                    <AlertTitle>Erreur de chargement</AlertTitle>
+                    <AlertDescription className="mt-2 space-y-3">
+                      <p>Une erreur s'est produite lors du chargement de la page de gamification.</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.location.reload()}
+                        className="gap-2"
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                        Recharger la page
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                }
+              >
                 <GamificationDashboard />
-              </GamificationErrorBoundary>
+              </ErrorBoundary>
             </div>
           </div>
         </main>
