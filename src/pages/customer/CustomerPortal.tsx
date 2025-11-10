@@ -9,7 +9,7 @@
  * - Support complet 4 types produits
  */
 
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ import {
   User,
   ArrowRight,
   Heart,
+  Menu,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import CustomerMyReturns from './CustomerMyReturns';
@@ -47,6 +48,35 @@ interface CustomerStats {
   services: number;
   courses: number;
   activeSubscriptions: number;
+}
+
+// Composant interne pour utiliser useSidebar
+function MobileHeader() {
+  const { toggleSidebar } = useSidebar();
+  
+  return (
+    <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+      <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+        {/* Hamburger Menu - Très visible */}
+        <button
+          onClick={toggleSidebar}
+          className="touch-manipulation h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] p-0 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700 transition-colors border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg"
+          aria-label="Ouvrir le menu"
+          type="button"
+        >
+          <Menu className="h-6 w-6 sm:h-7 sm:w-7 text-gray-900 dark:text-gray-50" aria-hidden="true" />
+        </button>
+        
+        {/* Titre avec Icône */}
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" aria-hidden="true" />
+          <h1 className="text-base sm:text-lg font-bold truncate text-gray-900 dark:text-gray-50">
+            Mon Espace Client
+          </h1>
+        </div>
+      </div>
+    </header>
+  );
 }
 
 export default function CustomerPortal() {
@@ -140,12 +170,14 @@ export default function CustomerPortal() {
         <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
           <AppSidebar />
           <main className="flex-1 flex flex-col min-w-0">
-            {/* Mobile Header avec SidebarTrigger */}
-            <header className="sticky top-0 z-10 border-b bg-white dark:bg-gray-900 lg:hidden">
-              <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-                <SidebarTrigger className="touch-manipulation min-h-[44px] min-w-[44px] -ml-2" aria-label="Ouvrir le menu" />
-                <div className="flex-1 min-w-0">
-                  <Skeleton className="h-5 w-40" />
+            {/* Mobile Header avec SidebarTrigger et Icône - Loading State */}
+            <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+              <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+                {/* Hamburger Menu Skeleton */}
+                <div className="h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse border border-gray-300 dark:border-gray-600" />
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  <Skeleton className="h-5 w-40 sm:w-48" />
                 </div>
               </div>
             </header>
@@ -176,17 +208,8 @@ export default function CustomerPortal() {
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <AppSidebar />
         <main className="flex-1 flex flex-col min-w-0">
-          {/* Mobile Header avec SidebarTrigger */}
-          <header className="sticky top-0 z-10 border-b bg-white dark:bg-gray-900 lg:hidden">
-            <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-              <SidebarTrigger className="touch-manipulation min-h-[44px] min-w-[44px] -ml-2" aria-label="Ouvrir le menu" />
-              <div className="flex-1 min-w-0">
-                <h1 className="text-lg font-bold truncate text-gray-900 dark:text-gray-50">
-                  Mon Espace Client
-                </h1>
-              </div>
-            </div>
-          </header>
+          {/* Mobile Header avec Hamburger et Icône */}
+          <MobileHeader />
           
           {/* Contenu principal */}
           <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
@@ -266,76 +289,93 @@ export default function CustomerPortal() {
             </div>
 
             {/* Sections principales */}
-            <Tabs defaultValue="overview" className="space-y-3 sm:space-y-4 md:space-y-6">
-              <div className="overflow-x-auto -mx-2.5 sm:-mx-3 md:mx-0 px-2.5 sm:px-3 md:px-0 scrollbar-hide">
-                <TabsList className="inline-flex w-full sm:w-auto min-w-full sm:min-w-0 flex-nowrap sm:flex-wrap gap-1 sm:gap-2 p-1 h-auto touch-manipulation">
-                  <TabsTrigger 
-                    value="overview" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Vue d'ensemble
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="orders" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Commandes
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="downloads" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Téléchargements
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="licenses" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Licences
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="updates" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Mises à jour
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="courses" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Mes Cours
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="wishlist" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Favoris
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="loyalty" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Fidélité
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="gift-cards" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Cartes Cadeaux
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="returns" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Mes Retours
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="profile" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation"
-                  >
-                    Mon Profil
-                  </TabsTrigger>
-                </TabsList>
+            <Tabs defaultValue="overview" className="space-y-3 sm:space-y-4 md:space-y-6 w-full">
+              {/* Container pour tabs avec scroll horizontal sur mobile */}
+              <div className="relative w-full">
+                {/* Indicateur de scroll à gauche (mobile uniquement) */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-900 pointer-events-none z-10 lg:hidden" aria-hidden="true"></div>
+                
+                {/* Indicateur de scroll à droite (mobile uniquement) */}
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 pointer-events-none z-10 lg:hidden" aria-hidden="true"></div>
+                
+                {/* Tabs avec scroll horizontal */}
+                <div 
+                  className="overflow-x-auto overflow-y-hidden -mx-2.5 sm:-mx-3 md:mx-0 px-2.5 sm:px-3 md:px-0 scrollbar-hide scroll-smooth"
+                  style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
+                  <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <TabsTrigger 
+                      value="overview" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Vue d'ensemble
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="orders" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Commandes
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="downloads" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Téléchargements
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="licenses" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Licences
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="updates" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Mises à jour
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="courses" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Mes Cours
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="wishlist" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Favoris
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="loyalty" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Fidélité
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="gift-cards" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Cartes Cadeaux
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="returns" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Mes Retours
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="profile" 
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                    >
+                      Mon Profil
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
               </div>
 
               {/* Vue d'ensemble */}
