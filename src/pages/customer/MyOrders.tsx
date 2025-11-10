@@ -12,7 +12,7 @@
  */
 
 import { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,8 @@ import {
   Clock,
   XCircle,
   AlertCircle,
+  Menu,
+  User,
 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -70,6 +72,35 @@ interface OrderItem {
   quantity: number;
   unit_price: number;
   total_price: number;
+}
+
+// Composant interne pour utiliser useSidebar
+function MobileHeader() {
+  const { toggleSidebar } = useSidebar();
+  
+  return (
+    <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+      <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+        {/* Hamburger Menu - Très visible */}
+        <button
+          onClick={toggleSidebar}
+          className="touch-manipulation h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] p-0 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700 transition-colors border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg"
+          aria-label="Ouvrir le menu"
+          type="button"
+        >
+          <Menu className="h-6 w-6 sm:h-7 sm:w-7 text-gray-900 dark:text-gray-50" aria-hidden="true" />
+        </button>
+        
+        {/* Titre avec Icône */}
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" aria-hidden="true" />
+          <h1 className="text-base sm:text-lg font-bold truncate text-gray-900 dark:text-gray-50">
+            Mes Commandes
+          </h1>
+        </div>
+      </div>
+    </header>
+  );
 }
 
 export default function MyOrders() {
@@ -177,12 +208,28 @@ export default function MyOrders() {
   if (isLoading) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-96" />
+          <main className="flex-1 flex flex-col min-w-0">
+            {/* Mobile Header - Loading State */}
+            <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+              <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+                <div className="h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse border border-gray-300 dark:border-gray-600" />
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <div className="h-5 w-5 sm:h-6 sm:w-6 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  <Skeleton className="h-5 w-32 sm:w-40" />
+                </div>
+              </div>
+            </header>
+            <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
+              <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+                {/* Header - Desktop seulement */}
+                <div className="hidden lg:block space-y-2">
+                  <Skeleton className="h-10 w-64" />
+                  <Skeleton className="h-5 w-80" />
+                </div>
+                <Skeleton className="h-96" />
+              </div>
             </div>
           </main>
         </div>
@@ -194,102 +241,203 @@ export default function MyOrders() {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+        <main className="flex-1 flex flex-col min-w-0">
+          {/* Mobile Header avec Hamburger et Icône */}
+          <MobileHeader />
+          
+          {/* Contenu principal */}
+          <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
+            <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+              {/* Header - Desktop seulement */}
+              <div className="hidden lg:block space-y-2">
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => navigate('/account')}
+                    className="touch-manipulation"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
-                  <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <ShoppingBag className="h-8 w-8" />
-                    Mes Commandes
+                  <h1 className="text-3xl lg:text-4xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-50">
+                    <ShoppingBag className="h-8 w-8 text-primary" />
+                    <span>Mes Commandes</span>
                   </h1>
                 </div>
-                <p className="text-muted-foreground">
+                <p className="text-base text-gray-600 dark:text-gray-400">
                   Consultez toutes vos commandes et leur statut
                 </p>
               </div>
-            </div>
 
-            {/* Filters */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Search */}
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              {/* Recherche */}
+              <Card className="border shadow-sm">
+                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                     <Input
                       placeholder="Rechercher par numéro de commande ou produit..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-9 sm:pl-10 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
                     />
                   </div>
+                </CardContent>
+              </Card>
 
-                  {/* Status Filter */}
-                  <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as OrderStatus)}>
-                    <TabsList>
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="pending">En attente</TabsTrigger>
-                      <TabsTrigger value="processing">En traitement</TabsTrigger>
-                      <TabsTrigger value="completed">Terminées</TabsTrigger>
-                      <TabsTrigger value="cancelled">Annulées</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-
-                  {/* Type Filter */}
-                  <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as ProductType)}>
-                    <TabsList>
-                      <TabsTrigger value="all">Tous types</TabsTrigger>
-                      <TabsTrigger value="digital">Digitaux</TabsTrigger>
-                      <TabsTrigger value="physical">Physiques</TabsTrigger>
-                      <TabsTrigger value="service">Services</TabsTrigger>
-                      <TabsTrigger value="course">Cours</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Orders List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {orders?.length || 0} {orders?.length === 1 ? 'commande' : 'commandes'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {!orders || orders.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Aucune commande</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Vous n'avez pas encore passé de commande
-                    </p>
-                    <Button onClick={() => navigate('/marketplace')}>
-                      Découvrir la marketplace
-                    </Button>
+              {/* Filtres - Scroll horizontal sur mobile */}
+              <div className="space-y-3 sm:space-y-4">
+                {/* Filtre Statut */}
+                <div className="relative w-full">
+                  {/* Indicateur de scroll à gauche (mobile uniquement) */}
+                  <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-900 pointer-events-none z-10 lg:hidden" aria-hidden="true"></div>
+                  
+                  {/* Indicateur de scroll à droite (mobile uniquement) */}
+                  <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 pointer-events-none z-10 lg:hidden" aria-hidden="true"></div>
+                  
+                  <div 
+                    className="overflow-x-auto overflow-y-hidden -mx-2.5 sm:-mx-3 md:mx-0 px-2.5 sm:px-3 md:px-0 scrollbar-hide scroll-smooth"
+                    style={{
+                      scrollbarWidth: 'none',
+                      msOverflowStyle: 'none',
+                      WebkitOverflowScrolling: 'touch',
+                    }}
+                  >
+                    <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as OrderStatus)}>
+                      <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <TabsTrigger 
+                          value="all" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Tous
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="pending" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          En attente
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="processing" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          En traitement
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="completed" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Terminées
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="cancelled" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Annulées
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <Card key={order.id} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <CardTitle className="flex items-center gap-2">
-                                <Package className="h-5 w-5" />
-                                Commande #{order.order_number}
-                              </CardTitle>
-                              <CardDescription className="flex items-center gap-2 mt-1">
-                                <Calendar className="h-4 w-4" />
+                </div>
+
+                {/* Filtre Type */}
+                <div className="relative w-full">
+                  {/* Indicateur de scroll à gauche (mobile uniquement) */}
+                  <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-900 pointer-events-none z-10 lg:hidden" aria-hidden="true"></div>
+                  
+                  {/* Indicateur de scroll à droite (mobile uniquement) */}
+                  <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 pointer-events-none z-10 lg:hidden" aria-hidden="true"></div>
+                  
+                  <div 
+                    className="overflow-x-auto overflow-y-hidden -mx-2.5 sm:-mx-3 md:mx-0 px-2.5 sm:px-3 md:px-0 scrollbar-hide scroll-smooth"
+                    style={{
+                      scrollbarWidth: 'none',
+                      msOverflowStyle: 'none',
+                      WebkitOverflowScrolling: 'touch',
+                    }}
+                  >
+                    <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as ProductType)}>
+                      <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <TabsTrigger 
+                          value="all" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Tous types
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="digital" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Digitaux
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="physical" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Physiques
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="service" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Services
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="course" 
+                          className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                        >
+                          Cours
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
+                </div>
+              </div>
+
+              {/* Résumé */}
+              <div className="px-2.5 sm:px-0">
+                <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-50">
+                  {orders?.length || 0} {orders?.length === 1 ? 'commande' : 'commandes'}
+                </p>
+              </div>
+
+              {/* Liste des Commandes */}
+              {!orders || orders.length === 0 ? (
+                <Card className="border shadow-sm">
+                  <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 px-4 sm:px-6">
+                    <div className="text-center space-y-4">
+                      <Package className="h-16 w-16 sm:h-20 sm:w-20 mx-auto text-gray-400 dark:text-gray-500" />
+                      <div className="space-y-2">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50">
+                          Aucune commande
+                        </h3>
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                          Vous n'avez pas encore passé de commande
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={() => navigate('/marketplace')}
+                        className="mt-4 min-h-[44px] touch-manipulation"
+                        size="lg"
+                      >
+                        Découvrir la marketplace
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3 sm:space-y-4">
+                  {orders.map((order) => (
+                    <Card key={order.id} className="border shadow-sm hover:shadow-md transition-shadow duration-200">
+                      <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 pt-4 sm:pt-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-gray-900 dark:text-gray-50">
+                              <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+                              <span className="truncate">Commande #{order.order_number}</span>
+                            </CardTitle>
+                            <CardDescription className="flex items-center gap-2 mt-1.5 sm:mt-2 text-xs sm:text-sm">
+                              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                              <span className="truncate">
                                 {new Date(order.created_at).toLocaleDateString('fr-FR', {
                                   year: 'numeric',
                                   month: 'long',
@@ -297,74 +445,82 @@ export default function MyOrders() {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })}
-                              </CardDescription>
-                            </div>
-                            <div className="flex items-center gap-4">
+                              </span>
+                            </CardDescription>
+                          </div>
+                          <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-shrink-0">
+                            <div className="flex-shrink-0">
                               {getStatusBadge(order.status, order.payment_status)}
-                              <div className="text-right">
-                                <p className="font-bold text-lg">
-                                  {order.total_amount.toLocaleString('fr-FR')} {order.currency}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {order.items.length} {order.items.length === 1 ? 'article' : 'articles'}
-                                </p>
-                              </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="font-bold text-base sm:text-lg text-gray-900 dark:text-gray-50">
+                                {order.total_amount.toLocaleString('fr-FR')} {order.currency}
+                              </p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">
+                                {order.items.length} {order.items.length === 1 ? 'article' : 'articles'}
+                              </p>
                             </div>
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          {/* Order Items */}
-                          <div className="space-y-2 mb-4">
-                            {order.items.map((item) => (
-                              <div
-                                key={item.id}
-                                className="flex items-center justify-between p-3 border rounded-lg"
-                              >
-                                <div className="flex items-center gap-3">
+                        </div>
+                      </CardHeader>
+                      <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+                        {/* Order Items */}
+                        <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                          {order.items.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 border rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                            >
+                              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                                <div className="flex-shrink-0 text-primary">
                                   {getProductTypeIcon(item.product_type)}
-                                  <div>
-                                    <p className="font-medium">{item.product_name}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                      {item.quantity}x {item.unit_price.toLocaleString('fr-FR')} {order.currency}
-                                    </p>
-                                  </div>
                                 </div>
-                                <p className="font-semibold">
-                                  {item.total_price.toLocaleString('fr-FR')} {order.currency}
-                                </p>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-50 truncate">
+                                    {item.product_name}
+                                  </p>
+                                  <p className="text-xs sm:text-sm text-muted-foreground">
+                                    {item.quantity}x {item.unit_price.toLocaleString('fr-FR')} {order.currency}
+                                  </p>
+                                </div>
                               </div>
-                            ))}
-                          </div>
+                              <p className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-50 flex-shrink-0 sm:text-right">
+                                {item.total_price.toLocaleString('fr-FR')} {order.currency}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
 
-                          {/* Actions */}
-                          <div className="flex gap-2">
+                        {/* Actions */}
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                          <Button
+                            variant="outline"
+                            onClick={() => navigate(`/orders/${order.id}`)}
+                            className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-sm sm:text-base"
+                          >
+                            <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                            <span className="truncate">Voir les détails</span>
+                          </Button>
+                          {order.payment_status === 'completed' && (
                             <Button
                               variant="outline"
-                              onClick={() => navigate(`/orders/${order.id}`)}
+                              onClick={() => {
+                                // TODO: Download invoice
+                                alert('Téléchargement facture (à implémenter)');
+                              }}
+                              className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-sm sm:text-base"
                             >
-                              <Eye className="h-4 w-4 mr-2" />
-                              Voir les détails
+                              <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                              <span className="truncate">Télécharger facture</span>
                             </Button>
-                            {order.payment_status === 'completed' && (
-                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                  // TODO: Download invoice
-                                  alert('Téléchargement facture (à implémenter)');
-                                }}
-                              >
-                                <Download className="h-4 w-4 mr-2" />
-                                Télécharger facture
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </main>
       </div>

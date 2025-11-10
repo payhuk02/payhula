@@ -56,6 +56,7 @@ import {
   Camera,
   Globe,
   Trophy,
+  ArrowRight,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -868,6 +869,8 @@ export function AppSidebar() {
                     logger.warn('Menu item missing icon:', item.title);
                     return null;
                   }
+                  // Afficher une flèche pour "Mes Commandes" pour améliorer la visibilité
+                  const showArrow = item.title === "Mes Commandes";
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
@@ -875,15 +878,29 @@ export function AppSidebar() {
                           to={item.url}
                           end={item.url === "/dashboard"}
                           className={({ isActive }) =>
-                            `transition-all duration-300 ${
+                            `transition-all duration-300 group relative flex items-center ${
                               isActive
                                 ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
                                 : "!text-black hover:bg-muted hover:translate-x-1"
                             }`
                           }
                         >
-                          <IconComponent className="h-4 w-4" />
-                          {!isCollapsed && <span>{item.title}</span>}
+                          <IconComponent 
+                            className={`${showArrow ? 'h-5 w-5 text-primary mr-2' : 'h-4 w-4'} flex-shrink-0`}
+                            style={showArrow ? { strokeWidth: 2.5 } : undefined}
+                          />
+                          {!isCollapsed && (
+                            <>
+                              <span className={`flex-1 ${showArrow ? 'font-semibold' : 'font-medium'}`}>{item.title}</span>
+                              {showArrow && (
+                                <ArrowRight 
+                                  className="h-5 w-5 ml-auto flex-shrink-0 text-primary opacity-90 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" 
+                                  style={{ strokeWidth: 2.5 }}
+                                  aria-hidden="true"
+                                />
+                              )}
+                            </>
+                          )}
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
