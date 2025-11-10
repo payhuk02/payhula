@@ -13,3 +13,5 @@ COMMENT ON COLUMN public.products.is_featured IS 'Indique si le produit est mis 
 
 
 
+
+

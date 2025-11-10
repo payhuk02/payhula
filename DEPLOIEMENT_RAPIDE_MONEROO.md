@@ -92,3 +92,5 @@ Pour plus de détails, consultez :
 - **GUIDE_DEPLOIEMENT_MONEROO_DASHBOARD.md** (guide détaillé)
 - **CORRECTION_ERREUR_FAILED_TO_FETCH.md** (diagnostic des erreurs)
 
+
+

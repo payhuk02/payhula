@@ -94,3 +94,5 @@ CREATE INDEX IF NOT EXISTS idx_stock_alerts_created_at ON public.stock_alerts(cr
 
 
 
+
+

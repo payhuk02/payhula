@@ -409,3 +409,5 @@ COMMENT ON FUNCTION public.record_price_history() IS 'Enregistre l''historique d
 
 
 
+
+

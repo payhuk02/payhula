@@ -1,111 +1,107 @@
-# 🔧 Correction : Endpoint Moneroo Incorrect
+# 🔧 Correction de l'Endpoint Moneroo - Erreur 404
 
-## 📋 Problème Identifié
+## 📊 Analyse des Logs
 
-D'après les logs Supabase Edge Functions, l'erreur suivante apparaît :
+D'après les logs Supabase, l'erreur suivante apparaît :
 
 ```
-Moneroo API error: {
-  message: "The route v1/checkout/initialize could not be found.",
-  data: null,
-  errors: []
+ERROR Moneroo API error: { status: 404, statusText: "Not Found", response: { message: "The route v1/checkout could not be..." }
+```
+
+**Problème identifié :** L'endpoint `/v1/checkout` n'existe pas dans l'API Moneroo.
+
+## ✅ Solution
+
+L'API Moneroo utilise `/payments` pour créer les paiements, pas `/checkout`. 
+
+### Correction appliquée
+
+L'endpoint `create_checkout` a été modifié pour utiliser `/payments` au lieu de `/checkout`.
+
+**Avant :**
+```typescript
+case 'create_checkout':
+  endpoint = '/checkout';  // ❌ N'existe pas
+  method = 'POST';
+  break;
+```
+
+**Après :**
+```typescript
+case 'create_checkout':
+  // Utiliser /payments pour créer un paiement avec checkout
+  // Moneroo utilise /payments pour créer les paiements (pas /checkout)
+  endpoint = '/payments';  // ✅ Endpoint correct
+  method = 'POST';
+  break;
+```
+
+## 🚀 Actions Requises
+
+1. **Mettre à jour l'Edge Function dans Supabase Dashboard**
+   - Copier le code corrigé depuis `MONEROO_CODE_COMPLET_A_COLLER.ts`
+   - Coller dans l'éditeur Supabase Dashboard
+   - Cliquer sur "Deploy updates"
+
+2. **Tester le paiement**
+   - Après le déploiement, tester un paiement depuis l'application
+   - Vérifier que l'erreur 404 n'apparaît plus dans les logs
+   - Vérifier que le paiement est créé avec succès
+
+## 📋 Vérifications
+
+### Logs attendus après correction
+
+**Avant (erreur) :**
+```
+ERROR Moneroo API error: { status: 404, statusText: "Not Found", response: { message: "The route v1/checkout could not be..." }
+```
+
+**Après (succès) :**
+```
+INFO [Moneroo Edge Function] Calling Moneroo API: { url: "https://api.moneroo.io/v1/payments", method: "POST", hasBody: true }
+INFO [Moneroo Edge Function] Moneroo API response: { status: 200, statusText: "OK", ok: true }
+INFO Moneroo response success: { action: "create_checkout", status: 200 }
+```
+
+## 🔍 Détails Techniques
+
+### Structure de l'API Moneroo
+
+- **Créer un paiement :** `POST /v1/payments`
+- **Récupérer un paiement :** `GET /v1/payments/:paymentId`
+- **Vérifier un paiement :** `GET /v1/payments/:paymentId/verify`
+- **Rembourser un paiement :** `POST /v1/payments/:paymentId/refund`
+- **Annuler un paiement :** `POST /v1/payments/:paymentId/cancel`
+
+### Format des données pour create_checkout
+
+Les données sont formatées comme suit :
+
+```typescript
+{
+  amount: number,
+  currency: string, // Par défaut 'XOF'
+  description: string,
+  customer_email: string,
+  customer_name: string,
+  return_url: string,
+  cancel_url: string,
+  metadata: object
 }
 ```
 
-## 🔍 Analyse
+## 📝 Notes
 
-L'endpoint `/checkout/initialize` n'existe pas dans l'API Moneroo. Il faut vérifier la documentation Moneroo pour trouver le bon endpoint.
+- L'endpoint `/checkout` n'existe pas dans l'API Moneroo
+- Tous les paiements (y compris les checkouts) utilisent `/payments`
+- Les paramètres `return_url` et `cancel_url` permettent de gérer la redirection après paiement
+- Le format des données reste le même, seul l'endpoint change
 
-## ✅ Solutions Possibles
+## ✅ Résultat Attendu
 
-### Solution 1: Utiliser l'endpoint `/checkout` (sans `/initialize`)
-
-L'endpoint pourrait être simplement `/checkout` au lieu de `/checkout/initialize`.
-
-**Code corrigé :**
-```typescript
-case 'create_checkout':
-  endpoint = '/checkout';  // Au lieu de '/checkout/initialize'
-  method = 'POST';
-  break;
-```
-
-### Solution 2: Utiliser l'endpoint `/payments`
-
-L'API Moneroo pourrait utiliser `/payments` pour créer un checkout.
-
-**Code corrigé :**
-```typescript
-case 'create_checkout':
-  endpoint = '/payments';  // Utiliser /payments pour créer un checkout
-  method = 'POST';
-  break;
-```
-
-### Solution 3: Vérifier la Documentation Moneroo
-
-**Actions requises :**
-1. Consulter la documentation officielle Moneroo
-2. Vérifier l'URL de base de l'API
-3. Vérifier les endpoints disponibles
-4. Corriger le code selon la documentation
-
-## 🔗 Documentation Moneroo
-
-- **Dashboard Moneroo** : https://moneroo.io/dashboard
-- **Documentation API** : Vérifier dans le dashboard Moneroo → Documentation
-- **Support** : Contacter le support Moneroo si nécessaire
-
-## 📝 Prochaines Étapes
-
-1. **Vérifier la documentation Moneroo** pour l'endpoint correct
-2. **Tester différents endpoints** :
-   - `/checkout`
-   - `/payments`
-   - `/v1/checkout`
-   - Autre endpoint selon la documentation
-3. **Mettre à jour le code** avec le bon endpoint
-4. **Redéployer l'Edge Function**
-5. **Tester à nouveau**
-
-## 🎯 Endpoints à Tester
-
-### Test 1: `/checkout`
-```typescript
-endpoint = '/checkout';
-```
-
-### Test 2: `/payments`
-```typescript
-endpoint = '/payments';
-```
-
-### Test 3: `/v1/checkout`
-```typescript
-endpoint = '/v1/checkout';
-```
-
-### Test 4: Endpoint selon documentation
-Vérifier la documentation Moneroo pour l'endpoint exact.
-
-## ⚠️ Important
-
-**Avant de corriger :**
-1. Vérifier la documentation officielle Moneroo
-2. Tester l'endpoint avec Postman ou curl
-3. Vérifier le format des données attendu par Moneroo
-4. Vérifier l'authentification (Bearer token, header, etc.)
-
-## 🔧 Correction Temporaire
-
-En attendant de vérifier la documentation, j'ai modifié le code pour :
-1. Utiliser `/checkout` au lieu de `/checkout/initialize`
-2. Formater les données selon le format Moneroo attendu
-3. Ajouter des logs pour diagnostic
-
-**Si l'erreur persiste :**
-1. Vérifier la documentation Moneroo
-2. Contacter le support Moneroo
-3. Tester avec Postman pour trouver le bon endpoint
-
-
+Après la correction :
+- ✅ Plus d'erreur 404 dans les logs
+- ✅ Les paiements sont créés avec succès
+- ✅ Les URLs de checkout sont retournées correctement
+- ✅ Les redirections fonctionnent après paiement

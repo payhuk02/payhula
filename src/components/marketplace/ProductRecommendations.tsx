@@ -258,7 +258,13 @@ export function PersonalizedRecommendations({
     }));
   }, [recommendations]);
 
-  if (!userId || error) {
+  // Ne pas afficher si pas d'userId, mais ignorer les erreurs (fonction peut ne pas exister)
+  if (!userId) {
+    return null;
+  }
+  
+  // Si erreur, ne pas afficher mais ne pas bloquer le reste de la page
+  if (error) {
     return null;
   }
 

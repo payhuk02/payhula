@@ -80,6 +80,13 @@ export function useUserProductRecommendations(
         return [];
       }
 
+      // Valider que userId est un UUID valide
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userId)) {
+        logger.warn('Invalid userId format for recommendations:', userId);
+        return [];
+      }
+
       try {
         const { data, error } = await supabase.rpc('get_user_product_recommendations', {
           p_user_id: userId,
@@ -87,19 +94,66 @@ export function useUserProductRecommendations(
         });
 
         if (error) {
-          logger.error('Error fetching user product recommendations:', error);
-          throw error;
+          // Codes d'erreur PostgreSQL/Supabase courants
+          const errorCode = error.code;
+          const errorMessage = error.message || '';
+          
+          // Fonction n'existe pas (42883 = undefined_function)
+          if (errorCode === '42883' || 
+              errorMessage.includes('does not exist') || 
+              (errorMessage.includes('function') && errorMessage.includes('does not exist'))) {
+            logger.warn('get_user_product_recommendations function does not exist. Run FIX_GET_USER_PRODUCT_RECOMMENDATIONS.sql to create it.');
+            return [];
+          }
+          
+          // Erreur de paramètres invalides (P0001 = raise_exception, 22023 = invalid_parameter_value)
+          if (errorCode === 'P0001' || errorCode === '22023' || errorMessage.includes('invalid input') || errorMessage.includes('invalid parameter')) {
+            logger.warn('Invalid parameters for get_user_product_recommendations:', errorMessage);
+            return [];
+          }
+          
+          // Erreur 400 Bad Request (généralement problème de format ou de validation)
+          if (errorCode === 'PGRST116' || errorMessage.includes('Bad Request') || errorMessage.includes('400')) {
+            logger.warn('Bad Request error for get_user_product_recommendations. This may indicate the function needs to be recreated or tables are missing.');
+            console.warn('Error details:', {
+              code: errorCode,
+              message: errorMessage,
+              details: error.details,
+              hint: error.hint,
+            });
+            return [];
+          }
+          
+          // Erreur de permissions (42501 = insufficient_privilege)
+          if (errorCode === '42501' || errorMessage.includes('permission denied')) {
+            logger.warn('Permission denied for get_user_product_recommendations. Check RLS policies.');
+            return [];
+          }
+          
+          // Pour toutes les autres erreurs, logger en warning (non-critique)
+          logger.warn('Error fetching user product recommendations (non-critical):', {
+            code: errorCode,
+            message: errorMessage,
+            details: error.details,
+            hint: error.hint,
+            userId,
+          });
+          
+          // Retourner un tableau vide au lieu de lever une erreur pour ne pas bloquer l'UI
+          return [];
         }
 
         return (data || []) as ProductRecommendation[];
       } catch (error) {
-        logger.error('Error in useUserProductRecommendations:', error);
+        // Capturer toutes les erreurs et retourner un tableau vide
+        logger.warn('Error in useUserProductRecommendations (non-critical):', error);
         return [];
       }
     },
     enabled: enabled && !!userId,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
+    retry: false, // Ne pas réessayer en cas d'erreur pour éviter le spam
   });
 }
 

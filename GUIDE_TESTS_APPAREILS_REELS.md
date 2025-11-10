@@ -352,3 +352,4 @@ Les formulaires sont difficiles à remplir sur mobile.
 **Statut** : ✅ **GUIDE COMPLET**  
 **Recommandation** : Tester sur appareils réels avant la mise en production
 
+

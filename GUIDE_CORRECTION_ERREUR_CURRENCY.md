@@ -164,3 +164,5 @@ Si l'erreur persiste après avoir exécuté la migration :
 - [Documentation PostgreSQL - ALTER TABLE](https://www.postgresql.org/docs/current/sql-altertable.html)
 
 
+
+

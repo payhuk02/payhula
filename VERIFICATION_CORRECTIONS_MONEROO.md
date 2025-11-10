@@ -138,3 +138,4 @@ L'erreur Sentry 429 est **en cours de correction** avec des améliorations de ra
 3. Tester un paiement complet
 4. Surveiller les erreurs Sentry
 
+

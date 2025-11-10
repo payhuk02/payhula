@@ -234,3 +234,4 @@ Tous les composants de l'intégration Moneroo sont présents et opérationnels d
 
 **Prochaine étape** : Effectuer les tests de paiement en conditions réelles pour valider le fonctionnement complet.
 
+

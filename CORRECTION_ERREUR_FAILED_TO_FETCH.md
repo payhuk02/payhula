@@ -129,3 +129,5 @@ Si l'erreur "Failed to fetch" persiste après le redéploiement :
 - [Supabase Edge Functions Logs](https://supabase.com/docs/guides/functions/debugging)
 - [Supabase Edge Functions Secrets](https://supabase.com/docs/guides/functions/secrets)
 
+
+

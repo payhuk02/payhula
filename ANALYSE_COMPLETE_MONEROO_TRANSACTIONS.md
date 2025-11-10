@@ -644,3 +644,4 @@ L'intégration Moneroo est **complète et opérationnelle** dans toute l'applica
 **Statut** : ✅ **OPÉRATIONNEL**  
 **Prochaine étape** : Tests de paiement en conditions réelles
 
+

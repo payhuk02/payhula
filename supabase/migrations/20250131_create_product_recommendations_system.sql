@@ -440,3 +440,5 @@ COMMENT ON FUNCTION public.get_frequently_bought_together(UUID, INTEGER) IS
 
 
 
+
+

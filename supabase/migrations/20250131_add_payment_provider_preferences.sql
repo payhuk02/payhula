@@ -46,3 +46,5 @@ ON public.stores USING GIN(enabled_payment_providers);
 
 
 
+
+
