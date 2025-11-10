@@ -212,12 +212,27 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
 
     logger.log("Moneroo response:", monerooResponse);
 
-    // 4. Mettre à jour la transaction avec les infos Moneroo
+    // 4. Extraire les données de la réponse Moneroo
+    // Selon la documentation Moneroo : https://docs.moneroo.io/
+    // La réponse Moneroo est : { message: "...", data: { id: "...", checkout_url: "..." } }
+    // L'Edge Function retourne : { success: true, data: { message: "...", data: { id: "...", checkout_url: "..." } } }
+    // Dans moneroo-client.ts, on retourne response.data, donc monerooResponse est : { message: "...", data: { id: "...", checkout_url: "..." } }
+    // Il faut donc accéder à monerooResponse.data.checkout_url et monerooResponse.data.id
+    const monerooData = (monerooResponse as any).data || monerooResponse;
+    const checkoutUrl = monerooData?.checkout_url || (monerooResponse as any).checkout_url;
+    const transactionId = monerooData?.id || (monerooResponse as any).id || (monerooResponse as any).transaction_id;
+
+    if (!checkoutUrl) {
+      logger.error("Moneroo response missing checkout_url:", monerooResponse);
+      throw new Error("La réponse Moneroo ne contient pas d'URL de checkout. Vérifiez les logs Supabase pour plus de détails.");
+    }
+
+    // 5. Mettre à jour la transaction avec les infos Moneroo
     const { error: updateError } = await supabase
       .from("transactions")
       .update({
-        moneroo_transaction_id: monerooResponse.transaction_id || monerooResponse.id,
-        moneroo_checkout_url: monerooResponse.checkout_url,
+        moneroo_transaction_id: transactionId,
+        moneroo_checkout_url: checkoutUrl,
         moneroo_response: monerooResponse,
         status: "processing",
       })
@@ -227,7 +242,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       logger.error("Error updating transaction:", updateError);
     }
 
-    // 5. Log du paiement initié
+    // 6. Log du paiement initié
     await supabase.from("transaction_logs").insert([{
       transaction_id: transaction.id,
       event_type: "payment_initiated",
@@ -235,12 +250,12 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       response_data: monerooResponse,
     }]);
 
-    // 6. Retourner les données pour redirection
+    // 7. Retourner les données pour redirection
     return {
       success: true,
       transaction_id: transaction.id,
-      checkout_url: monerooResponse.checkout_url,
-      moneroo_transaction_id: monerooResponse.transaction_id || monerooResponse.id,
+      checkout_url: checkoutUrl,
+      moneroo_transaction_id: transactionId,
     };
     } catch (error: unknown) {
       const monerooError = parseMonerooError(error);

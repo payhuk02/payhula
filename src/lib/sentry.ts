@@ -16,20 +16,22 @@ export const initSentry = () => {
     return;
   }
 
-  // Valider le format du DSN
-  try {
-    // Vérifier que le DSN est valide
-    // Formats supportés :
-    // 1. https://xxx@xxx.ingest.sentry.io/xxx (format classique avec @)
-    // 2. https://[long-hex-string].ingest.de.sentry.io/xxx (format nouveau sans @)
-    // 3. https://xxx.ingest.sentry.io/xxx (format standard)
-    const dsnPattern = /^https:\/\/([a-f0-9]+@)?[a-f0-9.-]+\.ingest\.(sentry\.io|de\.sentry\.io)\/[0-9]+$/;
-    if (!SENTRY_DSN.match(dsnPattern)) {
-      logger.error('Invalid Sentry Dsn:', SENTRY_DSN);
-      return;
-    }
-  } catch (error) {
-    logger.error('Erreur lors de la validation du DSN Sentry:', error);
+  // Valider le format du DSN de manière plus permissive
+  // Sentry validera le DSN de toute façon, donc on évite de bloquer l'initialisation
+  // Si le DSN est invalide, Sentry le détectera et ne l'utilisera pas silencieusement
+  if (!SENTRY_DSN || typeof SENTRY_DSN !== 'string' || SENTRY_DSN.trim().length === 0) {
+    logger.warn('Sentry DSN est vide ou invalide. Error tracking désactivé.', {
+      environment: ENV,
+    });
+    return;
+  }
+  
+  // Vérification basique : doit commencer par https://
+  if (!SENTRY_DSN.startsWith('https://')) {
+    logger.warn('Sentry DSN doit commencer par https://. Error tracking désactivé.', {
+      environment: ENV,
+      dsnPrefix: SENTRY_DSN.substring(0, 20) + '...',
+    });
     return;
   }
 
