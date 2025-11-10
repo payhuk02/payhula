@@ -869,8 +869,8 @@ export function AppSidebar() {
                     logger.warn('Menu item missing icon:', item.title);
                     return null;
                   }
-                  // Afficher une flèche pour "Mes Commandes" et "Commandes Multi-Stores" pour améliorer la visibilité
-                  const showArrow = item.title === "Mes Commandes" || item.title === "Commandes Multi-Stores";
+                  // Afficher une flèche pour "Mes Commandes", "Commandes Multi-Stores" et "Mes Téléchargements" pour améliorer la visibilité
+                  const showArrow = item.title === "Mes Commandes" || item.title === "Commandes Multi-Stores" || item.title === "Mes Téléchargements";
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
