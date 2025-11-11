@@ -27,16 +27,20 @@ export const GamificationDashboard = () => {
   // Utiliser useAuth normalement comme dans les autres composants
   const { user, loading: authLoading } = useAuth();
 
+  // Extraire user?.id une seule fois pour éviter les recalculs
+  const userId = user?.id;
+
   // Appeler tous les hooks AVANT le return conditionnel (règle de React)
-  // Les hooks React Query sont automatiquement désactivés si user est null grâce à 'enabled'
-  const { data: gamification, isLoading } = useUserGamification(user?.id);
-  const { data: badges = [] } = useUserBadges(user?.id);
-  const { data: achievements = [] } = useUserAchievements(user?.id);
-  const { data: leaderboard = [] } = useGlobalLeaderboard(10);
-  const { data: pointsHistory = [] } = usePointsHistory(user?.id, 10);
+  // Les hooks React Query sont automatiquement désactivés si userId est undefined grâce à 'enabled'
+  // Passer userId explicitement pour éviter les appels multiples à useAuth dans les hooks
+  const { data: gamification, isLoading: isLoadingGamification } = useUserGamification(userId);
+  const { data: badges = [], isLoading: isLoadingBadges } = useUserBadges(userId);
+  const { data: achievements = [], isLoading: isLoadingAchievements } = useUserAchievements(userId);
+  const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useGlobalLeaderboard(10);
+  const { data: pointsHistory = [], isLoading: isLoadingPoints } = usePointsHistory(userId, 10);
 
   // Si l'utilisateur n'est pas encore chargé, afficher un skeleton
-  if (authLoading || !user) {
+  if (authLoading || !user || !userId) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-32 w-full" />
@@ -45,6 +49,10 @@ export const GamificationDashboard = () => {
     );
   }
 
+  // Combiner tous les états de chargement
+  const isLoading = isLoadingGamification || isLoadingBadges || isLoadingAchievements || isLoadingLeaderboard || isLoadingPoints;
+
+  // Afficher le skeleton pendant le chargement
   if (isLoading) {
     return (
       <div className="space-y-4">

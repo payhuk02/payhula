@@ -1,37 +1,38 @@
 /**
- * Error Boundary avancée avec logging et UI personnalisable
+ * Error Boundary simplifié et autonome pour la page Gamification
+ * N'importe PAS ErrorFallback pour éviter les problèmes de bundling en production
  */
 
-import React, { Component, ReactNode, Suspense, lazy } from 'react';
-import { logError } from '@/lib/error-logger';
+import React, { Component, ReactNode } from 'react';
 
-// Lazy load ErrorFallback pour éviter les problèmes de bundling en production
-const ErrorFallback = lazy(() => import('./ErrorFallback').then(module => ({ default: module.ErrorFallback })));
-
-interface ErrorBoundaryProps {
+interface GamificationErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
-  level?: 'app' | 'page' | 'section' | 'component';
 }
 
-interface ErrorBoundaryState {
+interface GamificationErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
-  errorInfo: React.ErrorInfo | null;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+/**
+ * Error Boundary simplifié spécifique pour Gamification
+ * Ne dépend d'aucun composant externe pour éviter les problèmes de bundling
+ */
+export class GamificationErrorBoundary extends Component<
+  GamificationErrorBoundaryProps,
+  GamificationErrorBoundaryState
+> {
+  constructor(props: GamificationErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null,
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): Partial<GamificationErrorBoundaryState> {
     return {
       hasError: true,
       error,
@@ -39,13 +40,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log l'erreur
-    logError(error, {
-      componentStack: errorInfo.componentStack,
-      level: this.props.level || 'component',
-    });
+    // Log simple dans la console pour éviter les dépendances
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Gamification Error:', error, errorInfo);
+    }
 
-    // Callback personnalisé
+    // Callback personnalisé si fourni
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
@@ -53,7 +53,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // Mettre à jour l'état
     this.setState({
       error,
-      errorInfo,
     });
   }
 
@@ -61,19 +60,18 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({
       hasError: false,
       error: null,
-      errorInfo: null,
     });
   };
 
   render() {
     if (this.state.hasError) {
-      // Utiliser le fallback personnalisé ou le fallback par défaut
+      // Si un fallback personnalisé est fourni, l'utiliser
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
-      // Fallback minimal en cas d'erreur de chargement du lazy component
-      const FallbackMinimal = () => (
+      // Fallback minimal par défaut (ne devrait jamais être utilisé car on fournit toujours un fallback)
+      return (
         <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg">
           <div className="flex items-center gap-3">
             <svg
@@ -104,33 +102,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           </div>
         </div>
       );
-
-      return (
-        <Suspense fallback={<FallbackMinimal />}>
-          <ErrorFallback
-            error={this.state.error}
-            resetError={this.handleReset}
-            level={this.props.level || 'component'}
-          />
-        </Suspense>
-      );
     }
 
     return this.props.children;
   }
-}
-
-/**
- * HOC pour envelopper un composant avec une Error Boundary
- */
-export function withErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
-) {
-  return (props: P) => (
-    <ErrorBoundary {...errorBoundaryProps}>
-      <Component {...props} />
-    </ErrorBoundary>
-  );
 }
 

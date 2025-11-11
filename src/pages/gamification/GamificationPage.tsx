@@ -8,10 +8,8 @@
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { GamificationDashboard } from '@/components/gamification/GamificationDashboard';
-import { ErrorBoundary } from '@/components/error/ErrorBoundary';
-import { Trophy, Menu, RefreshCw } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { GamificationErrorBoundary } from '@/components/gamification/GamificationErrorBoundary';
+import { Trophy, Menu } from 'lucide-react';
 
 // Composant interne pour utiliser useSidebar
 function MobileHeader() {
@@ -66,29 +64,57 @@ export default function GamificationPage() {
                 </p>
               </div>
 
-              {/* ErrorBoundary pour capturer les erreurs avec fallback simple */}
-              <ErrorBoundary
-                level="section"
+              {/* ErrorBoundary simplifié pour capturer les erreurs avec fallback autonome */}
+              <GamificationErrorBoundary
                 fallback={
-                  <Alert variant="destructive" className="m-4">
-                    <AlertTitle>Erreur de chargement</AlertTitle>
-                    <AlertDescription className="mt-2 space-y-3">
-                      <p>Une erreur s'est produite lors du chargement de la page de gamification.</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.location.reload()}
-                        className="gap-2"
-                      >
-                        <RefreshCw className="h-3 w-3" />
-                        Recharger la page
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
+                  <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/10">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="h-6 w-6 text-red-600 dark:text-red-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                          Erreur de chargement
+                        </h3>
+                        <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                          Une erreur s'est produite lors du chargement de la page de gamification.
+                        </p>
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                          Recharger la page
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 }
               >
                 <GamificationDashboard />
-              </ErrorBoundary>
+              </GamificationErrorBoundary>
             </div>
           </div>
         </main>
