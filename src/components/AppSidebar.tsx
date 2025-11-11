@@ -48,7 +48,6 @@ import {
   Factory,
   Hash,
   Building2,
-  AlertCircle,
   BarChart,
   Layers,
   FileBarChart,
@@ -684,7 +683,7 @@ const adminMenuSections = [
       {
         title: "Monitoring Transactions",
         url: "/admin/transaction-monitoring",
-        icon: AlertCircle,
+        icon: BarChart, // Utiliser BarChart au lieu de AlertCircle pour éviter les problèmes de bundling
       },
     ]
   },

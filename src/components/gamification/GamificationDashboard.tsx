@@ -28,18 +28,21 @@ export const GamificationDashboard = () => {
   const { user, loading: authLoading } = useAuth();
 
   // Extraire user?.id une seule fois pour éviter les recalculs
+  // S'assurer que userId est défini avant d'appeler les hooks
   const userId = user?.id;
 
   // Appeler tous les hooks AVANT le return conditionnel (règle de React)
   // Les hooks React Query sont automatiquement désactivés si userId est undefined grâce à 'enabled'
   // Passer userId explicitement pour éviter les appels multiples à useAuth dans les hooks
+  // Le leaderboard ne nécessite pas d'userId, donc on peut toujours l'appeler
+  const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useGlobalLeaderboard(10);
   const { data: gamification, isLoading: isLoadingGamification } = useUserGamification(userId);
   const { data: badges = [], isLoading: isLoadingBadges } = useUserBadges(userId);
   const { data: achievements = [], isLoading: isLoadingAchievements } = useUserAchievements(userId);
-  const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useGlobalLeaderboard(10);
   const { data: pointsHistory = [], isLoading: isLoadingPoints } = usePointsHistory(userId, 10);
 
   // Si l'utilisateur n'est pas encore chargé, afficher un skeleton
+  // Cette vérification doit être faite APRÈS tous les appels de hooks
   if (authLoading || !user || !userId) {
     return (
       <div className="space-y-4">

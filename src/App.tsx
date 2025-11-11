@@ -20,7 +20,6 @@ import { Suspense, lazy, useEffect } from "react";
 import { initSentry } from "@/lib/sentry";
 import { initWebVitals } from "@/lib/web-vitals";
 import * as Sentry from "@sentry/react";
-import { logger } from "@/lib/logger";
 
 // Composant de chargement pour le lazy loading
 const LoadingFallback = () => (
@@ -32,43 +31,18 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Composant d'erreur pour Sentry avec affichage détaillé en développement
+// Composant d'erreur pour Sentry - Complètement autonome sans dépendances externes
+// pour éviter les problèmes de bundling en production
 const ErrorFallbackComponent = () => {
   const isDev = import.meta.env.DEV;
-  
-  // Utiliser le hook useErrorHandler de Sentry pour obtenir l'erreur
-  // Note: Sentry.ErrorBoundary peut passer l'erreur via le contexte
-  // Pour l'instant, on affiche un message générique et on log dans la console
-  useEffect(() => {
-    // Logger toutes les erreurs non capturées
-    const handleError = (event: ErrorEvent) => {
-      logger.error('Erreur non capturée:', {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        error: event.error,
-      });
-    };
-
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      logger.error('Promesse rejetée non gérée:', {
-        reason: event.reason,
-      });
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, []);
 
   const handleReset = () => {
     // Réessayer en rechargeant la page
     window.location.reload();
+  };
+
+  const handleGoHome = () => {
+    window.location.href = '/';
   };
 
   return (
@@ -76,8 +50,17 @@ const ErrorFallbackComponent = () => {
       <div className="max-w-md w-full p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center">
         <div className="mb-4">
           <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            {/* SVG Alert Icon - Inline pour éviter les problèmes de bundling */}
+            <svg 
+              className="w-8 h-8 text-red-600 dark:text-red-400" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="12" cy="12" r="10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <line x1="12" y1="8" x2="12" y2="12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         </div>
@@ -105,7 +88,7 @@ const ErrorFallbackComponent = () => {
             Recharger la page
           </button>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={handleGoHome}
             className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
           >
             Retour à l'accueil
