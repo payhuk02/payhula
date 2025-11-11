@@ -27,6 +27,14 @@ export const GamificationDashboard = () => {
   // Utiliser useAuth normalement comme dans les autres composants
   const { user, loading: authLoading } = useAuth();
 
+  // Appeler tous les hooks AVANT le return conditionnel (règle de React)
+  // Les hooks React Query sont automatiquement désactivés si user est null grâce à 'enabled'
+  const { data: gamification, isLoading } = useUserGamification(user?.id);
+  const { data: badges = [] } = useUserBadges(user?.id);
+  const { data: achievements = [] } = useUserAchievements(user?.id);
+  const { data: leaderboard = [] } = useGlobalLeaderboard(10);
+  const { data: pointsHistory = [] } = usePointsHistory(user?.id, 10);
+
   // Si l'utilisateur n'est pas encore chargé, afficher un skeleton
   if (authLoading || !user) {
     return (
@@ -36,12 +44,6 @@ export const GamificationDashboard = () => {
       </div>
     );
   }
-
-  const { data: gamification, isLoading } = useUserGamification();
-  const { data: badges = [] } = useUserBadges();
-  const { data: achievements = [] } = useUserAchievements();
-  const { data: leaderboard = [] } = useGlobalLeaderboard(10);
-  const { data: pointsHistory = [] } = usePointsHistory(undefined, 10);
 
   if (isLoading) {
     return (
