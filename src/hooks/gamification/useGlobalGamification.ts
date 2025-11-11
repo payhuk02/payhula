@@ -223,7 +223,14 @@ export const useUserBadges = (userId?: string) => {
         .eq('user_id', targetUserId)
         .order('earned_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        // Si erreur 400/403/406, retourner un tableau vide au lieu de throw
+        if (error.code === 'PGRST116' || error.code === 'PGRST301') {
+          return [] as UserBadge[];
+        }
+        console.warn('Error fetching user badges:', error);
+        return [] as UserBadge[];
+      }
       return (data || []) as UserBadge[];
     },
     enabled: !!targetUserId,
@@ -251,7 +258,14 @@ export const useUserAchievements = (userId?: string) => {
         .eq('user_id', targetUserId)
         .order('earned_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        // Si erreur 400/403/406, retourner un tableau vide au lieu de throw
+        if (error.code === 'PGRST116' || error.code === 'PGRST301') {
+          return [] as UserAchievement[];
+        }
+        console.warn('Error fetching user achievements:', error);
+        return [] as UserAchievement[];
+      }
       return (data || []) as UserAchievement[];
     },
     enabled: !!targetUserId,
@@ -260,12 +274,39 @@ export const useUserAchievements = (userId?: string) => {
 
 /**
  * useGlobalLeaderboard - Récupère le leaderboard global
+ * Note: Essaie d'abord d'utiliser la vue optimisée, sinon récupère les données séparément
  */
 export const useGlobalLeaderboard = (limit: number = 10, period: 'all' | 'monthly' | 'weekly' = 'all') => {
   return useQuery({
     queryKey: ['global-leaderboard', limit, period],
     queryFn: async () => {
-      // Récupérer les données de gamification avec les profils
+      // Essayer d'abord d'utiliser la vue optimisée si elle existe
+      try {
+        const { data: viewData, error: viewError } = await supabase
+          .from('gamification_leaderboard_view')
+          .select('*')
+          .limit(limit);
+
+        if (!viewError && viewData && viewData.length > 0) {
+          // Transformer les données de la vue
+          const leaderboard: LeaderboardEntry[] = viewData.map((entry: any, index: number) => ({
+            user_id: entry.user_id,
+            user_name: entry.user_name || 'Utilisateur',
+            user_avatar: entry.avatar_url || undefined,
+            total_points: entry.total_points || 0,
+            current_level: entry.current_level || 1,
+            current_streak_days: entry.current_streak_days || 0,
+            total_products_purchased: entry.total_products_purchased || 0,
+            rank: index + 1,
+          }));
+          return leaderboard;
+        }
+      } catch (viewErr) {
+        // Si la vue n'existe pas ou échoue, continuer avec la méthode normale
+        console.debug('Leaderboard view not available, using direct query');
+      }
+
+      // Méthode de fallback : récupérer les données de gamification (sans jointure)
       const { data: gamificationData, error: gamificationError } = await supabase
         .from('user_gamification')
         .select(`
@@ -273,81 +314,65 @@ export const useGlobalLeaderboard = (limit: number = 10, period: 'all' | 'monthl
           total_points,
           current_level,
           current_streak_days,
-          total_products_purchased,
-          profile:profiles!user_gamification_user_id_fkey (
-            display_name,
-            first_name,
-            last_name,
-            avatar_url
-          )
+          total_products_purchased
         `)
         .order('total_points', { ascending: false })
         .limit(limit);
 
       if (gamificationError) {
-        // Si l'erreur est due à une jointure avec profiles qui échoue, réessayer sans la jointure
-        if (gamificationError.code === 'PGRST116' || gamificationError.message?.includes('profiles')) {
-          const { data: simpleData, error: simpleError } = await supabase
-            .from('user_gamification')
-            .select(`
-              user_id,
-              total_points,
-              current_level,
-              current_streak_days,
-              total_products_purchased
-            `)
-            .order('total_points', { ascending: false })
-            .limit(limit);
-
-          if (simpleError) throw simpleError;
-
-          // Récupérer les profils séparément
-          const userIds = (simpleData || []).map(entry => entry.user_id);
-          const { data: profilesData } = await supabase
-            .from('profiles')
-            .select('user_id, display_name, first_name, last_name, avatar_url')
-            .in('user_id', userIds);
-
-          // Créer un map des profils
-          const profilesMap = new Map(
-            (profilesData || []).map(profile => [profile.user_id, profile])
-          );
-
-          // Transformer les données
-          const leaderboard: LeaderboardEntry[] = (simpleData || []).map((entry, index) => {
-            const profile = profilesMap.get(entry.user_id);
-            return {
-              user_id: entry.user_id,
-              user_name: profile?.display_name || 
-                        `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 
-                        'Utilisateur',
-              user_avatar: profile?.avatar_url,
-              total_points: entry.total_points,
-              current_level: entry.current_level,
-              current_streak_days: entry.current_streak_days,
-              total_products_purchased: entry.total_products_purchased,
-              rank: index + 1,
-            };
-          });
-
-          return leaderboard;
-        }
-        throw gamificationError;
+        // Gérer toutes les erreurs possibles de manière gracieuse
+        // Erreur 400 peut être due à une syntaxe incorrecte ou RLS
+        // Erreur 403 peut être due à RLS qui bloque
+        // Erreur 406 peut être due à un header Accept incorrect
+        console.warn('Leaderboard: Error fetching data:', {
+          code: gamificationError.code,
+          message: gamificationError.message,
+          details: gamificationError.details,
+          hint: gamificationError.hint,
+        });
+        
+        // Pour toutes les erreurs, retourner un tableau vide pour éviter de casser l'UI
+        // L'utilisateur verra simplement "Aucun classement disponible"
+        return [] as LeaderboardEntry[];
       }
 
-      // Transformer les données avec la jointure profiles
-      const leaderboard: LeaderboardEntry[] = (gamificationData || []).map((entry, index) => {
-        const profile = entry.profile as any;
+      // Si pas de données, retourner un tableau vide
+      if (!gamificationData || gamificationData.length === 0) {
+        return [] as LeaderboardEntry[];
+      }
+
+      // Récupérer les profils séparément pour les user_id trouvés
+      const userIds = gamificationData.map(entry => entry.user_id).filter(Boolean) as string[];
+      
+      let profilesMap = new Map();
+      if (userIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('user_id, display_name, first_name, last_name, avatar_url')
+          .in('user_id', userIds);
+
+        // Ignorer les erreurs de profils (pas critique si les profils ne sont pas disponibles)
+        if (!profilesError && profilesData) {
+          profilesMap = new Map(
+            profilesData.map(profile => [profile.user_id, profile])
+          );
+        }
+      }
+
+      // Transformer les données en combinant gamification et profils
+      const leaderboard: LeaderboardEntry[] = gamificationData.map((entry, index) => {
+        const profile = profilesMap.get(entry.user_id);
         return {
           user_id: entry.user_id,
           user_name: profile?.display_name || 
-                    `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 
-                    'Utilisateur',
-          user_avatar: profile?.avatar_url,
-          total_points: entry.total_points,
-          current_level: entry.current_level,
-          current_streak_days: entry.current_streak_days,
-          total_products_purchased: entry.total_products_purchased,
+                    (profile?.first_name || profile?.last_name 
+                      ? `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim()
+                      : 'Utilisateur'),
+          user_avatar: profile?.avatar_url || undefined,
+          total_points: entry.total_points || 0,
+          current_level: entry.current_level || 1,
+          current_streak_days: entry.current_streak_days || 0,
+          total_products_purchased: entry.total_products_purchased || 0,
           rank: index + 1,
         };
       });
@@ -376,7 +401,14 @@ export const usePointsHistory = (userId?: string, limit: number = 20) => {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
+      if (error) {
+        // Si erreur 400/403/406, retourner un tableau vide au lieu de throw
+        if (error.code === 'PGRST116' || error.code === 'PGRST301') {
+          return [] as PointsHistory[];
+        }
+        console.warn('Error fetching points history:', error);
+        return [] as PointsHistory[];
+      }
       return (data || []) as PointsHistory[];
     },
     enabled: !!targetUserId,

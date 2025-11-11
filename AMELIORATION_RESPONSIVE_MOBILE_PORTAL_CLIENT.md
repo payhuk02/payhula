@@ -440,3 +440,5 @@ SidebarProvider
 **Statut** : ✅ **COMPLÉTÉ**  
 **Recommandation** : Tester sur différents appareils et navigateurs pour valider la responsivité
 
+
+

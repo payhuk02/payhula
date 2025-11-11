@@ -41,3 +41,5 @@ COMMENT ON FUNCTION public.increment_affiliate_link_sales(UUID, NUMERIC, NUMERIC
 
 
 
+
+

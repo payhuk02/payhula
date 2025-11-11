@@ -254,3 +254,5 @@ supabase db execute --file CREER_FONCTION_RECOMMENDATIONS_COMPLETE.sql
 
 
 
+
+

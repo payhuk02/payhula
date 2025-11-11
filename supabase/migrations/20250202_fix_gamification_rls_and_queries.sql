@@ -133,28 +133,36 @@ GRANT EXECUTE ON FUNCTION public.initialize_user_gamification(UUID) TO authentic
 -- S'assurer que la politique public_view_gamification_leaderboard permet bien de voir les données nécessaires
 -- (Elle existe déjà avec USING (TRUE), donc pas besoin de la modifier)
 
--- Vérifier que les politiques sont correctes
-DO $$
-BEGIN
-  -- Vérifier que toutes les politiques nécessaires existent
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies 
-    WHERE tablename = 'user_gamification' 
-    AND policyname = 'users_view_own_gamification'
-  ) THEN
-    CREATE POLICY "users_view_own_gamification" ON public.user_gamification
-      FOR SELECT
-      USING (auth.uid() = user_id);
-  END IF;
+-- S'assurer que les politiques RLS sont correctes
+-- Supprimer et recréer les politiques pour éviter les conflits
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies 
-    WHERE tablename = 'user_gamification' 
-    AND policyname = 'public_view_gamification_leaderboard'
-  ) THEN
-    CREATE POLICY "public_view_gamification_leaderboard" ON public.user_gamification
-      FOR SELECT
-      USING (TRUE);
+-- Supprimer les politiques existantes
+DROP POLICY IF EXISTS "users_view_own_gamification" ON public.user_gamification;
+DROP POLICY IF EXISTS "public_view_gamification_leaderboard" ON public.user_gamification;
+
+-- Recréer la politique pour les utilisateurs de voir leur propre gamification
+CREATE POLICY "users_view_own_gamification" ON public.user_gamification
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Recréer la politique publique pour le leaderboard (doit permettre à tous de voir)
+-- IMPORTANT: Cette politique doit permettre l'accès même aux utilisateurs non authentifiés
+CREATE POLICY "public_view_gamification_leaderboard" ON public.user_gamification
+  FOR SELECT
+  USING (TRUE); -- TRUE permet à tous (authentifiés et non authentifiés) de voir les données
+
+-- Vérifier que les politiques sont bien créées
+DO $$
+DECLARE
+  v_policy_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO v_policy_count
+  FROM pg_policies 
+  WHERE tablename = 'user_gamification' 
+  AND schemaname = 'public';
+  
+  IF v_policy_count < 2 THEN
+    RAISE WARNING 'Only % policies found for user_gamification, expected at least 2', v_policy_count;
   END IF;
 END $$;
 
@@ -181,9 +189,12 @@ FROM public.user_gamification ug
 LEFT JOIN public.profiles p ON p.user_id = ug.user_id
 ORDER BY ug.total_points DESC;
 
--- Grant select permission to authenticated users
+-- Grant select permission to authenticated users and anonymous
 GRANT SELECT ON public.gamification_leaderboard_view TO authenticated;
 GRANT SELECT ON public.gamification_leaderboard_view TO anon;
+
+-- S'assurer que la vue est accessible même sans authentification
+-- (nécessaire pour le leaderboard public)
 
 -- Commentaire sur la vue
 COMMENT ON VIEW public.gamification_leaderboard_view IS 'Vue optimisée pour le leaderboard de gamification avec les données de profil';

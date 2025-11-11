@@ -200,3 +200,5 @@ COMMENT ON FUNCTION public.create_affiliate_commission_on_transaction() IS 'Cré
 
 
 
+
+

@@ -171,3 +171,5 @@ Toutes les optimisations recommandées ont été implémentées avec succès. L'
 **Prochaines étapes** : Tests sur appareils réels et utilisation des nouvelles fonctionnalités
 
 
+
+

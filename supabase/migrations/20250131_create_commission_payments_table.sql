@@ -108,3 +108,5 @@ COMMENT ON FUNCTION public.get_pending_commission_total(UUID) IS 'Calcule le mon
 
 
 
+
+

@@ -157,3 +157,5 @@ SELECT * FROM get_user_product_recommendations('USER_ID_HERE'::UUID, 6);
 
 
 
+
+

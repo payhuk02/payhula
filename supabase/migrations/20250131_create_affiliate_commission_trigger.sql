@@ -180,3 +180,5 @@ COMMENT ON FUNCTION public.create_affiliate_commission_on_payment() IS 'Crée au
 
 
 
+
+

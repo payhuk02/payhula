@@ -258,3 +258,5 @@ Après le déploiement :
 Une fois ces étapes terminées, les paiements devraient fonctionner correctement ! 🎉
 
 
+
+

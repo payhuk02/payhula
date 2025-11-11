@@ -195,3 +195,5 @@ Après le déploiement :
 Une fois ces étapes terminées, l'erreur 404 devrait être résolue et les paiements devraient fonctionner correctement.
 
 
+
+

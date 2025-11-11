@@ -238,3 +238,5 @@ Les optimisations supplémentaires implémentées améliorent significativement 
 **Prochaines étapes** : Tests sur appareils réels et optimisations supplémentaires
 
 
+
+

@@ -122,3 +122,5 @@ currency    | text      | NO          | 'XOF'::text
 
 
 
+
+

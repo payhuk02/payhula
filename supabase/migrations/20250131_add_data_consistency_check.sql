@@ -176,3 +176,5 @@ COMMENT ON FUNCTION public.generate_consistency_report IS 'Génère un rapport J
 
 
 
+
+

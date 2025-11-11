@@ -254,3 +254,5 @@ Les améliorations implémentées améliorent significativement :
 **Prochaines étapes** : Tests sur appareils réels et optimisations supplémentaires
 
 
+
+

@@ -201,3 +201,5 @@ Cela appliquera la correction Sentry.
 Une fois ces étapes terminées, les erreurs devraient être résolues et les paiements devraient fonctionner correctement.
 
 
+
+
