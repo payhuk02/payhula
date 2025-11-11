@@ -23,10 +23,10 @@ import {
   Filter,
   Package,
   Clock,
-  AlertCircle,
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
+import { AlertCircleIcon } from '@/components/icons/AlertCircleIcon';
 import { useCustomerPurchasedProducts, PurchasedDigitalProduct } from '@/hooks/digital/useCustomerPurchasedProducts';
 import { useGenerateDownloadLink } from '@/hooks/digital/useDownloads';
 import { useToast } from '@/hooks/use-toast';
@@ -104,7 +104,7 @@ export const MyDigitalProducts = () => {
   if (error) {
     return (
       <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
+        <AlertCircleIcon className="h-4 w-4" size={16} />
         <AlertDescription>
           Erreur lors du chargement de vos produits. Veuillez réessayer plus tard.
         </AlertDescription>

@@ -25,10 +25,10 @@ import {
   XCircle,
   Clock,
   Shield,
-  AlertCircle,
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { AlertCircleIcon } from '@/components/icons/AlertCircleIcon';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -166,7 +166,7 @@ export const MyLicenses = () => {
   if (error) {
     return (
       <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
+        <AlertCircleIcon className="h-4 w-4" size={16} />
         <AlertDescription>
           Erreur lors du chargement de vos licences. Veuillez réessayer plus tard.
         </AlertDescription>

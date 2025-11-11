@@ -47,12 +47,25 @@ export const DigitalPreferences = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Non authentifié');
 
-      // Récupérer depuis user_metadata ou créer une table dédiée
-      const { data: profile } = await supabase
+      // Récupérer depuis profiles.digital_preferences
+      // Utiliser user_id au lieu de id car profiles.id est un UUID généré, pas user_id
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('digital_preferences')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
+      
+      // Si la colonne n'existe pas encore, retourner les préférences par défaut
+      if (profileError) {
+        // Si l'erreur est due à la colonne manquante (PGRST116 ou 400), retourner les préférences par défaut
+        if (profileError.code === 'PGRST116' || profileError.code === '42703' || profileError.message?.includes('digital_preferences')) {
+          logger.debug('digital_preferences column not found, using defaults', { error: profileError });
+          return preferences;
+        }
+        // Pour les autres erreurs, logger et retourner les préférences par défaut
+        logger.warn('Error fetching digital preferences', { error: profileError });
+        return preferences;
+      }
 
       if (profile?.digital_preferences) {
         setPreferences({ ...preferences, ...profile.digital_preferences });
@@ -68,15 +81,15 @@ export const DigitalPreferences = () => {
       if (!user) throw new Error('Non authentifié');
 
       // Sauvegarder dans profiles.digital_preferences (JSONB)
+      // Utiliser user_id au lieu de id car profiles.id est un UUID généré, pas user_id
+      // Utiliser update au lieu de upsert car le profil devrait déjà exister
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
+        .update({
           digital_preferences: prefs,
           updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'id',
-        });
+        })
+        .eq('user_id', user.id);
 
       if (error) {
         logger.error('Error saving preferences', { error });

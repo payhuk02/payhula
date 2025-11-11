@@ -40,13 +40,33 @@ export interface ErrorLog {
  * Log une erreur dans tous les services configurés
  */
 export function logError(error: Error, context: ErrorLogContext = {}): void {
+  // S'assurer que l'erreur a un message valide
+  let errorMessage = error?.message || 'Unknown error';
+  let errorStack = error?.stack;
+  let errorName = error?.name || 'Error';
+
+  // Si l'erreur n'est pas une instance d'Error, essayer de la convertir
+  if (!(error instanceof Error)) {
+    try {
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        errorMessage = (error as any).message || JSON.stringify(error);
+      } else {
+        errorMessage = String(error);
+      }
+    } catch (e) {
+      errorMessage = 'Error object could not be serialized';
+    }
+  }
+
   // Créer le log structuré
   const errorLog: ErrorLog = {
     timestamp: new Date().toISOString(),
     error: {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
+      message: errorMessage,
+      stack: errorStack,
+      name: errorName,
     },
     context,
     userAgent: navigator.userAgent,
@@ -211,15 +231,34 @@ export function setupGlobalErrorHandlers(): void {
 
   // Promesses rejetées non gérées
   window.addEventListener('unhandledrejection', (event) => {
-    const error = event.reason instanceof Error
-      ? event.reason
-      : new Error(String(event.reason));
+    let error: Error;
+    
+    if (event.reason instanceof Error) {
+      error = event.reason;
+    } else if (typeof event.reason === 'string') {
+      error = new Error(event.reason);
+    } else if (event.reason && typeof event.reason === 'object') {
+      // Pour les objets complexes, essayer de les sérialiser en JSON
+      try {
+        const message = event.reason.message || event.reason.toString?.() || JSON.stringify(event.reason);
+        error = new Error(String(message));
+      } catch (e) {
+        // Si la sérialisation échoue, utiliser un message générique
+        error = new Error('Unhandled promise rejection (non-serializable object)');
+      }
+    } else {
+      // Pour les valeurs primitives (number, boolean, etc.)
+      error = new Error(String(event.reason ?? 'Unknown rejection reason'));
+    }
 
     logError(error, {
       level: 'app',
       extra: {
         type: 'unhandledrejection',
-        promise: event.promise,
+        reasonType: typeof event.reason,
+        reasonValue: event.reason && typeof event.reason === 'object' 
+          ? (event.reason.message || 'object') 
+          : event.reason,
       },
     });
   });

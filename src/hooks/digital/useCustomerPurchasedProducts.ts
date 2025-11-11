@@ -43,17 +43,33 @@ export const useCustomerPurchasedProducts = () => {
       if (!user) throw new Error('Non authentifié');
 
       // Récupérer le customer_id depuis l'email
-      const { data: customer, error: customerError } = await supabase
+      // Note: La table customers peut avoir plusieurs enregistrements pour le même email (multi-stores)
+      // On récupère le premier enregistrement trouvé
+      const { data: customers, error: customerError } = await supabase
         .from('customers')
         .select('id')
-        .eq('email', user.email)
-        .limit(1)
-        .single();
+        .eq('email', user.email || '')
+        .limit(1);
 
-      if (customerError || !customer) {
-        logger.warn('Customer not found', { email: user.email, error: customerError });
+      if (customerError) {
+        // Si erreur 406 (Not Acceptable), cela peut être dû à RLS ou à la syntaxe
+        // Si erreur 400, cela peut être dû à une colonne manquante
+        // Dans tous les cas, logger et retourner un tableau vide
+        logger.warn('Error fetching customer', { 
+          email: user.email, 
+          error: customerError,
+          code: customerError.code,
+          message: customerError.message 
+        });
         return [];
       }
+
+      if (!customers || customers.length === 0) {
+        logger.warn('Customer not found', { email: user.email });
+        return [];
+      }
+
+      const customer = customers[0];
 
       // Récupérer les commandes avec produits digitaux
       const { data: orders, error: ordersError } = await supabase
