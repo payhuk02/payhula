@@ -14,21 +14,22 @@ import {
   MapPin,
   Calendar,
   ExternalLink,
+  Eye,
 } from 'lucide-react';
-import { useCustomerPhysicalOrder } from '@/hooks/physical/useCustomerPhysicalOrders';
+import { useCustomerPhysicalOrders, useCustomerPhysicalOrder } from '@/hooks/physical/useCustomerPhysicalOrders';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 interface OrderTrackingProps {
   orderId?: string;
 }
 
-export const OrderTracking = ({ orderId: orderIdProp }: OrderTrackingProps) => {
-  const { orderId: orderIdParam } = useParams<{ orderId: string }>();
-  const orderId = orderIdProp || orderIdParam;
+// Composant pour afficher le suivi d'une commande spécifique
+const OrderTrackingDetail = ({ orderId }: { orderId: string }) => {
   const { data: order, isLoading, error } = useCustomerPhysicalOrder(orderId);
 
   const getStatusSteps = () => {
@@ -320,6 +321,219 @@ export const OrderTracking = ({ orderId: orderIdProp }: OrderTrackingProps) => {
                 })}
               </span>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Composant principal pour afficher la liste des commandes avec suivi
+export const OrderTracking = ({ orderId: orderIdProp }: OrderTrackingProps) => {
+  const { orderId: orderIdParam } = useParams<{ orderId: string }>();
+  const orderId = orderIdProp || orderIdParam;
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(orderId || null);
+  const { data: orders, isLoading, error } = useCustomerPhysicalOrders();
+  const navigate = useNavigate();
+
+  // Si un orderId est fourni, afficher le détail
+  if (selectedOrderId) {
+    return (
+      <div className="space-y-4">
+        <Button
+          variant="outline"
+          onClick={() => setSelectedOrderId(null)}
+          className="mb-4"
+        >
+          ← Retour à la liste
+        </Button>
+        <OrderTrackingDetail orderId={selectedOrderId} />
+      </div>
+    );
+  }
+
+  // Afficher la liste des commandes avec suivi
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Erreur lors du chargement de vos commandes. Veuillez réessayer.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center py-8 sm:py-12">
+            <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold mb-2">Aucune commande</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4 px-4">
+              Vous n'avez pas encore de commandes à suivre
+            </p>
+            <Button 
+              onClick={() => navigate('/physical')}
+              className="min-h-[44px] px-6 touch-manipulation"
+              size="lg"
+            >
+              Parcourir les produits
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const getStatusSteps = (status: string) => {
+    const steps = [
+      { id: 'pending', label: 'Commande créée', icon: Package },
+      { id: 'confirmed', label: 'Commande confirmée', icon: CheckCircle2 },
+      { id: 'processing', label: 'En préparation', icon: Package },
+      { id: 'shipped', label: 'Expédiée', icon: Truck },
+      { id: 'delivered', label: 'Livrée', icon: CheckCircle2 },
+    ];
+
+    const statusOrder = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
+    const currentIndex = statusOrder.indexOf(status);
+
+    return steps.map((step) => {
+      const stepIndex = statusOrder.indexOf(step.id);
+      return {
+        ...step,
+        isCompleted: stepIndex <= currentIndex,
+        isCurrent: stepIndex === currentIndex,
+      };
+    });
+  };
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <Card>
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl">
+            <Truck className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span>Suivi de vos commandes</span>
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            Suivez l'avancement de toutes vos commandes de produits physiques
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-4 sm:space-y-6">
+            {orders.map((order) => {
+              const steps = getStatusSteps(order.status);
+              const latestShipment = order.shipments?.[order.shipments.length - 1];
+              const currentStep = steps.find(step => step.isCurrent) || steps[0];
+
+              return (
+                <Card key={order.id} className="overflow-hidden">
+                  <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 pt-3 sm:pt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg mb-1 sm:mb-2 break-words">
+                          Commande #{order.order_number}
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
+                          Passée le {format(new Date(order.created_at), 'dd MMMM yyyy à HH:mm', { locale: fr })}
+                        </CardDescription>
+                      </div>
+                      <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0">
+                        <Badge variant="default" className="text-xs sm:text-sm">
+                          {order.total_amount.toLocaleString('fr-FR', {
+                            style: 'currency',
+                            currency: order.currency || 'XOF',
+                          })}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-4">
+                    {/* Statut actuel simplifié */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 flex-shrink-0 ${
+                          currentStep.isCompleted
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : currentStep.isCurrent
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-muted bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        {(() => {
+                          const StepIcon = currentStep.icon;
+                          return <StepIcon className="h-4 w-4 sm:h-5 sm:w-5" />;
+                        })()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm sm:text-base font-medium break-words">
+                          {currentStep.label}
+                        </p>
+                        {latestShipment?.tracking_number && (
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
+                            Numéro de suivi: {latestShipment.tracking_number}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Informations de livraison */}
+                    {latestShipment && (
+                      <div className="p-3 bg-muted rounded-lg space-y-2">
+                        {latestShipment.tracking_number && (
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <span className="text-xs sm:text-sm font-medium">Numéro de suivi</span>
+                            {latestShipment.tracking_url && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.open(latestShipment.tracking_url, '_blank')}
+                                className="min-h-[36px] sm:min-h-[32px] touch-manipulation w-full sm:w-auto"
+                              >
+                                <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
+                                Suivre
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                        {latestShipment.carrier_name && (
+                          <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                            Transporteur: {latestShipment.carrier_name}
+                          </p>
+                        )}
+                        {latestShipment.estimated_delivery && (
+                          <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2">
+                            <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            Livraison estimée: {format(new Date(latestShipment.estimated_delivery), 'dd MMMM yyyy', { locale: fr })}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Bouton pour voir les détails */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedOrderId(order.id)}
+                      className="w-full sm:w-auto min-h-[40px] sm:min-h-[36px] touch-manipulation"
+                    >
+                      <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                      Voir le suivi détaillé
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
