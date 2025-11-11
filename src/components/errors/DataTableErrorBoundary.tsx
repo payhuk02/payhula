@@ -6,7 +6,8 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw, Database } from 'lucide-react';
+import { RefreshCw, Database } from 'lucide-react';
+import { AlertCircleIcon } from '@/components/icons/AlertCircleIcon';
 import * as Sentry from '@sentry/react';
 
 interface Props {
@@ -124,7 +125,7 @@ export class DataTableErrorBoundary extends Component<Props, State> {
       // Erreur normale
       return (
         <Alert variant="destructive" className="my-4">
-          <AlertCircle className="h-4 w-4" />
+          <AlertCircleIcon className="h-4 w-4" size={16} />
           <AlertTitle>Erreur d'affichage du tableau</AlertTitle>
           <AlertDescription className="mt-2 space-y-3">
             <p>
