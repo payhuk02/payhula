@@ -48,17 +48,21 @@ import { logger } from '@/lib/logger';
 interface CourseEnrollment {
   id: string;
   course_id: string;
-  enrolled_at: string;
+  enrollment_date?: string;
+  enrolled_at?: string; // Fallback for compatibility
   progress_percentage: number;
   completed_lessons_count: number;
   total_lessons_count: number;
-  last_accessed_at: string;
+  last_accessed_at?: string;
   course: {
     id: string;
-    name: string;
-    description: string;
-    image_url?: string;
-    slug: string;
+    product?: {
+      id: string;
+      name: string;
+      description: string;
+      image_url?: string;
+      slug: string;
+    };
   };
 }
 
@@ -90,11 +94,24 @@ export default function MyCourses() {
       if (!user?.id) return [];
 
       // Fetch enrollments - Using type assertion for untyped Supabase tables
+      // Join courses table and products table to get course and product data
       const { data: enrollmentsData, error } = await (supabase
         .from('course_enrollments' as any)
-        .select('*, course:course_id(id, name, description, image_url, slug)')
+        .select(`
+          *,
+          course:courses(
+            *,
+            product:products(
+              id,
+              name,
+              description,
+              image_url,
+              slug
+            )
+          )
+        `)
         .eq('user_id', user.id)
-        .order('last_accessed_at', { ascending: false, nullsFirst: false }) as any);
+        .order('enrollment_date', { ascending: false, nullsFirst: false }) as any);
 
       if (error) throw error;
 
@@ -135,12 +152,23 @@ export default function MyCourses() {
           const completed = completedLessons || 0;
           const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
+          // Extract product data from course.product
+          const product = enrollment.course?.product || {};
+          
+          // Map enrollment data to CourseEnrollment interface
           return {
-            ...enrollment,
+            id: enrollment.id,
+            course_id: enrollment.course_id,
+            enrollment_date: enrollment.enrollment_date || enrollment.enrolled_at || new Date().toISOString(),
+            enrolled_at: enrollment.enrolled_at || enrollment.enrollment_date || new Date().toISOString(), // Fallback
             progress_percentage: progress,
             completed_lessons_count: completed,
             total_lessons_count: total,
-            course: enrollment.course || {},
+            last_accessed_at: enrollment.last_accessed_at,
+            course: {
+              id: enrollment.course?.id || enrollment.course_id,
+              product: product,
+            },
           } as CourseEnrollment;
         })
       );
@@ -157,13 +185,14 @@ export default function MyCourses() {
     if (!enrollments) return [];
 
     return enrollments.filter((enrollment: CourseEnrollment) => {
-      const courseName = enrollment.course?.name || '';
+      const courseName = enrollment.course?.product?.name || '';
+      const courseSlug = enrollment.course?.product?.slug || '';
       
       // Search filter
       const searchLower = debouncedSearch.toLowerCase();
       const matchesSearch =
         courseName.toLowerCase().includes(searchLower) ||
-        enrollment.course?.slug?.toLowerCase().includes(searchLower);
+        courseSlug.toLowerCase().includes(searchLower);
 
       // Tab filter
       const matchesTab =
@@ -422,10 +451,10 @@ export default function MyCourses() {
                         >
                           {/* Image du cours */}
                           <div className="relative h-40 sm:h-48 lg:h-52 overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600">
-                            {enrollment.course?.image_url ? (
+                            {enrollment.course?.product?.image_url ? (
                               <img
-                                src={enrollment.course.image_url}
-                                alt={enrollment.course.name}
+                                src={enrollment.course.product.image_url}
+                                alt={enrollment.course.product.name}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 loading="lazy"
                               />
@@ -457,11 +486,11 @@ export default function MyCourses() {
 
                           <CardHeader className="p-4 sm:p-6">
                             <CardTitle className="text-base sm:text-lg lg:text-xl font-bold line-clamp-2 mb-2 group-hover:text-primary transition-colors duration-200">
-                              {enrollment.course?.name || 'Cours'}
+                              {enrollment.course?.product?.name || 'Cours'}
                             </CardTitle>
                             <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
                               <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                              <span>Inscrit le {new Date(enrollment.enrolled_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                              <span>Inscrit le {new Date(enrollment.enrollment_date || enrollment.enrolled_at || new Date()).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                             </CardDescription>
                           </CardHeader>
 
@@ -497,7 +526,7 @@ export default function MyCourses() {
                               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] touch-manipulation"
                               variant={enrollment.progress_percentage === 100 ? 'outline' : 'default'}
                             >
-                              <Link to={`/courses/${enrollment.course?.slug}`} className="flex items-center justify-center">
+                              <Link to={`/courses/${enrollment.course?.product?.slug || ''}`} className="flex items-center justify-center">
                                 {enrollment.progress_percentage === 100 ? (
                                   <>
                                     <CheckCircle2 className="h-4 w-4 mr-2" />
