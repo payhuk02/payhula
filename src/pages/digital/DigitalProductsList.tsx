@@ -806,9 +806,10 @@ export const DigitalProductsList = () => {
                       )}
                     </>
                   )}
-                </TabsContent>
+                </div>
+              </TabsContent>
 
-                <TabsContent value="active" className="mt-4 sm:mt-6">
+              <TabsContent value="active" className="mt-4 sm:mt-6">
                   {isLoading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                       {[1, 2, 3, 4].map((i) => (
@@ -1076,7 +1077,6 @@ export const DigitalProductsList = () => {
                   )}
                 </TabsContent>
               </Tabs>
-            </div>
           </div>
         </main>
       </div>
