@@ -1,17 +1,18 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Package, ShoppingCart, Users, DollarSign, Activity, Zap, Bell, Settings } from "lucide-react";
+import { Package, ShoppingCart, Users, DollarSign, Activity, Zap, Bell, Settings, LayoutDashboard, AlertCircle } from "lucide-react";
 import { useDashboardStats } from "@/hooks/useDashboardStatsRobust";
 import { useStore } from "@/hooks/use-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { AlertCircle } from 'lucide-react';
 import "@/styles/dashboard-responsive.css";
 
 const Dashboard = () => {
@@ -19,7 +20,6 @@ const Dashboard = () => {
   const { store, loading: storeLoading } = useStore();
   const { stats, loading, error: hookError, refetch } = useDashboardStats();
   const navigate = useNavigate();
-  const [lastUpdated, setLastUpdated] = useState(new Date().toISOString());
   const [error, setError] = useState<string | null>(null);
 
   // Données simulées pour les notifications
@@ -53,13 +53,16 @@ const Dashboard = () => {
   const handleRefresh = useCallback(async () => {
     try {
       setError(null);
-      logger.info('Actualisation du dashboard...');
+      logger.info('Actualisation du dashboard...', {});
       await refetch();
-      setLastUpdated(new Date().toISOString());
-      logger.info('Dashboard actualisé avec succès');
+      logger.info('Dashboard actualisé avec succès', {});
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-      logger.error('Erreur lors de l\'actualisation du dashboard:', err);
+      const error = err instanceof Error ? err : new Error('Erreur lors de l\'actualisation du dashboard');
+      logger.error(error, {
+        error: err,
+        message: errorMessage,
+      });
       setError(errorMessage || 'Erreur lors du chargement des données');
     }
   }, [refetch]);
@@ -89,52 +92,60 @@ const Dashboard = () => {
   }, [navigate]);
 
   // Animations au scroll
+  const headerRef = useScrollAnimation<HTMLDivElement>();
   const statsRef = useScrollAnimation<HTMLDivElement>();
   const actionsRef = useScrollAnimation<HTMLDivElement>();
   const bottomRef = useScrollAnimation<HTMLDivElement>();
 
+  // Loading state
   if (storeLoading || loading) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-              <p className="mt-2 text-muted-foreground">{t('dashboard.loading')}</p>
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+              <Skeleton className="h-10 w-64" />
+              <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-24" />
+                ))}
+              </div>
+              <Skeleton className="h-96 w-full" />
             </div>
-          </div>
+          </main>
         </div>
       </SidebarProvider>
     );
   }
 
+  // No store state
   if (!store) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
-          <div className="flex-1 flex flex-col">
-            <header className="sticky top-0 z-10 border-b bg-card shadow-soft">
-              <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-4 px-3 sm:px-4 md:px-6">
-                <SidebarTrigger />
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold truncate">{t('dashboard.title')}</h1>
-                </div>
-              </div>
-            </header>
-            <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 bg-gradient-hero overflow-x-hidden">
-              <div className="max-w-3xl mx-auto text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">{t('dashboard.welcome')}</h2>
-                <p className="text-muted-foreground mb-6">
-                  {t('dashboard.createStorePrompt')}
-                </p>
-                <Button onClick={() => navigate("/dashboard/store")} size="lg">
-                  {t('dashboard.createStoreButton')}
-                </Button>
-              </div>
-            </main>
-          </div>
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500">
+                <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 text-center">
+                  <LayoutDashboard className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-4 animate-in zoom-in-95 duration-500" />
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4">
+                    {t('dashboard.welcome')}
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-6">
+                    {t('dashboard.createStorePrompt')}
+                  </p>
+                  <Button 
+                    onClick={() => navigate("/dashboard/store")} 
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  >
+                    {t('dashboard.createStoreButton')}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </main>
         </div>
       </SidebarProvider>
     );
@@ -142,29 +153,43 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
-        
-        <div className="flex-1 flex flex-col">
-          {/* Header - Responsive et Professionnel */}
-          <header className="sticky top-0 z-10 border-b bg-card/95 backdrop-blur-sm shadow-soft" role="banner">
-            <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-4 px-3 sm:px-4 md:px-6">
-              <SidebarTrigger className="touch-manipulation min-h-[44px] min-w-[44px]" aria-label={t('dashboard.sidebarToggle', 'Toggle sidebar')} />
-              <div className="flex-1 min-w-0">
-                <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold truncate" id="dashboard-title">
-                  {t('dashboard.titleWithStore', { storeName: store.name })}
-                </h1>
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header - Responsive & Animated */}
+            <div
+              ref={headerRef}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700"
+            >
+              <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+                <SidebarTrigger className="mt-1 sm:mt-0 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold flex flex-col sm:flex-row sm:items-center gap-2 mb-1 sm:mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500 shrink-0">
+                        <LayoutDashboard className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                      </div>
+                      <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
+                        {t('dashboard.titleWithStore', { storeName: store.name })}
+                      </span>
+                    </div>
+                  </h1>
+                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
+                    Vue d'ensemble de votre boutique
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs px-2 py-1 hidden sm:flex" aria-label={t('dashboard.status.online', 'En ligne')}>
-                  <Activity className="h-3 w-3 mr-1" aria-hidden="true" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Badge variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 hidden sm:flex items-center gap-1.5" aria-label={t('dashboard.status.online', 'En ligne')}>
+                  <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                   {t('dashboard.online')}
                 </Badge>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={handleRefresh}
-                  className="touch-manipulation min-h-[44px] min-w-[44px]"
+                  className="h-9 sm:h-10 w-9 sm:w-10 p-0"
                   aria-label={t('dashboard.refresh')}
                   title={t('dashboard.refresh')}
                 >
@@ -172,216 +197,218 @@ const Dashboard = () => {
                 </Button>
               </div>
             </div>
-          </header>
 
-          {/* Main Content */}
-          <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 bg-gradient-hero overflow-x-hidden" role="main" aria-labelledby="dashboard-title">
+            {/* Error Alert */}
             {(error || hookError) && (
-              <div className="mb-4 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg" role="alert" aria-live="polite">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-red-500" aria-hidden="true" />
-                  <h3 className="font-medium text-red-800 dark:text-red-200">{t('dashboard.error.title')}</h3>
+              <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle className="text-sm sm:text-base">{t('dashboard.error.title')}</AlertTitle>
+                <AlertDescription className="text-xs sm:text-sm mt-1">
+                  {error || hookError}
+                </AlertDescription>
+                <div className="mt-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleRefresh}
+                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                    aria-label={t('dashboard.retry')}
+                  >
+                    {t('dashboard.retry')}
+                  </Button>
                 </div>
-                <p className="text-sm text-red-600 dark:text-red-300 mt-1">{error || hookError}</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleRefresh}
-                  className="mt-2 touch-manipulation min-h-[44px]"
-                  aria-label={t('dashboard.retry')}
-                >
-                  {t('dashboard.retry')}
-                </Button>
+              </Alert>
+            )}
+            {/* Stats Cards - Responsive & Animated */}
+            {stats && (
+              <div
+                ref={statsRef}
+                className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                role="region"
+                aria-label={t('dashboard.stats.ariaLabel', 'Statistiques du tableau de bord')}
+              >
+                {[
+                  {
+                    label: t('dashboard.stats.products.title'),
+                    value: stats.totalProducts ?? 0,
+                    description: t('dashboard.stats.products.active', { count: stats.activeProducts }),
+                    icon: Package,
+                    color: 'from-green-600 to-emerald-600',
+                    trend: `+${stats.trends.productGrowth}%`,
+                  },
+                  {
+                    label: t('dashboard.stats.orders.title'),
+                    value: stats.totalOrders,
+                    description: t('dashboard.stats.orders.pending', { count: stats.pendingOrders }),
+                    icon: ShoppingCart,
+                    color: 'from-blue-600 to-cyan-600',
+                    trend: `+${stats.trends.orderGrowth}%`,
+                  },
+                  {
+                    label: t('dashboard.stats.customers.title'),
+                    value: stats.totalCustomers,
+                    description: t('dashboard.stats.customers.registered'),
+                    icon: Users,
+                    color: 'from-purple-600 to-pink-600',
+                    trend: `+${stats.trends.customerGrowth}%`,
+                  },
+                  {
+                    label: t('dashboard.stats.revenue.title'),
+                    value: `${stats.totalRevenue.toLocaleString()} FCFA`,
+                    description: t('dashboard.stats.revenue.total'),
+                    icon: DollarSign,
+                    color: 'from-yellow-600 to-orange-600',
+                    trend: `+${stats.trends.revenueGrowth}%`,
+                  },
+                ].map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <Card
+                      key={stat.label}
+                      className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-in fade-in slide-in-from-bottom-4"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+                        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {stat.label}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-3 sm:p-4 pt-0">
+                        <div className={`text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1`}>
+                          {stat.value}
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          {stat.description}
+                        </p>
+                        <Badge variant="default" className="text-xs px-2 py-0.5">
+                          {stat.trend}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
-            <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-fade-in">
-              
-              {/* Stats Grid - Responsive et Professionnel */}
-              {stats && (
-              <div ref={statsRef} className="dashboard-stats-grid" role="region" aria-label={t('dashboard.stats.ariaLabel', 'Statistiques du tableau de bord')}>
-                <Card className="dashboard-card group">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2 dashboard-card-header">
-                    <CardTitle className="dashboard-card-title">{t('dashboard.stats.products.title')}</CardTitle>
-                    <div className="dashboard-icon-container bg-green-500/10 group-hover:bg-green-500/20">
-                      <Package className="h-4 w-4 text-green-500" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="dashboard-card-content pt-0">
-                    <div className="dashboard-stat-value">{stats?.totalProducts ?? 0}</div>
-                    <p className="dashboard-stat-description">{t('dashboard.stats.products.active', { count: stats.activeProducts })}</p>
-                    <Badge variant="default" className="text-xs px-2 py-1">
-                      +{stats.trends.productGrowth}%
-                    </Badge>
-                  </CardContent>
-                </Card>
 
-                <Card className="dashboard-card group">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2 dashboard-card-header">
-                    <CardTitle className="dashboard-card-title">{t('dashboard.stats.orders.title')}</CardTitle>
-                    <div className="dashboard-icon-container bg-blue-500/10 group-hover:bg-blue-500/20">
-                      <ShoppingCart className="h-4 w-4 text-blue-500" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="dashboard-card-content pt-0">
-                    <div className="dashboard-stat-value">{stats.totalOrders}</div>
-                    <p className="dashboard-stat-description">{t('dashboard.stats.orders.pending', { count: stats.pendingOrders })}</p>
-                    <Badge variant="default" className="text-xs px-2 py-1">
-                      +{stats.trends.orderGrowth}%
-                    </Badge>
-                  </CardContent>
-                </Card>
+            {/* Quick Actions - Responsive & Animated */}
+            <Card 
+              ref={actionsRef} 
+              className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700" 
+              role="region" 
+              aria-labelledby="quick-actions-title"
+            >
+              <CardHeader className="pb-3 p-4 sm:p-6">
+                <CardTitle id="quick-actions-title" className="flex items-center gap-2 text-base sm:text-lg">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20">
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                  </div>
+                  {t('dashboard.quickActions.title')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label={t('dashboard.quickActions.ariaLabel', 'Actions rapides disponibles')}>
+                  {[
+                    {
+                      title: t('dashboard.quickActions.newProduct'),
+                      description: t('dashboard.quickActions.newProductDesc'),
+                      icon: Package,
+                      color: 'from-green-600 to-emerald-600',
+                      onClick: handleCreateProduct,
+                    },
+                    {
+                      title: t('dashboard.quickActions.newOrder'),
+                      description: t('dashboard.quickActions.newOrderDesc'),
+                      icon: ShoppingCart,
+                      color: 'from-blue-600 to-cyan-600',
+                      onClick: handleCreateOrder,
+                    },
+                    {
+                      title: t('dashboard.quickActions.analytics'),
+                      description: t('dashboard.quickActions.analyticsDesc'),
+                      icon: Activity,
+                      color: 'from-purple-600 to-pink-600',
+                      onClick: handleViewAnalytics,
+                    },
+                  ].map((action, index) => {
+                    const Icon = action.icon;
+                    return (
+                      <Card
+                        key={action.title}
+                        className="cursor-pointer border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group touch-manipulation min-h-[120px] sm:min-h-[140px] animate-in fade-in slide-in-from-bottom-4"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                        onClick={action.onClick}
+                        role="listitem"
+                        aria-label={action.title}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            action.onClick();
+                          }
+                        }}
+                      >
+                        <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-center">
+                          <div className="flex items-start gap-3">
+                            <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color === 'from-green-600 to-emerald-600' ? 'from-green-500/10 to-emerald-500/10' : action.color === 'from-blue-600 to-cyan-600' ? 'from-blue-500/10 to-cyan-500/10' : 'from-purple-500/10 to-pink-500/10'} group-hover:opacity-80 transition-colors shrink-0`}>
+                              <Icon 
+                                className={`h-5 w-5 sm:h-6 sm:w-6 ${action.color === 'from-green-600 to-emerald-600' ? 'text-green-500' : action.color === 'from-blue-600 to-cyan-600' ? 'text-blue-500' : 'text-purple-500'}`} 
+                                aria-hidden="true" 
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm sm:text-base mb-1">{action.title}</h3>
+                              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{action.description}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
 
-                <Card className="dashboard-card group">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2 dashboard-card-header">
-                    <CardTitle className="dashboard-card-title">{t('dashboard.stats.customers.title')}</CardTitle>
-                    <div className="dashboard-icon-container bg-purple-500/10 group-hover:bg-purple-500/20">
-                      <Users className="h-4 w-4 text-purple-500" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="dashboard-card-content pt-0">
-                    <div className="dashboard-stat-value">{stats.totalCustomers}</div>
-                    <p className="dashboard-stat-description">{t('dashboard.stats.customers.registered')}</p>
-                    <Badge variant="default" className="text-xs px-2 py-1">
-                      +{stats.trends.customerGrowth}%
-                    </Badge>
-                  </CardContent>
-                </Card>
-
-                <Card className="dashboard-card group">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2 dashboard-card-header">
-                    <CardTitle className="dashboard-card-title">{t('dashboard.stats.revenue.title')}</CardTitle>
-                    <div className="dashboard-icon-container bg-yellow-500/10 group-hover:bg-yellow-500/20">
-                      <DollarSign className="h-4 w-4 text-yellow-500" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="dashboard-card-content pt-0">
-                    <div className="dashboard-stat-value">{stats.totalRevenue.toLocaleString()} FCFA</div>
-                    <p className="dashboard-stat-description">{t('dashboard.stats.revenue.total')}</p>
-                    <Badge variant="default" className="text-xs px-2 py-1">
-                      +{stats.trends.revenueGrowth}%
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </div>
-              )}
-
-              {/* Quick Actions - Responsive et Professionnel */}
-              <Card ref={actionsRef} className="shadow-soft hover:shadow-lg transition-all duration-300" role="region" aria-labelledby="quick-actions-title">
+            {/* Bottom Row - Responsive & Animated */}
+            <div 
+              ref={bottomRef} 
+              className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700" 
+              role="region" 
+              aria-label={t('dashboard.bottomSection.ariaLabel', 'Notifications et activité récente')}
+            >
+              {/* Notifications */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300" role="region" aria-labelledby="notifications-title">
                 <CardHeader className="pb-3 p-4 sm:p-6">
-                  <CardTitle id="quick-actions-title" className="flex items-center gap-2 text-base sm:text-lg">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Zap className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <CardTitle id="notifications-title" className="flex items-center gap-2 text-base sm:text-lg">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 backdrop-blur-sm border border-blue-500/20">
+                      <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 dark:text-blue-400" aria-hidden="true" />
                     </div>
-                    {t('dashboard.quickActions.title')}
+                    {t('dashboard.notifications.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="dashboard-actions-grid" role="list" aria-label={t('dashboard.quickActions.ariaLabel', 'Actions rapides disponibles')}>
-                    <Card 
-                      className="cursor-pointer shadow-soft hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 group touch-manipulation min-h-[120px] sm:min-h-[140px]"
-                      onClick={handleCreateProduct}
-                      role="listitem"
-                      aria-label={t('dashboard.quickActions.newProduct')}
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleCreateProduct();
-                        }
-                      }}
-                    >
-                      <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-center">
-                        <div className="flex items-start gap-3">
-                          <div className="p-3 rounded-xl bg-green-500/10 group-hover:bg-green-500/20 transition-colors">
-                            <Package className="h-6 w-6 text-green-500" aria-hidden="true" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm sm:text-base mb-1">{t('dashboard.quickActions.newProduct')}</h3>
-                            <p className="text-xs sm:text-sm text-muted-foreground">{t('dashboard.quickActions.newProductDesc')}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card 
-                      className="cursor-pointer shadow-soft hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 group touch-manipulation min-h-[120px] sm:min-h-[140px]" 
-                      onClick={handleCreateOrder}
-                      role="listitem"
-                      aria-label={t('dashboard.quickActions.newOrder')}
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleCreateOrder();
-                        }
-                      }}
-                    >
-                      <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-center">
-                        <div className="flex items-start gap-3">
-                          <div className="p-3 rounded-xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                            <ShoppingCart className="h-6 w-6 text-blue-500" aria-hidden="true" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm sm:text-base mb-1">{t('dashboard.quickActions.newOrder')}</h3>
-                            <p className="text-xs sm:text-sm text-muted-foreground">{t('dashboard.quickActions.newOrderDesc')}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card 
-                      className="cursor-pointer shadow-soft hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 group touch-manipulation min-h-[120px] sm:min-h-[140px]" 
-                      onClick={handleViewAnalytics}
-                      role="listitem"
-                      aria-label={t('dashboard.quickActions.analytics')}
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleViewAnalytics();
-                        }
-                      }}
-                    >
-                      <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-center">
-                        <div className="flex items-start gap-3">
-                          <div className="p-3 rounded-xl bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                            <Activity className="h-6 w-6 text-purple-500" aria-hidden="true" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm sm:text-base mb-1">{t('dashboard.quickActions.analytics')}</h3>
-                            <p className="text-xs sm:text-sm text-muted-foreground">{t('dashboard.quickActions.analyticsDesc')}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Bottom Row - Responsive et Professionnel */}
-              <div ref={bottomRef} className="dashboard-bottom-grid" role="region" aria-label={t('dashboard.bottomSection.ariaLabel', 'Notifications et activité récente')}>
-                <Card className="shadow-soft hover:shadow-lg transition-all duration-300" role="region" aria-labelledby="notifications-title">
-                  <CardHeader className="pb-3 p-4 sm:p-6">
-                    <CardTitle id="notifications-title" className="flex items-center gap-2 text-base sm:text-lg">
-                      <div className="p-2 rounded-lg bg-blue-500/10">
-                        <Bell className="h-5 w-5 text-blue-500" aria-hidden="true" />
+                  <div className="space-y-3" role="list" aria-label={t('dashboard.notifications.list.ariaLabel', 'Liste des notifications')}>
+                    {notifications.length === 0 ? (
+                      <div className="text-center py-6">
+                        <Bell className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+                        <p className="text-xs sm:text-sm text-muted-foreground">Aucune notification</p>
                       </div>
-                      {t('dashboard.notifications.title')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 sm:p-6 pt-0">
-                    <div className="space-y-3" role="list" aria-label={t('dashboard.notifications.list.ariaLabel', 'Liste des notifications')}>
-                      {notifications.map((notification) => (
-                        <div key={notification.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation" role="listitem">
+                    ) : (
+                      notifications.map((notification) => (
+                        <div 
+                          key={notification.id} 
+                          className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation" 
+                          role="listitem"
+                        >
                           <div className="flex-shrink-0 mt-0.5">
                             <div className="p-1.5 rounded-full bg-blue-500/10">
                               <Bell className="h-3 w-3 text-blue-500" aria-hidden="true" />
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium mb-1">{notification.title}</h4>
+                            <h4 className="text-xs sm:text-sm font-medium mb-1">{notification.title}</h4>
                             <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{notification.message}</p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs text-muted-foreground">
                                 {new Date(notification.timestamp).toLocaleString('fr-FR', {
                                   day: '2-digit',
@@ -399,32 +426,43 @@ const Dashboard = () => {
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card className="shadow-soft hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3 p-4 sm:p-6">
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <div className="p-2 rounded-lg bg-green-500/10">
-                        <Activity className="h-5 w-5 text-green-500" />
+              {/* Recent Activity */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardHeader className="pb-3 p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5 backdrop-blur-sm border border-green-500/20">
+                      <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 dark:text-green-400" />
+                    </div>
+                    {t('dashboard.recentActivity.title')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="space-y-3">
+                    {stats.recentActivity.length === 0 ? (
+                      <div className="text-center py-6">
+                        <Activity className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+                        <p className="text-xs sm:text-sm text-muted-foreground">Aucune activité récente</p>
                       </div>
-                      {t('dashboard.recentActivity.title')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 sm:p-6 pt-0">
-                    <div className="space-y-3">
-                      {stats.recentActivity.map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation">
+                    ) : (
+                      stats.recentActivity.map((activity) => (
+                        <div 
+                          key={activity.id} 
+                          className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation"
+                        >
                           <div className="flex-shrink-0 mt-0.5">
                             <div className="p-1.5 rounded-full bg-green-500/10">
                               <Activity className="h-3 w-3 text-green-500" />
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium mb-1 line-clamp-2">{activity.message}</h4>
-                            <div className="flex items-center gap-2">
+                            <h4 className="text-xs sm:text-sm font-medium mb-1 line-clamp-2">{activity.message}</h4>
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs text-muted-foreground">
                                 {new Date(activity.timestamp).toLocaleString('fr-FR', {
                                   day: '2-digit',
@@ -442,53 +480,54 @@ const Dashboard = () => {
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card className="shadow-soft hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3 p-4 sm:p-6">
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <div className="p-2 rounded-lg bg-gray-500/10">
-                        <Settings className="h-5 w-5 text-gray-500" />
-                      </div>
-                      Paramètres Rapides
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 sm:p-6 pt-0">
-                    <div className="space-y-3">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start h-12 text-sm touch-manipulation min-h-[44px] hover:bg-muted/50 transition-colors" 
-                        onClick={handleViewStore}
-                      >
-                        <Settings className="h-4 w-4 mr-3" />
-                        Paramètres Boutique
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start h-12 text-sm touch-manipulation min-h-[44px] hover:bg-muted/50 transition-colors" 
-                        onClick={handleManageCustomers}
-                      >
-                        <Users className="h-4 w-4 mr-3" />
-                        Gérer les Clients
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start h-12 text-sm touch-manipulation min-h-[44px] hover:bg-muted/50 transition-colors" 
-                        onClick={handleSettings}
-                      >
-                        <Settings className="h-4 w-4 mr-3" />
-                        Configuration
-                      </Button>
+              {/* Quick Settings */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardHeader className="pb-3 p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-gray-500/10 to-gray-500/5 backdrop-blur-sm border border-gray-500/20">
+                      <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    Paramètres Rapides
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="space-y-2 sm:space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-10 sm:h-12 text-xs sm:text-sm touch-manipulation min-h-[44px] hover:bg-muted/50 transition-colors" 
+                      onClick={handleViewStore}
+                    >
+                      <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 sm:mr-3" />
+                      Paramètres Boutique
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-10 sm:h-12 text-xs sm:text-sm touch-manipulation min-h-[44px] hover:bg-muted/50 transition-colors" 
+                      onClick={handleManageCustomers}
+                    >
+                      <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 sm:mr-3" />
+                      Gérer les Clients
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-10 sm:h-12 text-xs sm:text-sm touch-manipulation min-h-[44px] hover:bg-muted/50 transition-colors" 
+                      onClick={handleSettings}
+                    >
+                      <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 sm:mr-3" />
+                      Configuration
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );
