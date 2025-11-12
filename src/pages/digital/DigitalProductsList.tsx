@@ -9,7 +9,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { logger } from '@/lib/logger';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -38,19 +37,11 @@ import {
   List,
   X,
   RefreshCw,
-  Loader2,
   Eye,
   Edit,
-  MoreVertical,
-  Sparkles,
   ArrowUpDown,
   CheckCircle2,
   Clock,
-  FileCode,
-  FileText,
-  Palette,
-  Music,
-  Video,
   Package,
   ChevronLeft,
   ChevronRight,
@@ -107,7 +98,6 @@ export const DigitalProductsList = () => {
   
   // Extraire les données et métadonnées de pagination
   const productsData = productsResponse?.data || productsResponse || [];
-  const totalProducts = productsResponse?.total || (Array.isArray(productsResponse) ? productsResponse.length : 0);
   
   // Log pour débogage
   useEffect(() => {
@@ -241,27 +231,35 @@ export const DigitalProductsList = () => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         searchInputRef.current?.focus();
-        logger.info('Raccourci clavier: Focus recherche');
+        logger.info('Raccourci clavier: Focus recherche', {});
       }
       
       // G pour toggle vue grille/liste
       if (e.key === 'g' && !e.ctrlKey && !e.metaKey && document.activeElement?.tagName !== 'INPUT') {
         e.preventDefault();
-        setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
-        logger.info(`Raccourci clavier: Changement de vue (${viewMode === 'grid' ? 'liste' : 'grille'})`);
+        setViewMode(prev => {
+          const newMode = prev === 'grid' ? 'list' : 'grid';
+          logger.info('Raccourci clavier: Changement de vue', { viewMode: newMode });
+          return newMode;
+        });
       }
       
       // Cmd/Ctrl + N pour nouveau produit
       if ((e.metaKey || e.ctrlKey) && e.key === 'n' && !e.shiftKey) {
         e.preventDefault();
         navigate('/dashboard/products/new?type=digital');
-        logger.info('Raccourci clavier: Nouveau produit digital');
+        logger.info('Raccourci clavier: Nouveau produit digital', {});
+      }
+      
+      // Esc pour effacer recherche
+      if (e.key === 'Escape' && document.activeElement?.id === 'search-digital-products') {
+        setSearchInput('');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, viewMode]);
+  }, [navigate]);
 
   /**
    * Handlers avec useCallback
@@ -325,8 +323,9 @@ export const DigitalProductsList = () => {
     logger.info('Page Produits Digitaux chargée', {
       productsCount: products?.length || 0,
       storeId: store?.id,
+      hasStore: !!store,
     });
-  }, [products?.length, store?.id]);
+  }, [products?.length, store?.id, store]);
 
   /**
    * Error handling avec détails
@@ -340,15 +339,10 @@ export const DigitalProductsList = () => {
         storeId: store?.id,
         hasStore: !!store,
       });
-      toast({
-        title: 'Erreur',
-        description: errorMessage.includes('Erreur') 
-          ? errorMessage 
-          : `Impossible de charger les produits digitaux: ${errorMessage}. Veuillez réessayer.`,
-        variant: 'destructive',
-      });
+      // Ne pas afficher de toast automatiquement pour éviter les spams
+      // Le toast sera affiché uniquement si nécessaire
     }
-  }, [error, toast, store?.id]);
+  }, [error, store?.id, store]);
 
   return (
     <SidebarProvider>

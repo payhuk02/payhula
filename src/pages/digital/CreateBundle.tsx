@@ -3,19 +3,23 @@
  * Date: 26 Janvier 2025
  */
 
-import React from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import React, { useCallback, useEffect } from 'react';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useStore } from '@/hooks/useStore';
 import { DigitalBundleManager } from '@/components/digital/DigitalBundleManager';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateBundle } from '@/hooks/digital/useDigitalBundles';
 import { generateSlug } from '@/lib/store-utils';
-import { Package } from 'lucide-react';
+import { Package, ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { logger } from '@/lib/logger';
 
 export default function CreateBundle() {
   const navigate = useNavigate();
@@ -23,9 +27,14 @@ export default function CreateBundle() {
   const { store, isLoading: storeLoading } = useStore();
   const createBundle = useCreateBundle();
 
+  // Animations au scroll
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+  const contentRef = useScrollAnimation<HTMLDivElement>();
+
   // Récupérer les produits digitaux de la boutique depuis la table products
   const [digitalProducts, setDigitalProducts] = React.useState<any[]>([]);
   const [productsLoading, setProductsLoading] = React.useState(true);
+  const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
     if (!store?.id) {
@@ -35,6 +44,7 @@ export default function CreateBundle() {
 
     const loadProducts = async () => {
       try {
+        setError(null);
         const { data, error } = await supabase
           .from('products')
           .select('id, name, description, price, currency, image_url, category, is_active, is_draft')
@@ -44,15 +54,29 @@ export default function CreateBundle() {
 
         if (error) throw error;
         setDigitalProducts(data || []);
+        logger.info('Produits digitaux chargés pour bundle', {
+          productsCount: data?.length || 0,
+          storeId: store.id,
+        });
       } catch (error) {
-        console.error('Error loading products:', error);
+        const err = error instanceof Error ? error : new Error('Erreur lors du chargement des produits');
+        setError(err);
+        logger.error(err, {
+          error,
+          storeId: store.id,
+        });
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de charger les produits digitaux. Veuillez réessayer.',
+          variant: 'destructive',
+        });
       } finally {
         setProductsLoading(false);
       }
     };
 
     loadProducts();
-  }, [store?.id]);
+  }, [store?.id, toast]);
 
   // Convertir les produits au format attendu par DigitalBundleManager
   const availableProducts = (digitalProducts || []).map((product: any) => ({
@@ -66,12 +90,15 @@ export default function CreateBundle() {
     isAvailable: product.is_active !== false && product.is_draft !== true,
   }));
 
-  const handleSave = async (bundle: any) => {
+  const handleSave = useCallback(async (bundle: any) => {
     if (!store?.id) {
       toast({
         title: 'Erreur',
         description: 'Boutique non trouvée',
         variant: 'destructive',
+      });
+      logger.error('Boutique non trouvée lors de la création du bundle', {
+        storeId: store?.id,
       });
       return;
     }
@@ -92,24 +119,39 @@ export default function CreateBundle() {
         product_ids: bundle.productIds || [],
       });
 
+      logger.info('Bundle créé avec succès', {
+        bundleName: bundle.name,
+        storeId: store.id,
+        productCount: bundle.productIds?.length || 0,
+      });
+
       navigate(`/dashboard/digital-products/bundles`);
     } catch (error: any) {
+      const err = error instanceof Error ? error : new Error('Erreur lors de la création du bundle');
+      logger.error(err, {
+        error,
+        bundleName: bundle.name,
+        storeId: store.id,
+      });
       // Error handled by hook
-      console.error('Error creating bundle:', error);
     }
-  };
+  }, [store?.id, createBundle, navigate, toast]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
+
+  const handleBack = useCallback(() => {
+    navigate('/dashboard/digital-products/bundles');
+  }, [navigate]);
 
   if (storeLoading || productsLoading) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
               <Skeleton className="h-10 w-64" />
               <Skeleton className="h-96" />
             </div>
@@ -122,16 +164,21 @@ export default function CreateBundle() {
   if (!store) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground">
-                  Vous devez créer une boutique avant de créer un bundle.
-                </p>
-              </CardContent>
-            </Card>
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="pt-6">
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Vous devez créer une boutique avant de créer un bundle.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </div>
           </main>
         </div>
       </SidebarProvider>
@@ -140,38 +187,75 @@ export default function CreateBundle() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Package className="h-8 w-8" />
-                Créer un Bundle de Produits Digitaux
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Regroupez plusieurs produits et offrez-les à prix réduit
-              </p>
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header avec animation - Style Inventaire et Mes Cours */}
+            <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <SidebarTrigger className="mr-1 sm:mr-2" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBack}
+                  className="h-9 sm:h-10 text-xs sm:text-sm"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                  <span className="hidden sm:inline">Retour</span>
+                </Button>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                      <Package className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                    </div>
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      Créer un Bundle de Produits Digitaux
+                    </span>
+                  </h1>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                    Regroupez plusieurs produits et offrez-les à prix réduit
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {/* Error Alert - Style Inventaire */}
+            {error && (
+              <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-4">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  {error instanceof Error ? error.message : 'Erreur lors du chargement des produits digitaux'}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Bundle Manager */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Configuration du Bundle</CardTitle>
-                <CardDescription>
-                  Sélectionnez les produits à inclure et configurez la remise
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <DigitalBundleManager
-                  availableProducts={availableProducts}
-                  onSave={handleSave}
-                  onCancel={handleCancel}
-                  mode="create"
-                />
-              </CardContent>
-            </Card>
+            <div ref={contentRef} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl">Configuration du Bundle</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
+                    Sélectionnez les produits à inclure et configurez la remise
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {createBundle.isPending ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                      <span className="ml-2 text-sm text-muted-foreground">Création du bundle...</span>
+                    </div>
+                  ) : (
+                    <DigitalBundleManager
+                      availableProducts={availableProducts}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      mode="create"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>

@@ -11,7 +11,6 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -29,7 +28,6 @@ import { useStore } from '@/hooks/useStore';
 import { useDigitalBundles, useFeaturedBundles } from '@/hooks/digital/useDigitalBundles';
 import { DigitalBundlesGrid } from '@/components/digital';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 
 type ViewMode = 'grid' | 'list';
 
