@@ -3,7 +3,7 @@
  * Date: 26 Janvier 2025
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,18 +32,35 @@ export default function CreateBundle() {
 
   // Récupérer les produits digitaux de la boutique depuis la table products
   const [digitalProducts, setDigitalProducts] = React.useState<any[]>([]);
+  // productsLoading doit rester true tant que storeLoading est true
   const [productsLoading, setProductsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
+  // Flag pour indiquer que la vérification du store est terminée
+  const [storeChecked, setStoreChecked] = React.useState(false);
 
   React.useEffect(() => {
+    // Ne rien faire tant que le store est en cours de chargement
+    if (storeLoading) {
+      // Garder productsLoading à true et storeChecked à false pendant le chargement
+      setProductsLoading(true);
+      setStoreChecked(false);
+      return;
+    }
+
+    // Le store est maintenant complètement chargé
+    setStoreChecked(true);
+
+    // Si le store n'existe pas après le chargement, arrêter le chargement des produits
     if (!store?.id) {
       setProductsLoading(false);
       return;
     }
 
+    // Charger les produits uniquement si le store est chargé et existe
     const loadProducts = async () => {
       try {
         setError(null);
+        setProductsLoading(true);
         const { data, error } = await supabase
           .from('products')
           .select('id, name, description, price, currency, image_url, category, is_active, is_draft')
@@ -75,7 +92,7 @@ export default function CreateBundle() {
     };
 
     loadProducts();
-  }, [store?.id, toast]);
+  }, [store?.id, storeLoading, toast]);
 
   // Convertir les produits au format attendu par DigitalBundleManager
   const availableProducts = (digitalProducts || []).map((product: any) => ({
@@ -140,7 +157,21 @@ export default function CreateBundle() {
     navigate(-1);
   }, [navigate]);
 
-  if (storeLoading || productsLoading) {
+  // Calculer l'état de chargement global
+  // On est en chargement si le store est en cours de chargement OU si les produits sont en cours de chargement
+  const isLoading = useMemo(() => {
+    return storeLoading || productsLoading;
+  }, [storeLoading, productsLoading]);
+
+  // Vérifier si on doit afficher l'erreur
+  // Seulement si le store a été vérifié (storeChecked), est complètement chargé (storeLoading = false) ET qu'il n'existe pas
+  const shouldShowError = useMemo(() => {
+    return storeChecked && !storeLoading && !store;
+  }, [storeChecked, storeLoading, store]);
+
+  // Afficher un skeleton pendant le chargement
+  // Cela évite l'affichage prématuré de l'erreur
+  if (isLoading) {
     return (
       <SidebarProvider>
         <div className="flex min-h-screen w-full bg-background">
@@ -156,7 +187,8 @@ export default function CreateBundle() {
     );
   }
 
-  if (!store) {
+  // Afficher l'erreur seulement après que le chargement soit complètement terminé
+  if (shouldShowError) {
     return (
       <SidebarProvider>
         <div className="flex min-h-screen w-full bg-background">
