@@ -1,6 +1,14 @@
 /**
  * Page CustomerMyReturns - Mes retours (Customer Portal)
- * Date: 26 Janvier 2025
+ * Date: 2 Février 2025
+ * 
+ * Fonctionnalités:
+ * - Liste toutes les demandes de retour du client
+ * - Filtres par statut
+ * - Recherche
+ * - Téléchargement PDF
+ * - Vue détaillée retour
+ * - Design responsive et moderne (style Inventaire/Mes Cours)
  */
 
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -10,10 +18,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCustomerReturns } from '@/hooks/returns/useReturns';
-import { useReturn } from '@/hooks/returns/useReturns';
+import { useCustomerReturns, ProductReturn } from '@/hooks/returns/useReturns';
 import {
   RefreshCw,
   Search,
@@ -25,8 +33,12 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  Loader2,
+  AlertTriangle,
+  X,
+  RotateCcw,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
@@ -37,21 +49,75 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ReturnRequestForm } from '@/components/returns/ReturnRequestForm';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
+import { ReturnDetailView } from '@/components/physical/customer/ReturnDetailView';
 
 export default function CustomerMyReturns() {
   const { user } = useAuth();
-  const { data: returns, isLoading } = useCustomerReturns(user?.id);
-  const [selectedReturnId, setSelectedReturnId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
+  const { data: returns, isLoading, error: returnsError, refetch } = useCustomerReturns(user?.id);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const [activeTab, setActiveTab] = useState<'all' | 'requested' | 'approved' | 'refunded' | 'rejected' | 'cancelled'>('all');
 
-  const filteredReturns = (returns || []).filter((r: any) =>
-    r.return_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.products?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Animations au scroll
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+  const statsRef = useScrollAnimation<HTMLDivElement>();
+  const filtersRef = useScrollAnimation<HTMLDivElement>();
+  const returnsRef = useScrollAnimation<HTMLDivElement>();
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: any; icon: any }> = {
+  // Stats calculées
+  const stats = useMemo(() => {
+    if (!returns) {
+      return { total: 0, inProgress: 0, refunded: 0, totalRefunded: 0 };
+    }
+
+    const inProgress = returns.filter((r: ProductReturn) => 
+      ['requested', 'approved', 'pending_pickup', 'in_transit', 'received', 'inspecting'].includes(r.status)
+    ).length;
+    const refunded = returns.filter((r: ProductReturn) => r.status === 'refunded').length;
+    const totalRefunded = returns.reduce((sum: number, r: ProductReturn) => sum + (r.refund_amount || 0), 0);
+
+    return {
+      total: returns.length,
+      inProgress,
+      refunded,
+      totalRefunded,
+    };
+  }, [returns]);
+
+  // Filtrer les retours
+  const filteredReturns = useMemo(() => {
+    if (!returns) return [];
+
+    let filtered = returns;
+
+    // Filtre par statut
+    if (activeTab !== 'all') {
+      if (activeTab === 'requested') {
+        filtered = filtered.filter((r: ProductReturn) => ['requested', 'approved', 'pending_pickup', 'in_transit', 'received', 'inspecting'].includes(r.status));
+      } else {
+        filtered = filtered.filter((r: ProductReturn) => r.status === activeTab);
+      }
+    }
+
+    // Recherche
+    if (debouncedSearch.trim()) {
+      const query = debouncedSearch.toLowerCase();
+      filtered = filtered.filter((r: ProductReturn) =>
+        r.return_number.toLowerCase().includes(query) ||
+        r.product_id?.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [returns, activeTab, debouncedSearch]);
+
+  const getStatusBadge = useCallback((status: string) => {
+    const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: any }> = {
       requested: { label: 'En attente', variant: 'secondary', icon: Clock },
       approved: { label: 'Approuvé', variant: 'default', icon: CheckCircle2 },
       rejected: { label: 'Rejeté', variant: 'destructive', icon: XCircle },
@@ -69,22 +135,55 @@ export default function CustomerMyReturns() {
     const Icon = config.icon;
 
     return (
-      <Badge variant={config.variant} className="flex items-center gap-1">
+      <Badge variant={config.variant} className="flex items-center gap-1 text-xs sm:text-sm">
         <Icon className="h-3 w-3" />
         {config.label}
       </Badge>
     );
-  };
+  }, []);
+
+  // Gérer le rafraîchissement
+  const handleRefresh = useCallback(async () => {
+    try {
+      await refetch();
+      toast({
+        title: 'Rafraîchissement réussi',
+        description: 'Les retours ont été mis à jour.',
+      });
+      logger.info('Returns refreshed');
+    } catch (err) {
+      logger.error('Error refreshing returns:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de rafraîchir les retours.',
+        variant: 'destructive',
+      });
+    }
+  }, [refetch, toast]);
+
+  // Formater la devise
+  const formatCurrency = useCallback((amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }, []);
+
+  const hasError = returnsError;
 
   if (isLoading) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-96" />
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+              <div className="text-center space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+                <p className="text-muted-foreground">Chargement des retours...</p>
+              </div>
             </div>
           </main>
         </div>
@@ -94,245 +193,375 @@ export default function CustomerMyReturns() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <RefreshCw className="h-8 w-8" />
-                Mes Retours
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Gérez vos demandes de retour et remboursement
-              </p>
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header avec animation - Style Inventaire et Mes Cours */}
+            <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                    <RotateCcw className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                  </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Mes Retours
+                  </span>
+                </h1>
+                <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                  Gérez vos demandes de retour et remboursement
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleRefresh}
+                  size="sm"
+                  variant="outline"
+                  className="h-9 sm:h-10 transition-all hover:scale-105 text-xs sm:text-sm"
+                  disabled={isLoading}
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">Rafraîchir</span>
+                  <span className="sm:hidden">Raf.</span>
+                </Button>
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{returns?.length || 0}</div>
-                  <div className="text-sm text-muted-foreground">Total retours</div>
+            {/* Gestion d'erreurs */}
+            {hasError && (
+              <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Une erreur est survenue lors du chargement des retours. Veuillez réessayer.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Stats Cards */}
+            <div ref={statsRef} className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Retours</p>
+                      <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        {stats.total}
+                      </p>
+                    </div>
+                    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/5">
+                      <RotateCcw className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {returns?.filter((r: any) => r.status === 'requested' || r.status === 'approved').length || 0}
+
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">En Cours</p>
+                      <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                        {stats.inProgress}
+                      </p>
+                    </div>
+                    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-yellow-500/10 to-orange-500/5">
+                      <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">En cours</div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {returns?.filter((r: any) => r.status === 'refunded').length || 0}
+
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Remboursés</p>
+                      <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                        {stats.refunded}
+                      </p>
+                    </div>
+                    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/5">
+                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">Remboursés</div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {returns?.reduce((sum: number, r: any) => sum + (r.refund_amount || 0), 0).toLocaleString('fr-FR') || 0} XOF
+
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Remboursé</p>
+                      <p className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                        {formatCurrency(stats.totalRefunded)}
+                      </p>
+                    </div>
+                    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/5">
+                      <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">Total remboursé</div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Search */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Rechercher par numéro de retour ou produit..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            {/* Recherche et Filtres */}
+            <div ref={filtersRef} className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              {/* Recherche */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                    <Input
+                      placeholder="Rechercher par numéro de retour ou produit..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      className="pl-10 sm:pl-12 pr-10 h-10 sm:h-11 text-sm sm:text-base"
+                    />
+                    {searchInput && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSearchInput('')}
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Historique des Retours</CardTitle>
-                <CardDescription>
-                  Liste de toutes vos demandes de retour
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {filteredReturns && filteredReturns.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Numéro</TableHead>
-                        <TableHead>Produit</TableHead>
-                        <TableHead>Raison</TableHead>
-                        <TableHead>Montant</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredReturns.map((returnItem: any) => (
-                        <TableRow key={returnItem.id}>
-                          <TableCell className="font-mono text-sm">
-                            {returnItem.return_number}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {returnItem.products?.image_url && (
-                                <img
-                                  src={returnItem.products.image_url}
-                                  alt={returnItem.products.name}
-                                  className="w-10 h-10 object-cover rounded"
-                                />
-                              )}
-                              <span className="font-medium">{returnItem.products?.name || 'Produit'}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {returnItem.return_reason === 'defective' && 'Défectueux'}
-                              {returnItem.return_reason === 'wrong_item' && 'Mauvais article'}
-                              {returnItem.return_reason === 'not_as_described' && 'Ne correspond pas'}
-                              {returnItem.return_reason === 'damaged' && 'Endommagé'}
-                              {returnItem.return_reason === 'size_fit' && 'Taille/ajustement'}
-                              {returnItem.return_reason === 'quality' && 'Qualité'}
-                              {returnItem.return_reason === 'duplicate' && 'Dupliqué'}
-                              {returnItem.return_reason === 'changed_mind' && 'Changement d\'avis'}
-                              {returnItem.return_reason === 'other' && 'Autre'}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">
-                                {returnItem.refund_amount
-                                  ? returnItem.refund_amount.toLocaleString('fr-FR')
-                                  : returnItem.total_amount.toLocaleString('fr-FR')}{' '}
-                                XOF
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(returnItem.status)}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Calendar className="h-3 w-3" />
-                              {format(new Date(returnItem.requested_at), 'PPP', { locale: fr })}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                                <DialogHeader>
-                                  <DialogTitle>Détails du Retour</DialogTitle>
-                                  <DialogDescription>
-                                    {returnItem.return_number}
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <ReturnDetailView returnId={returnItem.id} />
-                              </DialogContent>
-                            </Dialog>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="text-center py-12">
-                    <RefreshCw className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      {searchTerm ? 'Aucun retour trouvé' : 'Aucun retour pour le moment'}
+              {/* Tabs pour le filtre de statut */}
+              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 h-auto p-1 bg-muted/50 overflow-x-auto">
+                  <TabsTrigger
+                    value="all"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                  >
+                    Tous
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="requested"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                  >
+                    <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                    En Cours
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="approved"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                    Approuvés
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="refunded"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                  >
+                    <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                    Remboursés
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="rejected"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                  >
+                    <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                    Rejetés
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="cancelled"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                  >
+                    <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                    Annulés
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            {/* Liste des retours */}
+            <div ref={returnsRef} className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+              {!isLoading && filteredReturns.length === 0 ? (
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                  <CardContent className="p-8 sm:p-12 text-center">
+                    <RotateCcw className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4 animate-in zoom-in duration-500" />
+                    <h3 className="text-lg sm:text-xl font-semibold mb-2">Aucun retour</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground mb-4">
+                      {searchInput || activeTab !== 'all'
+                        ? 'Aucun retour ne correspond à vos critères de recherche.'
+                        : 'Aucun retour pour le moment'}
                     </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                    {searchInput && (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSearchInput('');
+                          setActiveTab('all');
+                        }}
+                        className="min-h-[44px] touch-manipulation"
+                      >
+                        Réinitialiser les filtres
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-base sm:text-lg">Historique des Retours</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {filteredReturns.length} retour{filteredReturns.length > 1 ? 's' : ''} trouvé{filteredReturns.length > 1 ? 's' : ''}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Tableau sur desktop, cartes sur mobile */}
+                    <div className="hidden md:block">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-xs sm:text-sm">Numéro</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Produit</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Raison</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Montant</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Statut</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Date</TableHead>
+                            <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredReturns.map((returnItem: ProductReturn) => (
+                            <TableRow key={returnItem.id} className="hover:bg-muted/50 transition-colors">
+                              <TableCell className="font-mono text-xs sm:text-sm">{returnItem.return_number}</TableCell>
+                              <TableCell className="text-xs sm:text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                  <span className="font-medium truncate">Produit {returnItem.product_id.slice(0, 8)}...</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs sm:text-sm">
+                                <span className="text-muted-foreground">
+                                  {returnItem.return_reason === 'defective' && 'Défectueux'}
+                                  {returnItem.return_reason === 'wrong_item' && 'Mauvais article'}
+                                  {returnItem.return_reason === 'not_as_described' && 'Ne correspond pas'}
+                                  {returnItem.return_reason === 'damaged' && 'Endommagé'}
+                                  {returnItem.return_reason === 'size_fit' && 'Taille/ajustement'}
+                                  {returnItem.return_reason === 'quality' && 'Qualité'}
+                                  {returnItem.return_reason === 'duplicate' && 'Dupliqué'}
+                                  {returnItem.return_reason === 'changed_mind' && 'Changement d\'avis'}
+                                  {returnItem.return_reason === 'other' && 'Autre'}
+                                </span>
+                              </TableCell>
+                              <TableCell className="font-semibold text-xs sm:text-sm">
+                                {formatCurrency(returnItem.refund_amount || returnItem.total_amount)}
+                              </TableCell>
+                              <TableCell>{getStatusBadge(returnItem.status)}</TableCell>
+                              <TableCell className="text-xs sm:text-sm">
+                                <div className="flex items-center gap-1 text-muted-foreground">
+                                  <Calendar className="h-3.5 w-3.5" />
+                                  {format(new Date(returnItem.requested_at), 'dd/MM/yyyy', { locale: fr })}
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="min-h-[36px] text-xs sm:text-sm"
+                                    >
+                                      <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                                      Voir
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                                    <DialogHeader>
+                                      <DialogTitle>Détails du Retour</DialogTitle>
+                                      <DialogDescription>
+                                        {returnItem.return_number}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <ReturnDetailView returnId={returnItem.id} />
+                                  </DialogContent>
+                                </Dialog>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    {/* Cartes sur mobile */}
+                    <div className="md:hidden space-y-3 sm:space-y-4">
+                      {filteredReturns.map((returnItem: ProductReturn) => (
+                        <Card key={returnItem.id} className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                          <CardContent className="p-4 sm:p-5">
+                            <div className="space-y-3 sm:space-y-4">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-sm sm:text-base mb-1 break-words font-mono">{returnItem.return_number}</h3>
+                                  <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground mb-2">
+                                    <Package className="h-3.5 w-3.5" />
+                                    Produit {returnItem.product_id.slice(0, 8)}...
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">
+                                    {returnItem.return_reason === 'defective' && 'Défectueux'}
+                                    {returnItem.return_reason === 'wrong_item' && 'Mauvais article'}
+                                    {returnItem.return_reason === 'not_as_described' && 'Ne correspond pas'}
+                                    {returnItem.return_reason === 'damaged' && 'Endommagé'}
+                                    {returnItem.return_reason === 'size_fit' && 'Taille/ajustement'}
+                                    {returnItem.return_reason === 'quality' && 'Qualité'}
+                                    {returnItem.return_reason === 'duplicate' && 'Dupliqué'}
+                                    {returnItem.return_reason === 'changed_mind' && 'Changement d\'avis'}
+                                    {returnItem.return_reason === 'other' && 'Autre'}
+                                  </p>
+                                </div>
+                                <div className="flex-shrink-0">{getStatusBadge(returnItem.status)}</div>
+                              </div>
+                              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                <div>
+                                  <p className="text-xs text-muted-foreground mb-1">Montant</p>
+                                  <p className="font-semibold text-base sm:text-lg">{formatCurrency(returnItem.refund_amount || returnItem.total_amount)}</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <Calendar className="h-3.5 w-3.5" />
+                                    {format(new Date(returnItem.requested_at), 'dd/MM/yyyy', { locale: fr })}
+                                  </div>
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="min-h-[44px] touch-manipulation text-xs sm:text-sm"
+                                      >
+                                        <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                                        Voir
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                                      <DialogHeader>
+                                        <DialogTitle>Détails du Retour</DialogTitle>
+                                        <DialogDescription>
+                                          {returnItem.return_number}
+                                        </DialogDescription>
+                                      </DialogHeader>
+                                      <ReturnDetailView returnId={returnItem.id} />
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         </main>
       </div>
     </SidebarProvider>
   );
 }
-
-// Composant pour afficher les détails d'un retour
-function ReturnDetailView({ returnId }: { returnId: string }) {
-  const { data: returnItem } = useReturn(returnId);
-
-  if (!returnItem) {
-    return <div>Chargement...</div>;
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* Statut */}
-      <div className="flex items-center justify-between">
-        <Badge>{returnItem.status}</Badge>
-        <span className="text-sm text-muted-foreground">
-          {format(new Date(returnItem.requested_at), 'PPP p', { locale: fr })}
-        </span>
-      </div>
-
-      {/* Informations */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <div className="text-sm text-muted-foreground">Montant total</div>
-          <div className="font-semibold">{returnItem.total_amount.toLocaleString('fr-FR')} XOF</div>
-        </div>
-        {returnItem.refund_amount && (
-          <div>
-            <div className="text-sm text-muted-foreground">Montant remboursé</div>
-            <div className="font-semibold">{returnItem.refund_amount.toLocaleString('fr-FR')} XOF</div>
-          </div>
-        )}
-      </div>
-
-      {/* Raison */}
-      {returnItem.return_reason_details && (
-        <div>
-          <div className="text-sm text-muted-foreground mb-1">Détails de la raison</div>
-          <p className="text-sm">{returnItem.return_reason_details}</p>
-        </div>
-      )}
-
-      {/* Notes */}
-      {returnItem.customer_notes && (
-        <div>
-          <div className="text-sm text-muted-foreground mb-1">Vos notes</div>
-          <p className="text-sm">{returnItem.customer_notes}</p>
-        </div>
-      )}
-
-      {/* Photos */}
-      {returnItem.customer_photos && returnItem.customer_photos.length > 0 && (
-        <div>
-          <div className="text-sm text-muted-foreground mb-2">Photos</div>
-          <div className="grid grid-cols-3 gap-2">
-            {returnItem.customer_photos.map((url: string, index: number) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Photo ${index + 1}`}
-                className="w-full h-24 object-cover rounded"
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
