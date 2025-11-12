@@ -12,13 +12,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,17 +35,11 @@ import {
   BarChart3,
   GraduationCap,
   Sparkles,
+  Menu,
+  RefreshCw,
+  X,
 } from 'lucide-react';
-
-// Progress component (fallback if not exists)
-const Progress = ({ value }: { value: number }) => (
-  <div className="w-full bg-secondary rounded-full h-2">
-    <div
-      className="bg-primary rounded-full h-2 transition-all"
-      style={{ width: `${value}%` }}
-    />
-  </div>
-);
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface CourseEnrollment {
   id: string;
@@ -64,11 +58,46 @@ interface CourseEnrollment {
   };
 }
 
+// Composant interne pour utiliser useSidebar
+function MobileHeader() {
+  const { toggleSidebar } = useSidebar();
+  
+  return (
+    <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+      <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+        {/* Hamburger Menu - Style Mes Commandes */}
+        <button
+          onClick={toggleSidebar}
+          className="touch-manipulation h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] p-0 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700 transition-colors border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg"
+          aria-label="Ouvrir le menu"
+          type="button"
+        >
+          <Menu className="h-6 w-6 sm:h-7 sm:w-7 text-gray-900 dark:text-gray-50" aria-hidden="true" />
+        </button>
+        
+        {/* Titre avec Icône - Style Mes Commandes */}
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" aria-hidden="true" />
+          <h1 className="text-base sm:text-lg font-bold truncate text-gray-900 dark:text-gray-50">
+            Mes Cours
+          </h1>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export default function MyCourses() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'in-progress' | 'completed'>('all');
+
+  // Animations au scroll
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+  const statsRef = useScrollAnimation<HTMLDivElement>();
+  const filtersRef = useScrollAnimation<HTMLDivElement>();
+  const coursesRef = useScrollAnimation<HTMLDivElement>();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -82,49 +111,47 @@ export default function MyCourses() {
     queryFn: async (): Promise<CourseEnrollment[]> => {
       if (!user?.id) return [];
 
-      // Fetch enrollments
-      const { data: enrollmentsData, error } = await supabase
-        .from('course_enrollments')
+      // Fetch enrollments - Using type assertion for untyped Supabase tables
+      const { data: enrollmentsData, error } = await (supabase
+        .from('course_enrollments' as any)
         .select('*, course:course_id(id, name, description, image_url, slug)')
         .eq('user_id', user.id)
-        .order('last_accessed_at', { ascending: false, nullsFirst: false });
+        .order('last_accessed_at', { ascending: false, nullsFirst: false }) as any);
 
       if (error) throw error;
 
       // Fetch progress for each enrollment
       const enrollmentsWithProgress = await Promise.all(
         (enrollmentsData || []).map(async (enrollment: any) => {
+          // Get course sections first
+          const { data: sectionsData } = await (supabase
+            .from('course_sections' as any)
+            .select('id')
+            .eq('course_id', enrollment.course_id) as any);
+          
+          const sectionIds = sectionsData?.map((s: any) => s.id) || [];
+
           // Get course lessons count
-          const { count: totalLessons } = await supabase
-            .from('course_lessons')
+          const { count: totalLessons } = await (supabase
+            .from('course_lessons' as any)
             .select('*', { count: 'exact', head: true })
-            .eq('section_id', 
-              await supabase
-                .from('course_sections')
-                .select('id')
-                .eq('course_id', enrollment.course_id)
-                .then(({ data }) => data?.map(s => s.id) || [])
-            );
+            .in('section_id', sectionIds.length > 0 ? sectionIds : ['']) as any);
+
+          // Get lesson IDs for this course
+          const { data: lessonsData } = await (supabase
+            .from('course_lessons' as any)
+            .select('id')
+            .in('section_id', sectionIds.length > 0 ? sectionIds : ['']) as any);
+          
+          const lessonIds = lessonsData?.map((l: any) => l.id) || [];
 
           // Get completed lessons count
-          const { count: completedLessons } = await supabase
-            .from('course_lesson_progress')
+          const { count: completedLessons } = await (supabase
+            .from('course_lesson_progress' as any)
             .select('*', { count: 'exact', head: true })
             .eq('user_id', user.id)
             .eq('is_completed', true)
-            .in('lesson_id',
-              await supabase
-                .from('course_lessons')
-                .select('id')
-                .in('section_id',
-                  await supabase
-                    .from('course_sections')
-                    .select('id')
-                    .eq('course_id', enrollment.course_id)
-                    .then(({ data }) => data?.map(s => s.id) || [])
-                )
-                .then(({ data }) => data?.map(l => l.id) || [])
-            );
+            .in('lesson_id', lessonIds.length > 0 ? lessonIds : ['']) as any);
 
           const total = totalLessons || 0;
           const completed = completedLessons || 0;
@@ -170,36 +197,51 @@ export default function MyCourses() {
       : 0,
   };
 
+  // Handlers
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   if (isLoading) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
+        <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
-          <main className="flex-1 overflow-x-hidden">
-            {/* Hero Section Skeleton */}
-            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                  <Skeleton className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-xl bg-white/20" />
-                  <div className="flex-1 space-y-3">
-                    <Skeleton className="h-10 sm:h-12 lg:h-14 w-48 sm:w-64 lg:w-80 bg-white/20" />
-                    <Skeleton className="h-6 sm:h-7 w-64 sm:w-80 lg:w-96 bg-white/10" />
-                  </div>
+          <main className="flex-1 flex flex-col min-w-0">
+            {/* Mobile Header - Loading State */}
+            <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-900 shadow-sm lg:hidden">
+              <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
+                <div className="h-10 w-10 sm:h-11 sm:w-11 min-h-[44px] min-w-[44px] rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse border border-gray-300 dark:border-gray-600" />
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <div className="h-5 w-5 sm:h-6 sm:w-6 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  <Skeleton className="h-5 w-32 sm:w-40" />
                 </div>
               </div>
-            </div>
-            {/* Content Skeleton */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-32 sm:h-36 lg:h-40 rounded-lg" />
-                ))}
-              </div>
-              <Skeleton className="h-20 sm:h-24 rounded-lg" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-80 sm:h-96 rounded-lg" />
-                ))}
+            </header>
+            <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-x-hidden">
+              <div className="container mx-auto space-y-4 sm:space-y-6">
+                {/* Header Skeleton */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg" />
+                    <Skeleton className="h-8 sm:h-10 w-48 sm:w-64" />
+                  </div>
+                  <Skeleton className="h-9 sm:h-10 w-32 sm:w-40" />
+                </div>
+                {/* Stats Skeleton */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-32 sm:h-36" />
+                  ))}
+                </div>
+                {/* Filters Skeleton */}
+                <Skeleton className="h-20 sm:h-24" />
+                {/* Courses Skeleton */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-80 sm:h-96" />
+                  ))}
+                </div>
               </div>
             </div>
           </main>
@@ -210,192 +252,165 @@ export default function MyCourses() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
+      <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
-        <main className="flex-1 overflow-x-hidden">
-          {/* Hero Section - Bannière avec titre visible */}
-          <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden shadow-lg">
-            {/* Pattern de fond */}
-            <div 
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                backgroundRepeat: 'repeat',
-              }}
-            />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 relative z-10">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {/* Icône visible et proéminente */}
-                <div className="p-3 sm:p-4 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg hover:scale-105 transition-transform duration-300 flex-shrink-0">
-                  <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" strokeWidth={2.5} />
-                </div>
-                {/* Titre et sous-titre */}
-                <div className="flex-1">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 sm:mb-3 drop-shadow-lg">
-                    Mes Cours
+        <main className="flex-1 flex flex-col min-w-0">
+          {/* Mobile Header */}
+          <MobileHeader />
+          
+          {/* Contenu principal */}
+          <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-x-hidden">
+            <div className="container mx-auto space-y-4 sm:space-y-6">
+              {/* Header avec animation - Style Inventaire */}
+              <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                      <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                    </div>
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      Mes Cours
+                    </span>
                   </h1>
-                  <p className="text-base sm:text-lg lg:text-xl text-blue-100 max-w-2xl leading-relaxed">
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
                     Continuez votre apprentissage et suivez votre progression
                   </p>
-                  {/* Badge avec nombre de cours */}
-                  {stats.total > 0 && (
-                    <div className="mt-4 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 animate-pulse" />
-                      <span className="text-sm sm:text-base text-blue-100 font-medium">
-                        {stats.total} {stats.total > 1 ? 'cours inscrits' : 'cours inscrit'}
-                      </span>
-                    </div>
-                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleRefresh}
+                    size="sm"
+                    className="h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                    <span className="hidden sm:inline text-xs sm:text-sm">Rafraîchir</span>
+                  </Button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Contenu principal */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8">
+              {/* Stats Cards - Style Inventaire (Purple-Pink Gradient) */}
+              <div 
+                ref={statsRef}
+                className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
+              >
+                {[
+                  { label: 'Total Cours', value: stats.total, icon: BookOpen, color: "from-purple-600 to-pink-600" },
+                  { label: 'En Cours', value: stats.inProgress, icon: PlayCircle, color: "from-blue-600 to-cyan-600" },
+                  { label: 'Terminés', value: stats.completed, icon: Award, color: "from-green-600 to-emerald-600" },
+                  { label: 'Progression Moyenne', value: `${stats.averageProgress}%`, icon: BarChart3, color: "from-purple-600 to-pink-600" },
+                ].map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <Card
+                      key={stat.label}
+                      className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-in fade-in slide-in-from-bottom-4"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+                        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {stat.label}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-3 sm:p-4 pt-0">
+                        <div className={`text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                          {stat.value}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
 
-            {/* Stats - Design moderne avec animations */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-blue-300 dark:hover:border-blue-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">Total Cours</CardTitle>
-                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors duration-300">
-                    <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1">{stats.total}</div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Cours inscrits</p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-blue-300 dark:hover:border-blue-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">En Cours</CardTitle>
-                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors duration-300">
-                    <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-1">{stats.inProgress}</div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">En apprentissage</p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-green-300 dark:hover:border-green-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">Terminés</CardTitle>
-                  <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors duration-300">
-                    <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-600 dark:text-green-400 mb-1">{stats.completed}</div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Complétés</p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-purple-300 dark:hover:border-purple-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">Progression Moyenne</CardTitle>
-                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors duration-300">
-                    <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-600 dark:text-purple-400 mb-1">{stats.averageProgress}%</div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Sur tous vos cours</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Filters - Design moderne et responsive */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
-              <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                  {/* Search */}
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground z-10" />
-                    <Input
-                      placeholder="Rechercher un cours..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 sm:pl-12 h-10 sm:h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all duration-200 text-sm sm:text-base"
-                    />
-                  </div>
-
-                  {/* Status Filter */}
-                  <div className="flex-shrink-0">
-                    <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)} className="w-full sm:w-auto">
-                      <TabsList className="grid grid-cols-3 w-full sm:w-auto bg-muted/50 p-1 h-10 sm:h-11">
-                        <TabsTrigger 
-                          value="all" 
-                          className="text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
+              {/* Search & Filters - Style Inventaire */}
+              <Card ref={filtersRef} className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                    {/* Search */}
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
+                      <Input
+                        id="search-courses"
+                        placeholder="Rechercher un cours..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-8 sm:pl-10 pr-8 sm:pr-20 h-9 sm:h-10 text-xs sm:text-sm"
+                        aria-label="Rechercher"
+                      />
+                      {searchQuery && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 sm:h-8 sm:w-8"
+                          onClick={() => setSearchQuery('')}
+                          aria-label="Effacer"
                         >
-                          Tous
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="in-progress" 
-                          className="text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
-                        >
-                          En cours
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="completed" 
-                          className="text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
-                        >
-                          Terminés
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Courses List - Design moderne avec cartes améliorées */}
-            <div>
-              {/* En-tête avec compteur */}
-              {filteredEnrollments && filteredEnrollments.length > 0 && (
-                <div className="mb-4 sm:mb-6">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
-                    {filteredEnrollments.length} {filteredEnrollments.length === 1 ? 'cours' : 'cours'} trouvé{filteredEnrollments.length > 1 ? 's' : ''}
-                  </h2>
-                </div>
-              )}
-
-              {!filteredEnrollments || filteredEnrollments.length === 0 ? (
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
-                  <CardContent className="py-12 sm:py-16 lg:py-20 text-center">
-                    <div className="max-w-md mx-auto">
-                      <div className="p-4 rounded-full bg-muted/50 w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
-                        <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground" />
-                      </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 sm:mb-3">Aucun cours</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
-                        {searchQuery || statusFilter !== 'all'
-                          ? 'Aucun cours ne correspond à vos critères de recherche'
-                          : 'Vous n\'êtes inscrit à aucun cours pour le moment. Explorez notre catalogue pour découvrir des cours passionnants !'}
-                      </p>
-                      {!searchQuery && statusFilter === 'all' && (
-                        <Button 
-                          onClick={() => navigate('/marketplace')}
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] px-6 sm:px-8"
-                        >
-                          <Sparkles className="h-4 w-4 mr-2" />
-                          Découvrir les cours disponibles
+                          <X className="w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tabs - Style Inventaire */}
+              <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+                <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 w-full sm:w-auto">
+                  <TabsTrigger 
+                    value="all" 
+                    className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  >
+                    Tous ({stats.total})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="in-progress" 
+                    className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  >
+                    En cours ({stats.inProgress})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="completed" 
+                    className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  >
+                    Terminés ({stats.completed})
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              {/* Courses List - Style Inventaire */}
+              <div ref={coursesRef} className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
+                {!filteredEnrollments || filteredEnrollments.length === 0 ? (
+                  <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                    <CardContent className="py-12 sm:py-16 lg:py-20 text-center">
+                      <div className="max-w-md mx-auto">
+                        <div className="p-4 rounded-full bg-muted/50 w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
+                          <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 sm:mb-3">Aucun cours trouvé</h3>
+                        <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
+                          {searchQuery || statusFilter !== 'all'
+                            ? 'Aucun cours ne correspond à vos critères de recherche'
+                            : 'Vous n\'êtes inscrit à aucun cours pour le moment. Explorez notre catalogue pour découvrir des cours passionnants !'}
+                        </p>
+                        {!searchQuery && statusFilter === 'all' && (
+                          <Button 
+                            onClick={() => navigate('/marketplace')}
+                            size="lg"
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] px-6 sm:px-8"
+                          >
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Découvrir les cours disponibles
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredEnrollments.map((enrollment) => (
                     <Card 
                       key={enrollment.id} 
-                      className="group hover:shadow-2xl transition-all duration-300 border-border/50 hover:border-primary/50 bg-card/80 backdrop-blur-sm hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
+                      className="group hover:shadow-lg transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm hover:scale-[1.02] overflow-hidden"
                     >
                       {/* Image du cours */}
                       <div className="relative h-40 sm:h-48 lg:h-52 overflow-hidden bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700">
@@ -473,7 +488,7 @@ export default function MyCourses() {
                         {/* Bouton d'action amélioré */}
                         <Button
                           asChild
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] touch-manipulation"
+                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] touch-manipulation"
                           variant={enrollment.progress_percentage === 100 ? 'outline' : 'default'}
                         >
                           <Link to={`/courses/${enrollment.course?.slug}`} className="flex items-center justify-center">
@@ -498,8 +513,9 @@ export default function MyCourses() {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </main>
