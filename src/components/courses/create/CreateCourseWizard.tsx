@@ -103,12 +103,18 @@ interface CreateCourseWizardProps {
   storeId?: string;
   onSuccess?: () => void;
   onBack?: () => void;
+  hideHeader?: boolean; // Prop pour cacher le header si il est déjà affiché dans la page parente
+  templateSelectorOpen?: boolean; // Prop pour contrôler l'ouverture du template selector depuis la page parente
+  onTemplateSelectorOpenChange?: (open: boolean) => void; // Callback pour notifier les changements d'état
 }
 
 export const CreateCourseWizard = ({ 
   storeId: propsStoreId,
   onSuccess,
   onBack,
+  hideHeader = false,
+  templateSelectorOpen,
+  onTemplateSelectorOpenChange,
 }: CreateCourseWizardProps = {}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -119,8 +125,16 @@ export const CreateCourseWizard = ({
   
   const [currentStep, setCurrentStep] = useState(1);
   
-  // Template system
-  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  // Template system - Utiliser la prop si fournie, sinon état interne
+  const [internalTemplateSelector, setInternalTemplateSelector] = useState(false);
+  const showTemplateSelector = templateSelectorOpen !== undefined ? templateSelectorOpen : internalTemplateSelector;
+  const setShowTemplateSelector = (open: boolean) => {
+    if (onTemplateSelectorOpenChange) {
+      onTemplateSelectorOpenChange(open);
+    } else {
+      setInternalTemplateSelector(open);
+    }
+  };
   const { applyTemplate } = useTemplateApplier();
 
   // Auto-save
@@ -759,43 +773,43 @@ export const CreateCourseWizard = ({
   }
 
   return (
-    <div className="min-h-screen bg-background py-4 sm:py-6 lg:py-8 overflow-x-hidden">
-      <div className="container max-w-5xl mx-auto px-2 sm:px-4 lg:px-6">
-        {/* Header */}
+    <div className="w-full space-y-4 sm:space-y-6">
+      {/* Header - Style Inventaire et Mes Cours (uniquement si hideHeader est false) */}
+      {!hideHeader && (
         <div 
           ref={headerRef}
-          className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-top-4 duration-700"
+          className="animate-in fade-in slide-in-from-top-4 duration-700"
         >
           {onBack && (
             <Button
               variant="ghost"
               onClick={onBack}
-              className="mb-3 sm:mb-4 text-xs sm:text-sm"
+              className="mb-3 sm:mb-4 h-8 sm:h-9 text-xs sm:text-sm hover:bg-muted"
               size="sm"
               aria-label={t('common.back', 'Retour')}
             >
-              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
               <span className="hidden sm:inline">{t('common.back', 'Retour')}</span>
               <span className="sm:hidden">{t('common.backShort', 'Retour')}</span>
             </Button>
           )}
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-amber-500/5 backdrop-blur-sm border border-orange-500/20 animate-in zoom-in duration-500">
-                <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 dark:text-orange-400" aria-hidden="true" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                  <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                </div>
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   {t('courses.create.title', 'Créer un Nouveau Cours')}
-                </h1>
-                <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                  {t('courses.create.subtitle', 'Créez un cours en ligne professionnel en 7 étapes')}
-                </p>
-              </div>
+                </span>
+              </h1>
+              <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                {t('courses.create.subtitle', 'Créez un cours en ligne professionnel en 7 étapes')}
+              </p>
             </div>
             
-            {/* Template Button - Badge "Nouveau" supprimé */}
+            {/* Template Button - Style Inventaire */}
             {currentStep === 1 && (
               <Button
                 variant="outline"
@@ -803,21 +817,25 @@ export const CreateCourseWizard = ({
                   setShowTemplateSelector(true);
                   logger.info('Ouverture sélecteur de template pour cours');
                 }}
-                className="gap-2 border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
+                className="h-9 sm:h-10 transition-all hover:scale-105 border-2 border-purple-500/20 hover:border-purple-500 hover:bg-purple-500/5"
                 size="sm"
                 aria-label={t('courses.useTemplate', 'Utiliser un template')}
               >
-                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                <span className="hidden sm:inline">{t('courses.useTemplate', 'Utiliser un template')}</span>
-                <span className="sm:hidden">{t('courses.template', 'Template')}</span>
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-purple-500" />
+                <span className="hidden sm:inline text-xs sm:text-sm">{t('courses.useTemplate', 'Utiliser un template')}</span>
+                <span className="sm:hidden text-xs">{t('courses.template', 'Template')}</span>
               </Button>
             )}
           </div>
+        </div>
+      )}
 
-          {/* Progress Bar */}
+      {/* Progress Bar - Style Inventaire */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <CardContent className="p-3 sm:p-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs sm:text-sm">
-              <span className="font-medium">
+              <span className="font-medium text-foreground">
                 {t('courses.step', 'Étape')} {currentStep} {t('courses.of', 'sur')} {STEPS.length}
               </span>
               <div className="flex items-center gap-2">
@@ -827,182 +845,184 @@ export const CreateCourseWizard = ({
                     <span className="hidden sm:inline">{t('courses.autoSaving', 'Auto-sauvegarde...')}</span>
                   </div>
                 )}
-                <span className="text-muted-foreground">{Math.round(progress)}% {t('courses.completed', 'complété')}</span>
+                <span className="text-muted-foreground font-medium">{Math.round(progress)}% {t('courses.completed', 'complété')}</span>
               </div>
             </div>
-            <Progress 
-              value={progress} 
-              className="h-1.5 sm:h-2 bg-muted"
-            />
-          </div>
-        </div>
-
-        {/* Steps Navigator - Responsive */}
-        <Card 
-          ref={stepsRef}
-          className="mb-6 sm:mb-8 border-border/50 bg-card/50 backdrop-blur-sm shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-700"
-        >
-          <CardContent className="p-3 sm:p-4 lg:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-2 sm:gap-3 lg:gap-4">
-              {STEPS.map((step, index) => {
-                const isActive = currentStep === step.id;
-                const isCompleted = currentStep > step.id;
-                const StepIcon = step.icon || Info;
-
-                return (
-                  <button
-                    key={step.id}
-                    onClick={() => handleStepClick(step.id)}
-                    role="tab"
-                    aria-selected={isActive}
-                    aria-label={`${t('courses.step', 'Étape')} ${step.id}: ${step.name}`}
-                    className={cn(
-                      "relative p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 text-left",
-                      "hover:shadow-md hover:scale-[1.02] touch-manipulation",
-                      isActive && 'border-orange-500 bg-orange-50 dark:bg-orange-950/30 shadow-lg scale-[1.02] ring-2 ring-orange-500/20',
-                      isCompleted && 'border-green-500 bg-green-50 dark:bg-green-950/30',
-                      !isActive && !isCompleted && 'border-border hover:border-orange-500/50 bg-card/50',
-                      "animate-in fade-in slide-in-from-bottom-4"
-                    )}
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="flex items-start gap-2 sm:gap-3">
-                      <div
-                        className={cn(
-                          "flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300",
-                          isActive && 'bg-orange-500 text-white shadow-lg scale-110',
-                          isCompleted && 'bg-green-500 text-white',
-                          !isActive && !isCompleted && 'bg-gray-200 dark:bg-gray-700 text-gray-500'
-                        )}
-                      >
-                        {isCompleted ? (
-                          <Check className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-                        ) : (
-                          <StepIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={cn(
-                          "text-xs sm:text-sm font-medium truncate mb-0.5",
-                          isActive && "text-orange-600 dark:text-orange-400 font-semibold",
-                          !isActive && !isCompleted && "text-muted-foreground"
-                        )}>
-                          {step.name}
-                        </p>
-                        <p className={cn(
-                          "text-[10px] sm:text-xs truncate hidden sm:block",
-                          isActive ? "text-orange-600/80 dark:text-orange-400/80" : "text-muted-foreground"
-                        )}>
-                          {step.description}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="w-full bg-secondary rounded-full h-2.5 sm:h-3 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Step Content */}
-        <Card 
-          ref={contentRef}
-          className="mb-6 sm:mb-8 border-border/50 bg-card/50 backdrop-blur-sm shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-700"
-        >
-          <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 lg:px-6">
-            {renderStepContent()}
-          </CardContent>
-        </Card>
+      {/* Steps Navigator - Style Inventaire (Responsive) */}
+      <Card 
+        ref={stepsRef}
+        className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700"
+      >
+        <CardContent className="p-3 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-2 sm:gap-3 lg:gap-4">
+            {STEPS.map((step, index) => {
+              const isActive = currentStep === step.id;
+              const isCompleted = currentStep > step.id;
+              const StepIcon = step.icon || Info;
 
-        {/* Navigation Buttons - Responsive */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handleSaveDraft}
-                  className="flex-1 sm:flex-none"
-                  size="sm"
-                  aria-label={t('courses.saveDraft', 'Sauvegarder comme brouillon')}
+              return (
+                <button
+                  key={step.id}
+                  onClick={() => handleStepClick(step.id)}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-label={`${t('courses.step', 'Étape')} ${step.id}: ${step.name}`}
+                  className={cn(
+                    "relative p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 text-left",
+                    "hover:shadow-md hover:scale-[1.02] touch-manipulation min-h-[80px] sm:min-h-[100px]",
+                    isActive && 'border-purple-500 bg-purple-50 dark:bg-purple-950/30 shadow-lg scale-[1.02] ring-2 ring-purple-500/20',
+                    isCompleted && 'border-green-500 bg-green-50 dark:bg-green-950/30',
+                    !isActive && !isCompleted && 'border-border hover:border-purple-500/50 bg-card/50',
+                    "animate-in fade-in slide-in-from-bottom-4"
+                  )}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">{t('courses.saveDraft', 'Sauvegarder brouillon')}</span>
-                  <span className="sm:hidden">{t('courses.draft', 'Brouillon')}</span>
-                  <Badge variant="secondary" className="ml-1.5 hidden sm:flex text-[10px]">
-                    ⌘S
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div
+                      className={cn(
+                        "flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300",
+                        isActive && 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-110',
+                        isCompleted && 'bg-green-500 text-white',
+                        !isActive && !isCompleted && 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                      )}
+                    >
+                      {isCompleted ? (
+                        <Check className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+                      ) : (
+                        <StepIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-xs sm:text-sm font-medium truncate mb-0.5",
+                        isActive && "text-purple-600 dark:text-purple-400 font-semibold",
+                        !isActive && !isCompleted && "text-muted-foreground"
+                      )}>
+                        {step.name}
+                      </p>
+                      <p className={cn(
+                        "text-[10px] sm:text-xs truncate hidden sm:block",
+                        isActive ? "text-purple-600/80 dark:text-purple-400/80" : "text-muted-foreground"
+                      )}>
+                        {step.description}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Step Content - Style Inventaire */}
+      <Card 
+        ref={contentRef}
+        className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700"
+      >
+        <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 lg:px-6">
+          {renderStepContent()}
+        </CardContent>
+      </Card>
+
+      {/* Navigation Buttons - Style Inventaire (Responsive) */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleSaveDraft}
+                className="flex-1 sm:flex-none h-9 sm:h-10 text-xs sm:text-sm"
+                size="sm"
+                aria-label={t('courses.saveDraft', 'Sauvegarder comme brouillon')}
+              >
+                <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">{t('courses.saveDraft', 'Sauvegarder brouillon')}</span>
+                <span className="sm:hidden">{t('courses.draft', 'Brouillon')}</span>
+                <Badge variant="outline" className="ml-1.5 hidden sm:flex text-[10px] font-mono px-1.5 py-0">
+                  ⌘S
+                </Badge>
+              </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className="flex-1 sm:flex-none h-9 sm:h-10 text-xs sm:text-sm"
+                size="sm"
+                aria-label={t('courses.previous', 'Étape précédente')}
+              >
+                <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">{t('courses.previous', 'Précédent')}</span>
+                <span className="sm:hidden">{t('courses.prev', 'Préc.')}</span>
+              </Button>
+
+              {currentStep < STEPS.length ? (
+                <Button 
+                  onClick={nextStep} 
+                  className="flex-1 sm:flex-none h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
+                  size="sm"
+                  aria-label={t('courses.next', 'Étape suivante')}
+                >
+                  <span className="hidden sm:inline">{t('courses.next', 'Suivant')}</span>
+                  <span className="sm:hidden">{t('courses.nextShort', 'Suiv.')}</span>
+                  <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-1.5 sm:ml-2" />
+                  <Badge variant="outline" className="ml-1.5 hidden sm:flex text-[10px] font-mono px-1.5 py-0 bg-white/20 text-white border-white/30">
+                    ⌘→
                   </Badge>
                 </Button>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <Button
-                  variant="outline"
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className="flex-1 sm:flex-none"
+              ) : (
+                <Button 
+                  onClick={handlePublish} 
+                  className="flex-1 sm:flex-none h-9 sm:h-10 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
+                  disabled={createFullCourse.isPending}
                   size="sm"
-                  aria-label={t('courses.previous', 'Étape précédente')}
+                  aria-label={t('courses.publish', 'Publier le cours')}
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">{t('courses.previous', 'Précédent')}</span>
-                  <span className="sm:hidden">{t('courses.prev', 'Préc.')}</span>
+                  {createFullCourse.isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
+                      <span className="hidden sm:inline">{t('courses.publishing', 'Publication en cours...')}</span>
+                      <span className="sm:hidden">{t('courses.publishingShort', 'Pub...')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                      <span className="hidden sm:inline">{t('courses.publish', 'Publier le cours')}</span>
+                      <span className="sm:hidden">{t('courses.publishShort', 'Publier')}</span>
+                    </>
+                  )}
                 </Button>
-
-                {currentStep < STEPS.length ? (
-                  <Button 
-                    onClick={nextStep} 
-                    className="flex-1 sm:flex-none bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    size="sm"
-                    aria-label={t('courses.next', 'Étape suivante')}
-                  >
-                    <span className="hidden sm:inline">{t('courses.next', 'Suivant')}</span>
-                    <span className="sm:hidden">{t('courses.nextShort', 'Suiv.')}</span>
-                    <ChevronRight className="h-4 w-4 ml-1.5 sm:ml-2" />
-                    <Badge variant="secondary" className="ml-1.5 hidden sm:flex text-[10px]">
-                      ⌘→
-                    </Badge>
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={handlePublish} 
-                    className="flex-1 sm:flex-none bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    disabled={createFullCourse.isPending}
-                    size="sm"
-                    aria-label={t('courses.publish', 'Publier le cours')}
-                  >
-                    {createFullCourse.isPending ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
-                        <span className="hidden sm:inline">{t('courses.publishing', 'Publication en cours...')}</span>
-                        <span className="sm:hidden">{t('courses.publishingShort', 'Pub...')}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                        <span className="hidden sm:inline">{t('courses.publish', 'Publier le cours')}</span>
-                        <span className="sm:hidden">{t('courses.publishShort', 'Publier')}</span>
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              )}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Keyboard Shortcuts Help */}
-        <div className="hidden lg:flex items-center justify-center gap-4 pt-4 border-t border-border/50">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Keyboard className="h-3 w-3" aria-hidden="true" />
-            <span>{t('common.shortcuts', 'Raccourcis')}:</span>
-            <Badge variant="outline" className="text-[10px] font-mono">⌘S</Badge>
-            <span className="text-muted-foreground">{t('courses.shortcuts.save', 'Brouillon')}</span>
-            <Badge variant="outline" className="text-[10px] font-mono ml-2">⌘→</Badge>
-            <span className="text-muted-foreground">{t('courses.shortcuts.next', 'Suivant')}</span>
-            <Badge variant="outline" className="text-[10px] font-mono ml-2">⌘←</Badge>
-            <span className="text-muted-foreground">{t('courses.shortcuts.prev', 'Précédent')}</span>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Keyboard Shortcuts Help - Style Inventaire */}
+      <div className="hidden lg:flex items-center justify-center gap-4 pt-4 border-t border-border/50">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Keyboard className="h-3 w-3" aria-hidden="true" />
+          <span>{t('common.shortcuts', 'Raccourcis')}:</span>
+          <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">⌘S</Badge>
+          <span className="text-muted-foreground">{t('courses.shortcuts.save', 'Brouillon')}</span>
+          <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0 ml-2">⌘→</Badge>
+          <span className="text-muted-foreground">{t('courses.shortcuts.next', 'Suivant')}</span>
+          <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0 ml-2">⌘←</Badge>
+          <span className="text-muted-foreground">{t('courses.shortcuts.prev', 'Précédent')}</span>
         </div>
       </div>
       
