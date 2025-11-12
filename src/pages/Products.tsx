@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Package, 
   Plus, 
@@ -17,7 +18,8 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Loader2
+  Loader2,
+  AlertTriangle
 } from "lucide-react";
 import { useStore } from "@/hooks/useStore";
 import { useProducts } from "@/hooks/useProducts";
@@ -206,6 +208,7 @@ const Products = () => {
   const activeProducts = products.filter(p => p.is_active).length;
 
   // Animations au scroll
+  const headerRef = useScrollAnimation<HTMLDivElement>();
   const statsRef = useScrollAnimation<HTMLDivElement>();
   const filtersRef = useScrollAnimation<HTMLDivElement>();
   const productsRef = useScrollAnimation<HTMLDivElement>();
@@ -282,17 +285,17 @@ const Products = () => {
   const handleDelete = useCallback(async () => {
     if (deletingProductId) {
       try {
-        logger.info(`Suppression du produit ${deletingProductId}`);
+        logger.info('Suppression du produit', { productId: deletingProductId });
         await deleteProduct(deletingProductId);
         setDeletingProductId(null);
         await refetch();
-        logger.info('Produit supprimé avec succès');
+        logger.info('Produit supprimé avec succès', { productId: deletingProductId });
         toast({
           title: "Produit supprimé",
           description: "Le produit a été supprimé avec succès",
         });
       } catch (error: any) {
-        logger.error('Erreur lors de la suppression du produit:', error);
+        logger.error(error instanceof Error ? error : 'Erreur lors de la suppression du produit', { error, productId: deletingProductId });
         toast({
           title: "Erreur",
           description: error.message || "Impossible de supprimer le produit",
@@ -304,17 +307,17 @@ const Products = () => {
 
   const handleBulkDelete = useCallback(async (productIds: string[]) => {
     try {
-      logger.info(`Suppression en lot de ${productIds.length} produits`);
+      logger.info('Suppression en lot de produits', { count: productIds.length, productIds });
       await Promise.all(productIds.map(id => deleteProduct(id)));
       setSelectedProducts([]);
       await refetch();
-      logger.info('Produits supprimés avec succès');
+      logger.info('Produits supprimés avec succès', { count: productIds.length });
       toast({
         title: "Produits supprimés",
         description: `${productIds.length} produit(s) supprimé(s) avec succès`,
       });
     } catch (error: any) {
-      logger.error('Erreur lors de la suppression en lot:', error);
+      logger.error(error instanceof Error ? error : 'Erreur lors de la suppression en lot', { error, productIds });
       toast({
         title: "Erreur",
         description: error.message || "Impossible de supprimer tous les produits",
@@ -325,18 +328,18 @@ const Products = () => {
 
   const handleBulkAction = useCallback(async (action: string, productIds: string[]) => {
     try {
-      logger.info(`Action en lot: ${action} sur ${productIds.length} produits`);
+      logger.info('Action en lot sur produits', { action, count: productIds.length, productIds });
       const updates = action === 'activate' ? { is_active: true } : { is_active: false };
       await Promise.all(productIds.map(id => updateProduct(id, updates)));
       setSelectedProducts([]);
       await refetch();
-      logger.info('Action en lot appliquée avec succès');
+      logger.info('Action en lot appliquée avec succès', { action, count: productIds.length });
       toast({
         title: "Action appliquée",
         description: `${productIds.length} produit(s) ${action === 'activate' ? 'activé(s)' : 'désactivé(s)'}`,
       });
     } catch (error: any) {
-      logger.error(`Erreur lors de l'action en lot ${action}:`, error);
+      logger.error(error instanceof Error ? error : `Erreur lors de l'action en lot ${action}`, { error, action, productIds });
       toast({
         title: "Erreur",
         description: error.message || `Impossible de ${action === 'activate' ? 'activer' : 'désactiver'} les produits`,
@@ -349,16 +352,17 @@ const Products = () => {
     const product = products.find(p => p.id === productId);
     if (product) {
       try {
-        logger.info(`Changement de statut du produit ${productId}: ${!product.is_active ? 'actif' : 'inactif'}`);
-        await updateProduct(productId, { is_active: !product.is_active });
+        const newStatus = !product.is_active;
+        logger.info('Changement de statut du produit', { productId, oldStatus: product.is_active, newStatus });
+        await updateProduct(productId, { is_active: newStatus });
         await refetch();
-        logger.info('Statut du produit modifié avec succès');
+        logger.info('Statut du produit modifié avec succès', { productId, newStatus });
         toast({
           title: product.is_active ? "Produit désactivé" : "Produit activé",
           description: `Le produit a été ${product.is_active ? 'désactivé' : 'activé'} avec succès`,
         });
       } catch (error: any) {
-        logger.error('Erreur lors du changement de statut:', error);
+        logger.error(error instanceof Error ? error : 'Erreur lors du changement de statut', { error, productId });
         toast({
           title: "Erreur",
           description: error.message || "Impossible de modifier le statut du produit",
@@ -369,7 +373,7 @@ const Products = () => {
   }, [products, updateProduct, refetch, toast]);
 
   const handleRefresh = useCallback(() => {
-    logger.info('Actualisation de la liste des produits');
+    logger.info('Actualisation de la liste des produits', {});
     refetch();
     toast({
       title: "Actualisation",
@@ -379,10 +383,10 @@ const Products = () => {
 
   const handleDuplicateProduct = useCallback(async (productId: string) => {
     try {
-      logger.info(`Duplication du produit ${productId}`);
+      logger.info('Duplication du produit', { productId });
       const product = products.find(p => p.id === productId);
       if (!product) {
-        logger.warn(`Produit ${productId} introuvable pour duplication`);
+        logger.warn('Produit introuvable pour duplication', { productId });
         return;
       }
 
@@ -399,13 +403,13 @@ const Products = () => {
       // Ici, vous devriez appeler votre API pour créer le nouveau produit
       // Pour l'instant, simulons avec une mise à jour
       await refetch();
-      logger.info('Produit dupliqué avec succès');
+      logger.info('Produit dupliqué avec succès', { productId });
       toast({
         title: "Produit dupliqué",
         description: "Le produit a été dupliqué avec succès",
       });
     } catch (error: any) {
-      logger.error('Erreur lors de la duplication du produit:', error);
+      logger.error(error instanceof Error ? error : 'Erreur lors de la duplication du produit', { error, productId });
       toast({
         title: "Erreur",
         description: error.message || "Impossible de dupliquer le produit",
@@ -443,7 +447,7 @@ const Products = () => {
     setExportingCSV(true);
 
     try {
-      logger.info(`Export CSV de ${filteredProducts.length} produits`);
+      logger.info('Export CSV de produits', { count: filteredProducts.length });
       const headers = [
         'id', 'name', 'slug', 'description', 'price', 'currency', 
         'category', 'product_type', 'licensing_type', 'license_terms', 'is_active', 'rating', 'reviews_count', 
@@ -477,13 +481,13 @@ const Products = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      logger.info('Export CSV réussi');
+      logger.info('Export CSV réussi', { count: filteredProducts.length });
       toast({
         title: "Export réussi",
         description: `${filteredProducts.length} produit(s) exporté(s)`,
       });
     } catch (error: any) {
-      logger.error('Erreur lors de l\'export CSV:', error);
+      logger.error(error instanceof Error ? error : 'Erreur lors de l\'export CSV', { error, count: filteredProducts.length });
       toast({
         title: "Erreur d'export",
         description: error.message || "Impossible d'exporter les produits",
@@ -554,109 +558,93 @@ const Products = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
-        
-        <div className="flex-1 flex flex-col">
-          <header className="sticky top-0 z-20 border-b bg-card/95 backdrop-blur-md shadow-sm transition-all duration-300" role="banner">
-            <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 lg:gap-4 px-2 sm:px-3 lg:px-6 overflow-hidden">
-              <SidebarTrigger 
-                aria-label={t('dashboard.sidebarToggle', 'Toggle sidebar')}
-                className="hover:bg-accent/50 transition-colors duration-200 flex-shrink-0 touch-manipulation min-h-[44px] min-w-[44px]"
-              />
-              <div className="flex-1 min-w-0 overflow-hidden">
-                <h1 className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent truncate px-1" id="products-title">
-                  {t('products.title')}
-                </h1>
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header avec animation - Style Inventaire et Mes Cours */}
+            <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <SidebarTrigger 
+                  aria-label={t('dashboard.sidebarToggle', 'Toggle sidebar')}
+                  className="hover:bg-accent/50 transition-colors duration-200 flex-shrink-0 touch-manipulation min-h-[44px] min-w-[44px]"
+                />
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                      <Package className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                    </div>
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      {t('products.title')}
+                    </span>
+                  </h1>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                    Gérez vos produits et vendez plus efficacement
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 flex-shrink-0">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleRefresh} 
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleRefresh}
+                  size="sm"
+                  variant="outline"
+                  className="h-9 sm:h-10 transition-all hover:scale-105 text-xs sm:text-sm"
                   disabled={productsLoading}
-                  aria-label={t('products.refresh')}
-                  className="hidden sm:flex hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation min-h-[36px]"
-                  title={`Actualiser (F5)`}
+                  title="Actualiser (F5)"
                 >
-                  <RefreshCw className={`h-4 w-4 ${productsLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
-                  <span className="hidden lg:inline ml-2">{t('products.refresh')}</span>
-                </Button>
-                <Button 
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleRefresh} 
-                  disabled={productsLoading}
-                  aria-label={t('products.refresh')}
-                  className="sm:hidden hover:scale-110 active:scale-95 transition-transform duration-200 touch-manipulation min-h-[44px] min-w-[44px]"
-                  title="Actualiser"
-                >
-                  <RefreshCw className={`h-4 w-4 ${productsLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
+                  <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${productsLoading ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">{t('products.refresh')}</span>
+                  <span className="sm:hidden">Raf.</span>
                 </Button>
                 <Button 
                   onClick={() => navigate("/dashboard/products/new")} 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 group hover:scale-105 active:scale-95 touch-manipulation min-h-[36px] sm:min-h-[40px] text-xs sm:text-sm px-2 sm:px-3 lg:px-4"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-200 group hover:scale-105 active:scale-95 touch-manipulation min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
                   aria-label={t('products.addNew')}
                   size="sm"
                   title="Nouveau produit (Cmd/Ctrl+N)"
                 >
-                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 lg:mr-2 group-hover:rotate-90 transition-transform duration-200 flex-shrink-0" aria-hidden="true" />
-                  <span className="hidden xs:inline sm:hidden">{t('products.add')}</span>
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 group-hover:rotate-90 transition-transform duration-200 flex-shrink-0" aria-hidden="true" />
                   <span className="hidden sm:inline">{t('products.addNew')}</span>
-                  <span className="xs:hidden">+</span>
+                  <span className="sm:hidden">+ Ajouter</span>
                 </Button>
               </div>
             </div>
-          </header>
-
-          <main className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6 bg-gradient-to-br from-background via-background to-muted/20 overflow-x-hidden" role="main" aria-labelledby="products-title">
-            <div className="max-w-7xl mx-auto space-y-2.5 sm:space-y-3 lg:space-y-5 xl:space-y-6 px-1 sm:px-2 lg:px-3">
-              {productsLoading ? (
-                <Card className="shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
-                  <CardContent className="py-12 text-center" role="status" aria-live="polite">
-                    <Loader2 className="inline-block h-8 w-8 animate-spin text-primary mb-3" aria-hidden="true" />
-                    <p className="mt-2 text-muted-foreground">{t('common.loading')}</p>
-                  </CardContent>
-                </Card>
-              ) : products.length === 0 ? (
-                <Card className="shadow-sm border-2 border-dashed border-border/50 bg-card/30 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500">
-                  <CardHeader className="text-center py-8 sm:py-12">
-                    <div className="flex justify-center mb-4 animate-in zoom-in-95 duration-500">
-                      <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                        <Package className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-                      </div>
-                    </div>
-                    <CardTitle className="text-xl sm:text-2xl font-bold">{t('products.empty.title')}</CardTitle>
-                    <CardDescription className="mt-2 text-sm sm:text-base">
-                      {t('products.empty.description')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-center pb-8 sm:pb-12">
-                    <div className="space-y-4">
-                      <Button 
-                        onClick={() => navigate("/dashboard/products/new")} 
-                        size="lg" 
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 group"
-                      >
-                        <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
-                        {t('products.add')}
-                      </Button>
-                      <div className="text-xs sm:text-sm text-muted-foreground">
-                        <p className="mb-3">{t('common.or')} {t('products.import').toLowerCase()}</p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => setImportDialogOpen(true)}
-                          className="hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95"
-                        >
-                          <Upload className="h-4 w-4 mr-2" />
-                          {t('products.import')}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
+            {/* États de chargement */}
+            {productsLoading ? (
+              <div className="text-center space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+                <p className="text-muted-foreground">{t('common.loading')}</p>
+              </div>
+            ) : products.length === 0 ? (
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="p-8 sm:p-12 text-center">
+                  <Package className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4 animate-in zoom-in duration-500" />
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('products.empty.title')}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4">
+                    {t('products.empty.description')}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                    <Button 
+                      onClick={() => navigate("/dashboard/products/new")} 
+                      size="lg" 
+                      className="min-h-[44px] touch-manipulation bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 group"
+                    >
+                      <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
+                      {t('products.add')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      onClick={() => setImportDialogOpen(true)}
+                      className="min-h-[44px] touch-manipulation hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      {t('products.import')}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
                 <>
                   {/* Statistiques avec animations améliorées */}
                   <div 
@@ -711,10 +699,10 @@ const Products = () => {
                   </div>
 
                   {filteredProducts.length === 0 ? (
-                    <Card className="shadow-sm border-border/50 bg-card/30 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500">
-                      <CardContent className="py-8 sm:py-12 text-center">
-                        <Package className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
-                        <h3 className="text-base sm:text-lg font-semibold mb-2">{t('products.empty.noResults')}</h3>
+                    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                      <CardContent className="p-8 sm:p-12 text-center">
+                        <Package className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4 animate-in zoom-in duration-500" />
+                        <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('products.empty.noResults')}</h3>
                         <p className="text-sm sm:text-base text-muted-foreground mb-4">
                           {t('products.empty.noResultsDescription')}
                         </p>
@@ -725,10 +713,11 @@ const Products = () => {
                             setCategory("all");
                             setProductType("all");
                             setStatus("all");
+                            setStockStatus("all");
                             setPriceRange([0, 1000000]);
                             setDateRange([null, null]);
                           }}
-                          className="hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95"
+                          className="min-h-[44px] touch-manipulation hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95"
                         >
                           {t('common.clearFilters', 'Effacer les filtres')}
                         </Button>
@@ -765,7 +754,7 @@ const Products = () => {
                             variant="outline" 
                             size="sm" 
                             onClick={() => setImportDialogOpen(true)}
-                            className="flex-1 hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation min-h-[40px] text-xs sm:text-sm"
+                            className="flex-1 hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation min-h-[44px] text-xs sm:text-sm"
                           >
                             <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 flex-shrink-0" />
                             <span className="hidden sm:inline">Importer</span>
@@ -776,7 +765,7 @@ const Products = () => {
                             size="sm" 
                             onClick={handleExportCSV}
                             disabled={exportingCSV || filteredProducts.length === 0}
-                            className="flex-1 hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[40px] text-xs sm:text-sm"
+                            className="flex-1 hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[44px] text-xs sm:text-sm"
                           >
                             {exportingCSV ? (
                               <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin flex-shrink-0" />
@@ -966,9 +955,8 @@ const Products = () => {
                   )}
                 </>
               )}
-            </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
 
       {/* Edit Product Dialog */}
