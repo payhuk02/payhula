@@ -47,18 +47,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const ORDER_STATUSES: { value: SupplierOrder['status'] | 'all'; label: string; color: string }[] = [
-  { value: 'all', label: 'Tous', color: 'from-purple-600 to-pink-600' },
-  { value: 'draft', label: 'Brouillon', color: 'from-gray-600 to-gray-600' },
-  { value: 'pending', label: 'En attente', color: 'from-yellow-600 to-orange-600' },
-  { value: 'sent', label: 'Envoyée', color: 'from-blue-600 to-cyan-600' },
-  { value: 'confirmed', label: 'Confirmée', color: 'from-green-600 to-emerald-600' },
-  { value: 'processing', label: 'En traitement', color: 'from-purple-600 to-pink-600' },
-  { value: 'shipped', label: 'Expédiée', color: 'from-indigo-600 to-indigo-600' },
-  { value: 'partially_received', label: 'Partiellement reçue', color: 'from-orange-600 to-orange-600' },
-  { value: 'received', label: 'Reçue', color: 'from-green-600 to-emerald-600' },
-  { value: 'cancelled', label: 'Annulée', color: 'from-red-600 to-rose-600' },
-  { value: 'completed', label: 'Terminée', color: 'from-emerald-600 to-emerald-600' },
+const ORDER_STATUSES: { value: SupplierOrder['status'] | 'all'; label: string; shortLabel: string; color: string; icon?: any }[] = [
+  { value: 'all', label: 'Tous', shortLabel: 'Tous', color: 'from-purple-600 to-pink-600' },
+  { value: 'draft', label: 'Brouillon', shortLabel: 'Brouillon', color: 'from-gray-600 to-gray-600' },
+  { value: 'pending', label: 'En attente', shortLabel: 'Attente', color: 'from-yellow-600 to-orange-600' },
+  { value: 'sent', label: 'Envoyée', shortLabel: 'Envoyée', color: 'from-blue-600 to-cyan-600' },
+  { value: 'confirmed', label: 'Confirmée', shortLabel: 'Confirmée', color: 'from-green-600 to-emerald-600' },
+  { value: 'processing', label: 'En traitement', shortLabel: 'Traitement', color: 'from-purple-600 to-pink-600' },
+  { value: 'shipped', label: 'Expédiée', shortLabel: 'Expédiée', color: 'from-indigo-600 to-indigo-600' },
+  { value: 'partially_received', label: 'Partiellement reçue', shortLabel: 'Partielle', color: 'from-orange-600 to-orange-600' },
+  { value: 'received', label: 'Reçue', shortLabel: 'Reçue', color: 'from-green-600 to-emerald-600' },
+  { value: 'cancelled', label: 'Annulée', shortLabel: 'Annulée', color: 'from-red-600 to-rose-600' },
+  { value: 'completed', label: 'Terminée', shortLabel: 'Terminée', color: 'from-emerald-600 to-emerald-600' },
 ];
 
 export default function SupplierOrders() {
@@ -259,15 +259,16 @@ export default function SupplierOrders() {
         className="animate-in fade-in slide-in-from-bottom-4 duration-700"
       >
         <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as SupplierOrder['status'] | 'all')} className="w-full">
-          <div className="overflow-x-auto">
-            <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 w-max min-w-full sm:w-auto sm:min-w-0 inline-flex">
+          <div className="overflow-x-auto scrollbar-hide scroll-smooth -mx-4 sm:-mx-6 md:mx-0 px-4 sm:px-6 md:px-0">
+            <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 w-max min-w-full sm:min-w-0 sm:w-auto inline-flex gap-1 sm:gap-1.5">
               {ORDER_STATUSES.map((status) => (
                 <TabsTrigger
                   key={status.value}
                   value={status.value}
-                  className="flex-none gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 whitespace-nowrap"
+                  className="flex-none gap-1 sm:gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 whitespace-nowrap shrink-0 touch-manipulation"
                 >
-                  {status.label}
+                  <span className="hidden lg:inline">{status.label}</span>
+                  <span className="lg:hidden">{status.shortLabel}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -296,18 +297,18 @@ export default function SupplierOrders() {
           </Card>
         ) : (
           <>
-            {/* Desktop Table */}
-            <div className="hidden md:block rounded-md border overflow-x-auto">
-              <Table>
+            {/* Desktop Table - Responsive with horizontal scroll */}
+            <div className="hidden lg:block rounded-md border overflow-x-auto scrollbar-hide scroll-smooth">
+              <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs sm:text-sm">Numéro</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Fournisseur</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Date</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Montant</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Statut</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Livraison prévue</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[140px]">Numéro</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">Fournisseur</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">Date</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">Montant</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[160px]">Statut</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">Livraison prévue</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap min-w-[80px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -315,64 +316,81 @@ export default function SupplierOrders() {
                     const status = ORDER_STATUSES.find(s => s.value === order.status);
                     return (
                       <TableRow key={order.id}>
-                        <TableCell className="text-xs sm:text-sm font-medium">{order.order_number}</TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          {(order.supplier as any)?.name || 'N/A'}
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          {format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
-                            {new Intl.NumberFormat('fr-FR', {
-                              style: 'currency',
-                              currency: order.currency || 'XOF',
-                            }).format(order.total_amount)}
+                        <TableCell className="text-xs sm:text-sm font-medium whitespace-nowrap min-w-[140px]">
+                          <div className="flex items-center gap-2">
+                            <Package className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span className="truncate">{order.order_number}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">
+                          <span className="truncate block">
+                            {(order.supplier as any)?.name || 'N/A'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">
+                          {format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span>
+                              {new Intl.NumberFormat('fr-FR', {
+                                style: 'currency',
+                                currency: order.currency || 'XOF',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              }).format(order.total_amount)}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[160px]">
                           <Select
                             value={order.status}
                             onValueChange={(value: SupplierOrder['status']) =>
                               handleStatusUpdate(order.id, value)
                             }
                           >
-                            <SelectTrigger className="w-40 h-8 text-xs">
+                            <SelectTrigger className="w-full max-w-[160px] h-8 text-xs">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-h-[300px]">
                               {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
-                                <SelectItem key={s.value} value={s.value}>
+                                <SelectItem key={s.value} value={s.value} className="text-xs">
                                   {s.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">
                           {order.expected_delivery_date ? (
                             <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}
+                              <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                              <span>
+                                {format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}
+                              </span>
                             </div>
                           ) : (
                             <span className="text-muted-foreground text-xs">Non définie</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right whitespace-nowrap min-w-[80px]">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem className="text-xs sm:text-sm">
                                 <Eye className="mr-2 h-4 w-4" />
                                 Voir détails
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'completed')}>
+                              <DropdownMenuItem 
+                                onClick={() => handleStatusUpdate(order.id, 'completed')}
+                                className="text-xs sm:text-sm"
+                                disabled={order.status === 'completed'}
+                              >
                                 <Package className="mr-2 h-4 w-4" />
                                 Marquer comme terminée
                               </DropdownMenuItem>
@@ -386,8 +404,8 @@ export default function SupplierOrders() {
               </Table>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-4">
+            {/* Tablet/Mobile Cards */}
+            <div className="lg:hidden space-y-3 sm:space-y-4">
               {filteredOrders.map((order) => {
                 const status = ORDER_STATUSES.find(s => s.value === order.status);
                 return (
@@ -395,69 +413,113 @@ export default function SupplierOrders() {
                     key={order.id}
                     className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-md transition-all duration-300"
                   >
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="space-y-2.5 sm:space-y-3">
+                        <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <Package className="h-4 w-4 text-muted-foreground shrink-0" />
-                              <h3 className="font-medium text-sm sm:text-base truncate">
+                              <h3 className="font-semibold text-sm sm:text-base truncate">
                                 {order.order_number}
                               </h3>
                             </div>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
                               {(order.supplier as any)?.name || 'N/A'}
+                              {(order.supplier as any)?.company_name && (
+                                <span className="ml-1">({(order.supplier as any).company_name})</span>
+                              )}
                             </p>
                           </div>
-                          <Badge variant={status?.value === 'all' ? 'default' : 'secondary'} className="text-xs shrink-0">
-                            {status?.label || order.status}
-                          </Badge>
+                          <div className="flex flex-col items-end gap-2 shrink-0">
+                            <Badge 
+                              variant={order.status === 'completed' ? 'default' : order.status === 'cancelled' ? 'destructive' : 'secondary'} 
+                              className="text-xs"
+                            >
+                              {status?.shortLabel || status?.label || order.status}
+                            </Badge>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                  <MoreVertical className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40 sm:w-48">
+                                <DropdownMenuItem className="text-xs sm:text-sm">
+                                  <Eye className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  Voir détails
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusUpdate(order.id, 'completed')}
+                                  className="text-xs sm:text-sm"
+                                  disabled={order.status === 'completed'}
+                                >
+                                  <Package className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  Terminée
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2 text-xs sm:text-sm">
-                          <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          <span className="text-muted-foreground">
-                            {format(new Date(order.order_date), 'PPP', { locale: fr })}
-                          </span>
-                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm">
+                            <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span className="text-muted-foreground truncate">
+                              {format(new Date(order.order_date), 'PPP', { locale: fr })}
+                            </span>
+                          </div>
 
-                        <div className="flex items-center gap-2 text-xs sm:text-sm">
-                          <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          <span className="font-medium">
-                            {new Intl.NumberFormat('fr-FR', {
-                              style: 'currency',
-                              currency: order.currency || 'XOF',
-                            }).format(order.total_amount)}
-                          </span>
+                          <div className="flex items-center gap-2 text-xs sm:text-sm">
+                            <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span className="font-semibold truncate">
+                              {new Intl.NumberFormat('fr-FR', {
+                                style: 'currency',
+                                currency: order.currency || 'XOF',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              }).format(order.total_amount)}
+                            </span>
+                          </div>
                         </div>
 
                         {order.expected_delivery_date && (
-                          <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm pt-1 border-t border-border/50">
                             <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                             <span className="text-muted-foreground">
-                              Livraison: {format(new Date(order.expected_delivery_date), 'PPP', { locale: fr })}
+                              Livraison prévue: {format(new Date(order.expected_delivery_date), 'PPP', { locale: fr })}
                             </span>
                           </div>
                         )}
 
-                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/50">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-border/50">
                           <Select
                             value={order.status}
                             onValueChange={(value: SupplierOrder['status']) =>
                               handleStatusUpdate(order.id, value)
                             }
                           >
-                            <SelectTrigger className="w-full h-8 text-xs">
+                            <SelectTrigger className="w-full sm:flex-1 h-8 sm:h-9 text-xs sm:text-sm">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-h-[300px]">
                               {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
-                                <SelectItem key={s.value} value={s.value}>
+                                <SelectItem key={s.value} value={s.value} className="text-xs sm:text-sm">
                                   {s.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              // Action pour voir les détails
+                            }}
+                            className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+                          >
+                            <Eye className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                            Détails
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -506,72 +568,84 @@ export default function SupplierOrders() {
                 </div>
 
                 {orderItems.map((item, index) => (
-                  <div key={index} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
-                    <div className="col-span-1 sm:col-span-4">
-                      <Label className="text-xs sm:text-sm">Produit / SKU</Label>
-                      <Input
-                        placeholder="ID produit ou SKU"
-                        value={item.product_id || item.supplier_product_id || ''}
-                        onChange={(e) =>
-                          handleUpdateItem(index, item.product_id ? 'product_id' : 'supplier_product_id', e.target.value)
-                        }
-                        className="text-sm"
-                      />
-                    </div>
-                    <div className="col-span-1 sm:col-span-2">
-                      <Label className="text-xs sm:text-sm">Quantité</Label>
-                      <Input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          handleUpdateItem(index, 'quantity', parseInt(e.target.value) || 0)
-                        }
-                        className="text-sm"
-                      />
-                    </div>
-                    <div className="col-span-1 sm:col-span-3">
-                      <Label className="text-xs sm:text-sm">Coût unitaire</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={item.unit_cost}
-                        onChange={(e) =>
-                          handleUpdateItem(index, 'unit_cost', parseFloat(e.target.value) || 0)
-                        }
-                        className="text-sm"
-                      />
-                    </div>
-                    <div className="col-span-1 sm:col-span-2">
-                      <Label className="text-xs sm:text-sm">Total</Label>
-                      <Input
-                        value={(item.quantity * item.unit_cost).toFixed(2)}
-                        disabled
-                        className="bg-muted text-sm"
-                      />
-                    </div>
-                    <div className="col-span-1 sm:col-span-1">
+                  <Card key={index} className="border-border/50 bg-card/50 p-3 sm:p-4">
+                    <div className="space-y-3 sm:space-y-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-2">
+                        <div className="col-span-1 sm:col-span-5 space-y-2">
+                          <Label className="text-xs sm:text-sm">Produit / SKU</Label>
+                          <Input
+                            placeholder="ID produit ou SKU"
+                            value={item.product_id || item.supplier_product_id || ''}
+                            onChange={(e) =>
+                              handleUpdateItem(index, item.product_id ? 'product_id' : 'supplier_product_id', e.target.value)
+                            }
+                            className="text-sm h-9 sm:h-10"
+                          />
+                        </div>
+                        <div className="col-span-1 sm:col-span-2 space-y-2">
+                          <Label className="text-xs sm:text-sm">Quantité</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleUpdateItem(index, 'quantity', parseInt(e.target.value) || 0)
+                            }
+                            className="text-sm h-9 sm:h-10"
+                          />
+                        </div>
+                        <div className="col-span-1 sm:col-span-3 space-y-2">
+                          <Label className="text-xs sm:text-sm">Coût unitaire</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={item.unit_cost}
+                            onChange={(e) =>
+                              handleUpdateItem(index, 'unit_cost', parseFloat(e.target.value) || 0)
+                            }
+                            className="text-sm h-9 sm:h-10"
+                          />
+                        </div>
+                        <div className="col-span-1 sm:col-span-2 space-y-2">
+                          <Label className="text-xs sm:text-sm">Total</Label>
+                          <div className="flex items-center h-9 sm:h-10 px-3 bg-muted rounded-md text-sm font-medium">
+                            {new Intl.NumberFormat('fr-FR', {
+                              style: 'currency',
+                              currency: 'XOF',
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(item.quantity * item.unit_cost)}
+                          </div>
+                        </div>
+                      </div>
                       {orderItems.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveItem(index)}
-                          className="h-10 w-full"
-                        >
-                          ×
-                        </Button>
+                        <div className="flex justify-end pt-2 border-t border-border/50 sm:pt-0 sm:border-0">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveItem(index)}
+                            className="h-8 sm:h-9 w-full sm:w-auto px-3 text-xs sm:text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 sm:mr-0" />
+                            <span className="sm:hidden">Supprimer cet article</span>
+                            <span className="hidden sm:inline">×</span>
+                          </Button>
+                        </div>
                       )}
                     </div>
-                  </div>
+                  </Card>
                 ))}
 
-                <div className="flex justify-end pt-2 border-t">
-                  <div className="text-base sm:text-lg font-semibold">
+                <div className="flex justify-between sm:justify-end items-center pt-3 sm:pt-2 border-t">
+                  <span className="text-sm sm:text-base font-medium text-muted-foreground sm:hidden">Total:</span>
+                  <div className="text-base sm:text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Total: {new Intl.NumberFormat('fr-FR', {
                       style: 'currency',
                       currency: 'XOF',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
                     }).format(
                       orderItems.reduce((sum, item) => sum + (item.quantity * item.unit_cost), 0)
                     )}
