@@ -3,11 +3,10 @@
  * Date: 26 Janvier 2025
  */
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useStore } from '@/hooks/useStore';
 import { DigitalBundleManager } from '@/components/digital/DigitalBundleManager';
@@ -15,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateBundle } from '@/hooks/digital/useDigitalBundles';
 import { generateSlug } from '@/lib/store-utils';
-import { Package, ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react';
+import { Package, AlertTriangle, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -141,10 +140,6 @@ export default function CreateBundle() {
     navigate(-1);
   }, [navigate]);
 
-  const handleBack = useCallback(() => {
-    navigate('/dashboard/digital-products/bundles');
-  }, [navigate]);
-
   if (storeLoading || productsLoading) {
     return (
       <SidebarProvider>
@@ -195,15 +190,6 @@ export default function CreateBundle() {
             <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
               <div className="flex items-center gap-2 sm:gap-3">
                 <SidebarTrigger className="mr-1 sm:mr-2" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBack}
-                  className="h-9 sm:h-10 text-xs sm:text-sm"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">Retour</span>
-                </Button>
                 <div>
                   <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
