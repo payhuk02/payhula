@@ -186,20 +186,22 @@ export default function CreateBundle() {
         <AppSidebar />
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
-            {/* Header avec animation - Style Inventaire et Mes Cours */}
+            {/* Header avec animation - Style Inventaire */}
             <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <SidebarTrigger className="mr-1 sm:mr-2" />
-                <div>
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
-                      <Package className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+              <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+                <SidebarTrigger className="mt-1 sm:mt-0 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold flex flex-col sm:flex-row sm:items-center gap-2 mb-1 sm:mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500 shrink-0">
+                        <Package className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                      </div>
+                      <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
+                        Créer un Bundle de Produits Digitaux
+                      </span>
                     </div>
-                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                      Créer un Bundle de Produits Digitaux
-                    </span>
                   </h1>
-                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
                     Regroupez plusieurs produits et offrez-les à prix réduit
                   </p>
                 </div>
@@ -218,26 +220,30 @@ export default function CreateBundle() {
 
             {/* Bundle Manager */}
             <div ref={contentRef} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Configuration du Bundle</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                <CardHeader className="p-3 sm:p-4 lg:p-6">
+                  <CardTitle className="text-base sm:text-lg md:text-xl">Configuration du Bundle</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm mt-1 sm:mt-2">
                     Sélectionnez les produits à inclure et configurez la remise
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3 sm:p-4 lg:p-6 pt-0 sm:pt-0">
                   {createBundle.isPending ? (
-                    <div className="flex items-center justify-center py-12">
-                      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-                      <span className="ml-2 text-sm text-muted-foreground">Création du bundle...</span>
+                    <div className="flex flex-col sm:flex-row items-center justify-center py-8 sm:py-12 gap-2 sm:gap-3">
+                      <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-purple-600" />
+                      <span className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+                        Création du bundle...
+                      </span>
                     </div>
                   ) : (
-                    <DigitalBundleManager
-                      availableProducts={availableProducts}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      mode="create"
-                    />
+                    <div className="w-full overflow-x-auto">
+                      <DigitalBundleManager
+                        availableProducts={availableProducts}
+                        onSave={handleSave}
+                        onCancel={handleCancel}
+                        mode="create"
+                      />
+                    </div>
                   )}
                 </CardContent>
               </Card>
