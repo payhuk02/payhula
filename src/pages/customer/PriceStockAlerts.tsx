@@ -55,13 +55,13 @@ export default function PriceStockAlerts() {
       try {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError) {
-          logger.error('Error fetching user:', userError);
+          logger.error(userError instanceof Error ? userError : 'Error fetching user', { error: userError });
           setError('Erreur lors du chargement de l\'utilisateur');
           return;
         }
         setUserId(user?.id || null);
       } catch (err) {
-        logger.error('Error in fetchUser:', err);
+        logger.error(err instanceof Error ? err : 'Error in fetchUser', { error: err });
         setError('Erreur lors du chargement de l\'utilisateur');
       }
     };
@@ -83,7 +83,8 @@ export default function PriceStockAlerts() {
       return priceDifference <= 0;
     }).length || 0;
     const stockAlertsInStock = stockAlerts?.filter(alert => {
-      const isInStock = alert.products?.stock_quantity !== null && alert.products?.stock_quantity > 0;
+      const stockQuantity = alert.products?.stock_quantity;
+      const isInStock = stockQuantity !== null && stockQuantity !== undefined && stockQuantity > 0;
       return isInStock;
     }).length || 0;
 
@@ -109,9 +110,9 @@ export default function PriceStockAlerts() {
         title: 'Alerte supprimée',
         description: 'L\'alerte de prix a été supprimée avec succès.',
       });
-      logger.info('Price alert deleted:', alert.id);
+      logger.info('Price alert deleted', { alertId: alert.id });
     } catch (error) {
-      logger.error('Error deleting price alert:', error);
+      logger.error(error instanceof Error ? error : 'Error deleting price alert', { error });
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer l\'alerte de prix.',
@@ -133,9 +134,9 @@ export default function PriceStockAlerts() {
         title: 'Alerte supprimée',
         description: 'L\'alerte de stock a été supprimée avec succès.',
       });
-      logger.info('Stock alert deleted:', alert.id);
+      logger.info('Stock alert deleted', { alertId: alert.id });
     } catch (error) {
-      logger.error('Error deleting stock alert:', error);
+      logger.error(error instanceof Error ? error : 'Error deleting stock alert', { error });
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer l\'alerte de stock.',
@@ -151,9 +152,9 @@ export default function PriceStockAlerts() {
         title: 'Rafraîchissement réussi',
         description: 'Les alertes ont été mises à jour.',
       });
-      logger.info('Alerts refreshed');
+      logger.info('Alerts refreshed', {});
     } catch (err) {
-      logger.error('Error refreshing alerts:', err);
+      logger.error(err instanceof Error ? err : 'Error refreshing alerts', { error: err });
       toast({
         title: 'Erreur',
         description: 'Impossible de rafraîchir les alertes.',
@@ -501,7 +502,8 @@ export default function PriceStockAlerts() {
                             const product = alert.products;
                             if (!product) return null;
 
-                            const isInStock = product.stock_quantity !== null && product.stock_quantity > 0;
+                            const stockQuantity = product.stock_quantity;
+                            const isInStock = stockQuantity !== null && stockQuantity !== undefined && stockQuantity > 0;
 
                             return (
                               <Card
@@ -538,10 +540,10 @@ export default function PriceStockAlerts() {
                                         </Link>
                                       </div>
                                       <div className="flex flex-wrap items-center gap-2">
-                                        {isInStock ? (
+                                        {isInStock && stockQuantity != null ? (
                                           <Badge className="bg-green-500 text-white text-xs sm:text-sm">
                                             <Package className="h-3 w-3 mr-1" />
-                                            En stock ! ({product.stock_quantity} disponible{product.stock_quantity > 1 ? 's' : ''})
+                                            En stock ! ({stockQuantity} disponible{stockQuantity > 1 ? 's' : ''})
                                           </Badge>
                                         ) : (
                                           <Badge variant="outline" className="text-xs sm:text-sm">
