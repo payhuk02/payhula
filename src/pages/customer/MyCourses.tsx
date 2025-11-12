@@ -27,14 +27,14 @@ import { Link } from 'react-router-dom';
 import {
   BookOpen,
   Search,
-  ArrowLeft,
   PlayCircle,
   CheckCircle2,
   Clock,
-  TrendingUp,
   Award,
   Calendar,
   BarChart3,
+  GraduationCap,
+  Sparkles,
 } from 'lucide-react';
 
 // Progress component (fallback if not exists)
@@ -173,14 +173,32 @@ export default function MyCourses() {
   if (isLoading) {
     return (
       <SidebarProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
-              <Skeleton className="h-10 w-64" />
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <main className="flex-1 overflow-x-hidden">
+            {/* Hero Section Skeleton */}
+            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                  <Skeleton className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-xl bg-white/20" />
+                  <div className="flex-1 space-y-3">
+                    <Skeleton className="h-10 sm:h-12 lg:h-14 w-48 sm:w-64 lg:w-80 bg-white/20" />
+                    <Skeleton className="h-6 sm:h-7 w-64 sm:w-80 lg:w-96 bg-white/10" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Content Skeleton */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-32" />
+                  <Skeleton key={i} className="h-32 sm:h-36 lg:h-40 rounded-lg" />
+                ))}
+              </div>
+              <Skeleton className="h-20 sm:h-24 rounded-lg" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-80 sm:h-96 rounded-lg" />
                 ))}
               </div>
             </div>
@@ -192,209 +210,297 @@ export default function MyCourses() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate('/account')}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                  <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <BookOpen className="h-8 w-8" />
+        <main className="flex-1 overflow-x-hidden">
+          {/* Hero Section - Bannière avec titre visible */}
+          <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden shadow-lg">
+            {/* Pattern de fond */}
+            <div 
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                backgroundRepeat: 'repeat',
+              }}
+            />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 relative z-10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                {/* Icône visible et proéminente */}
+                <div className="p-3 sm:p-4 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                  <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" strokeWidth={2.5} />
+                </div>
+                {/* Titre et sous-titre */}
+                <div className="flex-1">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 sm:mb-3 drop-shadow-lg">
                     Mes Cours
                   </h1>
+                  <p className="text-base sm:text-lg lg:text-xl text-blue-100 max-w-2xl leading-relaxed">
+                    Continuez votre apprentissage et suivez votre progression
+                  </p>
+                  {/* Badge avec nombre de cours */}
+                  {stats.total > 0 && (
+                    <div className="mt-4 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 animate-pulse" />
+                      <span className="text-sm sm:text-base text-blue-100 font-medium">
+                        {stats.total} {stats.total > 1 ? 'cours inscrits' : 'cours inscrit'}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-muted-foreground">
-                  Continuez votre apprentissage et suivez votre progression
-                </p>
               </div>
             </div>
+          </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Cours</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+          {/* Contenu principal */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8">
+
+            {/* Stats - Design moderne avec animations */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-blue-300 dark:hover:border-blue-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">Total Cours</CardTitle>
+                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors duration-300">
+                    <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.total}</div>
-                  <p className="text-xs text-muted-foreground">Cours inscrits</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1">{stats.total}</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Cours inscrits</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">En Cours</CardTitle>
-                  <PlayCircle className="h-4 w-4 text-blue-600" />
+              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-blue-300 dark:hover:border-blue-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">En Cours</CardTitle>
+                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors duration-300">
+                    <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
-                  <p className="text-xs text-muted-foreground">En apprentissage</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-1">{stats.inProgress}</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">En apprentissage</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Terminés</CardTitle>
-                  <Award className="h-4 w-4 text-green-600" />
+              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-green-300 dark:hover:border-green-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">Terminés</CardTitle>
+                  <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors duration-300">
+                    <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-                  <p className="text-xs text-muted-foreground">Complétés</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-600 dark:text-green-400 mb-1">{stats.completed}</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Complétés</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Progression Moyenne</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-purple-300 dark:hover:border-purple-700 bg-card/80 backdrop-blur-sm hover:scale-105 hover:-translate-y-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-semibold text-foreground">Progression Moyenne</CardTitle>
+                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors duration-300">
+                    <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.averageProgress}%</div>
-                  <p className="text-xs text-muted-foreground">Sur tous vos cours</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-600 dark:text-purple-400 mb-1">{stats.averageProgress}%</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Sur tous vos cours</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Filters */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col md:flex-row gap-4">
+            {/* Filters - Design moderne et responsive */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
+              <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   {/* Search */}
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground z-10" />
                     <Input
                       placeholder="Rechercher un cours..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 sm:pl-12 h-10 sm:h-11 bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all duration-200 text-sm sm:text-base"
                     />
                   </div>
 
                   {/* Status Filter */}
-                  <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-                    <TabsList>
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="in-progress">En cours</TabsTrigger>
-                      <TabsTrigger value="completed">Terminés</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
+                  <div className="flex-shrink-0">
+                    <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)} className="w-full sm:w-auto">
+                      <TabsList className="grid grid-cols-3 w-full sm:w-auto bg-muted/50 p-1 h-10 sm:h-11">
+                        <TabsTrigger 
+                          value="all" 
+                          className="text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
+                        >
+                          Tous
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="in-progress" 
+                          className="text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
+                        >
+                          En cours
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="completed" 
+                          className="text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
+                        >
+                          Terminés
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Courses List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {filteredEnrollments?.length || 0} {filteredEnrollments?.length === 1 ? 'cours' : 'cours'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {!filteredEnrollments || filteredEnrollments.length === 0 ? (
-                  <div className="text-center py-12">
-                    <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Aucun cours</h3>
-                    <p className="text-muted-foreground mb-4">
-                      {searchQuery || statusFilter !== 'all'
-                        ? 'Aucun cours ne correspond à vos critères'
-                        : 'Vous n\'êtes inscrit à aucun cours pour le moment'}
-                    </p>
-                    {!searchQuery && statusFilter === 'all' && (
-                      <Button onClick={() => navigate('/marketplace')}>
-                        Découvrir les cours disponibles
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredEnrollments.map((enrollment) => (
-                      <Card key={enrollment.id} className="hover:shadow-lg transition-shadow">
-                        {enrollment.course?.image_url && (
+            {/* Courses List - Design moderne avec cartes améliorées */}
+            <div>
+              {/* En-tête avec compteur */}
+              {filteredEnrollments && filteredEnrollments.length > 0 && (
+                <div className="mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
+                    {filteredEnrollments.length} {filteredEnrollments.length === 1 ? 'cours' : 'cours'} trouvé{filteredEnrollments.length > 1 ? 's' : ''}
+                  </h2>
+                </div>
+              )}
+
+              {!filteredEnrollments || filteredEnrollments.length === 0 ? (
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
+                  <CardContent className="py-12 sm:py-16 lg:py-20 text-center">
+                    <div className="max-w-md mx-auto">
+                      <div className="p-4 rounded-full bg-muted/50 w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
+                        <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 sm:mb-3">Aucun cours</h3>
+                      <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
+                        {searchQuery || statusFilter !== 'all'
+                          ? 'Aucun cours ne correspond à vos critères de recherche'
+                          : 'Vous n\'êtes inscrit à aucun cours pour le moment. Explorez notre catalogue pour découvrir des cours passionnants !'}
+                      </p>
+                      {!searchQuery && statusFilter === 'all' && (
+                        <Button 
+                          onClick={() => navigate('/marketplace')}
+                          size="lg"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] px-6 sm:px-8"
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Découvrir les cours disponibles
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredEnrollments.map((enrollment) => (
+                    <Card 
+                      key={enrollment.id} 
+                      className="group hover:shadow-2xl transition-all duration-300 border-border/50 hover:border-primary/50 bg-card/80 backdrop-blur-sm hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
+                    >
+                      {/* Image du cours */}
+                      <div className="relative h-40 sm:h-48 lg:h-52 overflow-hidden bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700">
+                        {enrollment.course?.image_url ? (
                           <img
                             src={enrollment.course.image_url}
                             alt={enrollment.course.name}
-                            className="w-full h-48 object-cover rounded-t-lg"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
                           />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <GraduationCap className="w-12 h-12 sm:w-16 sm:h-16 text-white/60" />
+                          </div>
                         )}
-                        <CardHeader>
-                          <CardTitle className="line-clamp-2">{enrollment.course?.name || 'Cours'}</CardTitle>
-                          <CardDescription className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            Inscrit le {new Date(enrollment.enrolled_at).toLocaleDateString('fr-FR')}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Progress */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Progression</span>
-                              <span className="font-semibold">{enrollment.progress_percentage}%</span>
-                            </div>
-                            <Progress value={enrollment.progress_percentage} />
-                            <p className="text-xs text-muted-foreground">
-                              {enrollment.completed_lessons_count} / {enrollment.total_lessons_count} leçons complétées
-                            </p>
-                          </div>
+                        {/* Badge de statut sur l'image */}
+                        <div className="absolute top-3 right-3">
+                          {enrollment.progress_percentage === 100 ? (
+                            <Badge className="bg-green-600 hover:bg-green-700 text-white shadow-lg border-0">
+                              <Award className="h-3 w-3 mr-1" />
+                              Terminé
+                            </Badge>
+                          ) : enrollment.progress_percentage > 0 ? (
+                            <Badge className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg border-0">
+                              <PlayCircle className="h-3 w-3 mr-1" />
+                              En cours
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="shadow-lg">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Nouveau
+                            </Badge>
+                          )}
+                        </div>
+                        {/* Overlay gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
 
-                          {/* Status Badge */}
-                          <div>
+                      <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-base sm:text-lg lg:text-xl font-bold line-clamp-2 mb-2 group-hover:text-primary transition-colors duration-200">
+                          {enrollment.course?.name || 'Cours'}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                          <span>Inscrit le {new Date(enrollment.enrolled_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                        </CardDescription>
+                      </CardHeader>
+
+                      <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
+                        {/* Progress Bar améliorée */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs sm:text-sm">
+                            <span className="font-medium text-foreground">Progression</span>
+                            <span className="font-bold text-primary">{enrollment.progress_percentage}%</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2.5 sm:h-3 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                enrollment.progress_percentage === 100
+                                  ? 'bg-gradient-to-r from-green-500 to-green-600'
+                                  : enrollment.progress_percentage >= 50
+                                  ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+                                  : enrollment.progress_percentage > 0
+                                  ? 'bg-gradient-to-r from-orange-500 to-orange-600'
+                                  : 'bg-gradient-to-r from-gray-400 to-gray-500'
+                              }`}
+                              style={{ width: `${enrollment.progress_percentage}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {enrollment.completed_lessons_count} / {enrollment.total_lessons_count} leçons complétées
+                          </p>
+                        </div>
+
+                        {/* Bouton d'action amélioré */}
+                        <Button
+                          asChild
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] touch-manipulation"
+                          variant={enrollment.progress_percentage === 100 ? 'outline' : 'default'}
+                        >
+                          <Link to={`/courses/${enrollment.course?.slug}`} className="flex items-center justify-center">
                             {enrollment.progress_percentage === 100 ? (
-                              <Badge className="bg-green-600">
-                                <Award className="h-3 w-3 mr-1" />
-                                Terminé
-                              </Badge>
+                              <>
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                <span>Revoir le cours</span>
+                              </>
                             ) : enrollment.progress_percentage > 0 ? (
-                              <Badge variant="default">
-                                <PlayCircle className="h-3 w-3 mr-1" />
-                                En cours
-                              </Badge>
+                              <>
+                                <PlayCircle className="h-4 w-4 mr-2" />
+                                <span>Continuer l'apprentissage</span>
+                              </>
                             ) : (
-                              <Badge variant="secondary">
-                                <Clock className="h-3 w-3 mr-1" />
-                                Non commencé
-                              </Badge>
+                              <>
+                                <PlayCircle className="h-4 w-4 mr-2" />
+                                <span>Commencer le cours</span>
+                              </>
                             )}
-                          </div>
-
-                          {/* Actions */}
-                          <div className="flex gap-2">
-                            <Button
-                              asChild
-                              className="flex-1"
-                              variant={enrollment.progress_percentage === 100 ? 'outline' : 'default'}
-                            >
-                              <Link to={`/courses/${enrollment.course?.slug}`}>
-                                {enrollment.progress_percentage === 100 ? (
-                                  <>
-                                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                                    Revoir
-                                  </>
-                                ) : (
-                                  <>
-                                    <PlayCircle className="h-4 w-4 mr-2" />
-                                    Continuer
-                                  </>
-                                )}
-                              </Link>
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                          </Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </main>
       </div>
