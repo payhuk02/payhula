@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus,
   Search,
@@ -34,7 +35,7 @@ type ViewMode = 'grid' | 'list';
 export const DigitalBundlesList = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { store } = useStore();
+  const { store, loading: storeLoading } = useStore();
 
   // State
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,7 +69,8 @@ export const DigitalBundlesList = () => {
     };
   }, [allBundles]);
 
-  const isLoading = activeTab === 'featured' ? isLoadingFeatured : isLoadingAll;
+  // État de chargement pour les bundles (sans inclure storeLoading car on veut afficher le skeleton séparément)
+  const bundlesLoading = activeTab === 'featured' ? isLoadingFeatured : isLoadingAll;
 
   const handleViewBundle = useCallback((bundleId: string) => {
     const bundle = allBundles?.find((b) => b.id === bundleId);
@@ -78,8 +80,31 @@ export const DigitalBundlesList = () => {
   }, [allBundles, navigate]);
 
   const handleCreateBundle = useCallback(() => {
-    navigate('/dashboard/bundles/new');
+    navigate('/dashboard/digital-products/bundles/create');
   }, [navigate]);
+
+  // Afficher un skeleton pendant le chargement du store
+  if (storeLoading) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar />
+          <main className="flex-1 overflow-x-hidden">
+            <div className="container mx-auto px-4 py-6 space-y-6">
+              <Skeleton className="h-24 w-full" />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-24" />
+                ))}
+              </div>
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-96 w-full" />
+            </div>
+          </main>
+        </div>
+      </SidebarProvider>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -215,7 +240,7 @@ export const DigitalBundlesList = () => {
               <TabsContent value="all" className="mt-6">
                 <DigitalBundlesGrid
                   bundles={filteredBundles}
-                  loading={isLoading}
+                  loading={bundlesLoading}
                   variant={viewMode === 'compact' ? 'compact' : 'default'}
                   onView={handleViewBundle}
                 />
@@ -224,7 +249,7 @@ export const DigitalBundlesList = () => {
               <TabsContent value="featured" className="mt-6">
                 <DigitalBundlesGrid
                   bundles={filteredBundles}
-                  loading={isLoading}
+                  loading={bundlesLoading}
                   variant="featured"
                   onView={handleViewBundle}
                 />
