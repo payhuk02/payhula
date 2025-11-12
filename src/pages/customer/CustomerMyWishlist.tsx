@@ -50,6 +50,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { logger } from '@/lib/logger';
+import { ProductType } from '@/types/cart';
 
 interface FavoriteProduct {
   id: string;
@@ -92,9 +93,11 @@ export default function CustomerMyWishlist() {
   const productsRef = useScrollAnimation<HTMLDivElement>();
   
   // Récupérer les baisses de prix
-  const { data: priceDrops } = usePriceDrops();
+  const { data: priceDropsData } = usePriceDrops();
+  const priceDrops: Array<{ product_id: string; old_price: number; new_price: number; currency?: string }> = Array.isArray(priceDropsData) ? priceDropsData : [];
   const updatePriceAlert = useUpdatePriceAlertSettings();
   const markAsRead = useMarkPriceAlertAsRead();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Convertir le Set en array pour les requêtes
   const favoriteIds = Array.from(favorites);
@@ -141,7 +144,7 @@ export default function CustomerMyWishlist() {
         .order('created_at', { ascending: false }) as any;
 
       if (favoritesError) {
-        logger.error('Erreur lors de la récupération des favoris', { error: favoritesError });
+        logger.error(favoritesError instanceof Error ? favoritesError : 'Erreur lors de la récupération des favoris', { error: favoritesError });
         throw favoritesError;
       }
 
@@ -198,26 +201,28 @@ export default function CustomerMyWishlist() {
 
   // Gérer l'ajout au panier - Style Inventaire
   const handleAddToCart = useCallback(async (product: FavoriteProduct) => {
+    setIsAddingToCart(true);
     try {
-      await addItem.mutateAsync({
-        productId: product.id,
-        productType: product.product_type,
+      await addItem({
+        product_id: product.id,
+        product_type: product.product_type as ProductType,
         quantity: 1,
-        price: product.price,
       });
 
       toast({
-        title: '✅ Ajouté au panier',
+        title: 'Ajouté au panier',
         description: `${product.name} a été ajouté à votre panier`,
       });
       logger.info('Produit ajouté au panier depuis wishlist', { productId: product.id });
     } catch (error: any) {
       toast({
-        title: '❌ Erreur',
+        title: 'Erreur',
         description: error.message || 'Impossible d\'ajouter au panier',
         variant: 'destructive',
       });
-      logger.error('Erreur ajout au panier depuis wishlist', { error });
+      logger.error(error instanceof Error ? error : 'Erreur ajout au panier depuis wishlist', { error, productId: product.id });
+    } finally {
+      setIsAddingToCart(false);
     }
   }, [addItem, toast]);
 
@@ -227,7 +232,7 @@ export default function CustomerMyWishlist() {
     await refetch();
     
     toast({
-      title: '✅ Retiré des favoris',
+      title: 'Retiré des favoris',
       description: `${productName} a été retiré de votre wishlist`,
     });
     logger.info('Produit retiré de la wishlist', { productId });
@@ -237,9 +242,9 @@ export default function CustomerMyWishlist() {
   const handleRefresh = useCallback(() => {
     setError(null);
     refetch();
-    logger.info('Wishlist refreshed');
+    logger.info('Wishlist refreshed', {});
     toast({
-      title: '✅ Actualisé',
+      title: 'Actualisé',
       description: 'La wishlist a été actualisée.',
     });
   }, [refetch, toast]);
@@ -267,7 +272,7 @@ export default function CustomerMyWishlist() {
     if (itemsError) {
       const errorMessage = itemsError?.message || 'Erreur lors du chargement de la wishlist';
       setError(errorMessage);
-      logger.error('Wishlist fetch error', { error: itemsError });
+      logger.error(itemsError instanceof Error ? itemsError : 'Wishlist fetch error', { error: itemsError });
     } else {
       setError(null);
     }
@@ -280,11 +285,11 @@ export default function CustomerMyWishlist() {
 
     if (!storeSlug) {
       toast({
-        title: '❌ Erreur',
+        title: 'Erreur',
         description: 'Boutique introuvable',
         variant: 'destructive',
       });
-      logger.error('Boutique introuvable pour produit', { productId: product.id });
+      logger.error('Boutique introuvable pour produit', { productId: product.id, storeSlug: product.stores?.slug });
       return;
     }
 
@@ -305,7 +310,7 @@ export default function CustomerMyWishlist() {
       default:
         navigate(`/marketplace/${storeSlug}/${product.slug}`);
     }
-    logger.info('Navigation vers produit depuis wishlist', { productId: product.id, productType });
+    logger.info('Navigation vers produit depuis wishlist', { productId: product.id, productType, storeSlug });
   }, [navigate, toast]);
 
   // Obtenir l'icône selon le type de produit
@@ -406,7 +411,7 @@ export default function CustomerMyWishlist() {
           </div>
 
           {/* Alertes prix - Style Inventaire */}
-          {priceDrops && priceDrops.length > 0 && (
+          {priceDrops.length > 0 && (
             <Alert className="border-green-500 bg-green-50 dark:bg-green-950/20 animate-in fade-in slide-in-from-top-4">
               <TrendingDown className="h-4 w-4 text-green-600 dark:text-green-400" />
               <AlertDescription>
@@ -654,15 +659,18 @@ export default function CustomerMyWishlist() {
                         <span className="hidden sm:inline mr-1">{getProductTypeIcon(product.product_type)}</span>
                         <span className="text-xs sm:text-sm">{getProductTypeLabel(product.product_type)}</span>
                       </Badge>
-                      {priceDrops?.some((drop: any) => drop.product_id === product.id) && (
-                        <div className="absolute bottom-2 left-2">
-                          <PriceAlertBadge
-                            oldPrice={priceDrops.find((drop: any) => drop.product_id === product.id)?.old_price || product.price}
-                            newPrice={priceDrops.find((drop: any) => drop.product_id === product.id)?.new_price || product.price}
-                            currency={product.currency}
-                          />
-                        </div>
-                      )}
+                      {priceDrops.length > 0 && priceDrops.some((drop) => drop.product_id === product.id) && (() => {
+                        const priceDrop = priceDrops.find((drop) => drop.product_id === product.id);
+                        return priceDrop ? (
+                          <div className="absolute bottom-2 left-2">
+                            <PriceAlertBadge
+                              oldPrice={priceDrop.old_price || product.price}
+                              newPrice={priceDrop.new_price || product.price}
+                              currency={priceDrop.currency || product.currency}
+                            />
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                     <CardHeader className="p-4 sm:p-6">
                       <CardTitle className="text-base sm:text-lg lg:text-xl font-bold line-clamp-2 mb-2 group-hover:text-primary transition-colors duration-200">
@@ -713,10 +721,10 @@ export default function CustomerMyWishlist() {
                         <Button
                           size="sm"
                           onClick={() => handleAddToCart(product)}
-                          disabled={addItem.isPending}
+                          disabled={isAddingToCart}
                           className="flex-1 h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 text-xs sm:text-sm min-h-[44px] touch-manipulation"
                         >
-                          {addItem.isPending ? (
+                          {isAddingToCart ? (
                             <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
                           ) : (
                             <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
