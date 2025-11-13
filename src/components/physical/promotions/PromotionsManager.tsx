@@ -5,7 +5,7 @@
  * Component for managing product promotions
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +53,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, MoreVertical, Edit, Trash2, Tag, Calendar, Users } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus, MoreVertical, Edit, Trash2, Tag, Calendar, Users, Percent, TrendingUp } from 'lucide-react';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import {
   usePromotions,
   useCreatePromotion,
@@ -179,6 +181,9 @@ export const PromotionsManager: React.FC = () => {
     setDeletePromotionId(null);
   };
 
+  // Refs for animations
+  const cardRef = useScrollAnimation<HTMLDivElement>();
+
   const isActive = (promotion: ProductPromotion) => {
     const now = new Date();
     return (
@@ -188,143 +193,368 @@ export const PromotionsManager: React.FC = () => {
     );
   };
 
+  // Stats calculées
+  const stats = useMemo(() => {
+    if (!promotions || promotions.length === 0) {
+      return { total: 0, active: 0, totalUses: 0, averageDiscount: 0 };
+    }
+    
+    const total = promotions.length;
+    const active = promotions.filter(p => {
+      const now = new Date();
+      return (
+        p.is_active &&
+        new Date(p.starts_at) <= now &&
+        (!p.ends_at || new Date(p.ends_at) >= now)
+      );
+    }).length;
+    const totalUses = promotions.reduce((sum, p) => sum + (p.current_uses || 0), 0);
+    const totalDiscount = promotions.reduce((sum, p) => {
+      if (p.discount_type === 'percentage') {
+        return sum + p.discount_value;
+      }
+      return sum;
+    }, 0);
+    const averageDiscount = total > 0 ? totalDiscount / total : 0;
+    
+    return { total, active, totalUses, averageDiscount };
+  }, [promotions]);
+
   if (isLoading) {
-    return <div className="text-center py-8">Chargement...</div>;
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Stats Cards - Responsive */}
+      {promotions && promotions.length > 0 && (
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Promotions</p>
+                  <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    {stats.total}
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5">
+                  <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Actives</p>
+                  <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    {stats.active}
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Utilisations</p>
+                  <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    {stats.totalUses}
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Moyenne Réduction</p>
+                  <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                    {stats.averageDiscount.toFixed(1)}%
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/5">
+                  <Percent className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <Card 
+        ref={cardRef}
+        className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700"
+      >
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <CardTitle>Promotions</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg sm:text-xl">Promotions</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Gérez vos promotions et codes de réduction
             </CardDescription>
           </div>
-          <Button onClick={() => handleOpenDialog()}>
-            <Plus className="mr-2 h-4 w-4" />
-            Créer une promotion
+          <Button 
+            onClick={() => handleOpenDialog()}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            size="sm"
+          >
+            <Plus className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">Créer une promotion</span>
           </Button>
         </CardHeader>
         <CardContent>
           {promotions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Aucune promotion configurée. Créez votre première promotion pour commencer.
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
+              <div className="p-4 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/5 mb-4 animate-in zoom-in duration-500">
+                <Tag className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">Aucune promotion</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 max-w-md">
+                Aucune promotion configurée. Créez votre première promotion pour commencer.
+              </p>
+              <Button 
+                onClick={() => handleOpenDialog()}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Créer une promotion
+              </Button>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Valeur</TableHead>
-                  <TableHead>Portée</TableHead>
-                  <TableHead>Dates</TableHead>
-                  <TableHead>Utilisations</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">Nom</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Code</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Type</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Valeur</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Portée</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Dates</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Utilisations</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Statut</TableHead>
+                        <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {promotions.map((promotion) => (
+                        <TableRow key={promotion.id} className="hover:bg-muted/50 transition-colors">
+                          <TableCell className="font-medium text-xs sm:text-sm">{promotion.name}</TableCell>
+                          <TableCell>
+                            {promotion.code ? (
+                              <code className="text-xs sm:text-sm bg-muted px-2 py-1 rounded font-mono">
+                                {promotion.code}
+                              </code>
+                            ) : (
+                              <span className="text-muted-foreground text-xs sm:text-sm">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {promotion.discount_type === 'percentage' && '%'}
+                              {promotion.discount_type === 'fixed_amount' && 'Montant fixe'}
+                              {promotion.discount_type === 'free_shipping' && 'Livraison gratuite'}
+                              {promotion.discount_type === 'buy_x_get_y' && 'Acheter X obtenir Y'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm font-medium">
+                            {promotion.discount_type === 'percentage'
+                              ? `${promotion.discount_value}%`
+                              : `${promotion.discount_value} XOF`}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="text-xs">
+                              {promotion.applies_to === 'all_products' && 'Tous les produits'}
+                              {promotion.applies_to === 'specific_products' && 'Produits spécifiques'}
+                              {promotion.applies_to === 'categories' && 'Catégories'}
+                              {promotion.applies_to === 'collections' && 'Collections'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                              <Calendar className="h-3.5 w-3.5" />
+                              <span>
+                                {format(new Date(promotion.starts_at), 'dd MMM yyyy', { locale: fr })}
+                                {promotion.ends_at &&
+                                  ` - ${format(new Date(promotion.ends_at), 'dd MMM yyyy', { locale: fr })}`}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2 text-xs sm:text-sm">
+                              <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span>
+                                {promotion.current_uses}
+                                {promotion.max_uses && ` / ${promotion.max_uses}`}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {isActive(promotion) ? (
+                              <Badge variant="outline" className="text-green-600 text-xs">
+                                Active
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-gray-500 text-xs">
+                                Inactive
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleOpenDialog(promotion)}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Modifier
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => setDeletePromotionId(promotion.id)}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Supprimer
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="lg:hidden space-y-3 sm:space-y-4">
                 {promotions.map((promotion) => (
-                  <TableRow key={promotion.id}>
-                    <TableCell className="font-medium">{promotion.name}</TableCell>
-                    <TableCell>
-                      {promotion.code ? (
-                        <code className="text-sm bg-muted px-2 py-1 rounded">
-                          {promotion.code}
-                        </code>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {promotion.discount_type === 'percentage' && '%'}
-                        {promotion.discount_type === 'fixed_amount' && 'Montant fixe'}
-                        {promotion.discount_type === 'free_shipping' && 'Livraison gratuite'}
-                        {promotion.discount_type === 'buy_x_get_y' && 'Acheter X obtenir Y'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {promotion.discount_type === 'percentage'
-                        ? `${promotion.discount_value}%`
-                        : `${promotion.discount_value} XOF`}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">
-                        {promotion.applies_to === 'all_products' && 'Tous les produits'}
-                        {promotion.applies_to === 'specific_products' && 'Produits spécifiques'}
-                        {promotion.applies_to === 'categories' && 'Catégories'}
-                        {promotion.applies_to === 'collections' && 'Collections'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {format(new Date(promotion.starts_at), 'dd MMM yyyy', { locale: fr })}
-                          {promotion.ends_at &&
-                            ` - ${format(new Date(promotion.ends_at), 'dd MMM yyyy', { locale: fr })}`}
-                        </span>
+                  <Card 
+                    key={promotion.id}
+                    className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+                  >
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold text-base sm:text-lg">{promotion.name}</h3>
+                            {isActive(promotion) ? (
+                              <Badge variant="outline" className="text-green-600 text-xs">
+                                Active
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-gray-500 text-xs">
+                                Inactive
+                              </Badge>
+                            )}
+                          </div>
+                          {promotion.code && (
+                            <code className="text-xs sm:text-sm bg-muted px-2 py-1 rounded font-mono mb-2 inline-block">
+                              {promotion.code}
+                            </code>
+                          )}
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenDialog(promotion)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Modifier
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => setDeletePromotionId(promotion.id)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <span>
-                          {promotion.current_uses}
-                          {promotion.max_uses && ` / ${promotion.max_uses}`}
-                        </span>
+
+                      <div className="space-y-2 pt-3 border-t border-border/50">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                            <Percent className="h-4 w-4 text-purple-500" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Type</p>
+                              <p className="text-xs sm:text-sm font-semibold">
+                                {promotion.discount_type === 'percentage' && '%'}
+                                {promotion.discount_type === 'fixed_amount' && 'Montant fixe'}
+                                {promotion.discount_type === 'free_shipping' && 'Livraison gratuite'}
+                                {promotion.discount_type === 'buy_x_get_y' && 'Acheter X obtenir Y'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                            <Tag className="h-4 w-4 text-blue-500" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Valeur</p>
+                              <p className="text-xs sm:text-sm font-semibold">
+                                {promotion.discount_type === 'percentage'
+                                  ? `${promotion.discount_value}%`
+                                  : `${promotion.discount_value} XOF`}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>
+                            {format(new Date(promotion.starts_at), 'dd MMM yyyy', { locale: fr })}
+                            {promotion.ends_at &&
+                              ` - ${format(new Date(promotion.ends_at), 'dd MMM yyyy', { locale: fr })}`}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Users className="h-3.5 w-3.5" />
+                          <span>
+                            {promotion.current_uses}
+                            {promotion.max_uses && ` / ${promotion.max_uses}`} utilisations
+                          </span>
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {isActive(promotion) ? (
-                        <Badge variant="outline" className="text-green-600">
-                          Active
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-gray-500">
-                          Inactive
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleOpenDialog(promotion)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => setDeletePromotionId(promotion.id)}
-                            className="text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Supprimer
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingPromotion ? 'Modifier la promotion' : 'Nouvelle promotion'}
@@ -334,7 +564,7 @@ export const PromotionsManager: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nom *</Label>
                 <Input
@@ -365,7 +595,7 @@ export const PromotionsManager: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="discount_type">Type de réduction *</Label>
                 <Select
@@ -425,7 +655,7 @@ export const PromotionsManager: React.FC = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="starts_at">Date de début *</Label>
                 <Input
@@ -449,7 +679,7 @@ export const PromotionsManager: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="max_uses">Limite d'utilisations (optionnel)</Label>
                 <Input
@@ -484,7 +714,7 @@ export const PromotionsManager: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="min_purchase_amount">Montant minimum (optionnel)</Label>
                 <Input
@@ -549,16 +779,19 @@ export const PromotionsManager: React.FC = () => {
         open={!!deletePromotionId}
         onOpenChange={(open) => !open && setDeletePromotionId(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>Supprimer la promotion</AlertDialogTitle>
             <AlertDialogDescription>
               Êtes-vous sûr de vouloir supprimer cette promotion ? Cette action est irréversible.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive">
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto">Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="w-full sm:w-auto bg-destructive hover:bg-destructive/90"
+            >
               Supprimer
             </AlertDialogAction>
           </AlertDialogFooter>

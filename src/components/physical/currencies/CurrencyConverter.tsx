@@ -4,7 +4,7 @@
  * Design responsive avec le même style que Mes Templates
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,13 +69,6 @@ export function CurrencyConverter() {
     setToCurrency(temp);
     setConvertedAmount(null);
   };
-
-  // Auto-convert when amount or currencies change
-  useEffect(() => {
-    if (amount > 0 && fromCurrency && toCurrency && currentRate) {
-      handleConvert();
-    }
-  }, [amount, fromCurrency, toCurrency]);
 
   if (isLoadingCurrencies || isLoadingRates) {
     return (

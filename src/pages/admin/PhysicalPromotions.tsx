@@ -1,23 +1,50 @@
 /**
  * Physical Promotions Management Page
  * Date: 2025-01-28
+ * Updated: 2025-02-02 - Responsive design with Mes Templates style
  */
 
 import React from 'react';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
 import { PromotionsManager } from '@/components/physical/promotions';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { Tag } from 'lucide-react';
 
 export default function PhysicalPromotions() {
-  return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Promotions et réductions</h1>
-        <p className="text-muted-foreground mt-2">
-          Gérez vos promotions, codes de réduction et offres spéciales
-        </p>
-      </div>
+  const headerRef = useScrollAnimation<HTMLDivElement>();
 
-      <PromotionsManager />
-    </div>
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full overflow-x-hidden">
+        <AppSidebar />
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header - Responsive & Animated */}
+            <div 
+              ref={headerRef}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700"
+            >
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                    <Tag className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                  </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Promotions et réductions
+                  </span>
+                </h1>
+                <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                  Gérez vos promotions, codes de réduction et offres spéciales
+                </p>
+              </div>
+            </div>
+
+            <PromotionsManager />
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
 
