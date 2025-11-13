@@ -567,7 +567,7 @@ const Marketplace = () => {
         />
       )}
       
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-x-hidden">
       {/* Skip to main content link for keyboard navigation */}
       <a 
         href="#main-content" 
@@ -579,19 +579,19 @@ const Marketplace = () => {
       <MarketplaceHeader />
 
       {/* Breadcrumb Navigation */}
-      <div className="container mx-auto max-w-6xl px-4 pt-6 pb-2">
+      <div className="container mx-auto max-w-6xl px-3 sm:px-4 pt-4 sm:pt-6 pb-2">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="text-slate-300 hover:text-white transition-colors">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <BreadcrumbLink href="/" className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors">
+                <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-slate-500" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white font-medium">
+              <BreadcrumbPage className="text-xs sm:text-sm text-white font-medium">
                 Marketplace
               </BreadcrumbPage>
             </BreadcrumbItem>
@@ -602,24 +602,24 @@ const Marketplace = () => {
       {/* Hero Section */}
       <section 
         ref={heroRef}
-        className="relative py-16 px-4 overflow-hidden" 
+        className="relative py-8 sm:py-12 lg:py-16 px-3 sm:px-4 overflow-hidden" 
         aria-labelledby="hero-title"
         role="banner"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse" aria-hidden="true"></div>
         <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="h-8 w-8 text-yellow-400 animate-pulse" aria-hidden="true" />
+          <div className="text-center mb-6 sm:mb-8 lg:mb-12">
+            <div className="flex items-center justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
+              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-yellow-400 animate-pulse" aria-hidden="true" />
               <h1 
                 id="hero-title" 
-                className="text-4xl md:text-6xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
               >
-            {t('marketplace.hero.title')}
-          </h1>
-              <Sparkles className="h-8 w-8 text-yellow-400 animate-pulse" aria-hidden="true" />
+                {t('marketplace.hero.title')}
+              </h1>
+              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-yellow-400 animate-pulse" aria-hidden="true" />
             </div>
-            <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-slate-300 mb-4 sm:mb-6 lg:mb-8 max-w-4xl mx-auto leading-relaxed px-2">
               {t('marketplace.hero.subtitle')}
               <br />
               <span className="text-blue-400 font-semibold">{t('marketplace.hero.tagline')}</span>
@@ -634,7 +634,7 @@ const Marketplace = () => {
           />
 
           {/* Barre de recherche avancée avec auto-complétion */}
-          <div className="max-w-4xl mx-auto mb-6">
+          <div className="max-w-4xl mx-auto mb-4 sm:mb-6 px-2">
             <SearchAutocomplete
               value={searchInput}
               onChange={setSearchInput}
@@ -651,11 +651,11 @@ const Marketplace = () => {
 
             {/* Filtres actifs (tags) */}
             {(filters.category !== "all" || filters.productType !== "all" || filters.priceRange !== "all" || filters.tags.length > 0 || filters.verifiedOnly || filters.featuredOnly) && (
-              <div className="flex flex-wrap gap-2 items-center justify-center mb-4">
-                <span className="text-sm text-slate-300 font-medium">{t('marketplace.filtersActive')}</span>
+              <div className="flex flex-wrap gap-2 items-center justify-center mb-3 sm:mb-4 px-2">
+                <span className="text-xs sm:text-sm text-slate-300 font-medium">{t('marketplace.filtersActive')}</span>
                 
                 {filters.category !== "all" && (
-                  <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1">
+                  <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
                     {t('marketplace.filterLabels.category')} {filters.category}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
@@ -666,7 +666,7 @@ const Marketplace = () => {
                 )}
                 
                 {filters.productType !== "all" && (
-                  <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1">
+                  <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
                     {t('marketplace.filterLabels.type')} {filters.productType}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
@@ -677,7 +677,7 @@ const Marketplace = () => {
                 )}
                 
                 {filters.priceRange !== "all" && (
-                  <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1">
+                  <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
                     {t('marketplace.filterLabels.priceRange')} {PRICE_RANGES.find(r => r.value === filters.priceRange)?.label}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
@@ -688,7 +688,7 @@ const Marketplace = () => {
                 )}
                 
                 {filters.verifiedOnly && (
-                  <Badge variant="secondary" className="bg-green-700 text-white hover:bg-green-600 transition-colors flex items-center gap-1">
+                  <Badge variant="secondary" className="bg-green-700 text-white hover:bg-green-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
                     ✓ {t('marketplace.filterLabels.verified')}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
@@ -699,7 +699,7 @@ const Marketplace = () => {
                 )}
                 
                 {filters.featuredOnly && (
-                  <Badge variant="secondary" className="bg-yellow-700 text-white hover:bg-yellow-600 transition-colors flex items-center gap-1">
+                  <Badge variant="secondary" className="bg-yellow-700 text-white hover:bg-yellow-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
                     ⭐ {t('marketplace.filterLabels.featured')}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
@@ -710,7 +710,7 @@ const Marketplace = () => {
                 )}
                 
                 {filters.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="bg-purple-700 text-white hover:bg-purple-600 transition-colors flex items-center gap-1">
+                  <Badge key={index} variant="secondary" className="bg-purple-700 text-white hover:bg-purple-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
                     {t('marketplace.filterLabels.tag')} {tag}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
@@ -724,7 +724,7 @@ const Marketplace = () => {
                   variant="ghost"
                   size="sm"
                   onClick={clearFilters}
-                  className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                  className="text-xs sm:text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 sm:h-8"
                   aria-label={`${t('marketplace.filterLabels.clear')} ${t('marketplace.filterLabels.all')}`}
                 >
                   {t('marketplace.filterLabels.clear')} {t('marketplace.filterLabels.all')}
@@ -733,19 +733,20 @@ const Marketplace = () => {
             )}
 
             {/* Filtres rapides */}
-            <div className="flex flex-wrap gap-3 justify-center" role="toolbar" aria-label={t('marketplace.toolbar.ariaLabel')}>
+            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center px-2" role="toolbar" aria-label={t('marketplace.toolbar.ariaLabel')}>
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
                 aria-label={`${showFilters ? t('common.hide') : t('common.show')} ${t('marketplace.filters.advanced')}`}
                 aria-expanded={showFilters}
                 aria-controls="advanced-filters"
               >
-                <Filter className="h-4 w-4 mr-2" aria-hidden="true" />
-                {t('marketplace.filters.advanced')}
+                <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">{t('marketplace.filters.advanced')}</span>
+                <span className="sm:hidden">Filtres</span>
                 {(filters.category !== "all" || filters.productType !== "all" || filters.priceRange !== "all" || filters.tags.length > 0) && (
-                  <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs animate-pulse" aria-label="Filtres actifs">
+                  <Badge variant="destructive" className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs animate-pulse" aria-label="Filtres actifs">
                     !
                   </Badge>
                 )}
@@ -754,20 +755,22 @@ const Marketplace = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
                 aria-label="Ouvrir la recherche intelligente"
                 aria-expanded={showAdvancedSearch}
               >
-                <Zap className="h-4 w-4 mr-2" aria-hidden="true" />
-                Recherche intelligente
+                <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Recherche intelligente</span>
+                <span className="sm:hidden">Recherche</span>
               </Button>
 
               {/* Note: Le modal FavoritesManager est géré via le composant lui-même */}
-              <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-600 text-white rounded-md px-4 py-2 flex items-center gap-2">
-                <Heart className="h-4 w-4" aria-hidden="true" />
-                <span>Mes favoris</span>
+              <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-600 text-white rounded-md px-2 sm:px-4 py-1.5 sm:py-2 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Heart className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Mes favoris</span>
+                <span className="sm:hidden">Favoris</span>
                 {favoritesCount > 0 && (
-                  <Badge variant="secondary" className="ml-2 bg-red-600 text-white" aria-label={`${favoritesCount} favoris`}>
+                  <Badge variant="secondary" className="ml-1 sm:ml-2 bg-red-600 text-white text-xs" aria-label={`${favoritesCount} favoris`}>
                     {favoritesCount}
                   </Badge>
                 )}
@@ -776,14 +779,14 @@ const Marketplace = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowComparison(true)}
-                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-slate-900 text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
                 aria-label={`Comparer ${comparisonProducts.length} produit${comparisonProducts.length !== 1 ? 's' : ''}`}
                 aria-expanded={showComparison}
               >
-                <BarChart3 className="h-4 w-4 mr-2" aria-hidden="true" />
-                Comparer
+                <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Comparer</span>
                 {comparisonProducts.length > 0 && (
-                  <Badge variant="secondary" className="ml-2 bg-green-600 text-white animate-bounce" aria-label={`${comparisonProducts.length} produits en comparaison`}>
+                  <Badge variant="secondary" className="ml-1 sm:ml-2 bg-green-600 text-white text-xs animate-bounce" aria-label={`${comparisonProducts.length} produits en comparaison`}>
                     {comparisonProducts.length}
                   </Badge>
                 )}
@@ -792,11 +795,12 @@ const Marketplace = () => {
               <Button
                 variant="outline"
                 onClick={clearFilters}
-                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                className="bg-slate-800/80 backdrop-blur-sm border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900 text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
                 aria-label="Effacer tous les filtres"
               >
-                <X className="h-4 w-4 mr-2" aria-hidden="true" />
-                Effacer tout
+                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Effacer tout</span>
+                <span className="sm:hidden">Effacer</span>
               </Button>
             </div>
           </div>
@@ -806,21 +810,21 @@ const Marketplace = () => {
       {showFilters && (
         <section 
           id="advanced-filters" 
-          className="py-8 px-4 bg-slate-800/30 backdrop-blur-sm" 
+          className="py-4 sm:py-6 lg:py-8 px-3 sm:px-4 bg-slate-800/30 backdrop-blur-sm" 
           role="region" 
           aria-label={t('marketplace.filters.advanced')}
         >
           <div className="container mx-auto max-w-6xl">
-            <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-600">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-600 border-border/50">
+              <CardContent className="p-3 sm:p-4 lg:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {/* Catégorie */}
                   <div>
-                    <label className="text-sm font-medium text-slate-300 mb-2 block">Catégorie</label>
+                    <label className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2 block">Catégorie</label>
                     <select
                       value={filters.category}
                       onChange={(e) => updateFilter({ category: e.target.value })}
-                      className="w-full p-2 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full p-2 h-9 sm:h-10 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm"
                     >
                       <option value="all">Toutes les catégories</option>
                       {categories.map(cat => (
@@ -831,11 +835,11 @@ const Marketplace = () => {
 
                   {/* Type de produit */}
                   <div>
-                    <label className="text-sm font-medium text-slate-300 mb-2 block">Type</label>
+                    <label className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2 block">Type</label>
                     <select
                       value={filters.productType}
                       onChange={(e) => updateFilter({ productType: e.target.value })}
-                      className="w-full p-2 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full p-2 h-9 sm:h-10 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm"
                     >
                       <option value="all">Tous les types</option>
                       {productTypes.map(type => (
@@ -846,7 +850,7 @@ const Marketplace = () => {
 
                   {/* Type de licence */}
                   <div>
-                    <label className="text-sm font-medium text-slate-300 mb-2 block">Licence</label>
+                    <label className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2 block">Licence</label>
                     <select
                       value={filters.licensingType || 'all'}
                       onChange={(e) => {
@@ -855,7 +859,7 @@ const Marketplace = () => {
                           licensingType: value === 'all' ? 'all' : value as 'standard' | 'plr' | 'copyrighted' 
                         });
                       }}
-                      className="w-full p-2 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full p-2 h-9 sm:h-10 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm"
                     >
                       <option value="all">Toutes</option>
                       <option value="standard">Standard</option>
@@ -866,11 +870,11 @@ const Marketplace = () => {
 
                   {/* Prix */}
                   <div>
-                    <label className="text-sm font-medium text-slate-300 mb-2 block">Prix</label>
+                    <label className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2 block">Prix</label>
                     <select
                       value={filters.priceRange}
                       onChange={(e) => updateFilter({ priceRange: e.target.value })}
-                      className="w-full p-2 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full p-2 h-9 sm:h-10 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm"
                     >
                       {PRICE_RANGES.map(range => (
                         <option key={range.value} value={range.value}>{range.label}</option>
@@ -880,11 +884,11 @@ const Marketplace = () => {
 
                   {/* Note */}
                   <div>
-                    <label className="text-sm font-medium text-slate-300 mb-2 block">Note minimum</label>
+                    <label className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2 block">Note minimum</label>
                     <select
                       value={filters.rating}
                       onChange={(e) => updateFilter({ rating: e.target.value })}
-                      className="w-full p-2 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full p-2 h-9 sm:h-10 bg-slate-700 border-slate-600 text-white rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm"
                     >
                       <option value="all">Toutes les notes</option>
                       <option value="4">4+ étoiles</option>
@@ -896,16 +900,16 @@ const Marketplace = () => {
                 </div>
 
                 {/* Filtres supplémentaires */}
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       id="verifiedOnly"
                       checked={filters.verifiedOnly}
                       onChange={(e) => updateFilter({ verifiedOnly: e.target.checked })}
-                      className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500"
+                      className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500 h-4 w-4"
                     />
-                    <label htmlFor="verifiedOnly" className="text-sm text-slate-300">
+                    <label htmlFor="verifiedOnly" className="text-xs sm:text-sm text-slate-300">
                       Boutiques vérifiées uniquement
                     </label>
                   </div>
@@ -916,9 +920,9 @@ const Marketplace = () => {
                       id="featuredOnly"
                       checked={filters.featuredOnly}
                       onChange={(e) => updateFilter({ featuredOnly: e.target.checked })}
-                      className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500"
+                      className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500 h-4 w-4"
                     />
-                    <label htmlFor="featuredOnly" className="text-sm text-slate-300">
+                    <label htmlFor="featuredOnly" className="text-xs sm:text-sm text-slate-300">
                       Produits en vedette uniquement
                     </label>
                   </div>
@@ -929,17 +933,17 @@ const Marketplace = () => {
                       id="inStock"
                       checked={filters.inStock}
                       onChange={(e) => updateFilter({ inStock: e.target.checked })}
-                      className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500"
+                      className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500 h-4 w-4"
                     />
-                    <label htmlFor="inStock" className="text-sm text-slate-300">
+                    <label htmlFor="inStock" className="text-xs sm:text-sm text-slate-300">
                       En stock uniquement
                     </label>
                   </div>
                 </div>
 
                 {/* Tags */}
-                <div className="mt-6">
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">Tags populaires</label>
+                <div className="mt-4 sm:mt-6">
+                  <label className="text-xs sm:text-sm font-medium text-slate-300 mb-2 block">Tags populaires</label>
                   <div className="flex flex-wrap gap-2">
                     {PRODUCT_TAGS.map(tag => (
                       <button
@@ -950,7 +954,7 @@ const Marketplace = () => {
                             : [...filters.tags, tag];
                           updateFilter({ tags: newTags });
                         }}
-                        className={`px-3 py-1 rounded-full text-xs transition-all duration-300 ${
+                        className={`px-2 sm:px-3 py-1 rounded-full text-xs transition-all duration-300 ${
                           filters.tags.includes(tag)
                             ? 'bg-blue-600 text-white'
                             : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
@@ -968,31 +972,31 @@ const Marketplace = () => {
       )}
 
       {/* Contrôles de tri et vue */}
-      <section className="py-6 px-4">
+      <section className="py-4 sm:py-6 px-3 sm:px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold text-white">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                 Tous les produits
               </h2>
-              <Badge variant="secondary" className="bg-slate-700 text-slate-300">
+              <Badge variant="secondary" className="bg-slate-700 text-slate-300 text-xs sm:text-sm">
                 {pagination.totalItems} produit{pagination.totalItems !== 1 ? "s" : ""}
               </Badge>
               {filters.search || filters.tags.length > 0 ? (
-                <Badge variant="secondary" className="bg-blue-600 text-white">
+                <Badge variant="secondary" className="bg-blue-600 text-white text-xs sm:text-sm">
                   {displayProducts.length} résultat{displayProducts.length !== 1 ? "s" : ""} affiché{displayProducts.length !== 1 ? "s" : ""}
                 </Badge>
               ) : null}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* Tri */}
               <div className="flex items-center gap-2">
-                <label className="text-sm text-slate-300">{t('marketplace.sorting.label')}</label>
+                <label className="text-xs sm:text-sm text-slate-300 hidden sm:block">{t('marketplace.sorting.label')}</label>
                 <select
                   value={filters.sortBy}
                   onChange={(e) => updateFilter({ sortBy: e.target.value })}
-                  className="p-2 bg-slate-700 border-slate-600 text-white rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="flex-1 sm:flex-initial p-2 h-9 sm:h-10 bg-slate-700 border-slate-600 text-white rounded-md text-xs sm:text-sm focus:border-blue-500 focus:ring-blue-500"
                 >
                   {SORT_OPTIONS.map(option => (
                     <option key={option.value} value={option.value}>{option.label}</option>
@@ -1002,9 +1006,9 @@ const Marketplace = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => updateFilter({ sortOrder: filters.sortOrder === "asc" ? "desc" : "asc" })}
-                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 transition-all duration-300"
+                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 transition-all duration-300 h-9 sm:h-10 w-9 sm:w-10 p-0"
                 >
-                  {filters.sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  {filters.sortOrder === "asc" ? <SortAsc className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <SortDesc className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                 </Button>
               </div>
 
@@ -1014,17 +1018,17 @@ const Marketplace = () => {
                   variant={filters.viewMode === "grid" ? "default" : "outline"}
                   size="sm"
                   onClick={() => updateFilter({ viewMode: "grid" })}
-                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 transition-all duration-300"
+                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 transition-all duration-300 h-9 sm:h-10 w-9 sm:w-10 p-0"
                 >
-                  <Grid3X3 className="h-4 w-4" />
+                  <Grid3X3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
                 <Button
                   variant={filters.viewMode === "list" ? "default" : "outline"}
                   size="sm"
                   onClick={() => updateFilter({ viewMode: "list" })}
-                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 transition-all duration-300"
+                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 transition-all duration-300 h-9 sm:h-10 w-9 sm:w-10 p-0"
                 >
-                  <List className="h-4 w-4" />
+                  <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
@@ -1039,7 +1043,7 @@ const Marketplace = () => {
       <section 
         ref={productsRef}
         id="main-content" 
-        className="py-6 px-4" 
+        className="py-4 sm:py-6 px-3 sm:px-4" 
         role="main" 
         aria-label={t('marketplace.productList.ariaLabel')}
       >
@@ -1049,14 +1053,14 @@ const Marketplace = () => {
               {null}
             </ProductGrid>
           ) : error ? (
-            <div className="text-center py-16" role="alert" aria-live="polite">
-              <div className="h-20 w-20 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
-                <AlertCircle className="h-10 w-10 text-red-500" aria-hidden="true" />
+            <div className="text-center py-8 sm:py-12 lg:py-16 px-2" role="alert" aria-live="polite">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-red-500" aria-hidden="true" />
               </div>
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2">
                 {t('marketplace.error.title', 'Erreur de chargement')}
               </h3>
-              <p className="text-slate-400 mb-6 max-w-md mx-auto">
+              <p className="text-sm sm:text-base text-slate-400 mb-4 sm:mb-6 max-w-md mx-auto">
                 {error}
               </p>
               <Button
@@ -1064,11 +1068,11 @@ const Marketplace = () => {
                   setError(null);
                   fetchProducts();
                 }}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold h-12 px-8 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold h-10 sm:h-12 px-4 sm:px-8 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
                 aria-label={t('marketplace.error.retry', 'Réessayer')}
               >
                 {t('marketplace.error.retry', 'Réessayer')}
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           ) : displayProducts.length > 0 ? (
@@ -1107,7 +1111,7 @@ const Marketplace = () => {
               {/* Pagination */}
               {totalPages > 1 && (
                 <nav 
-                  className="flex justify-center items-center gap-2 mt-12" 
+                  className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 mt-8 sm:mt-12" 
                   role="navigation" 
                   aria-label={t('marketplace.pagination.ariaLabel')}
                 >
@@ -1115,10 +1119,10 @@ const Marketplace = () => {
                     variant="outline"
                     onClick={() => goToPage(pagination.currentPage - 1)}
                     disabled={!canGoPrevious}
-                    className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700 disabled:opacity-50 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700 disabled:opacity-50 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 h-8 sm:h-10 w-8 sm:w-10 p-0"
                     aria-label={t('marketplace.pagination.previous')}
                   >
-                    <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                    <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
                   </Button>
 
                   {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
@@ -1140,10 +1144,10 @@ const Marketplace = () => {
                         key={page}
                         variant={isActive ? "default" : "outline"}
                         onClick={() => goToPage(page)}
-                        className={isActive 
-                          ? "bg-blue-600 text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900" 
-                          : "bg-slate-800 border-slate-600 text-white hover:bg-slate-700 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
-                        }
+                        className={`${isActive 
+                          ? "bg-blue-600 text-white" 
+                          : "bg-slate-800 border-slate-600 text-white hover:bg-slate-700"
+                        } transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 h-8 sm:h-10 w-8 sm:w-10 p-0 text-xs sm:text-sm`}
                         aria-label={`Page ${page}`}
                         aria-current={isActive ? "page" : undefined}
                       >
@@ -1156,31 +1160,31 @@ const Marketplace = () => {
                     variant="outline"
                     onClick={() => goToPage(pagination.currentPage + 1)}
                     disabled={!canGoNext}
-                    className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700 disabled:opacity-50 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700 disabled:opacity-50 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 h-8 sm:h-10 w-8 sm:w-10 p-0"
                     aria-label={t('marketplace.pagination.next')}
                   >
-                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                    <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
                   </Button>
                 </nav>
               )}
             </>
           ) : (
-            <div className="text-center py-16">
-              <div className="h-20 w-20 rounded-full bg-slate-700 mx-auto mb-4 flex items-center justify-center">
-                <ShoppingCart className="h-10 w-10 text-slate-400" />
+            <div className="text-center py-8 sm:py-12 lg:py-16 px-2">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-slate-700 mx-auto mb-4 flex items-center justify-center">
+                <ShoppingCart className="h-8 w-8 sm:h-10 sm:w-10 text-slate-400" />
               </div>
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2">
                 {t('marketplace.noProducts')}
               </h3>
-              <p className="text-slate-400 mb-6">
+              <p className="text-sm sm:text-base text-slate-400 mb-4 sm:mb-6 max-w-md mx-auto">
                 {filters.search
                   ? t('marketplace.noProductsSearch')
                   : t('marketplace.noProductsDefault')}
               </p>
               <Link to="/auth">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold h-12 px-8 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold h-10 sm:h-12 px-4 sm:px-8 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105 text-xs sm:text-sm">
                   {t('marketplace.createStore')}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </Link>
             </div>
@@ -1189,28 +1193,28 @@ const Marketplace = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 px-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 relative overflow-hidden">
+      <section className="py-8 sm:py-12 lg:py-16 px-3 sm:px-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Rocket className="h-8 w-8 text-white animate-bounce" />
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
-            {t('marketplace.cta.title')}
-          </h2>
-            <Rocket className="h-8 w-8 text-white animate-bounce" />
+          <div className="flex items-center justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
+            <Rocket className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-bounce" />
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+              {t('marketplace.cta.title')}
+            </h2>
+            <Rocket className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-bounce" />
           </div>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-base sm:text-lg lg:text-xl text-blue-100 mb-4 sm:mb-6 lg:mb-8 px-2">
             {t('marketplace.cta.subtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/auth">
-              <Button size="lg" className="bg-white text-blue-600 font-semibold h-14 px-8 hover:bg-blue-50 transition-all duration-300 hover:scale-105">
-              {t('marketplace.cta.startFree')}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 h-14 px-8 transition-all duration-300 hover:scale-105">
-              <Users className="mr-2 h-5 w-5" />
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2">
+            <Link to="/auth" className="w-full sm:w-auto">
+              <Button size="lg" className="bg-white text-blue-600 font-semibold h-11 sm:h-14 px-6 sm:px-8 hover:bg-blue-50 transition-all duration-300 hover:scale-105 w-full sm:w-auto text-sm sm:text-base">
+                {t('marketplace.cta.startFree')}
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+            </Link>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 h-11 sm:h-14 px-6 sm:px-8 transition-all duration-300 hover:scale-105 w-full sm:w-auto text-sm sm:text-base">
+              <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               {t('marketplace.cta.joinCommunity')}
             </Button>
           </div>
