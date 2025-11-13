@@ -65,6 +65,9 @@ const Customers = () => {
     };
   }, [store?.id, setCustomers]);
 
+  // Refs for animations
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+
   // --- 🔍 Filtrage + tri optimisé ---
   const filteredCustomers = useMemo(() => {
     if (!customers) return [];
@@ -92,8 +95,17 @@ const Customers = () => {
       });
   }, [customers, searchQuery, sortBy]);
 
-  // Refs for animations
-  const headerRef = useScrollAnimation<HTMLDivElement>();
+  // Stats calculées
+  const stats = useMemo(() => {
+    if (!customers) return { total: 0, totalOrders: 0, totalSpent: 0, averageSpent: 0 };
+    
+    const total = customers.length;
+    const totalOrders = customers.reduce((sum, c) => sum + (c.total_orders || 0), 0);
+    const totalSpent = customers.reduce((sum, c) => sum + (Number(c.total_spent) || 0), 0);
+    const averageSpent = total > 0 ? totalSpent / total : 0;
+    
+    return { total, totalOrders, totalSpent, averageSpent };
+  }, [customers]);
 
   // --- 🧱 Loading du store ---
   if (storeLoading) {
@@ -134,18 +146,6 @@ const Customers = () => {
       </SidebarProvider>
     );
   }
-
-  // Stats calculées
-  const stats = useMemo(() => {
-    if (!customers) return { total: 0, totalOrders: 0, totalSpent: 0, averageSpent: 0 };
-    
-    const total = customers.length;
-    const totalOrders = customers.reduce((sum, c) => sum + (c.total_orders || 0), 0);
-    const totalSpent = customers.reduce((sum, c) => sum + (Number(c.total_spent) || 0), 0);
-    const averageSpent = total > 0 ? totalSpent / total : 0;
-    
-    return { total, totalOrders, totalSpent, averageSpent };
-  }, [customers]);
 
   // --- ✅ Interface principale ---
   return (

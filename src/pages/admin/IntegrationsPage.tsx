@@ -46,6 +46,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useStore } from '@/hooks/useStore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface StoreIntegration {
   id: string;
@@ -210,15 +211,20 @@ export default function IntegrationsPage() {
     return integrations.find(i => i.integration_type === type);
   };
 
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+  const tabsRef = useScrollAnimation<HTMLDivElement>();
+
   if (storeLoading || isLoading) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full overflow-x-hidden">
           <AppSidebar />
           <div className="flex-1 flex flex-col">
-            <main className="flex-1 p-6 space-y-6">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-96 w-full" />
+            <main className="flex-1 overflow-auto">
+              <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+                <Skeleton className="h-8 sm:h-10 w-48 sm:w-64" />
+                <Skeleton className="h-96 w-full" />
+              </div>
             </main>
           </div>
         </div>
@@ -229,17 +235,24 @@ export default function IntegrationsPage() {
   if (!store) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full overflow-x-hidden">
           <AppSidebar />
           <div className="flex-1 flex flex-col">
-            <main className="flex-1 p-6 space-y-6">
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-center text-muted-foreground py-8">
-                    Aucune boutique trouvée. Veuillez créer une boutique pour configurer les intégrations.
-                  </p>
-                </CardContent>
-              </Card>
+            <main className="flex-1 overflow-auto">
+              <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                  <CardContent className="pt-6">
+                    <div className="text-center py-12 sm:py-16">
+                      <div className="p-4 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/5 mb-4 animate-in zoom-in duration-500 inline-block">
+                        <Settings className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground opacity-20" />
+                      </div>
+                      <p className="text-sm sm:text-base text-foreground font-medium">
+                        Aucune boutique trouvée. Veuillez créer une boutique pour configurer les intégrations.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </main>
           </div>
         </div>
@@ -249,44 +262,61 @@ export default function IntegrationsPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full overflow-x-hidden">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <main className="flex-1 p-6 space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                <Settings className="h-8 w-8" />
-                Intégrations
-              </h1>
-              <p className="text-muted-foreground">
-                Configurez vos intégrations tierces (Zoom, OpenAI, Shipping APIs)
-              </p>
-            </div>
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+              {/* Header - Responsive & Animated */}
+              <div
+                ref={headerRef}
+                className="animate-in fade-in slide-in-from-top-4 duration-700"
+              >
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                    <Settings className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                  </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Intégrations
+                  </span>
+                </h1>
+                <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                  Configurez vos intégrations tierces (Zoom, OpenAI, Shipping APIs)
+                </p>
+              </div>
 
-            <Tabs defaultValue="zoom" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="zoom">
-                  <Video className="h-4 w-4 mr-2" />
-                  Video Conferencing
-                </TabsTrigger>
-                <TabsTrigger value="ai">
-                  <Brain className="h-4 w-4 mr-2" />
-                  AI Features
-                </TabsTrigger>
-                <TabsTrigger value="shipping">
-                  <Truck className="h-4 w-4 mr-2" />
-                  Shipping APIs
-                </TabsTrigger>
-              </TabsList>
+              <Tabs defaultValue="zoom" className="w-full">
+                <div
+                  ref={tabsRef}
+                  className="animate-in fade-in slide-in-from-bottom-4 duration-700"
+                >
+                  <TabsList className="grid w-full grid-cols-3 gap-2 overflow-x-auto">
+                    <TabsTrigger value="zoom" className="text-xs sm:text-sm">
+                      <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                      <span className="hidden sm:inline">Video Conferencing</span>
+                      <span className="sm:hidden">Video</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="ai" className="text-xs sm:text-sm">
+                      <Brain className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                      <span className="hidden sm:inline">AI Features</span>
+                      <span className="sm:hidden">AI</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="shipping" className="text-xs sm:text-sm">
+                      <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                      <span className="hidden sm:inline">Shipping APIs</span>
+                      <span className="sm:hidden">Shipping</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
               {/* Zoom Tab */}
-              <TabsContent value="zoom" className="space-y-4">
-                <Card>
+              <TabsContent value="zoom" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                       <div>
-                        <CardTitle>Zoom Video Conferencing</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-base sm:text-lg">Zoom Video Conferencing</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
                           Configurez Zoom pour créer automatiquement des réunions pour vos services
                         </CardDescription>
                       </div>
@@ -296,16 +326,17 @@ export default function IntegrationsPage() {
                           setSelectedType('zoom');
                           setIsDialogOpen(true);
                         }}
+                        className="h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       >
                         {getIntegrationByType('zoom') ? (
                           <>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Modifier
+                            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                            <span className="text-xs sm:text-sm">Modifier</span>
                           </>
                         ) : (
                           <>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Configurer
+                            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                            <span className="text-xs sm:text-sm">Configurer</span>
                           </>
                         )}
                       </Button>
@@ -314,12 +345,14 @@ export default function IntegrationsPage() {
                   <CardContent>
                     {getIntegrationByType('zoom') ? (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <Video className="h-5 w-5 text-primary" />
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-border/50 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center gap-3 mb-3 sm:mb-0">
+                            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5">
+                              <Video className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
+                            </div>
                             <div>
-                              <div className="font-medium">{getIntegrationByType('zoom')?.display_name}</div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="font-medium text-sm sm:text-base">{getIntegrationByType('zoom')?.display_name}</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 {getIntegrationByType('zoom')?.is_active ? 'Actif' : 'Inactif'}
                               </div>
                             </div>
@@ -338,15 +371,24 @@ export default function IntegrationsPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => deleteIntegration.mutate(getIntegrationByType('zoom')!.id)}
+                              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        Aucune configuration Zoom. Cliquez sur "Configurer" pour commencer.
+                      <div className="text-center py-12 sm:py-16">
+                        <div className="p-4 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/5 mb-4 animate-in zoom-in duration-500 inline-block">
+                          <Video className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground opacity-20" />
+                        </div>
+                        <p className="text-sm sm:text-base text-foreground font-medium mb-2">
+                          Aucune configuration Zoom
+                        </p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          Cliquez sur "Configurer" pour commencer.
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -354,13 +396,13 @@ export default function IntegrationsPage() {
               </TabsContent>
 
               {/* AI Tab */}
-              <TabsContent value="ai" className="space-y-4">
-                <Card>
+              <TabsContent value="ai" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                       <div>
-                        <CardTitle>AI Features</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-base sm:text-lg">AI Features</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
                           Configurez OpenAI pour la génération de contenu intelligent
                         </CardDescription>
                       </div>
@@ -370,16 +412,17 @@ export default function IntegrationsPage() {
                           setSelectedType('openai');
                           setIsDialogOpen(true);
                         }}
+                        className="h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       >
                         {getIntegrationByType('openai') ? (
                           <>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Modifier
+                            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                            <span className="text-xs sm:text-sm">Modifier</span>
                           </>
                         ) : (
                           <>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Configurer
+                            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                            <span className="text-xs sm:text-sm">Configurer</span>
                           </>
                         )}
                       </Button>
@@ -388,12 +431,14 @@ export default function IntegrationsPage() {
                   <CardContent>
                     {getIntegrationByType('openai') ? (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <Brain className="h-5 w-5 text-primary" />
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-border/50 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center gap-3 mb-3 sm:mb-0">
+                            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5">
+                              <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                            </div>
                             <div>
-                              <div className="font-medium">{getIntegrationByType('openai')?.display_name}</div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="font-medium text-sm sm:text-base">{getIntegrationByType('openai')?.display_name}</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 {getIntegrationByType('openai')?.is_active ? 'Actif' : 'Inactif'}
                               </div>
                             </div>
@@ -412,15 +457,24 @@ export default function IntegrationsPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => deleteIntegration.mutate(getIntegrationByType('openai')!.id)}
+                              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        Aucune configuration OpenAI. Cliquez sur "Configurer" pour commencer.
+                      <div className="text-center py-12 sm:py-16">
+                        <div className="p-4 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/5 mb-4 animate-in zoom-in duration-500 inline-block">
+                          <Brain className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground opacity-20" />
+                        </div>
+                        <p className="text-sm sm:text-base text-foreground font-medium mb-2">
+                          Aucune configuration OpenAI
+                        </p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          Cliquez sur "Configurer" pour commencer.
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -428,29 +482,31 @@ export default function IntegrationsPage() {
               </TabsContent>
 
               {/* Shipping Tab */}
-              <TabsContent value="shipping" className="space-y-4">
-                <Card>
+              <TabsContent value="shipping" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle>Shipping APIs</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-base sm:text-lg">Shipping APIs</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
                       Configurez vos transporteurs (FedEx, DHL, UPS)
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {['shipping_fedex', 'shipping_dhl', 'shipping_ups'].map((type) => {
                         const integration = getIntegrationByType(type);
                         const typeLabel = type.replace('shipping_', '').toUpperCase();
                         return (
                           <div
                             key={type}
-                            className="flex items-center justify-between p-4 border rounded-lg"
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-border/50 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                           >
-                            <div className="flex items-center gap-3">
-                              <Truck className="h-5 w-5 text-primary" />
+                            <div className="flex items-center gap-3 mb-3 sm:mb-0">
+                              <div className="p-2 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5">
+                                <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                              </div>
                               <div>
-                                <div className="font-medium">{integration?.display_name || typeLabel}</div>
-                                <div className="text-sm text-muted-foreground">
+                                <div className="font-medium text-sm sm:text-base">{integration?.display_name || typeLabel}</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground">
                                   {integration ? (integration.is_active ? 'Actif' : 'Inactif') : 'Non configuré'}
                                 </div>
                               </div>
@@ -475,15 +531,16 @@ export default function IntegrationsPage() {
                                   setSelectedType(type);
                                   setIsDialogOpen(true);
                                 }}
+                                className="h-8 sm:h-9 text-xs sm:text-sm"
                               >
                                 {integration ? (
                                   <>
-                                    <Edit className="h-4 w-4 mr-2" />
+                                    <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                                     Modifier
                                   </>
                                 ) : (
                                   <>
-                                    <Plus className="h-4 w-4 mr-2" />
+                                    <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                                     Configurer
                                   </>
                                 )}
@@ -500,12 +557,12 @@ export default function IntegrationsPage() {
 
             {/* Configuration Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-[90vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>
+                  <DialogTitle className="text-base sm:text-lg">
                     {selectedIntegration ? 'Modifier l\'intégration' : 'Configurer l\'intégration'}
                   </DialogTitle>
-                  <DialogDescription>
+                  <DialogDescription className="text-xs sm:text-sm">
                     Configurez les paramètres de l'intégration {selectedType}
                   </DialogDescription>
                 </DialogHeader>
@@ -521,6 +578,7 @@ export default function IntegrationsPage() {
                 />
               </DialogContent>
             </Dialog>
+            </div>
           </main>
         </div>
       </div>
@@ -552,7 +610,7 @@ const IntegrationConfigForm = ({
         return (
           <>
             <div>
-              <Label>API Key</Label>
+              <Label className="text-xs sm:text-sm">API Key</Label>
               <Input
                 type="password"
                 value={formData.config?.api_key || ''}
@@ -561,10 +619,11 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_key: e.target.value },
                 })}
                 placeholder="Zoom API Key"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <Label>API Secret</Label>
+              <Label className="text-xs sm:text-sm">API Secret</Label>
               <Input
                 type="password"
                 value={formData.config?.api_secret || ''}
@@ -573,10 +632,11 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_secret: e.target.value },
                 })}
                 placeholder="Zoom API Secret"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <Label>Account ID (optionnel)</Label>
+              <Label className="text-xs sm:text-sm">Account ID (optionnel)</Label>
               <Input
                 value={formData.config?.account_id || ''}
                 onChange={(e) => setFormData({
@@ -584,6 +644,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, account_id: e.target.value },
                 })}
                 placeholder="Zoom Account ID (pour OAuth)"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
           </>
@@ -592,7 +653,7 @@ const IntegrationConfigForm = ({
         return (
           <>
             <div>
-              <Label>API Key</Label>
+              <Label className="text-xs sm:text-sm">API Key</Label>
               <Input
                 type="password"
                 value={formData.config?.api_key || ''}
@@ -601,10 +662,11 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_key: e.target.value },
                 })}
                 placeholder="OpenAI API Key"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <Label>Model (optionnel)</Label>
+              <Label className="text-xs sm:text-sm">Model (optionnel)</Label>
               <Input
                 value={formData.config?.model || 'gpt-4-turbo-preview'}
                 onChange={(e) => setFormData({
@@ -612,6 +674,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, model: e.target.value },
                 })}
                 placeholder="gpt-4-turbo-preview"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
           </>
@@ -622,7 +685,7 @@ const IntegrationConfigForm = ({
         return (
           <>
             <div>
-              <Label>API Key</Label>
+              <Label className="text-xs sm:text-sm">API Key</Label>
               <Input
                 type="password"
                 value={formData.config?.api_key || ''}
@@ -631,10 +694,11 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_key: e.target.value },
                 })}
                 placeholder="Shipping API Key"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <Label>API Secret / Password</Label>
+              <Label className="text-xs sm:text-sm">API Secret / Password</Label>
               <Input
                 type="password"
                 value={formData.config?.api_secret || ''}
@@ -643,10 +707,11 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_secret: e.target.value },
                 })}
                 placeholder="Shipping API Secret"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <Label>Account Number</Label>
+              <Label className="text-xs sm:text-sm">Account Number</Label>
               <Input
                 value={formData.config?.account_number || ''}
                 onChange={(e) => setFormData({
@@ -654,6 +719,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, account_number: e.target.value },
                 })}
                 placeholder="Account Number"
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
           </>
@@ -664,20 +730,21 @@ const IntegrationConfigForm = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <div>
-        <Label>Nom d'affichage</Label>
+        <Label className="text-xs sm:text-sm">Nom d'affichage</Label>
         <Input
           value={formData.display_name}
           onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
           placeholder="Nom de l'intégration"
+          className="h-9 sm:h-10 text-xs sm:text-sm"
         />
       </div>
       {getConfigFields()}
       <div className="flex items-center justify-between">
         <div>
-          <Label>Activer l'intégration</Label>
-          <p className="text-sm text-muted-foreground">
+          <Label className="text-xs sm:text-sm">Activer l'intégration</Label>
+          <p className="text-xs text-muted-foreground">
             Activez ou désactivez cette intégration
           </p>
         </div>
@@ -686,11 +753,11 @@ const IntegrationConfigForm = ({
           onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
         />
       </div>
-      <DialogFooter>
-        <Button variant="outline" onClick={() => {}}>
+      <DialogFooter className="flex-col sm:flex-row gap-2">
+        <Button variant="outline" onClick={() => {}} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
           Annuler
         </Button>
-        <Button onClick={() => onSubmit(formData)}>
+        <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
           {integration ? 'Modifier' : 'Créer'}
         </Button>
       </DialogFooter>

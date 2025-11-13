@@ -10,10 +10,10 @@ import { WebhooksManager } from '@/components/physical/webhooks/WebhooksManager'
 export default function PhysicalProductWebhooks() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full overflow-x-hidden">
         <AppSidebar />
-        <main className="flex-1 p-6">
-          <div className="container mx-auto">
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6">
             <WebhooksManager />
           </div>
         </main>

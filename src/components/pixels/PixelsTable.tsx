@@ -65,8 +65,8 @@ export const PixelsTable = ({ pixels }: { pixels: Pixel[] }) => {
       {/* Desktop Table View */}
       <div className="hidden lg:block">
         <div className="border border-border/50 rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
+        <Table>
+          <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="text-xs sm:text-sm font-semibold">Type</TableHead>
                 <TableHead className="text-xs sm:text-sm font-semibold">Nom</TableHead>
@@ -74,73 +74,73 @@ export const PixelsTable = ({ pixels }: { pixels: Pixel[] }) => {
                 <TableHead className="text-xs sm:text-sm font-semibold">Statut</TableHead>
                 <TableHead className="text-xs sm:text-sm font-semibold">Créé le</TableHead>
                 <TableHead className="text-right text-xs sm:text-sm font-semibold">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pixels.map((pixel) => {
-                const Icon = pixelIcons[pixel.pixel_type];
-                return (
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pixels.map((pixel) => {
+              const Icon = pixelIcons[pixel.pixel_type];
+              return (
                   <TableRow key={pixel.id} className="hover:bg-muted/50 transition-colors">
                     <TableCell className="text-xs sm:text-sm">
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-muted-foreground" />
                         <span>{pixelLabels[pixel.pixel_type]}</span>
-                      </div>
-                    </TableCell>
+                    </div>
+                  </TableCell>
                     <TableCell className="text-xs sm:text-sm">
-                      {pixel.pixel_name || <span className="text-muted-foreground">Sans nom</span>}
-                    </TableCell>
-                    <TableCell>
+                    {pixel.pixel_name || <span className="text-muted-foreground">Sans nom</span>}
+                  </TableCell>
+                  <TableCell>
                       <code className="text-xs bg-muted/50 px-2 py-1 rounded font-mono">
-                        {pixel.pixel_id.substring(0, 20)}
-                        {pixel.pixel_id.length > 20 && '...'}
-                      </code>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={pixel.is_active}
-                          onCheckedChange={(checked) => handleToggle(pixel, checked)}
-                        />
+                      {pixel.pixel_id.substring(0, 20)}
+                      {pixel.pixel_id.length > 20 && '...'}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={pixel.is_active}
+                        onCheckedChange={(checked) => handleToggle(pixel, checked)}
+                      />
                         <Badge variant={pixel.is_active ? "default" : "secondary"} className="text-xs">
-                          {pixel.is_active ? 'Actif' : 'Inactif'}
-                        </Badge>
-                      </div>
-                    </TableCell>
+                        {pixel.is_active ? 'Actif' : 'Inactif'}
+                      </Badge>
+                    </div>
+                  </TableCell>
                     <TableCell className="text-xs sm:text-sm text-muted-foreground">
                       {format(new Date(pixel.created_at), "dd MMM yyyy", { locale: fr })}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedPixel(pixel);
-                            setEditDialogOpen(true);
-                          }}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedPixel(pixel);
+                          setEditDialogOpen(true);
+                        }}
                           className="h-8 w-8 p-0"
-                        >
+                      >
                           <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedPixel(pixel);
-                            setDeleteDialogOpen(true);
-                          }}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedPixel(pixel);
+                          setDeleteDialogOpen(true);
+                        }}
                           className="h-8 w-8 p-0"
-                        >
+                      >
                           <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
         </div>
       </div>
 

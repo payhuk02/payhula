@@ -34,16 +34,16 @@ export const SEOOverview = ({ data, isLoading }: SEOOverviewProps) => {
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium">Score SEO moyen</p>
               </div>
-              {isLoading ? (
+          {isLoading ? (
                 <Skeleton className="h-6 sm:h-8 w-20 mb-2" />
-              ) : (
-                <>
+          ) : (
+            <>
                   <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                     {averageScore}%
                   </p>
                   <Progress value={averageScore} className="h-2" />
-                </>
-              )}
+            </>
+          )}
             </div>
           </div>
         </CardContent>
@@ -60,13 +60,13 @@ export const SEOOverview = ({ data, isLoading }: SEOOverviewProps) => {
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium">Points à améliorer</p>
               </div>
-              {isLoading ? (
+          {isLoading ? (
                 <Skeleton className="h-6 sm:h-8 w-16" />
-              ) : (
+          ) : (
                 <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                   {improvements.length}
                 </p>
-              )}
+          )}
             </div>
           </div>
         </CardContent>
@@ -83,13 +83,13 @@ export const SEOOverview = ({ data, isLoading }: SEOOverviewProps) => {
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium">Pages optimisées</p>
               </div>
-              {isLoading ? (
+          {isLoading ? (
                 <Skeleton className="h-6 sm:h-8 w-16" />
-              ) : (
+          ) : (
                 <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                   {optimizedCount}
-                </p>
-              )}
+            </p>
+          )}
             </div>
           </div>
         </CardContent>

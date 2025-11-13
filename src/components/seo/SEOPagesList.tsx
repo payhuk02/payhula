@@ -200,9 +200,9 @@ export const SEOPagesList = ({ data, isLoading }: SEOPagesListProps) => {
                     <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
                   </div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Score Moyen</p>
-                </div>
+            </div>
                 <p className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${getScoreColor(averageScore).includes('text-red') ? 'from-red-600 to-orange-600' : getScoreColor(averageScore).includes('text-orange') ? 'from-orange-600 to-yellow-600' : 'from-green-600 to-emerald-600'} bg-clip-text text-transparent`}>
-                  {averageScore}/100
+              {averageScore}/100
                 </p>
               </div>
             </div>
@@ -218,9 +218,9 @@ export const SEOPagesList = ({ data, isLoading }: SEOPagesListProps) => {
                     <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />
                   </div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Pages Optimisées</p>
-                </div>
+            </div>
                 <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  {optimizedCount}
+              {optimizedCount}
                 </p>
               </div>
             </div>
@@ -272,10 +272,10 @@ export const SEOPagesList = ({ data, isLoading }: SEOPagesListProps) => {
             <div className="flex flex-wrap gap-2">
               <div className="relative flex-1 sm:flex-initial sm:w-[200px]">
                 <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+              <Input
+                placeholder="Rechercher..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                   className="pl-8 pr-8 h-9 sm:h-10 text-xs sm:text-sm w-full"
                 />
                 {search && (

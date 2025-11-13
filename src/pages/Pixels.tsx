@@ -28,7 +28,7 @@ const Pixels = () => {
               ref={headerRef}
               className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700"
             >
-              <div>
+        <div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
                   <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
                     <Code className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
@@ -38,13 +38,13 @@ const Pixels = () => {
                   </span>
                 </h1>
                 <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                  Gérez vos Pixels publicitaires et suivez leurs performances
-                </p>
-              </div>
+            Gérez vos Pixels publicitaires et suivez leurs performances
+          </p>
+        </div>
               <div className="flex items-center gap-2">
-                <CreatePixelDialog />
+        <CreatePixelDialog />
               </div>
-            </div>
+      </div>
 
             {/* Stats Cards - Responsive */}
             <div
@@ -61,15 +61,15 @@ const Pixels = () => {
                         {pixels.length}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {activePixels} actif{activePixels > 1 ? 's' : ''}
-                      </p>
+              {activePixels} actif{activePixels > 1 ? 's' : ''}
+            </p>
                     </div>
                     <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5">
                       <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+          </CardContent>
+        </Card>
 
               {/* Événements PageView */}
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
@@ -86,8 +86,8 @@ const Pixels = () => {
                       <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+          </CardContent>
+        </Card>
 
               {/* Add to Cart */}
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
@@ -104,8 +104,8 @@ const Pixels = () => {
                       <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+          </CardContent>
+        </Card>
 
               {/* Achats */}
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
@@ -122,90 +122,90 @@ const Pixels = () => {
                       <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+          </CardContent>
+        </Card>
+      </div>
 
             {/* Vos Pixels */}
             <Card
               ref={tableRef}
               className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700"
             >
-              <CardHeader>
+        <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Vos Pixels</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
-                  Liste de tous vos Pixels configurés. Activez ou désactivez-les selon vos besoins.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-12 w-full" />
-                    <Skeleton className="h-12 w-full" />
-                    <Skeleton className="h-12 w-full" />
-                  </div>
-                ) : (
-                  <PixelsTable pixels={pixels} />
-                )}
-              </CardContent>
-            </Card>
+            Liste de tous vos Pixels configurés. Activez ou désactivez-les selon vos besoins.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : (
+            <PixelsTable pixels={pixels} />
+          )}
+        </CardContent>
+      </Card>
 
             {/* Comment ça fonctionne ? */}
             <Card
               ref={helpRef}
               className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700"
             >
-              <CardHeader>
+        <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Comment ça fonctionne ?</CardTitle>
-              </CardHeader>
+        </CardHeader>
               <CardContent className="space-y-3 sm:space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-bold text-xs">
                     1
                   </div>
-                  <div>
+          <div>
                     <h3 className="font-semibold text-xs sm:text-sm mb-1">Ajoutez vos Pixels</h3>
                     <p className="text-xs text-muted-foreground">
-                      Cliquez sur "Ajouter un Pixel" et renseignez les informations de votre Pixel publicitaire (Facebook, Google, TikTok, etc.).
-                    </p>
-                  </div>
+              Cliquez sur "Ajouter un Pixel" et renseignez les informations de votre Pixel publicitaire (Facebook, Google, TikTok, etc.).
+            </p>
+          </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-bold text-xs">
                     2
                   </div>
-                  <div>
+          <div>
                     <h3 className="font-semibold text-xs sm:text-sm mb-1">Injection automatique</h3>
                     <p className="text-xs text-muted-foreground">
-                      Vos Pixels actifs seront automatiquement injectés sur vos pages de produits et de vente.
-                    </p>
-                  </div>
+              Vos Pixels actifs seront automatiquement injectés sur vos pages de produits et de vente.
+            </p>
+          </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-bold text-xs">
                     3
                   </div>
-                  <div>
+          <div>
                     <h3 className="font-semibold text-xs sm:text-sm mb-1">Suivi des événements</h3>
                     <p className="text-xs text-muted-foreground">
-                      Le système envoie automatiquement les événements importants : visites de pages, ajouts au panier, achats et leads.
-                    </p>
-                  </div>
+              Le système envoie automatiquement les événements importants : visites de pages, ajouts au panier, achats et leads.
+            </p>
+          </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-bold text-xs">
                     4
                   </div>
-                  <div>
+          <div>
                     <h3 className="font-semibold text-xs sm:text-sm mb-1">Confidentialité</h3>
                     <p className="text-xs text-muted-foreground">
-                      Vos Pixels sont privés et ne s'activent que sur vos propres produits. Conformité RGPD garantie.
-                    </p>
+              Vos Pixels sont privés et ne s'activent que sur vos propres produits. Conformité RGPD garantie.
+            </p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
+        </CardContent>
+      </Card>
+    </div>
         </main>
       </div>
     </SidebarProvider>
