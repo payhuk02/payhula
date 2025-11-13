@@ -255,9 +255,7 @@ export default function AdminSuppliersManagement() {
                   </TabsContent>
 
                   <TabsContent value="orders" className="mt-4 sm:mt-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="overflow-x-auto">
-                      <SupplierOrders />
-                    </div>
+                    <SupplierOrders />
                   </TabsContent>
 
                   <TabsContent value="reorder-rules" className="mt-4 sm:mt-6 animate-in fade-in slide-in-from-bottom-4 duration-700">

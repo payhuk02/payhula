@@ -297,110 +297,112 @@ export default function SupplierOrders() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <CardContent className="overflow-x-auto p-0">
-              <Table className="min-w-[800px] w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[140px]">Numéro</TableHead>
-                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">Fournisseur</TableHead>
-                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">Date</TableHead>
-                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">Montant</TableHead>
-                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[160px]">Statut</TableHead>
-                    <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">Livraison prévue</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap min-w-[80px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOrders.map((order) => {
-                    const status = ORDER_STATUSES.find(s => s.value === order.status);
-                    return (
-                      <TableRow key={order.id}>
-                        <TableCell className="text-xs sm:text-sm font-medium whitespace-nowrap min-w-[140px]">
-                          <div className="flex items-center gap-2">
-                            <Package className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="truncate">{order.order_number}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">
-                          <span className="truncate block">
-                            {(order.supplier as any)?.name || 'N/A'}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">
-                          {format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[120px]">
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span>
-                              {new Intl.NumberFormat('fr-FR', {
-                                style: 'currency',
-                                currency: order.currency || 'XOF',
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              }).format(order.total_amount)}
+            <CardContent className="p-0">
+              <div className="overflow-x-auto scrollbar-hide scroll-smooth">
+                <Table className="min-w-[800px] w-full">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[140px] px-4">Numéro</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[150px] px-4">Fournisseur</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[120px] px-4">Date</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[120px] px-4">Montant</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[160px] px-4">Statut</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[150px] px-4">Livraison prévue</TableHead>
+                      <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap min-w-[80px] px-4">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOrders.map((order) => {
+                      const status = ORDER_STATUSES.find(s => s.value === order.status);
+                      return (
+                        <TableRow key={order.id}>
+                          <TableCell className="text-xs sm:text-sm font-medium whitespace-nowrap min-w-[140px] px-4">
+                            <div className="flex items-center gap-2">
+                              <Package className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                              <span className="truncate">{order.order_number}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[150px] px-4">
+                            <span className="truncate block">
+                              {(order.supplier as any)?.name || 'N/A'}
                             </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[160px]">
-                          <Select
-                            value={order.status}
-                            onValueChange={(value: SupplierOrder['status']) =>
-                              handleStatusUpdate(order.id, value)
-                            }
-                          >
-                            <SelectTrigger className="w-full max-w-[160px] h-8 text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-[300px]">
-                              {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
-                                <SelectItem key={s.value} value={s.value} className="text-xs">
-                                  {s.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[150px]">
-                          {order.expected_delivery_date ? (
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[120px] px-4">
+                            {format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[120px] px-4">
                             <div className="flex items-center gap-1">
-                              <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                              <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                               <span>
-                                {format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}
+                                {new Intl.NumberFormat('fr-FR', {
+                                  style: 'currency',
+                                  currency: order.currency || 'XOF',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(order.total_amount)}
                               </span>
                             </div>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">Non définie</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right whitespace-nowrap min-w-[80px]">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                              <DropdownMenuItem className="text-xs sm:text-sm">
-                                <Eye className="mr-2 h-4 w-4" />
-                                Voir détails
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusUpdate(order.id, 'completed')}
-                                className="text-xs sm:text-sm"
-                                disabled={order.status === 'completed'}
-                              >
-                                <Package className="mr-2 h-4 w-4" />
-                                Marquer comme terminée
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[160px] px-4">
+                            <Select
+                              value={order.status}
+                              onValueChange={(value: SupplierOrder['status']) =>
+                                handleStatusUpdate(order.id, value)
+                              }
+                            >
+                              <SelectTrigger className="w-full max-w-[160px] h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-[300px]">
+                                {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
+                                  <SelectItem key={s.value} value={s.value} className="text-xs">
+                                    {s.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap min-w-[150px] px-4">
+                            {order.expected_delivery_date ? (
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                <span>
+                                  {format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">Non définie</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right whitespace-nowrap min-w-[80px] px-4">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem className="text-xs sm:text-sm">
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  Voir détails
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusUpdate(order.id, 'completed')}
+                                  className="text-xs sm:text-sm"
+                                  disabled={order.status === 'completed'}
+                                >
+                                  <Package className="mr-2 h-4 w-4" />
+                                  Marquer comme terminée
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         )}
