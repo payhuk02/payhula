@@ -15,11 +15,16 @@ import { DatabaseMigrationInstructions } from "@/components/debug/DatabaseMigrat
 import { ResponsiveDesignTest } from "@/components/debug/ResponsiveDesignTest";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { Settings as SettingsIcon } from "lucide-react";
 
 const Settings = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("profile");
+
+  // Refs for animations
+  const headerRef = useScrollAnimation<HTMLDivElement>();
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -34,189 +39,146 @@ const Settings = () => {
       // L'action sera gérée par le composant StoreSettings
     }
   }, [searchParams]);
+
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full overflow-x-hidden">
         <AppSidebar />
-        <main className="flex-1 w-full overflow-x-hidden">
-          <div className="w-full h-full px-4 py-6 sm:px-6 md:px-8 lg:px-10">
-            <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
-              {/* Header - Responsive */}
-              <div className="space-y-2">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
-                  {t('settings.title')}
-                </h1>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  {t('settings.subtitle')}
-                </p>
-              </div>
-
-              {/* Tabs - Fully Responsive */}
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-                {/* Mobile: Dropdown, Tablet+: Horizontal tabs */}
-                <div className="w-full">
-                  {/* Mobile View (< 640px) */}
-                  <div className="block sm:hidden">
-                    <TabsList className="grid w-full grid-cols-2 h-auto gap-2">
-                      <TabsTrigger value="profile" className="text-xs py-2">
-                        {t('settings.tabs.profile')}
-                      </TabsTrigger>
-                      <TabsTrigger value="store" className="text-xs py-2">
-                        {t('settings.tabs.store')}
-                      </TabsTrigger>
-                      <TabsTrigger value="domain" className="text-xs py-2">
-                        {t('settings.tabs.domain')}
-                      </TabsTrigger>
-                      <TabsTrigger value="notifications" className="text-xs py-2">
-                        {t('settings.tabs.notifications')}
-                      </TabsTrigger>
-                      <TabsTrigger value="security" className="text-xs py-2">
-                        {t('settings.tabs.security')}
-                      </TabsTrigger>
-                      <TabsTrigger value="debug" className="text-xs py-2">
-                        {t('settings.tabs.debug')}
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  {/* Tablet View (640px - 1024px) */}
-                  <div className="hidden sm:block lg:hidden">
-                    <TabsList className="grid w-full grid-cols-3 h-auto gap-2">
-                      <TabsTrigger value="profile" className="text-sm py-2.5">
-                        {t('settings.tabs.profile')}
-                      </TabsTrigger>
-                      <TabsTrigger value="store" className="text-sm py-2.5">
-                        {t('settings.tabs.store')}
-                      </TabsTrigger>
-                      <TabsTrigger value="domain" className="text-sm py-2.5">
-                        {t('settings.tabs.domain')}
-                      </TabsTrigger>
-                      <TabsTrigger value="notifications" className="text-sm py-2.5">
-                        {t('settings.tabs.notifications')}
-                      </TabsTrigger>
-                      <TabsTrigger value="security" className="text-sm py-2.5">
-                        {t('settings.tabs.security')}
-                      </TabsTrigger>
-                      <TabsTrigger value="debug" className="text-sm py-2.5">
-                        {t('settings.tabs.debug')}
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  {/* Desktop View (> 1024px) */}
-                  <div className="hidden lg:block">
-                    <TabsList className="grid w-full grid-cols-6 h-auto">
-                      <TabsTrigger value="profile" className="py-3">
-                        {t('settings.tabs.profile')}
-                      </TabsTrigger>
-                      <TabsTrigger value="store" className="py-3">
-                        {t('settings.tabs.store')}
-                      </TabsTrigger>
-                      <TabsTrigger value="domain" className="py-3">
-                        {t('settings.tabs.domain')}
-                      </TabsTrigger>
-                      <TabsTrigger value="notifications" className="py-3">
-                        {t('settings.tabs.notifications')}
-                      </TabsTrigger>
-                      <TabsTrigger value="security" className="py-3">
-                        {t('settings.tabs.security')}
-                      </TabsTrigger>
-                      <TabsTrigger value="debug" className="py-3">
-                        {t('settings.tabs.debug')}
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header - Responsive & Animated */}
+            <div 
+              ref={headerRef}
+              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700"
+            >
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                  <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                 </div>
-
-                {/* Profile Tab */}
-                <TabsContent value="profile" className="space-y-3 sm:space-y-4 animate-fade-in">
-                  <Card className="border-none shadow-lg">
-                    <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
-                      <CardTitle className="text-lg sm:text-xl">{t('settings.profile.cardTitle')}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        {t('settings.profile.cardDescription')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                      <AdvancedProfileSettings />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Store Tab */}
-                <TabsContent value="store" className="space-y-3 sm:space-y-4 animate-fade-in">
-                  <Card className="border-none shadow-lg">
-                    <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
-                      <CardTitle className="text-lg sm:text-xl">{t('settings.store.cardTitle')}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        {t('settings.store.cardDescription')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                      <StoreSettings action={searchParams.get('action')} />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Domain Tab */}
-                <TabsContent value="domain" className="space-y-3 sm:space-y-4 animate-fade-in">
-                  <div className="space-y-3 sm:space-y-4">
-                    <DomainSettings />
-                  </div>
-                </TabsContent>
-
-                {/* Notifications Tab */}
-                <TabsContent value="notifications" className="space-y-3 sm:space-y-4 animate-fade-in">
-                  <Card className="border-none shadow-lg">
-                    <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
-                      <CardTitle className="text-lg sm:text-xl">{t('settings.notifications.cardTitle')}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        {t('settings.notifications.cardDescription')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                      <NotificationSettings />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Security Tab */}
-                <TabsContent value="security" className="space-y-3 sm:space-y-4 animate-fade-in">
-                  <Card className="border-none shadow-lg">
-                    <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
-                      <CardTitle className="text-lg sm:text-xl">{t('settings.security.cardTitle')}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        {t('settings.security.cardDescription')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                      <SecuritySettings />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Debug Tab */}
-                <TabsContent value="debug" className="space-y-3 sm:space-y-4 animate-fade-in">
-                  <Card className="border-none shadow-lg">
-                    <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
-                      <CardTitle className="text-lg sm:text-xl">{t('settings.debug.cardTitle')}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        {t('settings.debug.cardDescription')}
-                      </CardDescription>
-                    </CardHeader>
-                            <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                              <DatabaseMigrationInstructions />
-                              <div className="mt-6">
-                                <ProfileTest />
-                              </div>
-                                  <div className="mt-6">
-                                    <ResponsiveDesignTest />
-                                  </div>
-                            </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      {t('settings.title')}
+                    </span>
+                  </h1>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                    {t('settings.subtitle')}
+                  </p>
+                </div>
+              </div>
             </div>
+
+            {/* Tabs - Fully Responsive */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 h-auto gap-2 overflow-x-auto">
+                <TabsTrigger value="profile" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  {t('settings.tabs.profile')}
+                </TabsTrigger>
+                <TabsTrigger value="store" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  {t('settings.tabs.store')}
+                </TabsTrigger>
+                <TabsTrigger value="domain" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  {t('settings.tabs.domain')}
+                </TabsTrigger>
+                <TabsTrigger value="notifications" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  {t('settings.tabs.notifications')}
+                </TabsTrigger>
+                <TabsTrigger value="security" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  {t('settings.tabs.security')}
+                </TabsTrigger>
+                <TabsTrigger value="debug" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  {t('settings.tabs.debug')}
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Profile Tab */}
+              <TabsContent value="profile" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
+                    <CardTitle className="text-lg sm:text-xl">{t('settings.profile.cardTitle')}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {t('settings.profile.cardDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                    <AdvancedProfileSettings />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Store Tab */}
+              <TabsContent value="store" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
+                    <CardTitle className="text-lg sm:text-xl">{t('settings.store.cardTitle')}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {t('settings.store.cardDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                    <StoreSettings action={searchParams.get('action')} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Domain Tab */}
+              <TabsContent value="domain" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="space-y-3 sm:space-y-4">
+                  <DomainSettings />
+                </div>
+              </TabsContent>
+
+              {/* Notifications Tab */}
+              <TabsContent value="notifications" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
+                    <CardTitle className="text-lg sm:text-xl">{t('settings.notifications.cardTitle')}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {t('settings.notifications.cardDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                    <NotificationSettings />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Security Tab */}
+              <TabsContent value="security" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
+                    <CardTitle className="text-lg sm:text-xl">{t('settings.security.cardTitle')}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {t('settings.security.cardDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                    <SecuritySettings />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Debug Tab */}
+              <TabsContent value="debug" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
+                    <CardTitle className="text-lg sm:text-xl">{t('settings.debug.cardTitle')}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {t('settings.debug.cardDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                    <DatabaseMigrationInstructions />
+                    <div className="mt-4 sm:mt-6">
+                      <ProfileTest />
+                    </div>
+                    <div className="mt-4 sm:mt-6">
+                      <ResponsiveDesignTest />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
