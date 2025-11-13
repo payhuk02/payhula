@@ -7,7 +7,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { WebhooksManager } from '@/components/digital/webhooks';
 
-export const DigitalProductWebhooks = () => {
+const DigitalProductWebhooks = () => {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full overflow-x-hidden">
@@ -21,4 +21,6 @@ export const DigitalProductWebhooks = () => {
     </SidebarProvider>
   );
 };
+
+export default DigitalProductWebhooks;
 
