@@ -7,7 +7,7 @@ import { useOrders } from "@/hooks/useOrders";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useProducts } from "@/hooks/useProducts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, DollarSign, ShoppingCart, Users, Package } from "lucide-react";
+import { TrendingUp, DollarSign, ShoppingCart, Users, Package, BarChart3 } from "lucide-react";
 import { SalesChart } from "@/components/analytics/SalesChart";
 import { TopProducts } from "@/components/analytics/TopProducts";
 import { RecentOrders } from "@/components/analytics/RecentOrders";
@@ -51,9 +51,11 @@ const Analytics = () => {
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <Skeleton className="h-8 w-64 mb-6" />
-            <Skeleton className="h-96 w-full" />
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+              <Skeleton className="h-8 w-64 mb-6" />
+              <Skeleton className="h-96 w-full" />
+            </div>
           </main>
         </div>
       </SidebarProvider>
@@ -65,15 +67,17 @@ const Analytics = () => {
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
           <AppSidebar />
-          <main className="flex-1 p-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Boutique non configurée</CardTitle>
-                <CardDescription>
-                  Veuillez d'abord créer votre boutique pour voir vos statistiques.
-                </CardDescription>
-              </CardHeader>
-            </Card>
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle>Boutique non configurée</CardTitle>
+                  <CardDescription>
+                    Veuillez d'abord créer votre boutique pour voir vos statistiques.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
           </main>
         </div>
       </SidebarProvider>
@@ -84,106 +88,139 @@ const Analytics = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
+      <div className="flex min-h-screen w-full overflow-x-hidden">
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8" role="main" aria-labelledby="analytics-title">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div ref={headerRef} role="banner">
-              <h1 className="text-3xl font-bold tracking-tight" id="analytics-title">Statistiques</h1>
-              <p className="text-muted-foreground mt-1">
-                Vue d'ensemble de votre activité
-              </p>
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header - Responsive & Animated */}
+            <div
+              ref={headerRef}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700"
+              role="banner"
+            >
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2" id="analytics-title">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                    <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                  </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Statistiques
+                  </span>
+                </h1>
+                <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                  Vue d'ensemble de votre activité
+                </p>
+              </div>
             </div>
 
-            {/* Stats Cards */}
-            <div ref={statsRef} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Cartes statistiques">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Revenu total</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-32" />
-                  ) : (
-                    <>
-                      <div className="text-2xl font-bold">
-                        {totalRevenue.toLocaleString()} XOF
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Total des ventes
-                      </p>
-                    </>
-                  )}
+            {/* Stats Cards - Responsive */}
+            <div
+              ref={statsRef}
+              className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
+              role="region"
+              aria-label="Cartes statistiques"
+            >
+              {/* Revenu total */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Revenu total</p>
+                      {isLoading ? (
+                        <Skeleton className="h-6 w-24 mb-1" />
+                      ) : (
+                        <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                          {totalRevenue.toLocaleString()} XOF
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">Total des ventes</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5">
+                      <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Commandes</CardTitle>
-                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-32" />
-                  ) : (
-                    <>
-                      <div className="text-2xl font-bold">{orders?.length || 0}</div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {completedOrders} terminées
-                      </p>
-                    </>
-                  )}
+              {/* Commandes */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Commandes</p>
+                      {isLoading ? (
+                        <Skeleton className="h-6 w-16 mb-1" />
+                      ) : (
+                        <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                          {orders?.length || 0}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">{completedOrders} terminées</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5">
+                      <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Clients</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-32" />
-                  ) : (
-                    <>
-                      <div className="text-2xl font-bold">{customers?.length || 0}</div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Base clients
-                      </p>
-                    </>
-                  )}
+              {/* Clients */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Clients</p>
+                      {isLoading ? (
+                        <Skeleton className="h-6 w-16 mb-1" />
+                      ) : (
+                        <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                          {customers?.length || 0}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">Base clients</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Produits actifs</CardTitle>
-                  <Package className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-32" />
-                  ) : (
-                    <>
-                      <div className="text-2xl font-bold">{activeProducts}</div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Sur {products?.length || 0} total
-                      </p>
-                    </>
-                  )}
+              {/* Produits actifs */}
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Produits actifs</p>
+                      {isLoading ? (
+                        <Skeleton className="h-6 w-16 mb-1" />
+                      ) : (
+                        <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                          {activeProducts}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">Sur {products?.length || 0} total</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/5">
+                      <Package className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Charts and Tables */}
-            <div ref={chartsRef} className="grid gap-6 md:grid-cols-2" role="region" aria-label="Graphiques et tableaux">
+            <div
+              ref={chartsRef}
+              className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-700"
+              role="region"
+              aria-label="Graphiques et tableaux"
+            >
               <SalesChart orders={orders || []} loading={isLoading} />
               <TopProducts orders={orders || []} loading={isLoading} />
             </div>
 
-            <div role="region" aria-label="Commandes récentes">
+            <div role="region" aria-label="Commandes récentes" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <RecentOrders orders={orders?.slice(0, 5) || []} loading={isLoading} />
             </div>
           </div>

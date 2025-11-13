@@ -47,23 +47,23 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Analyse SEO : {page.name}</span>
-            <span className={`text-2xl font-bold ${getScoreColor(page.analysis.score.overall)}`}>
+          <DialogTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-base sm:text-lg">
+            <span className="truncate">Analyse SEO : {page.name}</span>
+            <span className={`text-xl sm:text-2xl font-bold ${getScoreColor(page.analysis.score.overall)}`}>
               {page.analysis.score.overall}/100
             </span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             {page.type === 'product' ? 'Produit' : 'Boutique'} • Analysé le {page.lastAnalyzed.toLocaleDateString('fr-FR')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Scores par catégorie */}
-          <div className="space-y-3">
-            <h3 className="font-semibold">Scores détaillés</h3>
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-sm sm:text-base">Scores détaillés</h3>
             {Object.entries(page.analysis.score).map(([key, value]) => {
               if (key === 'overall') return null;
               
@@ -77,7 +77,7 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
 
               return (
                 <div key={key} className="space-y-1">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-xs sm:text-sm">
                     <span>{labels[key]}</span>
                     <span className={`font-semibold ${getScoreColor(value)}`}>
                       {value}/100
@@ -92,15 +92,15 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
           {/* Points forts */}
           {page.analysis.strengths.length > 0 && (
             <div className="space-y-2">
-              <h3 className="font-semibold flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                 Points forts
               </h3>
               <div className="grid gap-2">
                 {page.analysis.strengths.map((strength, index) => (
                   <Alert key={index} className="bg-green-50 border-green-200">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-900">
+                    <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
+                    <AlertDescription className="text-xs sm:text-sm text-green-900">
                       {strength}
                     </AlertDescription>
                   </Alert>
@@ -112,11 +112,11 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
           {/* Problèmes et recommandations */}
           {page.analysis.issues.length > 0 && (
             <div className="space-y-2">
-              <h3 className="font-semibold flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
+              <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
+                <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                 Recommandations
               </h3>
-              <div className="grid gap-3">
+              <div className="grid gap-2 sm:gap-3">
                 {page.analysis.issues.map((issue, index) => (
                   <Alert key={index} className={
                     issue.type === 'error' ? 'bg-red-50 border-red-200' :
@@ -126,7 +126,7 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
                     <div className="flex items-start gap-2">
                       {getPriorityIcon(issue.priority)}
                       <div className="flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="outline" className="text-xs">
                             {issue.category}
                           </Badge>
@@ -145,9 +145,9 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
                           issue.type === 'warning' ? 'text-orange-900' :
                           'text-blue-900'
                         }>
-                          <p className="font-medium">{issue.message}</p>
+                          <p className="font-medium text-xs sm:text-sm">{issue.message}</p>
                           {issue.recommendation && (
-                            <p className="text-sm mt-1 opacity-80">
+                            <p className="text-xs sm:text-sm mt-1 opacity-80">
                               💡 {issue.recommendation}
                             </p>
                           )}
@@ -163,10 +163,10 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
           {/* Mots-clés suggérés */}
           {page.analysis.keywords.length > 0 && (
             <div className="space-y-2">
-              <h3 className="font-semibold">Mots-clés détectés</h3>
+              <h3 className="font-semibold text-sm sm:text-base">Mots-clés détectés</h3>
               <div className="flex flex-wrap gap-2">
                 {page.analysis.keywords.map((keyword, index) => (
-                  <Badge key={index} variant="secondary">
+                  <Badge key={index} variant="secondary" className="text-xs">
                     {keyword}
                   </Badge>
                 ))}
@@ -175,10 +175,10 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
           )}
 
           {/* Action button */}
-          <div className="pt-4 border-t">
-            <Button onClick={handleEdit} className="w-full">
+          <div className="pt-3 sm:pt-4 border-t">
+            <Button onClick={handleEdit} className="w-full h-9 sm:h-10 text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
               Corriger maintenant
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
