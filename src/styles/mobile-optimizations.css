@@ -259,6 +259,32 @@ select {
   display: none;  /* Chrome, Safari et Opera */
 }
 
+/* === SCROLLBAR PROFESSIONNELLE POUR ONGLET COMMANDES === */
+/* Barre de défilement horizontale visible et stylisée pour l'onglet Commandes */
+.scrollbar-orders {
+  scrollbar-width: thin;  /* Firefox - barre fine */
+  scrollbar-color: rgb(168 85 247 / 0.6) rgb(0 0 0 / 0.1);  /* Firefox - thumb et track */
+}
+
+.scrollbar-orders::-webkit-scrollbar {
+  height: 8px;  /* Hauteur de la barre de défilement horizontale */
+}
+
+.scrollbar-orders::-webkit-scrollbar-track {
+  background: rgb(0 0 0 / 0.05);  /* Couleur de fond de la piste */
+  border-radius: 4px;
+}
+
+.scrollbar-orders::-webkit-scrollbar-thumb {
+  background: rgb(168 85 247 / 0.5);  /* Couleur du curseur (violet avec transparence) */
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-orders::-webkit-scrollbar-thumb:hover {
+  background: rgb(168 85 247 / 0.7);  /* Couleur au survol */
+}
+
 /* === PERFORMANCE MOBILE === */
 /* Optimisations de performance pour mobile */
 @media (max-width: 768px) {

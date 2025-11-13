@@ -298,7 +298,7 @@ export default function SupplierOrders() {
         ) : (
           <Card className="overflow-hidden">
             <CardContent className="p-0">
-              <div className="overflow-x-auto scrollbar-hide scroll-smooth">
+              <div className="overflow-x-auto scroll-smooth scrollbar-orders">
                 <Table className="min-w-[800px] w-full">
                   <TableHeader>
                     <TableRow>
