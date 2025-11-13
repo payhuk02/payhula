@@ -49,6 +49,7 @@ import {
   User,
 } from 'lucide-react';
 import { useEffect } from 'react';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 type OrderStatus = 'all' | 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
 type ProductType = 'all' | 'digital' | 'physical' | 'service' | 'course';
@@ -109,6 +110,7 @@ export default function MyOrders() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus>('all');
   const [typeFilter, setTypeFilter] = useState<ProductType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const headerRef = useScrollAnimation<HTMLDivElement>();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -249,37 +251,48 @@ export default function MyOrders() {
           <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
               {/* Header - Desktop seulement */}
-              <div className="hidden lg:block space-y-2">
-                <div className="flex items-center gap-2">
+              <div ref={headerRef} className="hidden lg:block space-y-2 animate-in fade-in slide-in-from-top-4">
+                <div className="flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => navigate('/account')}
-                    className="touch-manipulation"
+                    className="touch-manipulation h-9 w-9"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
-                  <h1 className="text-3xl lg:text-4xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-50">
-                    <ShoppingBag className="h-8 w-8 text-primary" />
-                    <span>Mes Commandes</span>
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center">
+                    <ShoppingBag className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    Mes Commandes
                   </h1>
                 </div>
-                <p className="text-base text-gray-600 dark:text-gray-400">
+                <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400">
                   Consultez toutes vos commandes et leur statut
                 </p>
               </div>
 
               {/* Recherche */}
-              <Card className="border shadow-sm">
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground z-10" />
                     <Input
                       placeholder="Rechercher par numéro de commande ou produit..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 sm:pl-10 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+                      className="pl-9 sm:pl-10 h-9 sm:h-10 lg:h-11 text-xs sm:text-sm lg:text-base touch-manipulation"
                     />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                        aria-label="Effacer la recherche"
+                      >
+                        <XCircle className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -395,17 +408,21 @@ export default function MyOrders() {
 
               {/* Résumé */}
               <div className="px-2.5 sm:px-0">
-                <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  {orders?.length || 0} {orders?.length === 1 ? 'commande' : 'commandes'}
+                <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-50">
+                  <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    {orders?.length || 0}
+                  </span> {orders?.length === 1 ? 'commande' : 'commandes'}
                 </p>
               </div>
 
               {/* Liste des Commandes */}
               {!orders || orders.length === 0 ? (
-                <Card className="border shadow-sm">
+                <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
                   <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 px-4 sm:px-6">
                     <div className="text-center space-y-4">
-                      <Package className="h-16 w-16 sm:h-20 sm:w-20 mx-auto text-gray-400 dark:text-gray-500" />
+                      <div className="h-16 w-16 sm:h-20 sm:w-20 mx-auto rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center">
+                        <Package className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
+                      </div>
                       <div className="space-y-2">
                         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50">
                           Aucune commande
@@ -416,7 +433,7 @@ export default function MyOrders() {
                       </div>
                       <Button 
                         onClick={() => navigate('/marketplace')}
-                        className="mt-4 min-h-[44px] touch-manipulation"
+                        className="mt-4 min-h-[44px] touch-manipulation bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0 transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-6 sm:px-8"
                         size="lg"
                       >
                         Découvrir la marketplace
@@ -426,13 +443,15 @@ export default function MyOrders() {
                 </Card>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
-                  {orders.map((order) => (
-                    <Card key={order.id} className="border shadow-sm hover:shadow-md transition-shadow duration-200">
+                  {orders.map((order, index) => (
+                    <Card key={order.id} className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: `${index * 50}ms` }}>
                       <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 pt-4 sm:pt-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                           <div className="flex-1 min-w-0">
                             <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-gray-900 dark:text-gray-50">
-                              <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+                              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center">
+                                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                              </div>
                               <span className="truncate">Commande #{order.order_number}</span>
                             </CardTitle>
                             <CardDescription className="flex items-center gap-2 mt-1.5 sm:mt-2 text-xs sm:text-sm">
@@ -453,7 +472,7 @@ export default function MyOrders() {
                               {getStatusBadge(order.status, order.payment_status)}
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <p className="font-bold text-base sm:text-lg text-gray-900 dark:text-gray-50">
+                              <p className="font-bold text-base sm:text-lg bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                                 {order.total_amount.toLocaleString('fr-FR')} {order.currency}
                               </p>
                               <p className="text-xs sm:text-sm text-muted-foreground">
@@ -469,7 +488,7 @@ export default function MyOrders() {
                           {order.items.map((item) => (
                             <div
                               key={item.id}
-                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 border rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 border border-border/50 rounded-lg bg-muted/30"
                             >
                               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                                 <div className="flex-shrink-0 text-primary">
@@ -496,7 +515,7 @@ export default function MyOrders() {
                           <Button
                             variant="outline"
                             onClick={() => navigate(`/orders/${order.id}`)}
-                            className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-sm sm:text-base"
+                            className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-xs sm:text-sm bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0 transition-all duration-300 hover:scale-105"
                           >
                             <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
                             <span className="truncate">Voir les détails</span>
@@ -508,7 +527,7 @@ export default function MyOrders() {
                                 // TODO: Download invoice
                                 alert('Téléchargement facture (à implémenter)');
                               }}
-                              className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-sm sm:text-base"
+                              className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-xs sm:text-sm bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 border-0 transition-all duration-300 hover:scale-105"
                             >
                               <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
                               <span className="truncate">Télécharger facture</span>
