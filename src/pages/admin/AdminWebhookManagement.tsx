@@ -1105,7 +1105,8 @@ export default function AdminWebhookManagement() {
             </div>
           </main>
         </div>
-      </SidebarProvider>
+      </div>
+    </SidebarProvider>
     );
   }
 
