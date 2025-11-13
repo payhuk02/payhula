@@ -57,10 +57,15 @@ import {
   Edit,
   TrendingUp,
   DollarSign,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import { GiftCardStatus } from '@/types/giftCards';
 import { formatCurrency } from '@/lib/utils';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminGiftCardManagement() {
   const { store } = useStore();
@@ -123,276 +128,463 @@ export default function AdminGiftCardManagement() {
     });
   };
 
+  // Refs for animations
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+
   if (!currentStore) {
     return (
-      <div className="container mx-auto py-8">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground">Veuillez sélectionner un store.</p>
-          </CardContent>
-        </Card>
-      </div>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full overflow-x-hidden">
+          <AppSidebar />
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="pt-6">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Veuillez sélectionner un store.</p>
+                </CardContent>
+              </Card>
+            </div>
+          </main>
+        </div>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Gestion des Cartes Cadeaux</h1>
-          <p className="text-muted-foreground mt-2">
-            Créez et gérez les cartes cadeaux de votre store
-          </p>
-        </div>
-        <CreateGiftCardDialog
-          storeId={currentStore.id}
-          open={isCreateDialogOpen}
-          onOpenChange={setIsCreateDialogOpen}
-        />
-      </div>
-
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Cartes</CardTitle>
-            <Gift className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.active} actives
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valeur Totale</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(stats.totalValue)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {formatCurrency(stats.remainingBalance)} restant
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilisées</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.redeemed}</div>
-            <p className="text-xs text-muted-foreground">
-              {formatCurrency(stats.totalRedeemed)} rédimées
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expirées</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.expired}</div>
-            <p className="text-xs text-muted-foreground">
-              Cartes expirées
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Liste des cartes cadeaux */}
-      <Tabs defaultValue="cards" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="cards">Cartes Cadeaux</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="cards" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Cartes Cadeaux</CardTitle>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Rechercher..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8 w-64"
-                    />
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full overflow-x-hidden">
+        <AppSidebar />
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            {/* Header - Responsive & Animated */}
+            <div 
+              ref={headerRef}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700"
+            >
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                    <Gift className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                   </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Statut" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tous</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="redeemed">Utilisée</SelectItem>
-                      <SelectItem value="expired">Expirée</SelectItem>
-                      <SelectItem value="pending">En attente</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Cartes Cadeaux
+                  </span>
+                </h1>
+                <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                  Créez et gérez les cartes cadeaux de votre store
+                </p>
               </div>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Chargement...
-                </div>
-              ) : giftCards.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Aucune carte cadeau trouvée
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Code</TableHead>
-                      <TableHead>Montant Initial</TableHead>
-                      <TableHead>Solde Restant</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Bénéficiaire</TableHead>
-                      <TableHead>Date d'émission</TableHead>
-                      <TableHead>Expiration</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {giftCards.map((card) => (
-                      <TableRow key={card.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                              {card.code}
-                            </code>
+              <CreateGiftCardDialog
+                storeId={currentStore.id}
+                open={isCreateDialogOpen}
+                onOpenChange={setIsCreateDialogOpen}
+              />
+            </div>
+
+            {/* Stats - Responsive */}
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Cartes</p>
+                      <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        {stats.total}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {stats.active} actives
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5">
+                      <Gift className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Valeur Totale</p>
+                      <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                        {formatCurrency(stats.totalValue)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formatCurrency(stats.remainingBalance)} restant
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5">
+                      <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Utilisées</p>
+                      <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                        {stats.redeemed}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formatCurrency(stats.totalRedeemed)} rédimées
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5">
+                      <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">Expirées</p>
+                      <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                        {stats.expired}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Cartes expirées
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/5">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Liste des cartes cadeaux */}
+            <Tabs defaultValue="cards" className="space-y-4 sm:space-y-6">
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="cards" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Cartes Cadeaux</span>
+                  <span className="sm:hidden">Cartes</span>
+                </TabsTrigger>
+                <TabsTrigger value="transactions" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Transactions</span>
+                  <span className="sm:hidden">Trans.</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="cards" className="space-y-4 sm:space-y-6">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                      <CardTitle className="text-lg sm:text-xl">Cartes Cadeaux</CardTitle>
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-initial">
+                          <Search className="absolute left-2.5 sm:left-3 top-2.5 sm:top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Rechercher..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-8 sm:pl-10 pr-8 sm:pr-10 h-9 sm:h-10 text-xs sm:text-sm w-full sm:w-64"
+                          />
+                          {searchTerm && (
                             <Button
                               variant="ghost"
-                              size="sm"
-                              onClick={() => handleCopyCode(card.code)}
+                              size="icon"
+                              className="absolute right-1 top-1 h-7 w-7 sm:h-8 sm:w-8"
+                              onClick={() => setSearchTerm('')}
                             >
-                              <Copy className="h-4 w-4" />
+                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </Button>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(card.initial_amount)}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(card.current_balance)}
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(card.status)}
-                        </TableCell>
-                        <TableCell>
-                          {card.recipient_email ? (
-                            <div>
-                              <div className="font-medium">{card.recipient_name || 'N/A'}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {card.recipient_email}
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
                           )}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(card.issued_at).toLocaleDateString('fr-FR')}
-                        </TableCell>
-                        <TableCell>
-                          {card.expires_at
-                            ? new Date(card.expires_at).toLocaleDateString('fr-FR')
-                            : 'Jamais'}
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                        </div>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                          <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm w-full sm:w-40">
+                            <SelectValue placeholder="Statut" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Tous</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="redeemed">Utilisée</SelectItem>
+                            <SelectItem value="expired">Expirée</SelectItem>
+                            <SelectItem value="pending">En attente</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="space-y-3 sm:space-y-4">
+                        {[1, 2, 3].map((i) => (
+                          <Skeleton key={i} className="h-16 sm:h-20 w-full" />
+                        ))}
+                      </div>
+                    ) : giftCards.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Gift className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <p className="text-xs sm:text-sm text-muted-foreground">Aucune carte cadeau trouvée</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Desktop Table */}
+                        <div className="hidden lg:block overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="text-xs sm:text-sm">Code</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Montant Initial</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Solde Restant</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Statut</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Bénéficiaire</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Date d'émission</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Expiration</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {giftCards.map((card) => (
+                                <TableRow key={card.id} className="hover:bg-muted/50">
+                                  <TableCell>
+                                    <div className="flex items-center gap-2">
+                                      <code className="text-xs sm:text-sm font-mono bg-muted px-2 py-1 rounded">
+                                        {card.code}
+                                      </code>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleCopyCode(card.code)}
+                                        className="h-7 w-7 sm:h-8 sm:w-8"
+                                      >
+                                        <Copy className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="font-medium text-xs sm:text-sm">
+                                    {formatCurrency(card.initial_amount)}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {formatCurrency(card.current_balance)}
+                                  </TableCell>
+                                  <TableCell>
+                                    {getStatusBadge(card.status)}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {card.recipient_email ? (
+                                      <div>
+                                        <div className="font-medium">{card.recipient_name || 'N/A'}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {card.recipient_email}
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <span className="text-muted-foreground">-</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {new Date(card.issued_at).toLocaleDateString('fr-FR')}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {card.expires_at
+                                      ? new Date(card.expires_at).toLocaleDateString('fr-FR')
+                                      : 'Jamais'}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8">
+                                      <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
 
-        <TabsContent value="transactions">
-          <Card>
-            <CardHeader>
-              <CardTitle>Transactions</CardTitle>
-              <CardDescription>
-                Historique de toutes les transactions sur les cartes cadeaux
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {transactions.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Aucune transaction
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Code Carte</TableHead>
-                      <TableHead>Montant</TableHead>
-                      <TableHead>Solde Avant</TableHead>
-                      <TableHead>Solde Après</TableHead>
-                      <TableHead>Commande</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell>
-                          {new Date(transaction.created_at).toLocaleString('fr-FR')}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {transaction.transaction_type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <code className="text-sm font-mono">
-                            {transaction.gift_card?.code}
-                          </code>
-                        </TableCell>
-                        <TableCell className={transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}>
-                          {transaction.amount > 0 ? '+' : ''}
-                          {formatCurrency(transaction.amount)}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(transaction.balance_before)}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(transaction.balance_after)}
-                        </TableCell>
-                        <TableCell>
-                          {transaction.order?.order_number || '-'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                        {/* Mobile Cards */}
+                        <div className="lg:hidden space-y-3 sm:space-y-4">
+                          {giftCards.map((card) => (
+                            <Card key={card.id} className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                              <CardContent className="p-3 sm:p-4">
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <code className="text-xs sm:text-sm font-mono bg-muted px-2 py-1 rounded">
+                                        {card.code}
+                                      </code>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleCopyCode(card.code)}
+                                        className="h-7 w-7"
+                                      >
+                                        <Copy className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </div>
+                                    {getStatusBadge(card.status)}
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                    <div>
+                                      <p className="text-muted-foreground">Montant Initial</p>
+                                      <p className="font-medium">{formatCurrency(card.initial_amount)}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-muted-foreground">Solde Restant</p>
+                                      <p className="font-medium">{formatCurrency(card.current_balance)}</p>
+                                    </div>
+                                  </div>
+                                  {card.recipient_email && (
+                                    <div className="text-xs sm:text-sm">
+                                      <p className="text-muted-foreground">Bénéficiaire</p>
+                                      <p className="font-medium">{card.recipient_name || 'N/A'}</p>
+                                      <p className="text-muted-foreground">{card.recipient_email}</p>
+                                    </div>
+                                  )}
+                                  <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                    <div>
+                                      <p className="text-muted-foreground">Émission</p>
+                                      <p>{new Date(card.issued_at).toLocaleDateString('fr-FR')}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-muted-foreground">Expiration</p>
+                                      <p>{card.expires_at ? new Date(card.expires_at).toLocaleDateString('fr-FR') : 'Jamais'}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-end pt-2">
+                                    <Button variant="ghost" size="sm" className="h-8">
+                                      <Edit className="h-3.5 w-3.5 mr-1.5" />
+                                      Modifier
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="transactions">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <CardHeader>
+                    <CardTitle className="text-lg sm:text-xl">Transactions</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      Historique de toutes les transactions sur les cartes cadeaux
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {transactions.length === 0 ? (
+                      <div className="text-center py-8">
+                        <TrendingUp className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <p className="text-xs sm:text-sm text-muted-foreground">Aucune transaction</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Desktop Table */}
+                        <div className="hidden lg:block overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="text-xs sm:text-sm">Date</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Type</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Code Carte</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Montant</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Solde Avant</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Solde Après</TableHead>
+                                <TableHead className="text-xs sm:text-sm">Commande</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {transactions.map((transaction) => (
+                                <TableRow key={transaction.id} className="hover:bg-muted/50">
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {new Date(transaction.created_at).toLocaleString('fr-FR')}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant="outline" className="text-xs">
+                                      {transaction.transaction_type}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                    <code className="text-xs sm:text-sm font-mono">
+                                      {transaction.gift_card?.code}
+                                    </code>
+                                  </TableCell>
+                                  <TableCell className={`text-xs sm:text-sm font-medium ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {transaction.amount > 0 ? '+' : ''}
+                                    {formatCurrency(transaction.amount)}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {formatCurrency(transaction.balance_before)}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {formatCurrency(transaction.balance_after)}
+                                  </TableCell>
+                                  <TableCell className="text-xs sm:text-sm">
+                                    {transaction.order?.order_number || '-'}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+
+                        {/* Mobile Cards */}
+                        <div className="lg:hidden space-y-3 sm:space-y-4">
+                          {transactions.map((transaction) => (
+                            <Card key={transaction.id} className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                              <CardContent className="p-3 sm:p-4">
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <Badge variant="outline" className="text-xs">
+                                      {transaction.transaction_type}
+                                    </Badge>
+                                    <span className={`text-xs sm:text-sm font-medium ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                      {transaction.amount > 0 ? '+' : ''}
+                                      {formatCurrency(transaction.amount)}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs sm:text-sm">
+                                    <p className="text-muted-foreground">Date</p>
+                                    <p>{new Date(transaction.created_at).toLocaleString('fr-FR')}</p>
+                                  </div>
+                                  <div className="text-xs sm:text-sm">
+                                    <p className="text-muted-foreground">Code Carte</p>
+                                    <code className="font-mono">{transaction.gift_card?.code}</code>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                    <div>
+                                      <p className="text-muted-foreground">Solde Avant</p>
+                                      <p className="font-medium">{formatCurrency(transaction.balance_before)}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-muted-foreground">Solde Après</p>
+                                      <p className="font-medium">{formatCurrency(transaction.balance_after)}</p>
+                                    </div>
+                                  </div>
+                                  {transaction.order?.order_number && (
+                                    <div className="text-xs sm:text-sm">
+                                      <p className="text-muted-foreground">Commande</p>
+                                      <p className="font-medium">{transaction.order.order_number}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
 
@@ -469,22 +661,26 @@ function CreateGiftCardDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Créer une carte cadeau
+        <Button 
+          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          size="sm"
+        >
+          <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">Créer une carte cadeau</span>
+          <span className="sm:hidden">Créer</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[90vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer une carte cadeau</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">Créer une carte cadeau</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             Générez une nouvelle carte cadeau avec un code unique
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="initial_amount">Montant Initial *</Label>
+              <Label htmlFor="initial_amount" className="text-xs sm:text-sm">Montant Initial *</Label>
               <Input
                 id="initial_amount"
                 type="number"
@@ -493,51 +689,56 @@ function CreateGiftCardDialog({
                 required
                 value={formData.initial_amount}
                 onChange={(e) => setFormData({ ...formData, initial_amount: e.target.value })}
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="expires_at">Date d'expiration</Label>
+              <Label htmlFor="expires_at" className="text-xs sm:text-sm">Date d'expiration</Label>
               <Input
                 id="expires_at"
                 type="datetime-local"
                 value={formData.expires_at}
                 onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="recipient_email">Email du bénéficiaire</Label>
+              <Label htmlFor="recipient_email" className="text-xs sm:text-sm">Email du bénéficiaire</Label>
               <Input
                 id="recipient_email"
                 type="email"
                 value={formData.recipient_email}
                 onChange={(e) => setFormData({ ...formData, recipient_email: e.target.value })}
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="recipient_name">Nom du bénéficiaire</Label>
+              <Label htmlFor="recipient_name" className="text-xs sm:text-sm">Nom du bénéficiaire</Label>
               <Input
                 id="recipient_name"
                 value={formData.recipient_name}
                 onChange={(e) => setFormData({ ...formData, recipient_name: e.target.value })}
+                className="h-9 sm:h-10 text-xs sm:text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="recipient_message">Message personnalisé</Label>
+            <Label htmlFor="recipient_message" className="text-xs sm:text-sm">Message personnalisé</Label>
             <Textarea
               id="recipient_message"
               value={formData.recipient_message}
               onChange={(e) => setFormData({ ...formData, recipient_message: e.target.value })}
               rows={3}
+              className="text-xs sm:text-sm"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="min_purchase_amount">Montant minimum d'achat</Label>
+            <Label htmlFor="min_purchase_amount" className="text-xs sm:text-sm">Montant minimum d'achat</Label>
             <Input
               id="min_purchase_amount"
               type="number"
@@ -545,28 +746,35 @@ function CreateGiftCardDialog({
               min="0"
               value={formData.min_purchase_amount}
               onChange={(e) => setFormData({ ...formData, min_purchase_amount: e.target.value })}
+              className="h-9 sm:h-10 text-xs sm:text-sm"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes internes</Label>
+            <Label htmlFor="notes" className="text-xs sm:text-sm">Notes internes</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={2}
+              className="text-xs sm:text-sm"
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              className="w-full sm:w-auto"
             >
               Annuler
             </Button>
-            <Button type="submit" disabled={createMutation.isPending}>
+            <Button 
+              type="submit" 
+              disabled={createMutation.isPending}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 w-full sm:w-auto"
+            >
               {createMutation.isPending ? 'Création...' : 'Créer la carte cadeau'}
             </Button>
           </DialogFooter>
