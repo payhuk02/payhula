@@ -39,6 +39,7 @@ import { DownloadsTab } from '@/components/customer/DownloadsTab';
 import { LicensesTab } from '@/components/customer/LicensesTab';
 import { UpdatesTab } from '@/components/customer/UpdatesTab';
 import { FavoritesTab } from '@/components/customer/FavoritesTab';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface CustomerStats {
   totalOrders: number;
@@ -82,6 +83,7 @@ function MobileHeader() {
 export default function CustomerPortal() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const headerRef = useScrollAnimation<HTMLDivElement>();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -215,72 +217,84 @@ export default function CustomerPortal() {
           <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
               {/* Header - Desktop seulement */}
-              <div className="hidden lg:block space-y-2">
-                <h1 className="text-3xl lg:text-4xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-50">
-                  <User className="h-8 w-8 text-primary" />
-                  <span>Mon Espace Client</span>
+              <div ref={headerRef} className="hidden lg:block space-y-2 animate-in fade-in slide-in-from-top-4">
+                <h1 className="text-3xl lg:text-4xl font-bold flex items-center gap-3 text-gray-900 dark:text-gray-50">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 border border-purple-500/20 flex items-center justify-center">
+                    <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Mon Espace Client
+                  </span>
                 </h1>
-                <p className="text-base text-gray-600 dark:text-gray-400">
+                <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400">
                   Gérez vos achats, téléchargements et informations personnelles
                 </p>
               </div>
 
             {/* Statistiques */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-              <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200 touch-manipulation">
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 touch-manipulation animate-in fade-in slide-in-from-bottom-4">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3 pt-3 sm:px-4 sm:pt-4">
                   <CardTitle className="text-[10px] xs:text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-50 leading-tight">
                     Total Commandes
                   </CardTitle>
-                  <ShoppingBag className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0 ml-1" />
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center">
+                    <ShoppingBag className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                  <div className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-50">
+                  <div className="text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                     {stats?.totalOrders || 0}
                   </div>
                   <p className="text-[10px] xs:text-xs text-muted-foreground mt-0.5 sm:mt-1 leading-tight">Commandes passées</p>
                 </CardContent>
               </Card>
 
-              <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200 touch-manipulation">
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 touch-manipulation animate-in fade-in slide-in-from-bottom-4">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3 pt-3 sm:px-4 sm:pt-4">
                   <CardTitle className="text-[10px] xs:text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-50 leading-tight">
                     Total Dépensé
                   </CardTitle>
-                  <TrendingUp className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0 ml-1" />
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5 border border-green-500/20 flex items-center justify-center">
+                    <TrendingUp className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                  <div className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-50 break-words">
+                  <div className="text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent break-words">
                     {(stats?.totalSpent || 0).toLocaleString('fr-FR')} XOF
                   </div>
                   <p className="text-[10px] xs:text-xs text-muted-foreground mt-0.5 sm:mt-1 leading-tight">Depuis le début</p>
                 </CardContent>
               </Card>
 
-              <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200 touch-manipulation">
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 touch-manipulation animate-in fade-in slide-in-from-bottom-4">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3 pt-3 sm:px-4 sm:pt-4">
                   <CardTitle className="text-[10px] xs:text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-50 leading-tight">
                     Produits Digitaux
                   </CardTitle>
-                  <Download className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0 ml-1" />
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 border border-purple-500/20 flex items-center justify-center">
+                    <Download className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                  <div className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-50">
+                  <div className="text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     {stats?.digitalProducts || 0}
                   </div>
                   <p className="text-[10px] xs:text-xs text-muted-foreground mt-0.5 sm:mt-1 leading-tight">Achetés</p>
                 </CardContent>
               </Card>
 
-              <Card className="border shadow-sm hover:shadow-md transition-shadow duration-200 touch-manipulation">
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 touch-manipulation animate-in fade-in slide-in-from-bottom-4">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3 pt-3 sm:px-4 sm:pt-4">
                   <CardTitle className="text-[10px] xs:text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-50 leading-tight">
                     Cours En Ligne
                   </CardTitle>
-                  <BookOpen className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0 ml-1" />
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/5 border border-orange-500/20 flex items-center justify-center">
+                    <BookOpen className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                  <div className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-50">
+                  <div className="text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                     {stats?.courses || 0}
                   </div>
                   <p className="text-[10px] xs:text-xs text-muted-foreground mt-0.5 sm:mt-1 leading-tight">Inscrit(e)s</p>
@@ -382,10 +396,12 @@ export default function CustomerPortal() {
               <TabsContent value="overview" className="space-y-2.5 sm:space-y-3 md:space-y-4 mt-3 sm:mt-4 md:mt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
                   {/* Mes Commandes */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/orders')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/orders')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center">
+                          <Package className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                        </div>
                         <span>Mes Commandes</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -393,7 +409,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir toutes mes commandes</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -401,10 +417,12 @@ export default function CustomerPortal() {
                   </Card>
 
                   {/* Mes Téléchargements */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/downloads')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/downloads')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <Download className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 border border-purple-500/20 flex items-center justify-center">
+                          <Download className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                        </div>
                         <span>Mes Téléchargements</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -412,7 +430,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Accéder aux téléchargements</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -420,10 +438,12 @@ export default function CustomerPortal() {
                   </Card>
 
                   {/* Mes Cours */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/courses')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/courses')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/5 border border-orange-500/20 flex items-center justify-center">
+                          <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                        </div>
                         <span>Mes Cours</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -431,7 +451,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-orange-600 to-red-600 text-white hover:from-orange-700 hover:to-red-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir mes cours</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -439,10 +459,12 @@ export default function CustomerPortal() {
                   </Card>
 
                   {/* Mes Réservations */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/bookings')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/bookings')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/5 border border-green-500/20 flex items-center justify-center">
+                          <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                        </div>
                         <span>Mes Réservations</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -450,7 +472,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir mes réservations</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -458,10 +480,12 @@ export default function CustomerPortal() {
                   </Card>
 
                   {/* Factures */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/invoices')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/invoices')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-indigo-500/10 to-blue-500/5 border border-indigo-500/20 flex items-center justify-center">
+                          <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                        </div>
                         <span>Mes Factures</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -469,7 +493,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir mes factures</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -477,10 +501,12 @@ export default function CustomerPortal() {
                   </Card>
 
                   {/* Ma Wishlist */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/wishlist')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/wishlist')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-red-500/10 to-pink-500/5 border border-red-500/20 flex items-center justify-center">
+                          <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                        </div>
                         <span>Ma Wishlist</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -488,7 +514,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir ma wishlist</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -496,10 +522,12 @@ export default function CustomerPortal() {
                   </Card>
 
                   {/* Mon Profil */}
-                  <Card className="border shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group touch-manipulation" onClick={() => navigate('/account/profile')}>
+                  <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer group touch-manipulation animate-in fade-in slide-in-from-bottom-4" onClick={() => navigate('/account/profile')}>
                     <CardHeader className="pb-2 sm:pb-3 px-3 pt-3 sm:px-4 sm:pt-4">
                       <CardTitle className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-gray-900 dark:text-gray-50">
-                        <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 border border-purple-500/20 flex items-center justify-center">
+                          <User className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                        </div>
                         <span>Mon Profil</span>
                       </CardTitle>
                       <CardDescription className="text-xs sm:text-sm mt-1 leading-snug">
@@ -507,7 +535,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Modifier mon profil</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
