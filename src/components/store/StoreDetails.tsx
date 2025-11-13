@@ -135,7 +135,7 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header avec informations de la boutique */}
-      <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-4 sm:p-6 border border-primary/20">
+      <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-4 sm:p-6 border border-primary/20 border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             {store.logo_url ? (
@@ -145,13 +145,13 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
                 className="h-12 w-12 sm:h-16 sm:w-16 rounded-lg object-cover border border-border shadow-sm"
               />
             ) : (
-              <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
-                <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/10 flex items-center justify-center border border-purple-500/30">
+                <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 dark:text-purple-400" />
               </div>
             )}
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-foreground">{store.name}</h2>
-              <p className="text-sm text-muted-foreground">Boutique en ligne</p>
+              <h2 className="text-base sm:text-lg lg:text-xl font-bold text-foreground">{store.name}</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">Boutique en ligne</p>
               {store.description && (
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">{store.description}</p>
               )}
@@ -162,21 +162,23 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
               variant="outline"
               size="sm"
               onClick={() => window.open(`/stores/${store.slug}`, '_blank')}
-              className="touch-manipulation text-xs sm:text-sm"
+              className="touch-manipulation text-xs sm:text-sm h-8 sm:h-10"
               aria-label={`Ouvrir la boutique ${store.name} dans un nouvel onglet`}
             >
               <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" aria-hidden="true" />
-              Voir la boutique
+              <span className="hidden sm:inline">Voir la boutique</span>
+              <span className="sm:hidden">Voir</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleCopyUrl}
-              className="touch-manipulation text-xs sm:text-sm"
+              className="touch-manipulation text-xs sm:text-sm h-8 sm:h-10"
               aria-label={`Copier le lien de la boutique ${store.name}`}
             >
               <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" aria-hidden="true" />
-              Copier le lien
+              <span className="hidden sm:inline">Copier le lien</span>
+              <span className="sm:hidden">Copier</span>
             </Button>
           </div>
         </div>
