@@ -88,6 +88,7 @@ export default function SupplierOrders() {
 
   // Animations
   const actionsRef = useScrollAnimation<HTMLDivElement>();
+  const statsRef = useScrollAnimation<HTMLDivElement>();
   const ordersRef = useScrollAnimation<HTMLDivElement>();
   const tabsRef = useScrollAnimation<HTMLDivElement>();
 
@@ -114,6 +115,69 @@ export default function SupplierOrders() {
 
     return filtered;
   }, [orders, statusFilter, debouncedSearch]);
+
+  const stats = useMemo(() => {
+    const totalOrders = filteredOrders.length;
+    const pendingOrders = filteredOrders.filter(order => ['draft', 'pending', 'sent'].includes(order.status)).length;
+    const receivedOrders = filteredOrders.filter(order => ['received', 'partially_received', 'completed'].includes(order.status)).length;
+    const totalAmount = filteredOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+
+    return {
+      totalOrders,
+      pendingOrders,
+      receivedOrders,
+      totalAmount,
+    };
+  }, [filteredOrders]);
+
+  const displayCurrency = useMemo(() => filteredOrders[0]?.currency ?? 'XOF', [filteredOrders]);
+
+  const statsCards = useMemo(() => [
+    {
+      label: 'Total commandes',
+      value: stats.totalOrders.toString(),
+      description: 'Toutes les commandes fournisseurs',
+      icon: Package,
+      gradient: 'from-purple-600 to-pink-600',
+      iconGradient: 'from-purple-500/10 to-pink-500/5',
+      iconBorder: 'border-purple-500/20',
+      iconColor: 'text-purple-600 dark:text-purple-400',
+    },
+    {
+      label: 'En cours',
+      value: stats.pendingOrders.toString(),
+      description: 'Brouillon, en attente ou envoyée',
+      icon: Calendar,
+      gradient: 'from-amber-500 to-orange-500',
+      iconGradient: 'from-amber-500/10 to-orange-500/5',
+      iconBorder: 'border-amber-500/20',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+    },
+    {
+      label: 'Réceptionnées',
+      value: stats.receivedOrders.toString(),
+      description: 'Partiellement ou totalement reçues',
+      icon: CheckCircle,
+      gradient: 'from-green-600 to-emerald-600',
+      iconGradient: 'from-green-500/10 to-emerald-500/5',
+      iconBorder: 'border-green-500/20',
+      iconColor: 'text-green-600 dark:text-green-400',
+    },
+    {
+      label: 'Total engagements',
+      value: new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: displayCurrency,
+        maximumFractionDigits: 0,
+      }).format(stats.totalAmount),
+      description: 'Montant cumulé des commandes',
+      icon: DollarSign,
+      gradient: 'from-blue-600 to-cyan-600',
+      iconGradient: 'from-blue-500/10 to-cyan-500/5',
+      iconBorder: 'border-blue-500/20',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+    },
+  ], [displayCurrency, stats.pendingOrders, stats.receivedOrders, stats.totalAmount, stats.totalOrders]);
 
   // Gestion du clavier pour la recherche
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -216,7 +280,7 @@ export default function SupplierOrders() {
         ref={actionsRef}
         className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 items-stretch sm:items-center animate-in fade-in slide-in-from-bottom-4 duration-700"
       >
-        <Card className="border border-border/50 bg-card/50 backdrop-blur-sm flex-1">
+        <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm flex-1 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-3 sm:p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground z-10" />
@@ -258,6 +322,40 @@ export default function SupplierOrders() {
         </Button>
       </div>
 
+      {/* Stats */}
+      <div
+        ref={statsRef}
+        className="grid gap-2.5 sm:gap-3.5 lg:gap-4 grid-cols-2 sm:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
+      >
+        {statsCards.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card
+              key={stat.label}
+              className="border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+              style={{ animationDelay: `${index * 70}ms` }}
+            >
+              <CardHeader className="pb-2 sm:pb-3 p-2.5 sm:p-3 lg:p-4">
+                <CardTitle className="text-[10px] xs:text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                  <div className={`h-6 w-6 rounded-lg bg-gradient-to-br ${stat.iconGradient} border ${stat.iconBorder} flex items-center justify-center`}>
+                    <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${stat.iconColor}`} />
+                  </div>
+                  {stat.label}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2.5 sm:p-3 lg:p-4 pt-0 space-y-1 sm:space-y-1.5">
+                <div className={`text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                  {stat.value}
+                </div>
+                <p className="text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
+                  {stat.description}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
       {/* Status Filters as Tabs */}
       <div
         ref={tabsRef}
@@ -295,7 +393,7 @@ export default function SupplierOrders() {
         className="animate-in fade-in slide-in-from-bottom-4 duration-700"
       >
         {filteredOrders.length === 0 ? (
-          <Card className="border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in zoom-in-95 duration-500">
+          <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in zoom-in-95 duration-500">
             <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 text-center px-3 sm:px-6">
               <div className="h-16 w-16 sm:h-20 sm:w-20 mx-auto rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center mb-4">
                 <Package className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
@@ -313,7 +411,7 @@ export default function SupplierOrders() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <Card className="border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden hidden lg:block">
+            <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm overflow-hidden hidden lg:block">
               <CardContent className="p-0">
                 <div className="overflow-x-auto scroll-smooth scrollbar-orders">
                   <Table className="min-w-[800px] w-full">
@@ -432,7 +530,7 @@ export default function SupplierOrders() {
                 return (
                   <Card
                     key={order.id}
-                    className="border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+                    className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <CardHeader className="pb-3 px-3 sm:px-4 pt-4">

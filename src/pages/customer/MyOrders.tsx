@@ -11,7 +11,7 @@
  * - Actions (voir détails, télécharger facture)
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -111,6 +111,7 @@ export default function MyOrders() {
   const [typeFilter, setTypeFilter] = useState<ProductType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const headerRef = useScrollAnimation<HTMLDivElement>();
+  const statsRef = useScrollAnimation<HTMLDivElement>();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -177,6 +178,81 @@ export default function MyOrders() {
     enabled: !!user?.id,
   });
 
+  const stats = useMemo(() => {
+    const totalOrders = orders?.length ?? 0;
+    const pendingOrders = orders?.filter(order => order.status === 'pending').length ?? 0;
+    const processingOrders = orders?.filter(order => order.status === 'processing').length ?? 0;
+    const completedOrders = orders?.filter(order => order.status === 'completed').length ?? 0;
+    const totalAmount = orders?.reduce((sum, order) => sum + (order.total_amount || 0), 0) ?? 0;
+
+    return {
+      totalOrders,
+      pendingOrders,
+      processingOrders,
+      completedOrders,
+      totalAmount,
+    };
+  }, [orders]);
+
+  const displayCurrency = useMemo(() => orders?.[0]?.currency ?? 'XOF', [orders]);
+
+  const statsCards = useMemo(() => [
+    {
+      label: 'Total commandes',
+      value: stats.totalOrders.toString(),
+      description: 'Toutes vos commandes',
+      icon: ShoppingBag,
+      gradient: 'from-blue-600 to-cyan-600',
+      iconGradient: 'from-blue-500/10 to-cyan-500/5',
+      iconBorder: 'border-blue-500/20',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+    },
+    {
+      label: 'En attente',
+      value: stats.pendingOrders.toString(),
+      description: 'En attente de traitement',
+      icon: Clock,
+      gradient: 'from-amber-500 to-orange-500',
+      iconGradient: 'from-amber-500/10 to-orange-500/5',
+      iconBorder: 'border-amber-500/20',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+    },
+    {
+      label: 'En traitement',
+      value: stats.processingOrders.toString(),
+      description: 'Commandes en cours',
+      icon: AlertCircle,
+      gradient: 'from-purple-600 to-pink-600',
+      iconGradient: 'from-purple-500/10 to-pink-500/5',
+      iconBorder: 'border-purple-500/20',
+      iconColor: 'text-purple-600 dark:text-purple-400',
+    },
+    {
+      label: 'Terminées',
+      value: stats.completedOrders.toString(),
+      description: 'Livrées et payées',
+      icon: CheckCircle,
+      gradient: 'from-green-600 to-emerald-600',
+      iconGradient: 'from-green-500/10 to-emerald-500/5',
+      iconBorder: 'border-green-500/20',
+      iconColor: 'text-green-600 dark:text-green-400',
+    },
+    {
+      label: 'Total dépensé',
+      value: new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: displayCurrency,
+        maximumFractionDigits: 0,
+      }).format(stats.totalAmount),
+      description: 'Montant cumulé',
+      icon: DollarSign,
+      gradient: 'from-indigo-600 to-blue-600',
+      iconGradient: 'from-indigo-500/10 to-blue-500/5',
+      iconBorder: 'border-indigo-500/20',
+      iconColor: 'text-indigo-600 dark:text-indigo-400',
+    },
+  ], [displayCurrency, stats.completedOrders, stats.pendingOrders, stats.processingOrders, stats.totalAmount, stats.totalOrders]);
+
   const getStatusBadge = (status: string, paymentStatus: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
       pending: { label: 'En attente', variant: 'secondary' },
@@ -241,7 +317,7 @@ export default function MyOrders() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
         <AppSidebar />
         <main className="flex-1 flex flex-col min-w-0">
           {/* Mobile Header avec Hamburger et Icône */}
@@ -273,8 +349,42 @@ export default function MyOrders() {
                 </p>
               </div>
 
+              {/* Stats */}
+              <div
+                ref={statsRef}
+                className="grid gap-2.5 sm:gap-3.5 lg:gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 animate-in fade-in slide-in-from-bottom-4 duration-700"
+              >
+                {statsCards.map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <Card
+                      key={stat.label}
+                      className="border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                      style={{ animationDelay: `${index * 70}ms` }}
+                    >
+                      <CardHeader className="pb-2 sm:pb-3 p-2.5 sm:p-3 lg:p-4">
+                        <CardTitle className="text-[10px] xs:text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                          <div className={`h-6 w-6 rounded-lg bg-gradient-to-br ${stat.iconGradient} border ${stat.iconBorder} flex items-center justify-center`}>
+                            <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${stat.iconColor}`} />
+                          </div>
+                          {stat.label}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-2.5 sm:p-3 lg:p-4 pt-0 space-y-1 sm:space-y-1.5">
+                        <div className={`text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                          {stat.value}
+                        </div>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
+                          {stat.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
               {/* Recherche */}
-              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+              <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground z-10" />
@@ -316,7 +426,7 @@ export default function MyOrders() {
                     }}
                   >
                     <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as OrderStatus)}>
-                      <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                      <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-muted/60 backdrop-blur-sm rounded-lg border border-border/50 shadow-sm">
                         <TabsTrigger 
                           value="all" 
                           className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
@@ -369,7 +479,7 @@ export default function MyOrders() {
                     }}
                   >
                     <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as ProductType)}>
-                      <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                      <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-muted/60 backdrop-blur-sm rounded-lg border border-border/50 shadow-sm">
                         <TabsTrigger 
                           value="all" 
                           className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
@@ -417,8 +527,8 @@ export default function MyOrders() {
 
               {/* Liste des Commandes */}
               {!orders || orders.length === 0 ? (
-                <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
-                  <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 px-4 sm:px-6">
+              <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+                <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 px-4 sm:px-6">
                     <div className="text-center space-y-4">
                       <div className="h-16 w-16 sm:h-20 sm:w-20 mx-auto rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center">
                         <Package className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
@@ -444,7 +554,11 @@ export default function MyOrders() {
               ) : (
                 <div className="space-y-3 sm:space-y-4">
                   {orders.map((order, index) => (
-                    <Card key={order.id} className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: `${index * 50}ms` }}>
+                    <Card
+                      key={order.id}
+                      className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
                       <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 pt-4 sm:pt-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                           <div className="flex-1 min-w-0">
@@ -488,7 +602,7 @@ export default function MyOrders() {
                           {order.items.map((item) => (
                             <div
                               key={item.id}
-                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 border border-border/50 rounded-lg bg-muted/30"
+                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 border border-border/50 rounded-lg bg-muted/40 dark:bg-muted/30"
                             >
                               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                                 <div className="flex-shrink-0 text-primary">
