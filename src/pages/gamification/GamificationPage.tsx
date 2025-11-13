@@ -10,6 +10,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { GamificationDashboard } from '@/components/gamification/GamificationDashboard';
 import { GamificationErrorBoundary } from '@/components/gamification/GamificationErrorBoundary';
 import { Trophy, Menu } from 'lucide-react';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 // Composant interne pour utiliser useSidebar
 function MobileHeader() {
@@ -42,24 +43,33 @@ function MobileHeader() {
 
 
 export default function GamificationPage() {
+  const headerRef = useScrollAnimation<HTMLDivElement>();
+
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
         <AppSidebar />
         <main className="flex-1 flex flex-col min-w-0">
           {/* Mobile Header avec Hamburger et Icône */}
           <MobileHeader />
           
           {/* Contenu principal */}
-          <div className="flex-1 p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
+          <div className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
               {/* Header - Desktop seulement */}
-              <div className="hidden lg:block space-y-2">
-                <h1 className="text-3xl lg:text-4xl font-bold flex items-center gap-3 text-gray-900 dark:text-gray-50">
-                  <Trophy className="h-8 w-8 lg:h-10 lg:w-10 text-primary flex-shrink-0" aria-hidden="true" />
-                  <span>Gamification</span>
-                </h1>
-                <p className="text-base text-gray-600 dark:text-gray-400">
+              <div
+                ref={headerRef}
+                className="hidden lg:block space-y-2 animate-in fade-in slide-in-from-top-4 duration-700"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center">
+                    <Trophy className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                  </div>
+                  <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    Gamification
+                  </h1>
+                </div>
+                <p className="text-sm lg:text-base text-muted-foreground">
                   Suivez vos points, badges, achievements et votre classement
                 </p>
               </div>
