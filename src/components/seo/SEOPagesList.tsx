@@ -453,6 +453,6 @@ export const SEOPagesList = ({ data, isLoading }: SEOPagesListProps) => {
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
       />
-    </>
+    </div>
   );
 };
