@@ -34,7 +34,7 @@ import { useSupplierOrders, useCreateSupplierOrder, useSuppliers, SupplierOrder 
 import { useStore } from '@/hooks/useStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { Plus, Package, Calendar, DollarSign, Search, X, MoreVertical, Eye } from 'lucide-react';
+import { Plus, Package, Calendar, DollarSign, Search, X, MoreVertical, Eye, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
