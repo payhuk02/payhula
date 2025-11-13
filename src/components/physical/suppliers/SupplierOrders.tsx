@@ -296,10 +296,9 @@ export default function SupplierOrders() {
             </CardContent>
           </Card>
         ) : (
-          <>
-            {/* Desktop Table - Responsive with horizontal scroll */}
-            <div className="hidden lg:block rounded-md border overflow-x-auto scrollbar-hide scroll-smooth">
-              <Table className="min-w-full">
+          <Card className="overflow-hidden">
+            <CardContent className="overflow-x-auto p-0">
+              <Table className="min-w-[800px] w-full">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-xs sm:text-sm whitespace-nowrap min-w-[140px]">Numéro</TableHead>
@@ -402,132 +401,8 @@ export default function SupplierOrders() {
                   })}
                 </TableBody>
               </Table>
-            </div>
-
-            {/* Tablet/Mobile Cards */}
-            <div className="lg:hidden space-y-3 sm:space-y-4">
-              {filteredOrders.map((order) => {
-                const status = ORDER_STATUSES.find(s => s.value === order.status);
-                return (
-                  <Card
-                    key={order.id}
-                    className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-md transition-all duration-300"
-                  >
-                    <CardContent className="p-3 sm:p-4">
-                      <div className="space-y-2.5 sm:space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Package className="h-4 w-4 text-muted-foreground shrink-0" />
-                              <h3 className="font-semibold text-sm sm:text-base truncate">
-                                {order.order_number}
-                              </h3>
-                            </div>
-                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                              {(order.supplier as any)?.name || 'N/A'}
-                              {(order.supplier as any)?.company_name && (
-                                <span className="ml-1">({(order.supplier as any).company_name})</span>
-                              )}
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-end gap-2 shrink-0">
-                            <Badge 
-                              variant={order.status === 'completed' ? 'default' : order.status === 'cancelled' ? 'destructive' : 'secondary'} 
-                              className="text-xs"
-                            >
-                              {status?.shortLabel || status?.label || order.status}
-                            </Badge>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                  <MoreVertical className="h-3.5 w-3.5" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-40 sm:w-48">
-                                <DropdownMenuItem className="text-xs sm:text-sm">
-                                  <Eye className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                  Voir détails
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleStatusUpdate(order.id, 'completed')}
-                                  className="text-xs sm:text-sm"
-                                  disabled={order.status === 'completed'}
-                                >
-                                  <Package className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                  Terminée
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                          <div className="flex items-center gap-2 text-xs sm:text-sm">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-muted-foreground truncate">
-                              {format(new Date(order.order_date), 'PPP', { locale: fr })}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-2 text-xs sm:text-sm">
-                            <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="font-semibold truncate">
-                              {new Intl.NumberFormat('fr-FR', {
-                                style: 'currency',
-                                currency: order.currency || 'XOF',
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              }).format(order.total_amount)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {order.expected_delivery_date && (
-                          <div className="flex items-center gap-2 text-xs sm:text-sm pt-1 border-t border-border/50">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-muted-foreground">
-                              Livraison prévue: {format(new Date(order.expected_delivery_date), 'PPP', { locale: fr })}
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-border/50">
-                          <Select
-                            value={order.status}
-                            onValueChange={(value: SupplierOrder['status']) =>
-                              handleStatusUpdate(order.id, value)
-                            }
-                          >
-                            <SelectTrigger className="w-full sm:flex-1 h-8 sm:h-9 text-xs sm:text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-[300px]">
-                              {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
-                                <SelectItem key={s.value} value={s.value} className="text-xs sm:text-sm">
-                                  {s.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              // Action pour voir les détails
-                            }}
-                            className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
-                          >
-                            <Eye className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            Détails
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </>
+            </CardContent>
+          </Card>
         )}
       </div>
 
