@@ -17,8 +17,8 @@ import {
   validateService,
   ServerValidationResult,
 } from '@/lib/server-validation';
-import { normalizeError, getUserFriendlyError } from '@/lib/error-handling';
-import { ErrorSeverity } from '@/lib/error-handling';
+import { normalizeError, ErrorSeverity } from '@/lib/error-handling';
+import { getUserFriendlyError } from '@/lib/user-friendly-errors';
 
 /**
  * Options pour la validation serveur
