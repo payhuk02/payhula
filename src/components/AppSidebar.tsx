@@ -847,7 +847,7 @@ export function AppSidebar() {
               className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain" 
             />
             {!isCollapsed && (
-              <span className="text-base sm:text-lg font-bold text-black dark:text-white truncate">
+              <span className="text-base sm:text-lg font-bold text-white dark:text-black truncate">
                 Payhuk
               </span>
             )}
@@ -857,7 +857,7 @@ export function AppSidebar() {
         {/* Menu Items - Organisé par sections (masqué sur pages admin) */}
         {!isOnAdminPage && menuSections.map((section) => (
           <SidebarGroup key={section.label}>
-            <SidebarGroupLabel className="!text-black">
+            <SidebarGroupLabel className="!text-white dark:!text-black">
               {!isCollapsed && section.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -880,12 +880,12 @@ export function AppSidebar() {
                             `transition-all duration-300 group relative flex items-center ${
                               isActive
                                 ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
-                                : "!text-black hover:bg-muted hover:translate-x-1"
+                                : "!text-white dark:!text-black hover:bg-muted hover:translate-x-1"
                             }`
                           }
                         >
                           <IconComponent 
-                            className={`${showArrow ? 'h-5 w-5 text-primary mr-2' : 'h-4 w-4'} flex-shrink-0`}
+                            className={`${showArrow ? 'h-5 w-5 text-primary mr-2' : 'h-4 w-4 text-white dark:text-black'} flex-shrink-0`}
                             style={showArrow ? { strokeWidth: 2.5 } : undefined}
                           />
                           {!isCollapsed && (
@@ -919,9 +919,9 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to="/dashboard"
-                      className="!text-primary hover:bg-primary/10 hover:translate-x-1 transition-all duration-300"
+                      className="!text-white dark:!text-black hover:bg-primary/10 hover:translate-x-1 transition-all duration-300"
                     >
-                      <LayoutDashboard className="h-4 w-4" />
+                      <LayoutDashboard className="h-4 w-4 text-white dark:text-black" />
                       {!isCollapsed && <span>← Retour Dashboard</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -934,7 +934,7 @@ export function AppSidebar() {
         {/* Admin Menu Items - Organisé par sections */}
         {isAdmin && adminMenuSections.map((section) => (
           <SidebarGroup key={section.label}>
-            <SidebarGroupLabel className="!text-black">
+            <SidebarGroupLabel className="!text-white dark:!text-black">
               {!isCollapsed && section.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -954,11 +954,11 @@ export function AppSidebar() {
                             `transition-all duration-300 ${
                               isActive
                                 ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
-                                : "!text-black hover:bg-muted hover:translate-x-1"
+                                : "!text-white dark:!text-black hover:bg-muted hover:translate-x-1"
                             }`
                           }
                         >
-                          <IconComponent className="h-4 w-4" />
+                          <IconComponent className="h-4 w-4 text-white dark:text-black" />
                           {!isCollapsed && <span>{item.title}</span>}
                         </NavLink>
                       </SidebarMenuButton>
@@ -978,10 +978,10 @@ export function AppSidebar() {
         )}
         <Button
           variant="ghost"
-          className="w-full justify-start !text-black"
+          className="w-full justify-start !text-white dark:!text-black"
           onClick={handleLogout}
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4 text-white dark:text-black" />
           {!isCollapsed && <span>Déconnexion</span>}
         </Button>
       </SidebarFooter>
