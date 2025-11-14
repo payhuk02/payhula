@@ -260,29 +260,72 @@ select {
 }
 
 /* === SCROLLBAR PROFESSIONNELLE POUR ONGLET COMMANDES === */
-/* Barre de défilement horizontale visible et stylisée pour l'onglet Commandes */
+/* Barre de défilement horizontale visible et stylisée pour l'onglet Commandes - Version Professionnelle */
 .scrollbar-orders {
   scrollbar-width: thin;  /* Firefox - barre fine */
-  scrollbar-color: rgb(168 85 247 / 0.6) rgb(0 0 0 / 0.1);  /* Firefox - thumb et track */
+  scrollbar-color: rgb(168 85 247 / 0.7) rgb(0 0 0 / 0.08);  /* Firefox - thumb et track améliorés */
+  /* Momentum scrolling pour iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
 .scrollbar-orders::-webkit-scrollbar {
-  height: 8px;  /* Hauteur de la barre de défilement horizontale */
+  height: 10px;  /* Hauteur de la barre de défilement horizontale - Augmentée pour meilleure visibilité */
 }
 
 .scrollbar-orders::-webkit-scrollbar-track {
-  background: rgb(0 0 0 / 0.05);  /* Couleur de fond de la piste */
-  border-radius: 4px;
+  background: linear-gradient(to right, 
+    rgb(0 0 0 / 0.03), 
+    rgb(0 0 0 / 0.05), 
+    rgb(0 0 0 / 0.03)
+  );  /* Gradient subtil pour la piste */
+  border-radius: 5px;
+  margin: 2px 0;
 }
 
 .scrollbar-orders::-webkit-scrollbar-thumb {
-  background: rgb(168 85 247 / 0.5);  /* Couleur du curseur (violet avec transparence) */
-  border-radius: 4px;
-  transition: background 0.2s ease;
+  background: linear-gradient(to right,
+    rgb(168 85 247 / 0.4),
+    rgb(168 85 247 / 0.7),
+    rgb(168 85 247 / 0.4)
+  );  /* Gradient pour le curseur */
+  border-radius: 5px;
+  border: 1px solid rgb(168 85 247 / 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgb(168 85 247 / 0.2);
 }
 
 .scrollbar-orders::-webkit-scrollbar-thumb:hover {
-  background: rgb(168 85 247 / 0.7);  /* Couleur au survol */
+  background: linear-gradient(to right,
+    rgb(168 85 247 / 0.6),
+    rgb(168 85 247 / 0.9),
+    rgb(168 85 247 / 0.6)
+  );  /* Gradient plus intense au survol */
+  box-shadow: 0 2px 6px rgb(168 85 247 / 0.4);
+  transform: scaleY(1.1);
+}
+
+.scrollbar-orders::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(to right,
+    rgb(147 51 234 / 0.7),
+    rgb(168 85 247 / 1),
+    rgb(147 51 234 / 0.7)
+  );  /* Gradient encore plus intense au clic */
+  box-shadow: 0 1px 3px rgb(168 85 247 / 0.5);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .scrollbar-orders {
+    scrollbar-color: rgb(168 85 247 / 0.8) rgb(255 255 255 / 0.05);
+  }
+  
+  .scrollbar-orders::-webkit-scrollbar-track {
+    background: linear-gradient(to right, 
+      rgb(255 255 255 / 0.02), 
+      rgb(255 255 255 / 0.05), 
+      rgb(255 255 255 / 0.02)
+    );
+  }
 }
 
 /* === PERFORMANCE MOBILE === */

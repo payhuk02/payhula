@@ -34,7 +34,8 @@ import { useSupplierOrders, useCreateSupplierOrder, useSuppliers, SupplierOrder 
 import { useStore } from '@/hooks/useStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { Plus, Package, Calendar, DollarSign, Search, X, MoreVertical, Eye, CheckCircle } from 'lucide-react';
+import { useHorizontalScroll } from '@/hooks/useHorizontalScroll';
+import { Plus, Package, Calendar, DollarSign, Search, X, MoreVertical, Eye, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -91,6 +92,24 @@ export default function SupplierOrders() {
   const statsRef = useScrollAnimation<HTMLDivElement>();
   const ordersRef = useScrollAnimation<HTMLDivElement>();
   const tabsRef = useScrollAnimation<HTMLDivElement>();
+
+  // Scroll horizontal pour les filtres/tabs
+  const {
+    scrollRef: tabsScrollRef,
+    canScrollLeft: canScrollTabsLeft,
+    canScrollRight: canScrollTabsRight,
+    scrollLeft: scrollTabsLeft,
+    scrollRight: scrollTabsRight,
+  } = useHorizontalScroll();
+
+  // Scroll horizontal pour la table
+  const {
+    scrollRef: tableScrollRef,
+    canScrollLeft: canScrollTableLeft,
+    canScrollRight: canScrollTableRight,
+    scrollLeft: scrollTableLeft,
+    scrollRight: scrollTableRight,
+  } = useHorizontalScroll();
 
   // Filtrer les commandes
   const filteredOrders = useMemo(() => {
@@ -356,20 +375,57 @@ export default function SupplierOrders() {
         })}
       </div>
 
-      {/* Status Filters as Tabs - Totalement Responsive */}
+      {/* Status Filters as Tabs - Totalement Responsive avec Scroll Professionnel */}
       <div
         ref={tabsRef}
         className="animate-in fade-in slide-in-from-bottom-4 duration-700"
       >
         <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as SupplierOrder['status'] | 'all')} className="w-full">
-          <div className="relative">
-            {/* Indicateur de scroll à gauche (mobile uniquement) */}
-            <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 md:hidden" aria-hidden="true"></div>
+          <div className="relative group">
+            {/* Indicateur de scroll à gauche - Dynamique */}
+            {canScrollTabsLeft && (
+              <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-12 md:w-16 bg-gradient-to-r from-background via-background/80 to-transparent z-20 flex items-center justify-start pl-1 sm:pl-2 transition-opacity duration-300">
+                <div className="h-full w-full flex items-center pointer-events-auto">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-background hover:scale-110 transition-all duration-200 touch-manipulation"
+                    onClick={scrollTabsLeft}
+                    aria-label="Défiler vers la gauche"
+                  >
+                    <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                </div>
+              </div>
+            )}
             
-            {/* Indicateur de scroll à droite (mobile uniquement) */}
-            <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 md:hidden" aria-hidden="true"></div>
+            {/* Indicateur de scroll à droite - Dynamique */}
+            {canScrollTabsRight && (
+              <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-12 md:w-16 bg-gradient-to-l from-background via-background/80 to-transparent z-20 flex items-center justify-end pr-1 sm:pr-2 transition-opacity duration-300">
+                <div className="h-full w-full flex items-center justify-end pointer-events-auto">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-background hover:scale-110 transition-all duration-200 touch-manipulation"
+                    onClick={scrollTabsRight}
+                    aria-label="Défiler vers la droite"
+                  >
+                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                </div>
+              </div>
+            )}
             
-            <div className="overflow-x-auto scrollbar-hide scroll-smooth -mx-2 sm:-mx-3 md:-mx-4 lg:mx-0 px-2 sm:px-3 md:px-4 lg:px-0">
+            {/* Zone de scroll avec momentum */}
+            <div 
+              ref={tabsScrollRef}
+              className="overflow-x-auto scrollbar-hide scroll-smooth -mx-2 sm:-mx-3 md:-mx-4 lg:mx-0 px-2 sm:px-3 md:px-4 lg:px-0"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
               <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 sm:p-1.5 w-max min-w-full sm:min-w-0 sm:w-auto inline-flex gap-1 sm:gap-1.5 md:gap-2 lg:gap-2.5">
                 {ORDER_STATUSES.map((status) => (
                   <TabsTrigger
@@ -410,10 +466,50 @@ export default function SupplierOrders() {
           </Card>
         ) : (
           <>
-            {/* Desktop Table View - Responsive */}
-            <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm overflow-hidden hidden lg:block">
+            {/* Desktop Table View - Responsive avec Scroll Professionnel */}
+            <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm overflow-hidden hidden lg:block relative group">
+              {/* Indicateur de scroll à gauche - Dynamique */}
+              {canScrollTableLeft && (
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-card via-card/90 to-transparent z-20 flex items-center justify-start pl-2 transition-opacity duration-300">
+                  <div className="pointer-events-auto">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200"
+                      onClick={scrollTableLeft}
+                      aria-label="Défiler vers la gauche"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Indicateur de scroll à droite - Dynamique */}
+              {canScrollTableRight && (
+                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-card via-card/90 to-transparent z-20 flex items-center justify-end pr-2 transition-opacity duration-300">
+                  <div className="pointer-events-auto">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200"
+                      onClick={scrollTableRight}
+                      aria-label="Défiler vers la droite"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
               <CardContent className="p-0">
-                <div className="overflow-x-auto scroll-smooth scrollbar-orders">
+                <div 
+                  ref={tableScrollRef}
+                  className="overflow-x-auto scroll-smooth scrollbar-orders"
+                  style={{
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
                   <Table className="min-w-[900px] lg:min-w-[1000px] xl:min-w-[1100px] w-full">
                     <TableHeader>
                       <TableRow>
