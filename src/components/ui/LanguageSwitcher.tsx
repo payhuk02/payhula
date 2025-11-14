@@ -18,12 +18,14 @@ import { cn } from '@/lib/utils';
 
 interface LanguageSwitcherProps {
   className?: string;
+  buttonClassName?: string;
   variant?: 'default' | 'ghost' | 'outline';
   showLabel?: boolean;
 }
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   className,
+  buttonClassName,
   variant = 'ghost',
   showLabel = false,
 }) => {
@@ -44,12 +46,12 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu className={className}>
       <DropdownMenuTrigger asChild>
         <Button
           variant={variant}
           size="sm"
-          className={cn('gap-2', className)}
+          className={cn('gap-2', buttonClassName)}
           aria-label="Change language"
         >
           <Globe className="h-4 w-4" />

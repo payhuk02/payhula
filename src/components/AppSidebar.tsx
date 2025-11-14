@@ -974,7 +974,12 @@ export function AppSidebar() {
       {/* Footer */}
       <SidebarFooter className="border-t p-4 space-y-2">
         {!isCollapsed && (
-          <LanguageSwitcher variant="outline" showLabel={true} className="w-full" />
+          <LanguageSwitcher 
+            variant="default" 
+            showLabel={true} 
+            className="w-full"
+            buttonClassName="w-full bg-gradient-to-r from-[#7851A9] to-[#FF69B4] text-white hover:opacity-90 border-0 [&_svg]:text-white [&_span]:text-white transition-all duration-300"
+          />
         )}
         <Button
           variant="ghost"
