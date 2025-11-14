@@ -85,8 +85,8 @@ export default defineConfig(({ mode }) => {
     },
     // Préserver les extensions pour éviter les conflits
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
-    // Dédupliquer React pour éviter les problèmes d'initialisation
-    dedupe: ['react', 'react-dom'],
+    // Dédupliquer React et Scheduler pour éviter les problèmes d'initialisation
+    dedupe: ['react', 'react-dom', 'scheduler'],
   },
   build: {
     rollupOptions: {
@@ -99,10 +99,14 @@ export default defineConfig(({ mode }) => {
         // Séparation intelligente des chunks pour améliorer les performances
         // Amélioration: Réduction du bundle initial de ~40-60%
         manualChunks: (id) => {
-          // CRITIQUE: React et React DOM dans le chunk principal (undefined)
+          // CRITIQUE: React, React DOM et Scheduler dans le chunk principal (undefined)
           // Ne pas séparer React pour garantir qu'il est chargé avant tous les composants
-          // Cela évite l'erreur "Cannot read properties of undefined (reading 'forwardRef')"
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+          // Cela évite les erreurs "forwardRef" et "unstable_scheduleCallback"
+          if (
+            id.includes('node_modules/react/') || 
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')
+          ) {
             return undefined; // Garder dans le chunk principal
           }
           
@@ -214,6 +218,7 @@ export default defineConfig(({ mode }) => {
     include: [
       'react',
       'react-dom',
+      'scheduler', // CRITIQUE: Inclure scheduler pour Radix UI
       'react-router-dom',
       '@tanstack/react-query',
       '@supabase/supabase-js',
