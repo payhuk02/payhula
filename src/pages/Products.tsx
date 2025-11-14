@@ -23,7 +23,9 @@ import {
 } from "lucide-react";
 import { useStore } from "@/hooks/useStore";
 import { useProducts } from "@/hooks/useProducts";
+import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { useProductManagement } from "@/hooks/useProductManagement";
+import { useDebounce } from "@/hooks/useDebounce";
 import EditProductDialog from "@/components/products/EditProductDialog";
 import ProductCardDashboard from "@/components/products/ProductCardDashboard";
 import ProductListView from "@/components/products/ProductListView";
@@ -65,7 +67,6 @@ const Products = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { store, loading: storeLoading } = useStore();
-  const { products, loading: productsLoading, refetch } = useProducts(store?.id);
   const { deleteProduct, updateProduct } = useProductManagement(store?.id || "");
   const { toast } = useToast();
   
@@ -82,17 +83,51 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
   
-  // Filtres
+  // Filtres avec debouncing pour optimiser les performances
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [category, setCategory] = useState("all");
+  const debouncedCategory = useDebounce(category, 300);
   const [productType, setProductType] = useState("all");
+  const debouncedProductType = useDebounce(productType, 300);
   const [status, setStatus] = useState("all");
+  const debouncedStatus = useDebounce(status, 300);
   const [stockStatus, setStockStatus] = useState("all");
+  const debouncedStockStatus = useDebounce(stockStatus, 300);
   const [sortBy, setSortBy] = useState("recent");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
+  const debouncedPriceRange = useDebounce(priceRange, 300);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  
+  // Utiliser le hook optimisé avec pagination serveur
+  const {
+    products,
+    total,
+    totalPages,
+    isLoading: productsLoading,
+    error: productsError,
+    refetch,
+  } = useProductsOptimized(store?.id, {
+    page: currentPage,
+    itemsPerPage,
+    sortBy: sortBy as any,
+    sortOrder: sortBy.includes('desc') || sortBy === 'popular' || sortBy === 'rating' ? 'desc' : 'asc',
+    searchQuery: debouncedSearchQuery,
+    category: debouncedCategory === 'all' ? undefined : debouncedCategory,
+    productType: debouncedProductType === 'all' ? undefined : debouncedProductType,
+    status: debouncedStatus === 'all' ? undefined : debouncedStatus,
+    stockStatus: debouncedStockStatus === 'all' ? undefined : debouncedStockStatus,
+    priceRange: debouncedPriceRange,
+  });
+  
+  // Fallback: utiliser l'ancien hook si pas de store (pour compatibilité)
+  const fallbackProducts = useProducts(store?.id);
+  const allProducts = store?.id ? products : fallbackProducts.products;
+  const productsLoadingState = store?.id ? productsLoading : fallbackProducts.loading;
 
-  // Extract unique categories and types
+  // Extract unique categories and types (pour les filtres)
+  // Note: Pour obtenir toutes les catégories/types, on doit charger tous les produits une fois
+  // Pour l'instant, on utilise les produits paginés (peut être amélioré avec une requête séparée)
   const categories = useMemo(() => {
     return Array.from(new Set(products.map((p) => p.category).filter(Boolean))) as string[];
   }, [products]);
@@ -101,110 +136,23 @@ const Products = () => {
     return Array.from(new Set(products.map((p) => p.product_type).filter(Boolean))) as string[];
   }, [products]);
 
-  // Filter and sort products
+  // Avec pagination serveur, les produits sont déjà filtrés et paginés
+  // On applique seulement le filtre dateRange côté client (trop complexe pour SQL)
   const filteredProducts = useMemo(() => {
-    let filtered = [...products];
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.slug?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (!dateRange[0] || !dateRange[1]) {
+      return products; // Pas de filtre date, utiliser directement les produits paginés
     }
 
-    // Category filter
-    if (category !== "all") {
-      filtered = filtered.filter((product) => product.category === category);
-    }
-
-    // Product type filter
-    if (productType !== "all") {
-      filtered = filtered.filter((product) => product.product_type === productType);
-    }
-
-    // Status filter
-    if (status === "active") {
-      filtered = filtered.filter((product) => product.is_active);
-    } else if (status === "inactive") {
-      filtered = filtered.filter((product) => !product.is_active);
-    }
-
-    // Stock status filter
-    if (stockStatus !== "all") {
-      filtered = filtered.filter((product) => {
-        // Ne filtrer que les produits qui trackent l'inventaire
-        if (product.track_inventory === false || product.product_type === 'digital') {
-          return stockStatus === "in_stock"; // Produits digitaux = toujours en stock
-        }
-
-        const status = calculateStockStatus(
-          product.stock_quantity,
-          product.low_stock_threshold,
-          product.track_inventory ?? true
-        );
-
-        if (stockStatus === "needs_restock") {
-          return needsRestock(
-            product.stock_quantity,
-            product.low_stock_threshold,
-            product.track_inventory ?? true
-          );
-        }
-
-        return status === stockStatus;
-      });
-    }
-
-    // Price range filter
-    filtered = filtered.filter((product) => 
-      product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
-
-    // Date range filter
-    if (dateRange[0] && dateRange[1]) {
-      filtered = filtered.filter((product) => {
-        const productDate = new Date(product.created_at);
-        return productDate >= dateRange[0]! && productDate <= dateRange[1]!;
-      });
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "recent":
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case "oldest":
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        case "name-asc":
-          return a.name.localeCompare(b.name);
-        case "name-desc":
-          return b.name.localeCompare(a.name);
-        case "price-asc":
-          return a.price - b.price;
-        case "price-desc":
-          return b.price - a.price;
-        case "popular":
-          return (b.reviews_count || 0) - (a.reviews_count || 0);
-        case "rating":
-          return b.rating - a.rating;
-        default:
-          return 0;
-      }
+    return products.filter((product) => {
+      const productDate = new Date(product.created_at);
+      return productDate >= dateRange[0]! && productDate <= dateRange[1]!;
     });
+  }, [products, dateRange]);
 
-    return filtered;
-  }, [products, searchQuery, category, productType, status, stockStatus, sortBy, priceRange, dateRange]);
-
-  // Pagination
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredProducts.slice(startIndex, endIndex);
-  }, [filteredProducts, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  // Pagination déjà gérée côté serveur, utiliser directement les produits
+  const paginatedProducts = filteredProducts;
+  
+  // Utiliser totalPages depuis le hook optimisé
   const activeProducts = products.filter(p => p.is_active).length;
 
   // Animations au scroll
@@ -589,10 +537,10 @@ const Products = () => {
                   size="sm"
                   variant="outline"
                   className="h-9 sm:h-10 transition-all hover:scale-105 text-xs sm:text-sm"
-                  disabled={productsLoading}
+                  disabled={productsLoadingState}
                   title="Actualiser (F5)"
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${productsLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${productsLoadingState ? 'animate-spin' : ''}`} />
                   <span className="hidden sm:inline">{t('products.refresh')}</span>
                   <span className="sm:hidden">Raf.</span>
                 </Button>
@@ -610,7 +558,7 @@ const Products = () => {
               </div>
             </div>
             {/* États de chargement */}
-            {productsLoading ? (
+            {productsLoadingState ? (
               <div className="text-center space-y-4">
                 <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
                 <p className="text-muted-foreground">{t('common.loading')}</p>

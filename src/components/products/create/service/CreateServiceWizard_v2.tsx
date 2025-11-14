@@ -148,6 +148,21 @@ export const CreateServiceWizard = ({
   const headerRef = useScrollAnimation<HTMLDivElement>();
   const stepsRef = useScrollAnimation<HTMLDivElement>();
   const contentRef = useScrollAnimation<HTMLDivElement>();
+
+  // Use props or fallback to hook store
+  const storeId = propsStoreId || store?.id;
+
+  // Server validation hook
+  const {
+    validateSlug,
+    validateService: validateServiceServer,
+    isValidating: isValidatingServer,
+    serverErrors,
+    clearServerErrors,
+  } = useWizardServerValidation({
+    storeId: storeId || undefined,
+    showToasts: true,
+  });
   
   const [formData, setFormData] = useState<Partial<any>>({
     // Basic Info (Step 1)
@@ -313,18 +328,96 @@ export const CreateServiceWizard = ({
   }, [formData, currentStep, applyTemplate, toast]);
 
   /**
-   * Validate current step
+   * Validate current step avec validation améliorée (client + serveur)
    */
-  const validateStep = useCallback((step: number): boolean => {
+  const validateStep = useCallback(async (step: number): Promise<boolean> => {
+    const { validateWithZod, formatValidators, getFieldError } = require('@/lib/wizard-validation');
+    const { serviceSchema } = require('@/lib/wizard-validation');
     const errors: string[] = [];
 
-    switch (step) {
-      case 1:
-        if (!formData.name?.trim()) errors.push(t('services.errors.nameRequired', 'Le nom du service est requis'));
-        if (!formData.description?.trim()) errors.push(t('services.errors.descriptionRequired', 'La description est requise'));
-        if (!formData.price || formData.price <= 0) errors.push(t('services.errors.priceRequired', 'Le prix doit être supérieur à 0'));
-        break;
+    // Réinitialiser les erreurs serveur
+    clearServerErrors();
 
+    switch (step) {
+      case 1: {
+        // 1. Validation client avec Zod
+        const result = validateWithZod(serviceSchema, {
+          name: formData.name,
+          slug: formData.slug,
+          description: formData.description,
+          price: formData.price,
+          duration: formData.duration,
+          max_participants: formData.max_participants,
+          meeting_url: formData.meeting_url,
+          location_address: formData.location_address,
+        });
+        
+        if (!result.valid) {
+          const nameError = getFieldError(result.errors, 'name');
+          const priceError = getFieldError(result.errors, 'price');
+          const durationError = getFieldError(result.errors, 'duration');
+          const maxParticipantsError = getFieldError(result.errors, 'max_participants');
+          const meetingUrlError = getFieldError(result.errors, 'meeting_url');
+          
+          if (nameError) errors.push(nameError);
+          if (priceError) errors.push(priceError);
+          if (durationError) errors.push(durationError);
+          if (maxParticipantsError) errors.push(maxParticipantsError);
+          if (meetingUrlError) errors.push(meetingUrlError);
+        }
+        
+        // 2. Validation format URL si fournie (client)
+        if (formData.meeting_url) {
+          const urlResult = formatValidators.url(formData.meeting_url);
+          if (!urlResult.valid) {
+            const urlFormatError = getFieldError(urlResult.errors, 'url');
+            if (urlFormatError) errors.push(urlFormatError);
+          }
+        }
+        
+        // Si erreurs client, arrêter ici
+        if (errors.length > 0) {
+          setValidationErrors(prev => ({ ...prev, [step]: errors }));
+          return false;
+        }
+        
+        // 3. Validation serveur (unicité slug, etc.)
+        if (storeId) {
+          const serverResult = await validateServiceServer({
+            name: formData.name,
+            slug: formData.slug,
+            price: formData.price,
+            duration: formData.duration,
+            maxParticipants: formData.max_participants,
+            meetingUrl: formData.meeting_url,
+          });
+          
+          if (!serverResult.valid) {
+            // Les erreurs sont déjà affichées dans le hook via toast
+            // Mais on les ajoute aussi aux erreurs de validation
+            if (serverResult.errors) {
+              serverResult.errors.forEach((err) => {
+                errors.push(err.message);
+              });
+            }
+            logger.warn('Validation serveur échouée - Étape 1', { errors: serverResult.errors });
+            setValidationErrors(prev => ({ ...prev, [step]: errors }));
+            return false;
+          }
+          
+          // Validation slug spécifique si fourni
+          if (formData.slug) {
+            const slugValid = await validateSlug(formData.slug);
+            if (!slugValid) {
+              errors.push(serverErrors.slug || 'Slug invalide');
+              setValidationErrors(prev => ({ ...prev, [step]: errors }));
+              return false;
+            }
+          }
+        }
+        
+        break;
+      }
       case 2:
         if (!formData.duration || formData.duration <= 0) {
           errors.push(t('services.errors.durationRequired', 'La durée du service est requise'));
@@ -369,13 +462,14 @@ export const CreateServiceWizard = ({
     }
     
     return isValid;
-  }, [formData, t]);
+  }, [formData, t, storeId, validateServiceServer, validateSlug, serverErrors, clearServerErrors]);
 
   /**
    * Navigation handlers
    */
-  const handleNext = useCallback(() => {
-    if (validateStep(currentStep)) {
+  const handleNext = useCallback(async () => {
+    const isValid = await validateStep(currentStep);
+    if (isValid) {
       const nextStepNum = currentStep + 1;
       setCurrentStep(nextStepNum);
       logger.info('Navigation vers étape suivante', { from: currentStep, to: nextStepNum });
@@ -398,12 +492,19 @@ export const CreateServiceWizard = ({
     }
   }, [currentStep]);
 
-  const handleStepClick = useCallback((stepId: number) => {
+  const handleStepClick = useCallback(async (stepId: number) => {
     // Permettre de revenir en arrière, mais valider avant d'avancer
-    if (stepId < currentStep || validateStep(currentStep)) {
+    if (stepId < currentStep) {
       setCurrentStep(stepId);
       logger.info('Navigation directe vers étape', { to: stepId });
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const isValid = await validateStep(currentStep);
+      if (isValid) {
+        setCurrentStep(stepId);
+        logger.info('Navigation directe vers étape', { to: stepId });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   }, [currentStep, validateStep]);
 

@@ -774,6 +774,20 @@ All colors MUST be HSL.
       transform: translateX(30px);
     }
   }
+
+  /* Animation shimmer pour LazyImage */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
 }
 
 /* TipTap Editor Styles */

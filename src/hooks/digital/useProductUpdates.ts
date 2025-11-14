@@ -5,10 +5,12 @@
  * Hooks pour gérer les mises à jour de produits digitaux
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { invalidateUpdateCache, invalidateDigitalProductCache, EntityAction } from '@/lib/cache-invalidation';
+import { useMutationWithRetry } from '@/hooks/useMutationWithRetry';
 
 // =====================================================
 // TYPES
@@ -299,7 +301,10 @@ export const useProductVersion = (versionId: string | undefined) => {
 export const useTrackVersionDownload = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutationWithRetry({
+    maxRetries: 3,
+    baseDelay: 1000,
+    errorToastTitle: 'Erreur mise à jour',
     mutationFn: async (versionId: string) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Non authentifié');
@@ -367,7 +372,10 @@ export const useCreateProductUpdate = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation({
+  return useMutationWithRetry({
+    maxRetries: 3,
+    baseDelay: 1000,
+    errorToastTitle: 'Erreur mise à jour',
     mutationFn: async (updateData: {
       digital_product_id: string;
       version: string;
@@ -396,8 +404,9 @@ export const useCreateProductUpdate = () => {
       return data as DigitalProductUpdate;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['productUpdates', data.digital_product_id] });
-      queryClient.invalidateQueries({ queryKey: ['digitalProducts'] });
+      // Invalidation intelligente du cache
+      invalidateUpdateCache(queryClient, data.id, EntityAction.CREATE, data.digital_product_id);
+      invalidateDigitalProductCache(queryClient, data.digital_product_id, EntityAction.UPDATE);
       toast({
         title: '✅ Mise à jour créée',
         description: `La mise à jour ${data.version} a été créée avec succès`,
@@ -421,7 +430,10 @@ export const useUpdateProductUpdate = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation({
+  return useMutationWithRetry({
+    maxRetries: 3,
+    baseDelay: 1000,
+    errorToastTitle: 'Erreur mise à jour',
     mutationFn: async ({
       updateId,
       updates,
@@ -440,7 +452,9 @@ export const useUpdateProductUpdate = () => {
       return data as DigitalProductUpdate;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['productUpdates', data.digital_product_id] });
+      // Invalidation intelligente du cache
+      invalidateUpdateCache(queryClient, data.id, EntityAction.UPDATE, data.digital_product_id);
+      invalidateDigitalProductCache(queryClient, data.digital_product_id, EntityAction.UPDATE);
       toast({
         title: '✅ Mise à jour modifiée',
         description: 'La mise à jour a été modifiée avec succès',
@@ -464,7 +478,10 @@ export const useDeleteProductUpdate = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation({
+  return useMutationWithRetry({
+    maxRetries: 3,
+    baseDelay: 1000,
+    errorToastTitle: 'Erreur mise à jour',
     mutationFn: async (updateId: string) => {
       // Récupérer le digital_product_id avant suppression
       const { data: update } = await supabase
@@ -479,11 +496,13 @@ export const useDeleteProductUpdate = () => {
         .eq('id', updateId);
 
       if (error) throw error;
-      return update?.digital_product_id;
+      return { updateId, digital_product_id: update?.digital_product_id };
     },
-    onSuccess: (digitalProductId) => {
-      if (digitalProductId) {
-        queryClient.invalidateQueries({ queryKey: ['productUpdates', digitalProductId] });
+    onSuccess: (data, updateId) => {
+      if (data.digital_product_id) {
+        // Invalidation intelligente du cache
+        invalidateUpdateCache(queryClient, updateId, EntityAction.DELETE, data.digital_product_id);
+        invalidateDigitalProductCache(queryClient, data.digital_product_id, EntityAction.UPDATE);
       }
       toast({
         title: '✅ Mise à jour supprimée',

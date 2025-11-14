@@ -5,15 +5,19 @@
  * Paramètres de détection et gestion des conflits de ressources
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
-import { Settings, Save, Loader2, AlertTriangle } from 'lucide-react';
+import { Save, Loader2, AlertTriangle } from 'lucide-react';
+import {
+  useResourceConflictSettings,
+  useUpdateResourceConflictSettings,
+  type ResourceConflictSettings as SettingsType,
+} from '@/hooks/service/useResourceConflictSettings';
 
 interface ResourceConflictSettingsProps {
   storeId: string;
@@ -22,42 +26,64 @@ interface ResourceConflictSettingsProps {
 export function ResourceConflictSettings({
   storeId,
 }: ResourceConflictSettingsProps) {
-  const { toast } = useToast();
+  // Charger les paramètres depuis la base de données
+  const { data: settings, isLoading } = useResourceConflictSettings(storeId);
+  const updateSettingsMutation = useUpdateResourceConflictSettings();
 
-  const [settings, setSettings] = useState({
-    autoDetectConflicts: true,
-    detectIntervalMinutes: 30,
-    preventDoubleBooking: true,
-    checkResourceAvailability: true,
-    checkCapacity: true,
-    checkTimeSlots: true,
-    notifyOnConflict: true,
-    autoResolveConflicts: false,
-    conflictResolutionMethod: 'manual' as 'manual' | 'auto' | 'suggest',
-  });
+  // État local pour les modifications (avant sauvegarde)
+  const [localSettings, setLocalSettings] = useState<Partial<SettingsType>>({});
 
-  const [isSaving, setIsSaving] = useState(false);
+  // Initialiser localSettings avec les données chargées
+  useEffect(() => {
+    if (settings) {
+      setLocalSettings({
+        auto_detect_conflicts: settings.auto_detect_conflicts,
+        detect_interval_minutes: settings.detect_interval_minutes,
+        prevent_double_booking: settings.prevent_double_booking,
+        check_resource_availability: settings.check_resource_availability,
+        check_capacity: settings.check_capacity,
+        check_time_slots: settings.check_time_slots,
+        notify_on_conflict: settings.notify_on_conflict,
+        auto_resolve_conflicts: settings.auto_resolve_conflicts,
+        conflict_resolution_method: settings.conflict_resolution_method,
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      // TODO: Save to database
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+    if (!settings) return;
 
-      toast({
-        title: '✅ Paramètres sauvegardés',
-        description: 'Les paramètres de détection de conflits ont été sauvegardés',
-      });
-    } catch (error: any) {
-      toast({
-        title: '❌ Erreur',
-        description: error.message || 'Impossible de sauvegarder les paramètres',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSaving(false);
-    }
+    updateSettingsMutation.mutate({
+      store_id: storeId,
+      ...localSettings,
+    });
   };
+
+  // Utiliser les settings locaux ou les settings chargés
+  const currentSettings = {
+    autoDetectConflicts: localSettings.auto_detect_conflicts ?? settings?.auto_detect_conflicts ?? true,
+    detectIntervalMinutes: localSettings.detect_interval_minutes ?? settings?.detect_interval_minutes ?? 30,
+    preventDoubleBooking: localSettings.prevent_double_booking ?? settings?.prevent_double_booking ?? true,
+    checkResourceAvailability: localSettings.check_resource_availability ?? settings?.check_resource_availability ?? true,
+    checkCapacity: localSettings.check_capacity ?? settings?.check_capacity ?? true,
+    checkTimeSlots: localSettings.check_time_slots ?? settings?.check_time_slots ?? true,
+    notifyOnConflict: localSettings.notify_on_conflict ?? settings?.notify_on_conflict ?? true,
+    autoResolveConflicts: localSettings.auto_resolve_conflicts ?? settings?.auto_resolve_conflicts ?? false,
+    conflictResolutionMethod: (localSettings.conflict_resolution_method ?? settings?.conflict_resolution_method ?? 'manual') as 'manual' | 'auto' | 'suggest',
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -81,25 +107,25 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.autoDetectConflicts}
+              checked={currentSettings.autoDetectConflicts}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, autoDetectConflicts: checked })
+                setLocalSettings({ ...localSettings, auto_detect_conflicts: checked })
               }
             />
           </div>
 
-          {settings.autoDetectConflicts && (
+          {currentSettings.autoDetectConflicts && (
             <div className="space-y-2">
               <Label>Intervalle de détection (minutes)</Label>
               <Input
                 type="number"
                 min={5}
                 max={1440}
-                value={settings.detectIntervalMinutes}
+                value={currentSettings.detectIntervalMinutes}
                 onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    detectIntervalMinutes: parseInt(e.target.value) || 30,
+                  setLocalSettings({
+                    ...localSettings,
+                    detect_interval_minutes: parseInt(e.target.value) || 30,
                   })
                 }
               />
@@ -117,9 +143,9 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.notifyOnConflict}
+              checked={currentSettings.notifyOnConflict}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, notifyOnConflict: checked })
+                setLocalSettings({ ...localSettings, notify_on_conflict: checked })
               }
             />
           </div>
@@ -143,9 +169,9 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.preventDoubleBooking}
+              checked={currentSettings.preventDoubleBooking}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, preventDoubleBooking: checked })
+                setLocalSettings({ ...localSettings, prevent_double_booking: checked })
               }
             />
           </div>
@@ -158,9 +184,9 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.checkResourceAvailability}
+              checked={currentSettings.checkResourceAvailability}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, checkResourceAvailability: checked })
+                setLocalSettings({ ...localSettings, check_resource_availability: checked })
               }
             />
           </div>
@@ -173,9 +199,9 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.checkCapacity}
+              checked={currentSettings.checkCapacity}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, checkCapacity: checked })
+                setLocalSettings({ ...localSettings, check_capacity: checked })
               }
             />
           </div>
@@ -188,9 +214,9 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.checkTimeSlots}
+              checked={currentSettings.checkTimeSlots}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, checkTimeSlots: checked })
+                setLocalSettings({ ...localSettings, check_time_slots: checked })
               }
             />
           </div>
@@ -214,9 +240,9 @@ export function ResourceConflictSettings({
               </p>
             </div>
             <Switch
-              checked={settings.autoResolveConflicts}
+              checked={currentSettings.autoResolveConflicts}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, autoResolveConflicts: checked })
+                setLocalSettings({ ...localSettings, auto_resolve_conflicts: checked })
               }
             />
           </div>
@@ -225,11 +251,11 @@ export function ResourceConflictSettings({
             <Label>Méthode de résolution</Label>
             <select
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={settings.conflictResolutionMethod}
+              value={currentSettings.conflictResolutionMethod}
               onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  conflictResolutionMethod: e.target.value as 'manual' | 'auto' | 'suggest',
+                setLocalSettings({
+                  ...localSettings,
+                  conflict_resolution_method: e.target.value as 'manual' | 'auto' | 'suggest',
                 })
               }
             >
@@ -246,8 +272,8 @@ export function ResourceConflictSettings({
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? (
+        <Button onClick={handleSave} disabled={updateSettingsMutation.isPending || isLoading}>
+          {updateSettingsMutation.isPending ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Sauvegarde...

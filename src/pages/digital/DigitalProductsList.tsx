@@ -74,8 +74,10 @@ export const DigitalProductsList = () => {
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 300);
   const [filterType, setFilterType] = useState('all');
+  const debouncedFilterType = useDebounce(filterType, 300); // Debounce pour éviter trop de requêtes
   const [sortBy, setSortBy] = useState('recent');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const debouncedStatusFilter = useDebounce(statusFilter, 300); // Debounce pour éviter trop de requêtes
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
@@ -136,17 +138,17 @@ export const DigitalProductsList = () => {
                            product.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                            product.description?.toLowerCase().includes(debouncedSearch.toLowerCase());
       
-      // Type filter
-      const matchesType = filterType === 'all' || p.digital_type === filterType;
+      // Type filter (utiliser debounced)
+      const matchesType = debouncedFilterType === 'all' || p.digital_type === debouncedFilterType;
       
-      // Status filter
+      // Status filter (utiliser debounced)
       const isActive = product.is_active !== undefined 
         ? product.is_active 
         : (p.status === 'active' || p.status === 'published');
       const matchesStatus = 
-        statusFilter === 'all' ||
-        (statusFilter === 'active' && isActive) ||
-        (statusFilter === 'draft' && !isActive);
+        debouncedStatusFilter === 'all' ||
+        (debouncedStatusFilter === 'active' && isActive) ||
+        (debouncedStatusFilter === 'draft' && !isActive);
       
       return matchesSearch && matchesType && matchesStatus;
     });
@@ -175,7 +177,7 @@ export const DigitalProductsList = () => {
     });
 
     return filtered;
-  }, [products, debouncedSearch, filterType, sortBy, statusFilter]);
+  }, [products, debouncedSearch, debouncedFilterType, sortBy, debouncedStatusFilter]);
 
   /**
    * Pagination - Maintenant gérée côté serveur

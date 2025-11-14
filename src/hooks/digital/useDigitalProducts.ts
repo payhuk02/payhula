@@ -406,15 +406,32 @@ export const useDigitalProducts = (
           itemsPerPage,
           totalPages: Math.ceil((totalCount || 0) / itemsPerPage),
         };
-      } catch (error: any) {
-        console.error('Erreur dans useDigitalProducts:', error);
-        // Re-lancer l'erreur avec un message plus clair
-        throw new Error(error.message || 'Impossible de charger les produits digitaux. Veuillez réessayer.');
+      } catch (error: unknown) {
+        // Logger l'erreur avec contexte
+        logger.error('Erreur dans useDigitalProducts', {
+          error: error instanceof Error ? error.message : String(error),
+          storeId,
+          page,
+          itemsPerPage,
+          sortBy,
+        });
+        
+        // Re-lancer l'erreur pour que React Query la gère
+        throw error;
       }
     },
     enabled: true,
-    retry: 1, // Réessayer une fois en cas d'erreur
-    retryDelay: 1000, // Attendre 1 seconde avant de réessayer
+    retry: (failureCount, error) => {
+      // Importer dynamiquement pour éviter dépendance circulaire
+      const { shouldRetryError } = require('@/lib/error-handling');
+      return shouldRetryError(error, failureCount);
+    },
+    retryDelay: (attemptIndex) => {
+      const { getRetryDelay } = require('@/lib/error-handling');
+      return getRetryDelay(attemptIndex);
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (anciennement cacheTime)
   });
 };
 

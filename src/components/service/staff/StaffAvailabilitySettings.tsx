@@ -5,17 +5,19 @@
  * Paramètres de disponibilité du staff
  */
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
 import { Settings, Save, Loader2 } from 'lucide-react';
+import {
+  useStaffAvailabilitySettings,
+  useUpdateStaffAvailabilitySettings,
+  type StaffAvailabilitySettings as SettingsType,
+} from '@/hooks/service/useStaffAvailabilitySettings';
 
 interface StaffAvailabilitySettingsProps {
   storeId: string;
@@ -26,50 +28,47 @@ export function StaffAvailabilitySettings({
   storeId,
   serviceId,
 }: StaffAvailabilitySettingsProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  // Charger les paramètres depuis la base de données
+  const { data: settings, isLoading } = useStaffAvailabilitySettings(storeId, serviceId);
+  const updateSettingsMutation = useUpdateStaffAvailabilitySettings();
 
-  const [settings, setSettings] = useState({
-    autoBlockOnTimeOff: true,
-    maxBookingsPerDay: 8,
-    bookingDensityWarningThreshold: 70,
-    bookingDensityCriticalThreshold: 85,
-    defaultWorkHoursStart: '09:00',
-    defaultWorkHoursEnd: '18:00',
-    bufferTimeBetweenBookings: 15,
-  });
+  // État local pour les modifications (avant sauvegarde)
+  const [localSettings, setLocalSettings] = useState<Partial<SettingsType>>({});
 
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Load settings (if stored in database)
-  const { isLoading } = useQuery({
-    queryKey: ['staff-availability-settings', storeId],
-    queryFn: async () => {
-      // TODO: Load from database if settings table exists
-      return settings;
-    },
-    enabled: false, // Disabled for now, using local state
-  });
+  // Initialiser localSettings avec les données chargées
+  useEffect(() => {
+    if (settings) {
+      setLocalSettings({
+        auto_block_on_time_off: settings.auto_block_on_time_off,
+        max_bookings_per_day: settings.max_bookings_per_day,
+        booking_density_warning_threshold: settings.booking_density_warning_threshold,
+        booking_density_critical_threshold: settings.booking_density_critical_threshold,
+        default_work_hours_start: settings.default_work_hours_start,
+        default_work_hours_end: settings.default_work_hours_end,
+        buffer_time_between_bookings: settings.buffer_time_between_bookings,
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      // TODO: Save to database
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+    if (!settings) return;
 
-      toast({
-        title: '✅ Paramètres sauvegardés',
-        description: 'Les paramètres de disponibilité ont été sauvegardés',
-      });
-    } catch (error: any) {
-      toast({
-        title: '❌ Erreur',
-        description: error.message || 'Impossible de sauvegarder les paramètres',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSaving(false);
-    }
+    updateSettingsMutation.mutate({
+      store_id: storeId,
+      service_id: serviceId,
+      ...localSettings,
+    });
+  };
+
+  // Utiliser les settings locaux ou les settings chargés
+  const currentSettings = {
+    autoBlockOnTimeOff: localSettings.auto_block_on_time_off ?? settings?.auto_block_on_time_off ?? true,
+    maxBookingsPerDay: localSettings.max_bookings_per_day ?? settings?.max_bookings_per_day ?? 8,
+    bookingDensityWarningThreshold: localSettings.booking_density_warning_threshold ?? settings?.booking_density_warning_threshold ?? 70,
+    bookingDensityCriticalThreshold: localSettings.booking_density_critical_threshold ?? settings?.booking_density_critical_threshold ?? 85,
+    defaultWorkHoursStart: localSettings.default_work_hours_start ?? settings?.default_work_hours_start ?? '09:00',
+    defaultWorkHoursEnd: localSettings.default_work_hours_end ?? settings?.default_work_hours_end ?? '18:00',
+    bufferTimeBetweenBookings: localSettings.buffer_time_between_bookings ?? settings?.buffer_time_between_bookings ?? 15,
   };
 
   if (isLoading) {
@@ -107,9 +106,9 @@ export function StaffAvailabilitySettings({
               </p>
             </div>
             <Switch
-              checked={settings.autoBlockOnTimeOff}
+              checked={currentSettings.autoBlockOnTimeOff}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, autoBlockOnTimeOff: checked })
+                setLocalSettings({ ...localSettings, auto_block_on_time_off: checked })
               }
             />
           </div>
@@ -121,11 +120,11 @@ export function StaffAvailabilitySettings({
               type="number"
               min={1}
               max={20}
-              value={settings.maxBookingsPerDay}
+              value={currentSettings.maxBookingsPerDay}
               onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  maxBookingsPerDay: parseInt(e.target.value) || 8,
+                setLocalSettings({
+                  ...localSettings,
+                  max_bookings_per_day: parseInt(e.target.value) || 8,
                 })
               }
             />
@@ -142,11 +141,11 @@ export function StaffAvailabilitySettings({
                 type="number"
                 min={0}
                 max={100}
-                value={settings.bookingDensityWarningThreshold}
+                value={currentSettings.bookingDensityWarningThreshold}
                 onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    bookingDensityWarningThreshold: parseInt(e.target.value) || 70,
+                  setLocalSettings({
+                    ...localSettings,
+                    booking_density_warning_threshold: parseInt(e.target.value) || 70,
                   })
                 }
               />
@@ -160,11 +159,11 @@ export function StaffAvailabilitySettings({
                 type="number"
                 min={0}
                 max={100}
-                value={settings.bookingDensityCriticalThreshold}
+                value={currentSettings.bookingDensityCriticalThreshold}
                 onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    bookingDensityCriticalThreshold: parseInt(e.target.value) || 85,
+                  setLocalSettings({
+                    ...localSettings,
+                    booking_density_critical_threshold: parseInt(e.target.value) || 85,
                   })
                 }
               />
@@ -180,9 +179,9 @@ export function StaffAvailabilitySettings({
               <Label>Heure de début par défaut</Label>
               <Input
                 type="time"
-                value={settings.defaultWorkHoursStart}
+                value={currentSettings.defaultWorkHoursStart}
                 onChange={(e) =>
-                  setSettings({ ...settings, defaultWorkHoursStart: e.target.value })
+                  setLocalSettings({ ...localSettings, default_work_hours_start: e.target.value })
                 }
               />
             </div>
@@ -190,9 +189,9 @@ export function StaffAvailabilitySettings({
               <Label>Heure de fin par défaut</Label>
               <Input
                 type="time"
-                value={settings.defaultWorkHoursEnd}
+                value={currentSettings.defaultWorkHoursEnd}
                 onChange={(e) =>
-                  setSettings({ ...settings, defaultWorkHoursEnd: e.target.value })
+                  setLocalSettings({ ...localSettings, default_work_hours_end: e.target.value })
                 }
               />
             </div>
@@ -205,11 +204,11 @@ export function StaffAvailabilitySettings({
               type="number"
               min={0}
               max={60}
-              value={settings.bufferTimeBetweenBookings}
+              value={currentSettings.bufferTimeBetweenBookings}
               onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  bufferTimeBetweenBookings: parseInt(e.target.value) || 15,
+                setLocalSettings({
+                  ...localSettings,
+                  buffer_time_between_bookings: parseInt(e.target.value) || 15,
                 })
               }
             />
@@ -220,8 +219,8 @@ export function StaffAvailabilitySettings({
 
           {/* Save Button */}
           <div className="flex justify-end pt-4 border-t">
-            <Button onClick={handleSave} disabled={isSaving}>
-              {isSaving ? (
+            <Button onClick={handleSave} disabled={updateSettingsMutation.isPending || isLoading}>
+              {updateSettingsMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Sauvegarde...

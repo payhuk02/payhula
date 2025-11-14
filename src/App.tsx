@@ -21,6 +21,7 @@ import { initSentry } from "@/lib/sentry";
 import { initWebVitals } from "@/lib/web-vitals";
 import * as Sentry from "@sentry/react";
 import { logger } from "@/lib/logger";
+import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 
 // Composant de chargement pour le lazy loading
 const LoadingFallback = () => (
@@ -311,11 +312,12 @@ const AppContent = () => {
   }, []);
 
   return (
-    <Sentry.ErrorBoundary 
-      fallback={<ErrorFallbackComponent />} 
-      showDialog
-    >
-      <PerformanceOptimizer />
+    <ErrorBoundary>
+      <Sentry.ErrorBoundary 
+        fallback={<ErrorFallbackComponent />} 
+        showDialog
+      >
+        <PerformanceOptimizer />
       <LoadingBar />
       <CurrencyRatesInitializer />
       <Require2FABanner position="top" />
@@ -527,7 +529,8 @@ const AppContent = () => {
       </Suspense>
       <CookieConsentBanner />
       <CrispChat />
-    </Sentry.ErrorBoundary>
+      </Sentry.ErrorBoundary>
+    </ErrorBoundary>
   );
 };
 
@@ -551,8 +554,17 @@ const queryClient = new QueryClient({
       networkMode: 'online', // Ne query que si online
     },
     mutations: {
-      // Retry pour les mutations aussi
-      retry: 1,
+      // Retry avec exponential backoff pour les mutations
+      // Note: Les hooks utilisant useMutationWithRetry auront leur propre config
+      retry: (failureCount, error) => {
+        // Importer dynamiquement pour éviter dépendance circulaire
+        const { shouldRetryError } = require('@/lib/error-handling');
+        return shouldRetryError(error, failureCount) && failureCount < 2; // Max 2 retries par défaut
+      },
+      retryDelay: (attemptIndex) => {
+        const { getRetryDelay } = require('@/lib/error-handling');
+        return getRetryDelay(attemptIndex, 1000, 30000);
+      },
       // Optimistic UI updates
       onMutate: async () => {
         // Cancel outgoing queries

@@ -49,6 +49,7 @@ import { PhysicalPreview } from './PhysicalPreview';
 import { PaymentOptionsForm } from '../shared/PaymentOptionsForm';
 import { useToast } from '@/hooks/use-toast';
 import { useStore } from '@/hooks/useStore';
+import { useWizardServerValidation } from '@/hooks/useWizardServerValidation';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -158,6 +159,22 @@ export const CreatePhysicalProductWizard = ({
   const headerRef = useScrollAnimation<HTMLDivElement>();
   const stepsRef = useScrollAnimation<HTMLDivElement>();
   const contentRef = useScrollAnimation<HTMLDivElement>();
+
+  // Use props or fallback to hook store
+  const storeId = propsStoreId || store?.id;
+
+  // Server validation hook
+  const {
+    validateSlug,
+    validateSku,
+    validatePhysicalProduct: validatePhysicalProductServer,
+    isValidating: isValidatingServer,
+    serverErrors,
+    clearServerErrors,
+  } = useWizardServerValidation({
+    storeId: storeId || undefined,
+    showToasts: true,
+  });
   
   const [formData, setFormData] = useState<Partial<any>>({
     // Basic Info (Step 1)
@@ -329,19 +346,110 @@ export const CreatePhysicalProductWizard = ({
   }, [formData, currentStep, applyTemplate, toast]);
 
   /**
-   * Validate current step
+   * Validate current step avec validation améliorée (client + serveur)
    */
-  const validateStep = useCallback((step: number): boolean => {
+  const validateStep = useCallback(async (step: number): Promise<boolean> => {
+    const { validateWithZod, formatValidators, getFieldError } = require('@/lib/wizard-validation');
+    const { physicalProductSchema } = require('@/lib/wizard-validation');
     const errors: string[] = [];
 
-    switch (step) {
-      case 1:
-        if (!formData.name?.trim()) errors.push(t('products.errors.nameRequired', 'Le nom est requis'));
-        if (!formData.description?.trim()) errors.push(t('products.errors.descriptionRequired', 'La description est requise'));
-        if (!formData.price || formData.price <= 0) errors.push(t('products.errors.priceRequired', 'Le prix doit être supérieur à 0'));
-        if (!formData.images || formData.images.length === 0) errors.push(t('products.errors.imageRequired', 'Au moins une image est requise'));
-        break;
+    // Réinitialiser les erreurs serveur
+    clearServerErrors();
 
+    switch (step) {
+      case 1: {
+        // 1. Validation client avec Zod
+        const result = validateWithZod(physicalProductSchema, {
+          name: formData.name,
+          slug: formData.slug,
+          description: formData.description,
+          price: formData.price,
+          sku: formData.sku,
+          weight: formData.weight,
+          quantity: formData.quantity,
+        });
+        
+        if (!result.valid) {
+          const nameError = getFieldError(result.errors, 'name');
+          const priceError = getFieldError(result.errors, 'price');
+          const skuError = getFieldError(result.errors, 'sku');
+          const weightError = getFieldError(result.errors, 'weight');
+          const quantityError = getFieldError(result.errors, 'quantity');
+          
+          if (nameError) errors.push(nameError);
+          if (priceError) errors.push(priceError);
+          if (skuError) errors.push(skuError);
+          if (weightError) errors.push(weightError);
+          if (quantityError) errors.push(quantityError);
+        }
+        
+        // 2. Validation format SKU si fourni (client)
+        if (formData.sku) {
+          const skuResult = formatValidators.sku(formData.sku);
+          if (!skuResult.valid) {
+            const skuFormatError = getFieldError(skuResult.errors, 'sku');
+            if (skuFormatError) errors.push(skuFormatError);
+          }
+        }
+        
+        // 3. Validation images
+        if (!formData.images || formData.images.length === 0) {
+          errors.push(t('products.errors.imageRequired', 'Au moins une image est requise'));
+        }
+        
+        // Si erreurs client, arrêter ici
+        if (errors.length > 0) {
+          setValidationErrors(prev => ({ ...prev, [step]: errors }));
+          return false;
+        }
+        
+        // 4. Validation serveur (unicité slug, SKU, etc.)
+        if (storeId) {
+          const serverResult = await validatePhysicalProductServer({
+            name: formData.name,
+            slug: formData.slug,
+            price: formData.price,
+            sku: formData.sku,
+            weight: formData.weight,
+            quantity: formData.quantity,
+          });
+          
+          if (!serverResult.valid) {
+            // Les erreurs sont déjà affichées dans le hook via toast
+            // Mais on les ajoute aussi aux erreurs de validation
+            if (serverResult.errors) {
+              serverResult.errors.forEach((err) => {
+                errors.push(err.message);
+              });
+            }
+            logger.warn('Validation serveur échouée - Étape 1', { errors: serverResult.errors });
+            setValidationErrors(prev => ({ ...prev, [step]: errors }));
+            return false;
+          }
+          
+          // Validation slug spécifique si fourni
+          if (formData.slug) {
+            const slugValid = await validateSlug(formData.slug);
+            if (!slugValid) {
+              errors.push(serverErrors.slug || 'Slug invalide');
+              setValidationErrors(prev => ({ ...prev, [step]: errors }));
+              return false;
+            }
+          }
+          
+          // Validation SKU spécifique si fourni
+          if (formData.sku) {
+            const skuValid = await validateSku(formData.sku);
+            if (!skuValid) {
+              errors.push(serverErrors.sku || 'SKU invalide');
+              setValidationErrors(prev => ({ ...prev, [step]: errors }));
+              return false;
+            }
+          }
+        }
+        
+        break;
+      }
       case 2:
         if (formData.has_variants) {
           if (!formData.options || formData.options.length === 0) {
@@ -385,13 +493,14 @@ export const CreatePhysicalProductWizard = ({
     }
     
     return isValid;
-  }, [formData, t]);
+  }, [formData, t, storeId, validatePhysicalProductServer, validateSlug, validateSku, serverErrors, clearServerErrors]);
 
   /**
    * Navigation handlers
    */
-  const handleNext = useCallback(() => {
-    if (validateStep(currentStep)) {
+  const handleNext = useCallback(async () => {
+    const isValid = await validateStep(currentStep);
+    if (isValid) {
       const nextStepNum = currentStep + 1;
       setCurrentStep(nextStepNum);
       logger.info('Navigation vers étape suivante', { from: currentStep, to: nextStepNum });

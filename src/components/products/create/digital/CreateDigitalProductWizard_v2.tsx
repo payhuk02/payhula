@@ -40,6 +40,7 @@ import { generateSlug } from '@/lib/store-utils';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
+import { useWizardServerValidation } from '@/hooks/useWizardServerValidation';
 
 // Step components
 import { DigitalBasicInfoForm } from './DigitalBasicInfoForm';
@@ -132,6 +133,19 @@ export const CreateDigitalProductWizard = ({
 
   // Use props or fallback to hook store
   const storeId = propsStoreId || store?.id;
+
+  // Server validation hook
+  const {
+    validateSlug,
+    validateVersion,
+    validateDigitalProduct: validateDigitalProductServer,
+    isValidating: isValidatingServer,
+    serverErrors,
+    clearServerErrors,
+  } = useWizardServerValidation({
+    storeId: storeId || undefined,
+    showToasts: true,
+  });
   const storeSlug = propsStoreSlug || store?.slug;
 
   const [formData, setFormData] = useState<any>({
@@ -303,21 +317,82 @@ export const CreateDigitalProductWizard = ({
   }, [formData, currentStep, applyTemplate, toast]);
 
   /**
-   * Validate current step
+   * Validate current step avec validation améliorée (client + serveur)
    */
-  const validateStep = useCallback((step: number): boolean => {
+  const validateStep = useCallback(async (step: number): Promise<boolean> => {
+    const { validateWithZod, formatValidators, getFieldError } = require('@/lib/wizard-validation');
+    const { digitalProductSchema } = require('@/lib/wizard-validation');
+    
+    // Réinitialiser les erreurs serveur
+    clearServerErrors();
+    
     switch (step) {
-      case 1:
-        if (!formData.name || !formData.price) {
+      case 1: {
+        // 1. Validation client avec Zod
+        const result = validateWithZod(digitalProductSchema, {
+          name: formData.name,
+          slug: formData.slug,
+          description: formData.description,
+          price: formData.price,
+          version: formData.version,
+        });
+        
+        if (!result.valid) {
+          const nameError = getFieldError(result.errors, 'name');
+          const priceError = getFieldError(result.errors, 'price');
+          const versionError = getFieldError(result.errors, 'version');
+          
           toast({
             title: t('wizard.errors.title', 'Erreur'),
-            description: t('wizard.errors.requiredFields', 'Veuillez remplir tous les champs obligatoires'),
+            description: nameError || priceError || versionError || t('wizard.errors.requiredFields', 'Veuillez remplir tous les champs obligatoires'),
             variant: 'destructive',
           });
-          logger.warn('Validation échouée - Étape 1', { hasName: !!formData.name, hasPrice: !!formData.price });
+          logger.warn('Validation client échouée - Étape 1', { errors: result.errors });
           return false;
         }
+        
+        // 2. Validation format version si fournie (client)
+        if (formData.version) {
+          const versionResult = formatValidators.version(formData.version);
+          if (!versionResult.valid) {
+            toast({
+              title: t('wizard.errors.title', 'Erreur'),
+              description: getFieldError(versionResult.errors, 'version') || 'Format de version invalide',
+              variant: 'destructive',
+            });
+            return false;
+          }
+        }
+        
+        // 3. Validation serveur (unicité slug, version, etc.)
+        if (storeId) {
+          const serverResult = await validateDigitalProductServer({
+            name: formData.name,
+            slug: formData.slug,
+            price: formData.price,
+          });
+          
+          if (!serverResult.valid) {
+            // Les erreurs sont déjà affichées dans le hook via toast
+            logger.warn('Validation serveur échouée - Étape 1', { errors: serverResult.errors });
+            return false;
+          }
+          
+          // Validation slug spécifique si fourni
+          if (formData.slug) {
+            const slugValid = await validateSlug(formData.slug);
+            if (!slugValid) {
+              return false;
+            }
+          }
+          
+          // Validation version spécifique si fournie (nécessite productId pour vérifier unicité)
+          // Note: Pour création, on ne peut pas valider l'unicité de version sans productId
+          // Cette validation sera faite lors de la création du produit
+        }
+        
         return true;
+      }
       case 2:
         if (!formData.main_file_url && (!formData.downloadable_files || formData.downloadable_files.length === 0)) {
           toast({
@@ -342,8 +417,9 @@ export const CreateDigitalProductWizard = ({
   /**
    * Navigation handlers
    */
-  const handleNext = useCallback(() => {
-    if (validateStep(currentStep)) {
+  const handleNext = useCallback(async () => {
+    const isValid = await validateStep(currentStep);
+    if (isValid) {
       const nextStep = Math.min(currentStep + 1, STEPS.length);
       setCurrentStep(nextStep);
       logger.info('Navigation vers étape suivante', { from: currentStep, to: nextStep });
@@ -362,12 +438,19 @@ export const CreateDigitalProductWizard = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
 
-  const handleStepClick = useCallback((stepId: number) => {
+  const handleStepClick = useCallback(async (stepId: number) => {
     // Permettre de revenir en arrière, mais valider avant d'avancer
-    if (stepId < currentStep || validateStep(currentStep)) {
+    if (stepId < currentStep) {
       setCurrentStep(stepId);
       logger.info('Navigation directe vers étape', { to: stepId });
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const isValid = await validateStep(currentStep);
+      if (isValid) {
+        setCurrentStep(stepId);
+        logger.info('Navigation directe vers étape', { to: stepId });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   }, [currentStep, validateStep]);
 
