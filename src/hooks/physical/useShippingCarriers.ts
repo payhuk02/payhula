@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
-import { DHLService, FedExService } from '@/integrations/shipping';
+import { DHLService, FedExService, UPSService } from '@/integrations/shipping';
 
 // =====================================================
 // TYPES
@@ -183,6 +183,37 @@ export const useCalculateCarrierRates = () => {
           weightUnit: 'kg',
           dimensions,
         });
+      } else if (carrier.carrier_name === 'UPS' || carrier.carrier_name === 'UPS_Express') {
+        const upsService = new UPSService({
+          apiKey: carrier.api_key || '',
+          apiSecret: carrier.api_secret || '',
+          accountNumber: carrier.account_number,
+          testMode: carrier.test_mode,
+        });
+        
+        const upsRates = await upsService.getRates({
+          from: {
+            country: from.country,
+            postalCode: from.postalCode,
+          },
+          to: {
+            country: to.country,
+            postalCode: to.postalCode,
+          },
+          weight,
+          weightUnit: 'kg',
+          dimensions,
+        });
+        
+        // Convertir format UPS vers format standard
+        rates = upsRates.map(rate => ({
+          serviceType: rate.serviceType,
+          serviceName: rate.serviceName,
+          totalPrice: rate.shippingCost,
+          currency: rate.currency,
+          estimatedDeliveryDays: rate.transitTime || 5,
+          estimatedDeliveryDate: rate.estimatedDelivery,
+        }));
       }
 
       return rates;

@@ -269,6 +269,9 @@ const PayBalanceList = lazy(() => import("./pages/payments/PayBalanceList"));
 const ShippingDashboard = lazy(() => import("./pages/shipping/ShippingDashboard"));
 const InventoryDashboard = lazy(() => import("./pages/inventory/InventoryDashboard"));
 const StoreAffiliateManagement = lazy(() => import("./pages/dashboard/StoreAffiliateManagement"));
+const DigitalProductUpdatesDashboard = lazy(() => import("./pages/digital/DigitalProductUpdatesDashboard"));
+const StaffAvailabilityCalendar = lazy(() => import("./pages/service/StaffAvailabilityCalendar"));
+const ResourceConflictManagement = lazy(() => import("./pages/service/ResourceConflictManagement"));
 
 // Pages Produits Physiques & Services - Détails
 const PhysicalProductDetail = lazy(() => import("./pages/physical/PhysicalProductDetail"));
@@ -431,8 +434,13 @@ const AppContent = () => {
           <Route path="/dashboard/licenses/manage/:id" element={<ProtectedRoute><LicenseManagement /></ProtectedRoute>} />
           <Route path="/dashboard/license-management" element={<ProtectedRoute><MyLicenses /></ProtectedRoute>} />
           <Route path="/dashboard/digital/analytics/:productId" element={<ProtectedRoute><DigitalProductAnalytics /></ProtectedRoute>} />
+          <Route path="/dashboard/digital/updates" element={<ProtectedRoute><DigitalProductUpdatesDashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/digital/updates/:productId" element={<ProtectedRoute><DigitalProductUpdatesDashboard /></ProtectedRoute>} />
           
           {/* --- Routes Services --- */}
+          <Route path="/dashboard/services/staff-availability" element={<ProtectedRoute><StaffAvailabilityCalendar /></ProtectedRoute>} />
+          <Route path="/dashboard/services/staff-availability/:serviceId" element={<ProtectedRoute><StaffAvailabilityCalendar /></ProtectedRoute>} />
+          <Route path="/dashboard/services/resource-conflicts" element={<ProtectedRoute><ResourceConflictManagement /></ProtectedRoute>} />
           <Route path="/dashboard/services/recurring-bookings" element={<ProtectedRoute><RecurringBookingsManagement /></ProtectedRoute>} />
 
           {/* --- Routes Templates --- */}

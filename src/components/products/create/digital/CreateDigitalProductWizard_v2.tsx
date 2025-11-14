@@ -457,7 +457,7 @@ export const CreateDigitalProductWizard = ({
       const mainFileFormat = mainFile?.type?.split('/')[1] || 
                              mainFile?.name?.split('.').pop() || 'unknown';
 
-      // 3. Create digital_product
+      // 3. Create digital_product (CORRECTION: Sauvegarde complète dans digital_products)
       const { data: digitalProduct, error: digitalError} = await supabase
         .from('digital_products')
         .insert({
@@ -469,21 +469,54 @@ export const CreateDigitalProductWizard = ({
                           (formData.license_type === 'unlimited' ? -1 : 
                            formData.license_type === 'multi' ? 5 : 1),
           allow_license_transfer: formData.allow_license_transfer || false,
+          license_key_format: formData.license_key_format || 'XXXX-XXXX-XXXX-XXXX',
           auto_generate_keys: formData.auto_generate_keys !== false,
           main_file_url: formData.main_file_url || (mainFile?.url || ''),
           main_file_size_mb: mainFile ? (mainFile.size / (1024 * 1024)) : 0,
           main_file_format: mainFileFormat,
           main_file_version: formData.main_file_version || '1.0',
+          main_file_hash: formData.main_file_hash || null, // Hash pour intégrité
           total_files: formData.downloadable_files?.length || 1,
           total_size_mb: totalSizeMB,
+          additional_files: formData.additional_files || [],
           download_limit: formData.download_limit || 5,
           download_expiry_days: formData.download_expiry_days || 30,
           require_registration: formData.require_registration !== false,
           watermark_enabled: formData.watermark_enabled || false,
           watermark_text: formData.watermark_text || '',
+          // Protection avancée
+          ip_restriction_enabled: formData.ip_restriction_enabled || false,
+          max_ips_allowed: formData.max_ips_allowed || 3,
+          geo_restriction_enabled: formData.geo_restriction_enabled || false,
+          allowed_countries: formData.allowed_countries || null,
+          blocked_countries: formData.blocked_countries || null,
+          // Updates & Versioning
           version: formData.version || '1.0',
+          changelog: formData.changelog || null,
+          auto_update_enabled: formData.auto_update_enabled || false,
+          update_notifications: formData.update_notifications !== false,
+          // Preview & Demo
+          has_preview: formData.has_preview || false,
+          preview_url: formData.preview_url || null,
+          preview_duration_seconds: formData.preview_duration_seconds || null,
+          demo_available: formData.demo_available || false,
+          demo_url: formData.demo_url || null,
+          trial_period_days: formData.trial_period_days || null,
+          // Advanced Features
+          source_code_included: formData.source_code_included || false,
+          documentation_url: formData.documentation_url || null,
+          support_period_days: formData.support_period_days || null,
+          support_email: formData.support_email || null,
+          compatible_os: formData.compatible_os || null,
+          minimum_requirements: formData.minimum_requirements || null,
+          // Statistics (initialisés à 0)
           total_downloads: 0,
           unique_downloaders: 0,
+          total_revenue: 0,
+          average_download_time_seconds: 0,
+          bounce_rate: 0,
+          average_rating: 0,
+          total_reviews: 0,
         })
         .select()
         .single();

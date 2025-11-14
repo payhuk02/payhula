@@ -334,3 +334,170 @@ export const useTrackVersionDownload = () => {
   });
 };
 
+/**
+ * useProductUpdates - Récupère les mises à jour d'un produit digital
+ */
+export const useProductUpdates = (digitalProductId: string | undefined) => {
+  return useQuery({
+    queryKey: ['productUpdates', digitalProductId],
+    queryFn: async () => {
+      if (!digitalProductId) throw new Error('Digital Product ID manquant');
+
+      const { data, error } = await supabase
+        .from('digital_product_updates')
+        .select('*')
+        .eq('digital_product_id', digitalProductId)
+        .order('release_date', { ascending: false });
+
+      if (error) {
+        logger.error('Error fetching product updates', { error, digitalProductId });
+        throw error;
+      }
+
+      return (data || []) as DigitalProductUpdate[];
+    },
+    enabled: !!digitalProductId,
+  });
+};
+
+/**
+ * useCreateProductUpdate - Crée une nouvelle mise à jour
+ */
+export const useCreateProductUpdate = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (updateData: {
+      digital_product_id: string;
+      version: string;
+      previous_version?: string;
+      release_type: 'major' | 'minor' | 'patch' | 'hotfix';
+      title: string;
+      description?: string;
+      changelog: string;
+      file_url: string;
+      file_size_mb?: number;
+      file_hash?: string;
+      is_published?: boolean;
+      is_forced?: boolean;
+    }) => {
+      const { data, error } = await supabase
+        .from('digital_product_updates')
+        .insert({
+          ...updateData,
+          release_date: new Date().toISOString(),
+          download_count: 0,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as DigitalProductUpdate;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['productUpdates', data.digital_product_id] });
+      queryClient.invalidateQueries({ queryKey: ['digitalProducts'] });
+      toast({
+        title: '✅ Mise à jour créée',
+        description: `La mise à jour ${data.version} a été créée avec succès`,
+      });
+    },
+    onError: (error: any) => {
+      logger.error('Error creating product update', { error });
+      toast({
+        title: '❌ Erreur',
+        description: error.message || 'Impossible de créer la mise à jour',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * useUpdateProductUpdate - Met à jour une mise à jour existante
+ */
+export const useUpdateProductUpdate = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      updateId,
+      updates,
+    }: {
+      updateId: string;
+      updates: Partial<DigitalProductUpdate>;
+    }) => {
+      const { data, error } = await supabase
+        .from('digital_product_updates')
+        .update(updates)
+        .eq('id', updateId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as DigitalProductUpdate;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['productUpdates', data.digital_product_id] });
+      toast({
+        title: '✅ Mise à jour modifiée',
+        description: 'La mise à jour a été modifiée avec succès',
+      });
+    },
+    onError: (error: any) => {
+      logger.error('Error updating product update', { error });
+      toast({
+        title: '❌ Erreur',
+        description: error.message || 'Impossible de modifier la mise à jour',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * useDeleteProductUpdate - Supprime une mise à jour
+ */
+export const useDeleteProductUpdate = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (updateId: string) => {
+      // Récupérer le digital_product_id avant suppression
+      const { data: update } = await supabase
+        .from('digital_product_updates')
+        .select('digital_product_id')
+        .eq('id', updateId)
+        .single();
+
+      const { error } = await supabase
+        .from('digital_product_updates')
+        .delete()
+        .eq('id', updateId);
+
+      if (error) throw error;
+      return update?.digital_product_id;
+    },
+    onSuccess: (digitalProductId) => {
+      if (digitalProductId) {
+        queryClient.invalidateQueries({ queryKey: ['productUpdates', digitalProductId] });
+      }
+      toast({
+        title: '✅ Mise à jour supprimée',
+        description: 'La mise à jour a été supprimée avec succès',
+      });
+    },
+    onError: (error: any) => {
+      logger.error('Error deleting product update', { error });
+      toast({
+        title: '❌ Erreur',
+        description: error.message || 'Impossible de supprimer la mise à jour',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
