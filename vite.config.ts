@@ -90,15 +90,20 @@ export default defineConfig(({ mode }) => {
   },
   build: {
     rollupOptions: {
-      preserveEntrySignatures: 'allow-extension',
+      // CRITIQUE: 'strict' garantit l'ordre de chargement des chunks
+      // React sera chargé avant tous les chunks qui en dépendent (Radix UI, etc.)
+      preserveEntrySignatures: 'strict',
       output: {
         // Code splitting réactivé avec stratégie optimisée
+        // IMPORTANT: React doit rester dans le chunk principal pour éviter l'erreur forwardRef sur Vercel
         // Séparation intelligente des chunks pour améliorer les performances
         // Amélioration: Réduction du bundle initial de ~40-60%
         manualChunks: (id) => {
-          // React et React DOM dans le chunk principal (chargé en premier)
+          // CRITIQUE: React et React DOM dans le chunk principal (undefined)
+          // Ne pas séparer React pour garantir qu'il est chargé avant tous les composants
+          // Cela évite l'erreur "Cannot read properties of undefined (reading 'forwardRef')"
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react-vendor';
+            return undefined; // Garder dans le chunk principal
           }
           
           // React Router dans un chunk séparé
@@ -117,6 +122,7 @@ export default defineConfig(({ mode }) => {
           }
           
           // Radix UI components (groupe tous les composants UI)
+          // IMPORTANT: Chargé après React grâce à preserveEntrySignatures
           if (id.includes('node_modules/@radix-ui')) {
             return 'radix-ui';
           }
