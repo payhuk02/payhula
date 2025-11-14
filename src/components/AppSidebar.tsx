@@ -55,7 +55,6 @@ import {
   Camera,
   Globe,
   Trophy,
-  ArrowRight,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -868,8 +867,6 @@ export function AppSidebar() {
                     logger.warn(`Menu item missing icon: ${item.title}`);
                     return null;
                   }
-                  // Afficher une flèche pour "Mes Commandes", "Commandes Multi-Stores" et "Mes Téléchargements" pour améliorer la visibilité
-                  const showArrow = item.title === "Mes Commandes" || item.title === "Commandes Multi-Stores" || item.title === "Mes Téléchargements";
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
@@ -885,20 +882,10 @@ export function AppSidebar() {
                           }
                         >
                           <IconComponent 
-                            className={`${showArrow ? 'h-5 w-5 text-primary mr-2' : 'h-4 w-4 !text-black'} flex-shrink-0`}
-                            style={showArrow ? { strokeWidth: 2.5 } : undefined}
+                            className="h-4 w-4 !text-black flex-shrink-0"
                           />
                           {!isCollapsed && (
-                            <>
-                              <span className={`flex-1 ${showArrow ? 'font-semibold' : 'font-medium'} !text-black`}>{item.title}</span>
-                              {showArrow && (
-                                <ArrowRight 
-                                  className="h-5 w-5 ml-auto flex-shrink-0 text-primary opacity-90 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" 
-                                  style={{ strokeWidth: 2.5 }}
-                                  aria-hidden="true"
-                                />
-                              )}
-                            </>
+                            <span className="flex-1 font-medium !text-black">{item.title}</span>
                           )}
                         </NavLink>
                       </SidebarMenuButton>
