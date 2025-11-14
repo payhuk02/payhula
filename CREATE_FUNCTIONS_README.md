@@ -1,4 +1,4 @@
-# 🔧 Création des Fonctions Supabase Manquantes
+﻿# 🔧 Création des Fonctions Supabase Manquantes
 
 ## 📋 Problème Identifié
 
@@ -13,7 +13,7 @@ Lors de la vérification de la base de données Supabase, deux fonctions personn
 
 1. **Ouvrez votre projet Supabase**
    ```
-   https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+   https://supabase.com/dashboard/project/your-project-id
    ```
 
 2. **Allez dans SQL Editor**

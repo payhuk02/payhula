@@ -21,14 +21,14 @@ Votre fichier .env contenant vos **clés Supabase** a été **commité et rendu 
 
 **Comment faire :**
 
-1. Allez sur https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/settings/api
+1. Allez sur https://app.supabase.com/project/your-project-id/settings/api
 2. Cliquez sur **"Reset anon/public key"** ou **"Rotate keys"**
 3. Copiez la nouvelle clé dans votre fichier .env local
 4. **NE JAMAIS** commiter ce fichier
 
 ### 2. VÉRIFIER L'ACCÈS À VOTRE BASE DE DONNÉES
 
-1. Allez sur https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/auth/users
+1. Allez sur https://app.supabase.com/project/your-project-id/auth/users
 2. Vérifiez s'il y a des utilisateurs suspects
 3. Vérifiez vos logs d'accès
 
@@ -75,8 +75,8 @@ git push origin main --force
 Votre fichier .env local doit maintenant ressembler à :
 
 \\\env
-VITE_SUPABASE_PROJECT_ID="hbdnzajbyjakdhuavrvb"
-VITE_SUPABASE_URL="https://hbdnzajbyjakdhuavrvb.supabase.co"
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
 VITE_SUPABASE_PUBLISHABLE_KEY="NOUVELLE_CLÉ_RÉGÉNÉRÉE_ICI"
 \\\
 

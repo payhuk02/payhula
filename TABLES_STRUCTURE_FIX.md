@@ -1,4 +1,4 @@
-# 🔧 Correction de l'Erreur "column oi.product_name does not exist"
+﻿# 🔧 Correction de l'Erreur "column oi.product_name does not exist"
 
 ## ❌ Problème Identifié
 
@@ -148,7 +148,7 @@ LIMIT 5;
 
 ### **1. Exécuter le SQL dans Supabase**
 ```
-1. Ouvrez : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. Ouvrez : https://supabase.com/dashboard/project/your-project-id
 2. Allez dans "SQL Editor"
 3. Copiez le contenu de : supabase/functions/fix-tables-structure.sql
 4. Exécutez le SQL

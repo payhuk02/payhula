@@ -1,4 +1,4 @@
-# 🔧 Instructions pour Exécuter la Migration
+﻿# 🔧 Instructions pour Exécuter la Migration
 
 ## 📋 Problème
 
@@ -17,7 +17,7 @@ Une nouvelle migration a été créée : `20250202_fix_get_user_product_recommen
 supabase status
 
 # Si vous n'êtes pas connecté, lier votre projet
-supabase link --project-ref hbdnzajbyjakdhuavrvb
+supabase link --project-ref your-project-id
 ```
 
 ### Étape 2 : Pousser la migration
@@ -35,7 +35,7 @@ supabase migration up
 ### Étape 1 : Accéder au SQL Editor
 
 1. Aller sur https://supabase.com/dashboard
-2. Sélectionner votre projet : `hbdnzajbyjakdhuavrvb`
+2. Sélectionner votre projet : `your-project-id`
 3. Aller dans **SQL Editor** (menu de gauche)
 4. Cliquer sur **New Query**
 
@@ -71,7 +71,7 @@ Vous devriez voir la fonction listée.
 
 ### Option A : Via Supabase Dashboard
 
-1. Aller sur https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/sql/new
+1. Aller sur https://supabase.com/dashboard/project/your-project-id/sql/new
 2. Copier le contenu de `FIX_GET_USER_PRODUCT_RECOMMENDATIONS.sql`
 3. Coller dans l'éditeur
 4. Cliquer sur **Run**

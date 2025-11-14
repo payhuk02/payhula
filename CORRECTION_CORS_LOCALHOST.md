@@ -1,10 +1,10 @@
-# 🔧 Correction du Problème CORS pour Localhost
+﻿# 🔧 Correction du Problème CORS pour Localhost
 
 ## 🔴 Problème Identifié
 
 L'erreur CORS suivante apparaît lors du développement local :
 ```
-Access to fetch at 'https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo' 
+Access to fetch at 'https://your-project-id.supabase.co/functions/v1/moneroo' 
 from origin 'http://localhost:8080' has been blocked by CORS policy: 
 Response to preflight request doesn't pass access control check: 
 The 'Access-Control-Allow-Origin' header has a value 'https://payhula.vercel.app/' 
@@ -37,7 +37,7 @@ L'Edge Function Moneroo a été modifiée pour :
 ### Option 1 : Via Supabase Dashboard (Recommandé)
 
 1. **Aller sur Supabase Dashboard :**
-   - https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+   - https://supabase.com/dashboard/project/your-project-id/functions/moneroo/code
 
 2. **Copier le code mis à jour :**
    - Ouvrir `supabase/functions/moneroo/index.ts`
@@ -78,7 +78,7 @@ Après le redéploiement :
    - ✅ Les logs Supabase montrent les requêtes POST
 
 4. **Vérifier les logs Supabase :**
-   - Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/logs
+   - Aller sur : https://supabase.com/dashboard/project/your-project-id/functions/moneroo/logs
    - Vérifier que les requêtes POST apparaissent (pas seulement OPTIONS)
 
 ## 📝 Notes Importantes

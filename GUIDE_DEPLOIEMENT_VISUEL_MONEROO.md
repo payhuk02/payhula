@@ -1,8 +1,8 @@
-# 🚀 Guide de Déploiement Visuel - Edge Function Moneroo
+﻿# 🚀 Guide de Déploiement Visuel - Edge Function Moneroo
 
 ## ❌ Problème Actuel
 
-**Erreur 404 :** `POST https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo 404 (Not Found)`
+**Erreur 404 :** `POST https://your-project-id.supabase.co/functions/v1/moneroo 404 (Not Found)`
 
 **Cause :** L'Edge Function `moneroo` n'est pas déployée dans Supabase Dashboard.
 

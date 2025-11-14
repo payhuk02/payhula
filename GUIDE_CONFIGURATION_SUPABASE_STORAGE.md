@@ -1,4 +1,4 @@
-# 📦 GUIDE - Configuration Supabase Storage pour les Vidéos
+﻿# 📦 GUIDE - Configuration Supabase Storage pour les Vidéos
 
 **Date** : 27 octobre 2025  
 **Phase** : Phase 3 - Upload de vidéos  
@@ -18,7 +18,7 @@ Configurer le bucket Supabase Storage "videos" pour permettre aux enseignants d'
 
 1. Aller sur https://supabase.com
 2. Se connecter avec votre compte
-3. Sélectionner votre projet : `hbdnzajbyjakdhuavrvb`
+3. Sélectionner votre projet : `your-project-id`
 
 ### ÉTAPE 2 : Exécuter la migration SQL
 

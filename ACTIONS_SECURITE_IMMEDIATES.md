@@ -1,4 +1,4 @@
-# 🚨 ACTIONS DE SÉCURITÉ IMMÉDIATES
+﻿# 🚨 ACTIONS DE SÉCURITÉ IMMÉDIATES
 
 **Date** : Janvier 2025  
 **Urgence** : 🔴 **CRITIQUE**
@@ -17,7 +17,7 @@ Les **clés Supabase sont exposées** dans l'historique Git et sont **toujours a
 
 ### Étape 1 : Accéder à Supabase
 
-1. Aller sur : https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/settings/api
+1. Aller sur : https://app.supabase.com/project/your-project-id/settings/api
 2. Noter l'ancienne clé (pour rollback si problème)
 
 ### Étape 2 : Régénérer la clé
@@ -30,8 +30,8 @@ Les **clés Supabase sont exposées** dans l'historique Git et sont **toujours a
 
 ```env
 # Nouveau fichier .env (local uniquement)
-VITE_SUPABASE_PROJECT_ID="hbdnzajbyjakdhuavrvb"
-VITE_SUPABASE_URL="https://hbdnzajbyjakdhuavrvb.supabase.co"
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
 VITE_SUPABASE_PUBLISHABLE_KEY="NOUVELLE_CLÉ_ICI"
 ```
 
@@ -48,7 +48,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY="NOUVELLE_CLÉ_ICI"
 
 ### Vérifier les logs Supabase
 
-1. Aller sur : https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/logs/explorer
+1. Aller sur : https://app.supabase.com/project/your-project-id/logs/explorer
 2. Filtrer :
    - Date : 7 derniers jours
    - Event : `auth.login`, `database.query`

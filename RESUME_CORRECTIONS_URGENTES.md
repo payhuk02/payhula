@@ -1,10 +1,10 @@
-# 🚨 Résumé des Corrections Urgentes
+﻿# 🚨 Résumé des Corrections Urgentes
 
 ## ❌ Problèmes Identifiés
 
 ### 1. **Erreur 404 sur l'Edge Function Moneroo** (CRITIQUE)
 ```
-POST https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo 404 (Not Found)
+POST https://your-project-id.supabase.co/functions/v1/moneroo 404 (Not Found)
 ```
 **Cause :** L'Edge Function `moneroo` n'est pas déployée ou le déploiement a échoué.
 

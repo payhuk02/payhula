@@ -1,4 +1,4 @@
-# 🖼️ Optimisation d'Images - Implémentation Complète
+﻿# 🖼️ Optimisation d'Images - Implémentation Complète
 
 ## 📋 Vue d'ensemble
 
@@ -214,7 +214,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 ### Vérifier que Image Transformations est activé
 
 1. **Aller sur Supabase Dashboard** : https://app.supabase.com
-2. **Sélectionner votre projet** : `hbdnzajbyjakdhuavrvb`
+2. **Sélectionner votre projet** : `your-project-id`
 3. **Aller dans Storage** → Cliquer sur votre bucket `store-images`
 4. **Settings** → Vérifier que "Image Transformations" est **ON**
 
@@ -230,7 +230,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 **Exemple d'URL générée** :
 ```
-https://hbdnzajbyjakdhuavrvb.supabase.co/storage/v1/object/public/store-images/user123/product-image/abc.jpg?width=600&quality=80&format=webp
+https://your-project-id.supabase.co/storage/v1/object/public/store-images/user123/product-image/abc.jpg?width=600&quality=80&format=webp
 ```
 
 ---

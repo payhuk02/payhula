@@ -1,4 +1,4 @@
-# 🔧 Correction de l'Erreur "column orders.order_number does not exist"
+﻿# 🔧 Correction de l'Erreur "column orders.order_number does not exist"
 
 ## ❌ Problème Identifié
 
@@ -122,7 +122,7 @@ ALTER COLUMN order_number SET NOT NULL;
 
 ### **1. Exécuter le SQL dans Supabase**
 ```
-1. Ouvrez : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. Ouvrez : https://supabase.com/dashboard/project/your-project-id
 2. Allez dans "SQL Editor"
 3. Copiez le contenu de : supabase/functions/fix-order-number-column.sql
 4. Exécutez le SQL

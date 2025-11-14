@@ -1,4 +1,4 @@
-# ⚡ SETUP RAPIDE - Storage Vidéos (1 minute)
+﻿# ⚡ SETUP RAPIDE - Storage Vidéos (1 minute)
 
 ---
 
@@ -6,7 +6,7 @@
 
 ### 1. Ouvrir Supabase Dashboard
 
-Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/sql/new
+Aller sur : https://supabase.com/dashboard/project/your-project-id/sql/new
 
 ### 2. Copier-Coller le script
 

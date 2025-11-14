@@ -1,4 +1,4 @@
-# 🔴 RAPPORT DE SÉCURITÉ CRITIQUE - CLÉS SUPABASE
+﻿# 🔴 RAPPORT DE SÉCURITÉ CRITIQUE - CLÉS SUPABASE
 
 **Date de l'audit** : Janvier 2025  
 **Statut** : 🔴 **ACTION URGENTE REQUISE**
@@ -28,9 +28,9 @@ Le fichier `.env` contenant les **clés Supabase** a été **commité dans l'his
 ### Clés exposées dans l'historique :
 
 ```env
-VITE_SUPABASE_PROJECT_ID="hbdnzajbyjakdhuavrvb"
-VITE_SUPABASE_URL="https://hbdnzajbyjakdhuavrvb.supabase.co"
-VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiZG56YWpieWpha2RodWF2cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTgyMzEsImV4cCI6MjA3MzE3NDIzMX0.myur8r50wIORQwfcCP4D1ZxlhKFxICdVqjUM80CgtnM"
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your_supabase_anon_key_here"
 ```
 
 **⚠️ Ces clés sont toujours accessibles via :**
@@ -69,7 +69,7 @@ git show d96b5c5:.env
 ### 🔴 PRIORITÉ 1 : Régénérer les clés Supabase (IMMÉDIAT)
 
 1. **Accéder au dashboard Supabase**
-   - https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/settings/api
+   - https://app.supabase.com/project/your-project-id/settings/api
 
 2. **Régénérer la clé publique (anon key)**
    - Cliquer sur "Reset anon/public key"
@@ -93,7 +93,7 @@ git show d96b5c5:.env
 ### 🔴 PRIORITÉ 2 : Vérifier activité suspecte (IMMÉDIAT)
 
 1. **Vérifier les logs Supabase**
-   - https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/logs/explorer
+   - https://app.supabase.com/project/your-project-id/logs/explorer
    - Filtrer : 7 derniers jours
    - Rechercher : IPs suspectes, tentatives de login en masse
 

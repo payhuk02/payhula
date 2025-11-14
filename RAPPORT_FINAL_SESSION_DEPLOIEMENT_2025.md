@@ -1,4 +1,4 @@
-# 📊 RAPPORT FINAL - SESSION DÉPLOIEMENT PRODUCTION
+﻿# 📊 RAPPORT FINAL - SESSION DÉPLOIEMENT PRODUCTION
 
 **Date :** 26 Octobre 2025  
 **Projet :** Payhuk SaaS Platform  
@@ -215,7 +215,7 @@ $ npm run build
 ```bash
 # OBLIGATOIRES
 VITE_SUPABASE_URL=https://[PROJECT_ID].supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
 
 # OPTIONNELLES
 VITE_SENTRY_DSN=https://...@sentry.io/...

@@ -1,4 +1,4 @@
-# 🔧 Solution Endpoint Moneroo API - Erreur 404
+﻿# 🔧 Solution Endpoint Moneroo API - Erreur 404
 
 ## ❌ Problème Identifié
 
@@ -37,7 +37,7 @@ case 'create_checkout':
 ### Redéployer l'Edge Function avec le Code Corrigé
 
 1. **Ouvrez Supabase Dashboard**
-   - Allez sur : https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+   - Allez sur : https://app.supabase.com/project/your-project-id/functions/moneroo/code
 
 2. **Copiez le Code Corrigé**
    - Ouvrez `CODE_MONEROO_POUR_SUPABASE.txt`

@@ -1,13 +1,13 @@
-# 🚀 Guide de Déploiement de l'Edge Function Moneroo via Dashboard
+﻿# 🚀 Guide de Déploiement de l'Edge Function Moneroo via Dashboard
 
 ## 📋 Prérequis
 
-- Accès au projet Supabase : `https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb`
+- Accès au projet Supabase : `https://supabase.com/dashboard/project/your-project-id`
 - Le fichier `supabase/functions/moneroo/index.ts` doit être à jour avec les dernières corrections
 
 ## 🔴 ÉTAPE 1 : Accéder à l'Edge Function
 
-1. Allez sur [Supabase Dashboard](https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb)
+1. Allez sur [Supabase Dashboard](https://supabase.com/dashboard/project/your-project-id)
 2. Dans le menu de gauche, cliquez sur **Edge Functions** (icône avec des flèches circulaires)
 3. Cliquez sur la fonction **moneroo** dans la liste
 

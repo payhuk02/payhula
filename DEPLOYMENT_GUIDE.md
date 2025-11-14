@@ -1,4 +1,4 @@
-# 🚀 GUIDE DE DÉPLOIEMENT PRODUCTION - PAYHUK
+﻿# 🚀 GUIDE DE DÉPLOIEMENT PRODUCTION - PAYHUK
 
 **Date :** 26 Octobre 2025  
 **Version :** 1.0.0  
@@ -61,7 +61,7 @@
 ```bash
 # .env.local (ne pas committer)
 VITE_SUPABASE_URL=https://votre-project-id.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
 ```
 
 ---

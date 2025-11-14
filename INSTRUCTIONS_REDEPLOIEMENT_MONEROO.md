@@ -1,4 +1,4 @@
-# 🚀 Instructions de Redéploiement de l'Edge Function Moneroo
+﻿# 🚀 Instructions de Redéploiement de l'Edge Function Moneroo
 
 ## 📋 Situation Actuelle
 
@@ -44,9 +44,9 @@ Les corrections suivantes ont été apportées au code mais ne sont pas encore d
 
 2. **Lier le projet** :
    ```bash
-   supabase link --project-ref hbdnzajbyjakdhuavrvb
+   supabase link --project-ref your-project-id
    ```
-   - Remplacez `hbdnzajbyjakdhuavrvb` par votre project-ref si différent
+   - Remplacez `your-project-id` par votre project-ref si différent
    - Vous pouvez trouver le project-ref dans l'URL Supabase Dashboard
 
 3. **Déployer l'Edge Function** :

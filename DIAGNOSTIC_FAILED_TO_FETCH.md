@@ -1,4 +1,4 @@
-# 🔍 Diagnostic : Erreur "Failed to fetch"
+﻿# 🔍 Diagnostic : Erreur "Failed to fetch"
 
 ## 📋 Problème
 
@@ -55,7 +55,7 @@ L'erreur **"Failed to fetch"** apparaît lors de la tentative de paiement sur le
    - Si ancien, redéployer l'Edge Function
 
 3. **Tester l'URL directement** :
-   - Ouvrir : https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo
+   - Ouvrir : https://your-project-id.supabase.co/functions/v1/moneroo
    - Devrait retourner une réponse (même si c'est une erreur 400 pour une requête invalide)
 
 ### Solution 2: Redéployer l'Edge Function
@@ -123,8 +123,8 @@ Après résolution, le paiement devrait fonctionner et l'erreur "Failed to fetch
 
 ## 📚 Ressources
 
-- **URL Edge Function** : https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo
-- **Dashboard Supabase** : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions
+- **URL Edge Function** : https://your-project-id.supabase.co/functions/v1/moneroo
+- **Dashboard Supabase** : https://supabase.com/dashboard/project/your-project-id/functions
 - **Guide Redéploiement** : `DEPLOIEMENT_DASHBOARD_ETAPE_PAR_ETAPE.md`
 
 

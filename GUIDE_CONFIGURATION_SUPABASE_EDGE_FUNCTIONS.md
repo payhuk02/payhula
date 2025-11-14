@@ -1,4 +1,4 @@
-# 🔐 Guide de Configuration des Secrets Supabase Edge Functions
+﻿# 🔐 Guide de Configuration des Secrets Supabase Edge Functions
 
 ## 📋 Vue d'Ensemble
 
@@ -109,7 +109,7 @@ Ces secrets sont généralement déjà configurés automatiquement :
 
 2. **SUPABASE_SERVICE_ROLE_KEY**
    - Clé service role Supabase
-   - Format : `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+   - Format : `your_supabase_anon_key_here`
    - Déjà configuré automatiquement
 
 **⚠️ Vérifier** : Ces secrets doivent être présents dans la liste.

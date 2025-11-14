@@ -1,4 +1,4 @@
-# 🔧 Correction de l'Erreur "Failed to fetch"
+﻿# 🔧 Correction de l'Erreur "Failed to fetch"
 
 ## 📋 Résumé
 
@@ -62,7 +62,7 @@ Les messages d'erreur incluent maintenant :
 ### Étape 3 : Vérifier la Configuration
 
 1. Vérifiez que `VITE_SUPABASE_URL` est configuré dans `.env.local`
-2. Vérifiez que l'URL est correcte : `https://hbdnzajbyjakdhuavrvb.supabase.co`
+2. Vérifiez que l'URL est correcte : `https://your-project-id.supabase.co`
 3. Vérifiez que `MONEROO_API_KEY` est configuré dans Supabase Dashboard → Edge Functions → Secrets
 
 ### Étape 4 : Vérifier le Déploiement
@@ -87,7 +87,7 @@ Les messages d'erreur incluent maintenant :
 supabase login
 
 # Lier le projet
-supabase link --project-ref hbdnzajbyjakdhuavrvb
+supabase link --project-ref your-project-id
 
 # Déployer l'Edge Function
 supabase functions deploy moneroo
@@ -102,9 +102,9 @@ supabase functions deploy moneroo
 
 ## 🔗 URLs Utiles
 
-- **Edge Function URL:** `https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo`
-- **Supabase Dashboard:** `https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb`
-- **Logs Edge Function:** `https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/logs`
+- **Edge Function URL:** `https://your-project-id.supabase.co/functions/v1/moneroo`
+- **Supabase Dashboard:** `https://supabase.com/dashboard/project/your-project-id`
+- **Logs Edge Function:** `https://supabase.com/dashboard/project/your-project-id/functions/moneroo/logs`
 
 ## 💡 Notes Importantes
 

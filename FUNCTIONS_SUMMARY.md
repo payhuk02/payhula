@@ -1,4 +1,4 @@
-# 🎯 Résumé : Création des Fonctions Supabase Manquantes
+﻿# 🎯 Résumé : Création des Fonctions Supabase Manquantes
 
 ## ✅ Ce qui a été préparé
 
@@ -17,7 +17,7 @@
 
 ### 1. **Exécuter le SQL dans Supabase**
 ```
-1. Ouvrez : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. Ouvrez : https://supabase.com/dashboard/project/your-project-id
 2. Allez dans "SQL Editor"
 3. Copiez le contenu de : supabase/functions/create-missing-functions.sql
 4. Exécutez le SQL

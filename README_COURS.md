@@ -1,4 +1,4 @@
-# 🎓 FONCTIONNALITÉ COURS - PAYHUK
+﻿# 🎓 FONCTIONNALITÉ COURS - PAYHUK
 
 > **Statut** : ✅ **Phase 1 complétée à 85%**  
 > **Date** : 27 Octobre 2025  
@@ -20,7 +20,7 @@ Aller sur : http://localhost:5173/dashboard/products/new
 
 ### 2. Exécuter la migration (5 min)
 
-1. Aller sur https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. Aller sur https://supabase.com/dashboard/project/your-project-id
 2. SQL Editor → Nouvelle query
 3. Copier-coller : `supabase/migrations/20251027_courses_system_complete.sql`
 4. Cliquer "Run"

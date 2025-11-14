@@ -1,9 +1,9 @@
-# 🚨 ACTION IMMÉDIATE REQUISE - Déploiement Edge Function Moneroo
+﻿# 🚨 ACTION IMMÉDIATE REQUISE - Déploiement Edge Function Moneroo
 
 ## ❌ ERREUR ACTUELLE
 
 ```
-POST https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo 404 (Not Found)
+POST https://your-project-id.supabase.co/functions/v1/moneroo 404 (Not Found)
 ```
 
 **L'Edge Function `moneroo` n'est pas déployée dans Supabase.**
@@ -14,7 +14,7 @@ POST https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo 404 (Not Foun
 
 ### Étape 1 : Ouvrir Supabase Dashboard
 
-🔗 **Allez sur :** [https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/functions](https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/functions)
+🔗 **Allez sur :** [https://app.supabase.com/project/your-project-id/functions](https://app.supabase.com/project/your-project-id/functions)
 
 ### Étape 2 : Créer/Modifier la Fonction
 

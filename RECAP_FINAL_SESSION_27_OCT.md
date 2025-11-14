@@ -1,4 +1,4 @@
-# ✅ RÉCAPITULATIF FINAL - SESSION 27 OCTOBRE 2025
+﻿# ✅ RÉCAPITULATIF FINAL - SESSION 27 OCTOBRE 2025
 
 ---
 
@@ -135,7 +135,7 @@
 **Action requise** : Exécuter la migration dans Supabase
 
 **Comment** :
-1. Aller sur https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. Aller sur https://supabase.com/dashboard/project/your-project-id
 2. Cliquer sur "SQL Editor"
 3. Copier-coller le contenu de :
    ```

@@ -1,4 +1,4 @@
-# 🚀 Déploiement Edge Function Moneroo - Étape par Étape
+﻿# 🚀 Déploiement Edge Function Moneroo - Étape par Étape
 
 ## ⚡ Méthode Rapide via Dashboard (2 minutes)
 
@@ -92,8 +92,8 @@ Si après le redéploiement, l'erreur persiste :
 ## 📚 Ressources
 
 - **Code à déployer** : `supabase/functions/moneroo/index.ts`
-- **URL Edge Function** : `https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo`
-- **Dashboard Supabase** : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions
+- **URL Edge Function** : `https://your-project-id.supabase.co/functions/v1/moneroo`
+- **Dashboard Supabase** : https://supabase.com/dashboard/project/your-project-id/functions
 
 
 

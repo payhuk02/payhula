@@ -1,4 +1,4 @@
-# 🔧 Correction de l'Erreur de Relation "order_items/orders"
+﻿# 🔧 Correction de l'Erreur de Relation "order_items/orders"
 
 ## ❌ Problème Identifié
 
@@ -127,7 +127,7 @@ LIMIT 5;
 
 ### **1. Exécuter le SQL dans Supabase**
 ```
-1. Ouvrez : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. Ouvrez : https://supabase.com/dashboard/project/your-project-id
 2. Allez dans "SQL Editor"
 3. Copiez le contenu de : supabase/functions/fix-order-items-relationship.sql
 4. Exécutez le SQL

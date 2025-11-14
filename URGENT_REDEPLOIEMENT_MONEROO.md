@@ -1,4 +1,4 @@
-# ⚠️ URGENT : Redéploiement Edge Function Moneroo Requis
+﻿# ⚠️ URGENT : Redéploiement Edge Function Moneroo Requis
 
 ## 🔴 Problème Confirmé
 
@@ -45,7 +45,7 @@ D'après les logs Supabase Edge Functions :
 supabase login
 
 # 2. Lier le projet
-supabase link --project-ref hbdnzajbyjakdhuavrvb
+supabase link --project-ref your-project-id
 
 # 3. Déployer l'Edge Function
 supabase functions deploy moneroo

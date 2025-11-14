@@ -1,4 +1,4 @@
-# 🚀 GUIDE DE DÉPLOIEMENT PRODUCTION - PAYHUK
+﻿# 🚀 GUIDE DE DÉPLOIEMENT PRODUCTION - PAYHUK
 
 **Date** : 27 octobre 2025  
 **Plateforme** : Vercel + Supabase  
@@ -55,7 +55,7 @@ Créez `.env.production` :
 ```env
 # Supabase (PRODUCTION)
 VITE_SUPABASE_URL=https://VOTRE_PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 
 # App Configuration
 VITE_APP_NAME=Payhuk

@@ -1,4 +1,4 @@
-# 🚀 GUIDE DE CONFIGURATION VERCEL - PAYHUK
+﻿# 🚀 GUIDE DE CONFIGURATION VERCEL - PAYHUK
 
 > **Date** : Janvier 2025  
 > **Projet** : Payhuk Platform  
@@ -13,9 +13,9 @@
 Ces variables sont **déjà définies et protégées** :
 
 ```env
-VITE_SUPABASE_PROJECT_ID="hbdnzajbyjakdhuavrvb"
-VITE_SUPABASE_URL="https://hbdnzajbyjakdhuavrvb.supabase.co"
-VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiZG56YWpieWpha2RodWF2cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTgyMzEsImV4cCI6MjA3MzE3NDIzMX0.myur8r50wIORQwfcCP4D1ZxlhKFxICdVqjUM80CgtnM"
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your_supabase_anon_key_here"
 ```
 
 ---
@@ -36,9 +36,9 @@ Cliquer sur **Add New** et ajouter :
 
 ```env
 # Supabase
-VITE_SUPABASE_URL=https://hbdnzajbyjakdhuavrvb.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiZG56YWpieWpha2RodWF2cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTgyMzEsImV4cCI6MjA3MzE3NDIzMX0.myur8r50wIORQwfcCP4D1ZxlhKFxICdVqjUM80CgtnM
-VITE_SUPABASE_PROJECT_ID=hbdnzajbyjakdhuavrvb
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
+VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
 
 **Important** :
@@ -192,7 +192,7 @@ Si vous rencontrez des problèmes :
 ## 🔗 LIENS UTILES
 
 - **Vercel Dashboard** : https://vercel.com/dashboard
-- **Supabase Dashboard** : https://app.supabase.com/project/hbdnzajbyjakdhuavrvb
+- **Supabase Dashboard** : https://app.supabase.com/project/your-project-id
 - **GitHub Repository** : https://github.com/payhuk02/payhula.git
 - **Documentation Vercel** : https://vercel.com/docs
 - **Documentation Supabase** : https://supabase.com/docs

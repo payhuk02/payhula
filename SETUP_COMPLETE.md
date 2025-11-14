@@ -1,4 +1,4 @@
-# ✅ Configuration Complète - Page Boutique Payhuk
+﻿# ✅ Configuration Complète - Page Boutique Payhuk
 
 **Date :** 24 Octobre 2025  
 **Statut :** ✅ **OPÉRATIONNEL**
@@ -303,10 +303,10 @@ Actions :
 ## 🔗 Liens Utiles
 
 ### **Supabase Dashboard**
-- [Projet](https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb)
-- [Storage](https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/storage/buckets)
-- [SQL Editor](https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/sql/new)
-- [Tables](https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/editor)
+- [Projet](https://supabase.com/dashboard/project/your-project-id)
+- [Storage](https://supabase.com/dashboard/project/your-project-id/storage/buckets)
+- [SQL Editor](https://supabase.com/dashboard/project/your-project-id/sql/new)
+- [Tables](https://supabase.com/dashboard/project/your-project-id/editor)
 
 ### **Application**
 - [Local](http://localhost:8080/)

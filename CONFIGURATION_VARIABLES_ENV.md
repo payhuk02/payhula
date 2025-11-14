@@ -11,9 +11,9 @@
 Les variables Supabase suivantes sont **déjà définies et protégées** :
 
 ```env
-VITE_SUPABASE_PROJECT_ID="hbdnzajbyjakdhuavrvb"
-VITE_SUPABASE_URL="https://hbdnzajbyjakdhuavrvb.supabase.co"
-VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiZG56YWpieWpha2RodWF2cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTgyMzEsImV4cCI6MjA3MzE3NDIzMX0.myur8r50wIORQwfcCP4D1ZxlhKFxICdVqjUM80CgtnM"
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your_supabase_anon_key_here"
 ```
 
 ### ✅ Validation de la Configuration
@@ -25,8 +25,8 @@ VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJz
 ### 📝 Note sur PROJECT_ID
 
 Le `VITE_SUPABASE_PROJECT_ID` peut être extrait de l'URL Supabase :
-- URL : `https://hbdnzajbyjakdhuavrvb.supabase.co`
-- Project ID : `hbdnzajbyjakdhuavrvb`
+- URL : `https://your-project-id.supabase.co`
+- Project ID : `your-project-id`
 
 Cette variable est optionnelle mais peut être utile pour :
 - Configuration de certaines intégrations
@@ -71,9 +71,9 @@ Pour déployer sur Vercel, configurez les variables d'environnement dans :
 
 ```env
 # Supabase (OBLIGATOIRE)
-VITE_SUPABASE_URL=https://hbdnzajbyjakdhuavrvb.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_SUPABASE_PROJECT_ID=hbdnzajbyjakdhuavrvb
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
+VITE_SUPABASE_PROJECT_ID=your-project-id
 
 # Paiements (si utilisés)
 VITE_PAYDUNYA_MASTER_KEY=...
@@ -131,7 +131,7 @@ npm run dev
 
 ## 🔗 LIENS UTILES
 
-- **Supabase Dashboard** : https://app.supabase.com/project/hbdnzajbyjakdhuavrvb
+- **Supabase Dashboard** : https://app.supabase.com/project/your-project-id
 - **Documentation Supabase** : https://supabase.com/docs
 - **GitHub Repository** : https://github.com/payhuk02/payhula.git
 - **Vercel Dashboard** : https://vercel.com/dashboard

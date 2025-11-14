@@ -1,4 +1,4 @@
-# 📋 Résumé des Corrections Complètes
+﻿# 📋 Résumé des Corrections Complètes
 
 ## 🔴 Problèmes Identifiés
 
@@ -84,7 +84,7 @@ function getCorsOrigin(req: Request): string {
 #### Option A : Via Supabase Dashboard (Recommandé)
 
 1. **Aller sur :**
-   - https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+   - https://supabase.com/dashboard/project/your-project-id/functions/moneroo/code
 
 2. **Copier le code :**
    - Ouvrir `supabase/functions/moneroo/index.ts`
@@ -109,7 +109,7 @@ supabase functions deploy moneroo
 #### Option A : Via Supabase Dashboard (Recommandé)
 
 1. **Aller sur :**
-   - https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/sql/new
+   - https://supabase.com/dashboard/project/your-project-id/sql/new
 
 2. **Copier le script :**
    - Ouvrir `CREER_FONCTION_RECOMMENDATIONS_COMPLETE.sql`
@@ -153,7 +153,7 @@ supabase db execute --file CREER_FONCTION_RECOMMENDATIONS_COMPLETE.sql
    - ✅ Plus d'erreur "Failed to fetch"
 
 4. **Vérifier les logs Supabase :**
-   - Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/logs
+   - Aller sur : https://supabase.com/dashboard/project/your-project-id/functions/moneroo/logs
    - Vérifier que les requêtes POST apparaissent (pas seulement OPTIONS)
    - Vérifier les logs CORS : `origin: http://localhost:8080`, `allowedOrigin: http://localhost:8080`
 

@@ -1,4 +1,4 @@
-# ✅ Vérification Finale - État des Corrections
+﻿# ✅ Vérification Finale - État des Corrections
 
 ## 📊 État Actuel
 
@@ -57,7 +57,7 @@
 
 **Dans Supabase Dashboard :**
 
-1. **Vous êtes sur :** https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+1. **Vous êtes sur :** https://supabase.com/dashboard/project/your-project-id/functions/moneroo/code
 
 2. **Le code corrigé est affiché** avec :
    - ✅ Fonction `getCorsOrigin()` (lignes 5-27)
@@ -96,7 +96,7 @@
    - ✅ Les requêtes POST atteignent l'Edge Function
 
 4. **Vérifier les logs Supabase :**
-   - Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/logs
+   - Aller sur : https://supabase.com/dashboard/project/your-project-id/functions/moneroo/logs
    - ✅ Vérifier que les requêtes POST apparaissent (pas seulement OPTIONS)
    - ✅ Vérifier les logs CORS : 
      - `origin: http://localhost:8080`

@@ -1,4 +1,4 @@
-# 🎬 PROGRESSION PHASE 3 - UPLOAD DE VIDÉOS
+﻿# 🎬 PROGRESSION PHASE 3 - UPLOAD DE VIDÉOS
 
 **Date de début** : 27 octobre 2025  
 **Date de fin** : 27 octobre 2025  
@@ -248,7 +248,7 @@ Clique "Ajouter une vidéo"
 [VideoUploader] Progression: 75%
 [VideoUploader] Progression: 100%
 [VideoUploader] Upload terminé !
-[VideoUploader] URL publique: https://hbdnzajbyjakdhuavrvb.supabase.co/storage/v1/object/public/videos/course-videos/1730038800000-abc123.mp4
+[VideoUploader] URL publique: https://your-project-id.supabase.co/storage/v1/object/public/videos/course-videos/1730038800000-abc123.mp4
 [VideoUploader] Durée calculée: 625 secondes
 [CourseCurriculumBuilder] Leçon mise à jour: { video_type: 'upload', video_url: '...', video_duration_seconds: 625 }
 ```

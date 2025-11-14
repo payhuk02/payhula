@@ -1,4 +1,4 @@
-# 🎉 RÉSUMÉ SESSION - 27 OCTOBRE 2025
+﻿# 🎉 RÉSUMÉ SESSION - 27 OCTOBRE 2025
 
 ---
 
@@ -172,7 +172,7 @@
 
 #### Option Rapide (Supabase Dashboard)
 
-1. **Aller sur** : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+1. **Aller sur** : https://supabase.com/dashboard/project/your-project-id
 
 2. **Cliquer sur "SQL Editor"** (menu gauche)
 

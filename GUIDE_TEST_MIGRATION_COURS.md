@@ -1,4 +1,4 @@
-# 🧪 GUIDE DE TEST - MIGRATION COURS PAYHUK
+﻿# 🧪 GUIDE DE TEST - MIGRATION COURS PAYHUK
 
 ---
 
@@ -40,7 +40,7 @@
 
 #### Étape 1 : Connexion au projet
 1. Aller sur https://supabase.com/dashboard
-2. Sélectionner votre projet : `hbdnzajbyjakdhuavrvb`
+2. Sélectionner votre projet : `your-project-id`
 
 #### Étape 2 : Exécuter la migration
 1. Cliquer sur **SQL Editor** dans le menu gauche
@@ -87,7 +87,7 @@ npm install -g supabase
 #### Étape 1 : Lier le projet
 ```bash
 cd payhula
-supabase link --project-ref hbdnzajbyjakdhuavrvb
+supabase link --project-ref your-project-id
 ```
 
 #### Étape 2 : Exécuter la migration

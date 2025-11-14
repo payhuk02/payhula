@@ -1,4 +1,4 @@
-# ⚡ DÉMARRAGE RAPIDE - FONCTIONNALITÉ COURS
+﻿# ⚡ DÉMARRAGE RAPIDE - FONCTIONNALITÉ COURS
 
 ---
 
@@ -35,7 +35,7 @@ Vous devez voir **4 cartes** de types de produits :
 
 #### A. Aller sur Supabase Dashboard
 
-🔗 https://supabase.com/dashboard/project/**hbdnzajbyjakdhuavrvb**
+🔗 https://supabase.com/dashboard/project/**your-project-id**
 
 #### B. Cliquer sur "SQL Editor" (menu gauche)
 

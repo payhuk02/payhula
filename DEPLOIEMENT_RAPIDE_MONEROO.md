@@ -1,11 +1,11 @@
-# ⚡ Déploiement Rapide de l'Edge Function Moneroo
+﻿# ⚡ Déploiement Rapide de l'Edge Function Moneroo
 
 ## 🎯 Méthode la Plus Simple : Via Dashboard Supabase
 
 ### 📋 Étapes Rapides
 
 1. **Ouvrir le Dashboard Supabase**
-   - Allez sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb
+   - Allez sur : https://supabase.com/dashboard/project/your-project-id
    - Connectez-vous si nécessaire
 
 2. **Accéder à l'Edge Function**

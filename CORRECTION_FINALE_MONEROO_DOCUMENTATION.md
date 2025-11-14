@@ -1,4 +1,4 @@
-# ✅ Correction Finale - Endpoint Moneroo selon Documentation Officielle
+﻿# ✅ Correction Finale - Endpoint Moneroo selon Documentation Officielle
 
 ## 📚 Documentation Moneroo
 
@@ -113,7 +113,7 @@ D'après la documentation, la réponse suit ce format :
 ### Redéployer l'Edge Function avec le Code Corrigé
 
 1. **Ouvrir Supabase Dashboard**
-   - Allez sur : https://app.supabase.com/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+   - Allez sur : https://app.supabase.com/project/your-project-id/functions/moneroo/code
 
 2. **Copier le Code Corrigé**
    - Ouvrez `CODE_MONEROO_POUR_SUPABASE.txt`

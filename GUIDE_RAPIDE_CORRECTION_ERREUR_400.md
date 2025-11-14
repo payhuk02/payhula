@@ -1,4 +1,4 @@
-# ⚡ Guide Rapide - Correction de l'Erreur 400
+﻿# ⚡ Guide Rapide - Correction de l'Erreur 400
 
 ## 🔴 Problème
 
@@ -9,7 +9,7 @@ L'erreur `400 Bad Request` sur `get_user_product_recommendations` apparaît car 
 ### Option 1 : Via Supabase Dashboard (Le Plus Rapide) ⚡
 
 1. **Ouvrir Supabase Dashboard :**
-   - Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/sql/new
+   - Aller sur : https://supabase.com/dashboard/project/your-project-id/sql/new
 
 2. **Copier le script SQL :**
    - Ouvrir le fichier : `FIX_GET_USER_PRODUCT_RECOMMENDATIONS.sql`

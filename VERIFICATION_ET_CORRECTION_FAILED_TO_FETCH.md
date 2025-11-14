@@ -1,4 +1,4 @@
-# ✅ Vérification et Correction de l'Erreur "Failed to fetch"
+﻿# ✅ Vérification et Correction de l'Erreur "Failed to fetch"
 
 ## 🔍 Diagnostic Basé sur les Logs
 
@@ -59,7 +59,7 @@ D'après les logs Supabase que vous avez partagés :
 ### Étape 1 : Vérifier le Déploiement de l'Edge Function
 
 1. **Aller dans Supabase Dashboard :**
-   - https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+   - https://supabase.com/dashboard/project/your-project-id/functions/moneroo/code
 
 2. **Vérifier le code déployé :**
    - Le code doit contenir les logs `[Moneroo Edge Function] Request received:`

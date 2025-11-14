@@ -1,4 +1,4 @@
-# Configuration Vercel pour Payhuk
+﻿# Configuration Vercel pour Payhuk
 # Ce fichier contient les instructions pour configurer le déploiement
 
 ## 🚀 Déploiement sur Vercel
@@ -8,9 +8,9 @@
 Dans le dashboard Vercel, ajoutez ces variables d'environnement :
 
 ```
-VITE_SUPABASE_URL=https://hbdnzajbyjakdhuavrvb.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiZG56YWpieWpha2RodWF2cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTgyMzEsImV4cCI6MjA3MzE3NDIzMX0.myur8r50wIORQwfcCP4D1ZxlhKFxICdVqjUM80CgtnM
-VITE_SUPABASE_PROJECT_ID=hbdnzajbyjakdhuavrvb
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
+VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
 
 ### 2. Configuration du build

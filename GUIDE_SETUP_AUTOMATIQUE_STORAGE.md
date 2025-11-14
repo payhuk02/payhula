@@ -1,4 +1,4 @@
-# 🤖 GUIDE - Configuration Automatique du Storage
+﻿# 🤖 GUIDE - Configuration Automatique du Storage
 
 **Date** : 27 octobre 2025  
 **Durée** : 2 minutes
@@ -46,7 +46,7 @@ node scripts/setup-storage.js
   Suivez le guide : GUIDE_CREATION_POLITIQUES_STORAGE.md
 
 🎯 Prochaines étapes :
-  1. Aller sur https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/storage/buckets/videos
+  1. Aller sur https://supabase.com/dashboard/project/your-project-id/storage/buckets/videos
   2. Cliquer sur l'onglet "Policies"
   3. Créer les 4 politiques (voir guide)
 
@@ -61,7 +61,7 @@ node scripts/setup-storage.js
 
 Vous devez les créer manuellement :
 
-1. Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/storage/buckets/videos
+1. Aller sur : https://supabase.com/dashboard/project/your-project-id/storage/buckets/videos
 2. Cliquer sur l'onglet **"Policies"**
 3. Créer les 4 politiques selon le guide : `GUIDE_CREATION_POLITIQUES_STORAGE.md`
 

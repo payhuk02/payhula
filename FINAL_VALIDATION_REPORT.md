@@ -1,4 +1,4 @@
-# Rapport Final - Validation de l'Onglet "Informations" avec Supabase
+﻿# Rapport Final - Validation de l'Onglet "Informations" avec Supabase
 
 ## 🎯 Objectif Accompli
 L'onglet "Informations" de la page de création de produit est maintenant **entièrement fonctionnel** avec les vraies variables d'environnement Supabase.
@@ -6,9 +6,9 @@ L'onglet "Informations" de la page de création de produit est maintenant **enti
 ## ✅ Variables d'Environnement Configurées
 
 ```env
-VITE_SUPABASE_PROJECT_ID="hbdnzajbyjakdhuavrvb"
-VITE_SUPABASE_URL="https://hbdnzajbyjakdhuavrvb.supabase.co"
-VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your_supabase_anon_key_here"
 ```
 
 ## 🔗 Connexion Supabase Validée

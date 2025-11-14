@@ -1,4 +1,4 @@
-# 🔐 GUIDE - Création des Politiques Storage (Dashboard)
+﻿# 🔐 GUIDE - Création des Politiques Storage (Dashboard)
 
 **Date** : 27 octobre 2025  
 **Durée** : 5 minutes
@@ -8,7 +8,7 @@
 ## 📋 ÉTAPE 1 : Créer le bucket via SQL
 
 1. Aller sur https://supabase.com
-2. Ouvrir votre projet : `hbdnzajbyjakdhuavrvb`
+2. Ouvrir votre projet : `your-project-id`
 3. Menu **"SQL Editor"** → **"New query"**
 4. Copier le contenu de `supabase/migrations/20251027_storage_videos_bucket_simple.sql`
 5. Coller et **Exécuter** (Ctrl+Enter)

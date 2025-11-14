@@ -1,4 +1,4 @@
-# 🔍 Analyse du Code Déployé vs Code Source
+﻿# 🔍 Analyse du Code Déployé vs Code Source
 
 ## ✅ Comparaison des Codes
 
@@ -79,12 +79,12 @@ D'après les logs Supabase :
 
 1. **Vérifier `.env` :**
    ```env
-   VITE_SUPABASE_URL=https://hbdnzajbyjakdhuavrvb.supabase.co
-   VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
    ```
 
 2. **Vérifier que l'URL est accessible :**
-   - Tester : `https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo`
+   - Tester : `https://your-project-id.supabase.co/functions/v1/moneroo`
    - Doit retourner une réponse (même une erreur)
 
 ### Solution 3 : Redéployer l'Edge Function avec le Code Correct

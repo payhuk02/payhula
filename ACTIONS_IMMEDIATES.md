@@ -1,4 +1,4 @@
-# ⚡ Actions Immédiates - Correction des Erreurs
+﻿# ⚡ Actions Immédiates - Correction des Erreurs
 
 ## 🔴 Problèmes Identifiés
 
@@ -21,7 +21,7 @@
 ### Action 1 : Redéployer l'Edge Function Moneroo (5 minutes)
 
 1. **Ouvrir Supabase Dashboard :**
-   - https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/code
+   - https://supabase.com/dashboard/project/your-project-id/functions/moneroo/code
 
 2. **Copier le code corrigé :**
    - Ouvrir le fichier : `supabase/functions/moneroo/index.ts`
@@ -40,7 +40,7 @@
 ### Action 2 : Créer la Fonction SQL (2 minutes)
 
 1. **Ouvrir Supabase SQL Editor :**
-   - https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/sql/new
+   - https://supabase.com/dashboard/project/your-project-id/sql/new
 
 2. **Copier le script complet :**
    - Ouvrir le fichier : `CREER_FONCTION_RECOMMENDATIONS_COMPLETE.sql`
@@ -72,7 +72,7 @@
    - ✅ Les requêtes POST fonctionnent
 
 3. **Vérifier les logs Supabase :**
-   - Aller sur : https://supabase.com/dashboard/project/hbdnzajbyjakdhuavrvb/functions/moneroo/logs
+   - Aller sur : https://supabase.com/dashboard/project/your-project-id/functions/moneroo/logs
    - ✅ Vérifier que les requêtes POST apparaissent
    - ✅ Vérifier les logs CORS : `origin: http://localhost:8080`
 

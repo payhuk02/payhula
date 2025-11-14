@@ -1,4 +1,4 @@
-# 📊 Rapport de Vérification Supabase - Payhuk
+﻿# 📊 Rapport de Vérification Supabase - Payhuk
 
 ## ✅ État Général : FONCTIONNEL
 
@@ -75,7 +75,7 @@ function generateReferralCode() {
 
 ### 2. Correction via Interface Supabase
 1. Aller sur [supabase.com](https://supabase.com)
-2. Ouvrir le projet `hbdnzajbyjakdhuavrvb`
+2. Ouvrir le projet `your-project-id`
 3. Aller dans SQL Editor
 4. Exécuter la migration `20250121_fix_referral_code_final.sql`
 
