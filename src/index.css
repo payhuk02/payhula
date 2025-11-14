@@ -64,11 +64,11 @@ All colors MUST be HSL.
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 20 14.3% 4.1%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 25 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 33 100% 96.5%;
-    --sidebar-accent-foreground: 25 95% 53%;
+    --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 20 5.9% 90%;
     --sidebar-ring: 25 95% 53%;
   }
@@ -113,11 +113,11 @@ All colors MUST be HSL.
     --shadow-glow: 0 0 50px hsl(210 100% 65% / 0.4);
 
     --sidebar-background: 24 9.8% 10%;
-    --sidebar-foreground: 0 0% 95%;
+    --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 25 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 25 9.1% 14.9%;
-    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 24 9.8% 15%;
     --sidebar-ring: 25 95% 53%;
   }
@@ -126,6 +126,115 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+  }
+
+  /* TEMPORAIRE : Force les couleurs de la sidebar en NOIR pour tous les modes */
+  /* Isolation du mode clair pour tester - FORCE NOIR sur TOUT */
+  [data-sidebar="sidebar"] {
+    --sidebar-foreground: 0 0% 0% !important;
+    --sidebar-accent-foreground: 0 0% 0% !important;
+    color: black !important;
+  }
+
+  /* Force NOIR sur TOUS les éléments texte - Règle ultra-spécifique */
+  [data-sidebar="sidebar"] *,
+  [data-sidebar="sidebar"] span,
+  [data-sidebar="sidebar"] a,
+  [data-sidebar="sidebar"] button,
+  [data-sidebar="sidebar"] div,
+  [data-sidebar="sidebar"] p,
+  [data-sidebar="sidebar"] li,
+  [data-sidebar="sidebar"] [data-sidebar="group-label"],
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"],
+  [data-sidebar="sidebar"] [data-sidebar="menu-item"],
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] *,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] span,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a {
+    color: black !important;
+  }
+
+  /* Force NOIR sur TOUTES les icônes SVG */
+  [data-sidebar="sidebar"] svg,
+  [data-sidebar="sidebar"] svg * {
+    color: black !important;
+    stroke: black !important;
+    fill: black !important;
+  }
+
+  /* Mode sombre : aussi en noir (temporaire) */
+  .dark [data-sidebar="sidebar"] {
+    --sidebar-foreground: 0 0% 0% !important;
+    --sidebar-accent-foreground: 0 0% 0% !important;
+    color: black !important;
+  }
+
+  .dark [data-sidebar="sidebar"] *,
+  .dark [data-sidebar="sidebar"] span,
+  .dark [data-sidebar="sidebar"] a,
+  .dark [data-sidebar="sidebar"] button,
+  .dark [data-sidebar="sidebar"] div,
+  .dark [data-sidebar="sidebar"] p,
+  .dark [data-sidebar="sidebar"] li,
+  .dark [data-sidebar="sidebar"] [data-sidebar="group-label"],
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"],
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-item"],
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] *,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] span,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] a {
+    color: black !important;
+  }
+
+  .dark [data-sidebar="sidebar"] svg,
+  .dark [data-sidebar="sidebar"] svg * {
+    color: black !important;
+    stroke: black !important;
+    fill: black !important;
+  }
+
+  /* Force NOIR sur tous les liens NavLink et leurs enfants - Priorité absolue */
+  [data-sidebar="sidebar"] a,
+  [data-sidebar="sidebar"] a *,
+  [data-sidebar="sidebar"] a span,
+  [data-sidebar="sidebar"] a div,
+  [data-sidebar="sidebar"] [class*="NavLink"],
+  [data-sidebar="sidebar"] [class*="nav-link"],
+  [data-sidebar="sidebar"] [class*="router-link"],
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a *,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a span {
+    color: black !important;
+  }
+
+  /* Force NOIR même sur les éléments avec classes Tailwind - Ultra spécifique */
+  [data-sidebar="sidebar"] [class*="text-"]:not([class*="text-primary"]):not([data-active="true"]),
+  [data-sidebar="sidebar"] [class*="text-"]:not([class*="text-primary"]):not([data-active="true"]) *,
+  [data-sidebar="sidebar"] [class*="text-"]:not([class*="text-primary"]):not([data-active="true"]) span {
+    color: black !important;
+  }
+
+  /* Exception pour les éléments actifs qui gardent leur couleur primaire */
+  [data-sidebar="sidebar"] [data-active="true"],
+  [data-sidebar="sidebar"] [data-active="true"] *,
+  [data-sidebar="sidebar"] .bg-primary\/20,
+  [data-sidebar="sidebar"] .bg-primary\/20 *,
+  [data-sidebar="sidebar"] .text-primary,
+  [data-sidebar="sidebar"] [class*="text-primary"],
+  [data-sidebar="sidebar"] [class*="text-primary"] * {
+    color: hsl(var(--primary)) !important;
+  }
+
+  [data-sidebar="sidebar"] .text-primary svg,
+  [data-sidebar="sidebar"] [class*="text-primary"] svg {
+    color: hsl(var(--primary)) !important;
+    stroke: hsl(var(--primary)) !important;
+    fill: hsl(var(--primary)) !important;
+  }
+
+  /* Exception pour les images (logo) - pas de modification */
+  [data-sidebar="sidebar"] img {
+    color: unset !important;
+    stroke: unset !important;
+    fill: unset !important;
   }
 
   html {
@@ -428,6 +537,63 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* TEMPORAIRE : Force NOIR sur tous les éléments sidebar - Priorité maximale dans utilities */
+  /* Règles ultra-spécifiques pour surcharger toutes les classes Tailwind */
+  [data-sidebar="sidebar"] *,
+  [data-sidebar="sidebar"] span,
+  [data-sidebar="sidebar"] a,
+  [data-sidebar="sidebar"] button,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"],
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] *,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] span,
+  [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+    color: black !important;
+  }
+
+  [data-sidebar="sidebar"] svg,
+  [data-sidebar="sidebar"] svg * {
+    color: black !important;
+    stroke: black !important;
+    fill: black !important;
+  }
+
+  .dark [data-sidebar="sidebar"] *,
+  .dark [data-sidebar="sidebar"] span,
+  .dark [data-sidebar="sidebar"] a,
+  .dark [data-sidebar="sidebar"] button,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"],
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] *,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] span,
+  .dark [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+    color: black !important;
+  }
+
+  .dark [data-sidebar="sidebar"] svg,
+  .dark [data-sidebar="sidebar"] svg * {
+    color: black !important;
+    stroke: black !important;
+    fill: black !important;
+  }
+
+  /* Force NOIR sur tous les liens NavLink dans utilities - Priorité maximale */
+  [data-sidebar="sidebar"] a,
+  [data-sidebar="sidebar"] a *,
+  [data-sidebar="sidebar"] a span,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a *,
+  [data-sidebar="sidebar"] [data-sidebar="menu-button"] a span {
+    color: black !important;
+  }
+
+  .dark [data-sidebar="sidebar"] a,
+  .dark [data-sidebar="sidebar"] a *,
+  .dark [data-sidebar="sidebar"] a span,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] a,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] a *,
+  .dark [data-sidebar="sidebar"] [data-sidebar="menu-button"] a span {
+    color: black !important;
+  }
+
   .gradient-primary {
     background: var(--gradient-primary);
   }

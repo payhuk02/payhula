@@ -847,7 +847,7 @@ export function AppSidebar() {
               className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain" 
             />
             {!isCollapsed && (
-              <span className="text-base sm:text-lg font-bold text-white dark:text-black truncate">
+              <span className="text-base sm:text-lg font-bold !text-black truncate">
                 Payhuk
               </span>
             )}
@@ -857,7 +857,7 @@ export function AppSidebar() {
         {/* Menu Items - Organisé par sections (masqué sur pages admin) */}
         {!isOnAdminPage && menuSections.map((section) => (
           <SidebarGroup key={section.label}>
-            <SidebarGroupLabel className="!text-white dark:!text-black">
+            <SidebarGroupLabel className="!text-black">
               {!isCollapsed && section.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -865,7 +865,7 @@ export function AppSidebar() {
                 {section.items.map((item) => {
                   const IconComponent = item.icon;
                   if (!IconComponent) {
-                    logger.warn('Menu item missing icon:', item.title);
+                    logger.warn(`Menu item missing icon: ${item.title}`);
                     return null;
                   }
                   // Afficher une flèche pour "Mes Commandes", "Commandes Multi-Stores" et "Mes Téléchargements" pour améliorer la visibilité
@@ -877,20 +877,20 @@ export function AppSidebar() {
                           to={item.url}
                           end={item.url === "/dashboard"}
                           className={({ isActive }) =>
-                            `transition-all duration-300 group relative flex items-center ${
+                            `transition-all duration-300 group relative flex items-center [&_*]:!text-black ${
                               isActive
-                                ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
-                                : "!text-white dark:!text-black hover:bg-muted hover:translate-x-1"
+                                ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary [&_*]:!text-primary"
+                                : "!text-black hover:bg-muted hover:translate-x-1"
                             }`
                           }
                         >
                           <IconComponent 
-                            className={`${showArrow ? 'h-5 w-5 text-primary mr-2' : 'h-4 w-4 text-white dark:text-black'} flex-shrink-0`}
+                            className={`${showArrow ? 'h-5 w-5 text-primary mr-2' : 'h-4 w-4 !text-black'} flex-shrink-0`}
                             style={showArrow ? { strokeWidth: 2.5 } : undefined}
                           />
                           {!isCollapsed && (
                             <>
-                              <span className={`flex-1 ${showArrow ? 'font-semibold' : 'font-medium'}`}>{item.title}</span>
+                              <span className={`flex-1 ${showArrow ? 'font-semibold' : 'font-medium'} !text-black`}>{item.title}</span>
                               {showArrow && (
                                 <ArrowRight 
                                   className="h-5 w-5 ml-auto flex-shrink-0 text-primary opacity-90 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" 
@@ -919,10 +919,10 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to="/dashboard"
-                      className="!text-white dark:!text-black hover:bg-primary/10 hover:translate-x-1 transition-all duration-300"
+                      className="!text-black hover:bg-primary/10 hover:translate-x-1 transition-all duration-300 [&_*]:!text-black"
                     >
-                      <LayoutDashboard className="h-4 w-4 text-white dark:text-black" />
-                      {!isCollapsed && <span>← Retour Dashboard</span>}
+                      <LayoutDashboard className="h-4 w-4 !text-black" />
+                      {!isCollapsed && <span className="!text-black">← Retour Dashboard</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -934,7 +934,7 @@ export function AppSidebar() {
         {/* Admin Menu Items - Organisé par sections */}
         {isAdmin && adminMenuSections.map((section) => (
           <SidebarGroup key={section.label}>
-            <SidebarGroupLabel className="!text-white dark:!text-black">
+            <SidebarGroupLabel className="!text-black">
               {!isCollapsed && section.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -942,7 +942,7 @@ export function AppSidebar() {
                 {section.items.map((item) => {
                   const IconComponent = item.icon;
                   if (!IconComponent) {
-                    logger.warn('Menu item missing icon:', item.title);
+                    logger.warn(`Menu item missing icon: ${item.title}`);
                     return null;
                   }
                   return (
@@ -951,15 +951,15 @@ export function AppSidebar() {
                         <NavLink
                           to={item.url}
                           className={({ isActive }) =>
-                            `transition-all duration-300 ${
+                            `transition-all duration-300 [&_*]:!text-black ${
                               isActive
-                                ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary"
-                                : "!text-white dark:!text-black hover:bg-muted hover:translate-x-1"
+                                ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary [&_*]:!text-primary"
+                                : "!text-black hover:bg-muted hover:translate-x-1"
                             }`
                           }
                         >
-                          <IconComponent className="h-4 w-4 text-white dark:text-black" />
-                          {!isCollapsed && <span>{item.title}</span>}
+                          <IconComponent className="h-4 w-4 !text-black" />
+                          {!isCollapsed && <span className="!text-black">{item.title}</span>}
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -978,11 +978,11 @@ export function AppSidebar() {
         )}
         <Button
           variant="ghost"
-          className="w-full justify-start !text-white dark:!text-black"
+          className="w-full justify-start !text-black [&_*]:!text-black"
           onClick={handleLogout}
         >
-          <LogOut className="h-4 w-4 text-white dark:text-black" />
-          {!isCollapsed && <span>Déconnexion</span>}
+          <LogOut className="h-4 w-4 !text-black" />
+          {!isCollapsed && <span className="!text-black">Déconnexion</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
