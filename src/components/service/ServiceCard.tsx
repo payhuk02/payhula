@@ -317,5 +317,4 @@ const ServicesGrid = ({
   );
 };
 
-export default ServiceCard;
 export { ServicesGrid };
