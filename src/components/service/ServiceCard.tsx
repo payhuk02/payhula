@@ -3,8 +3,10 @@
  * Date: 28 octobre 2025
  * 
  * Professional card for displaying service products
+ * Optimisé avec React.memo et LazyImage pour performance mobile
  */
 
+import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,6 +33,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import type { ServiceProduct } from '@/hooks/service';
 import type { Product } from '@/types/product';
+import { LazyImage } from '@/components/ui/LazyImage';
+import { getImageAttributesForPreset } from '@/lib/image-transform';
 
 interface ServiceCardProps {
   service: ServiceProduct & { product?: Product };
@@ -39,7 +43,7 @@ interface ServiceCardProps {
   showActions?: boolean;
 }
 
-const ServiceCard = ({
+const ServiceCardComponent = ({
   service,
   onEdit,
   onDelete,
@@ -79,15 +83,23 @@ const ServiceCard = ({
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
   };
 
+  // Optimiser l'image avec LazyImage et presets
+  const imageAttrs = service.product?.image_url 
+    ? getImageAttributesForPreset(service.product.image_url, 'productImage')
+    : null;
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       {/* Service Image */}
       <div className="relative aspect-video bg-muted">
-        {service.product?.image_url ? (
-          <img
-            src={service.product.image_url}
+        {service.product?.image_url && imageAttrs ? (
+          <LazyImage
+            {...imageAttrs}
             alt={service.product.name}
+            placeholder="skeleton"
             className="w-full h-full object-cover"
+            format="webp"
+            quality={85}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -216,6 +228,30 @@ const ServiceCard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ServiceCard = React.memo(ServiceCardComponent, (prevProps, nextProps) => {
+  // Comparaison personnalisée pour éviter re-renders inutiles
+  return (
+    prevProps.service.id === nextProps.service.id &&
+    prevProps.service.product_id === nextProps.service.product_id &&
+    prevProps.service.product?.price === nextProps.service.product?.price &&
+    prevProps.service.product?.image_url === nextProps.service.product?.image_url &&
+    prevProps.service.product?.name === nextProps.service.product?.name &&
+    prevProps.service.total_bookings === nextProps.service.total_bookings &&
+    prevProps.service.average_rating === nextProps.service.average_rating &&
+    prevProps.service.duration_minutes === nextProps.service.duration_minutes &&
+    prevProps.service.location_type === nextProps.service.location_type &&
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+ServiceCard.displayName = 'ServiceCard';
+
+// Export par défaut pour compatibilité
+export default ServiceCard;
 
 /**
  * Grid of Service Cards

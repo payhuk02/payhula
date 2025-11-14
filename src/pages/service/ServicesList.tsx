@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Plus, Search } from 'lucide-react';
 import { ServicesGrid } from '@/components/service';
+import { ServicesListVirtualized } from '@/components/service/ServicesListVirtualized';
 import { useToast } from '@/hooks/use-toast';
 
 export const ServicesList = () => {
@@ -93,13 +94,31 @@ export const ServicesList = () => {
               />
             </div>
 
-            {/* Services Grid */}
-            <ServicesGrid
-              services={filteredServices || []}
-              loading={isLoading}
-              onEdit={(id) => navigate(`/dashboard/services/${id}/edit`)}
-              onDelete={(id) => setDeleteServiceId(id)}
-            />
+            {/* Services Grid ou Virtualized */}
+            {isLoading ? (
+              <ServicesGrid
+                services={[]}
+                loading={true}
+                onEdit={(id) => navigate(`/dashboard/services/${id}/edit`)}
+                onDelete={(id) => setDeleteServiceId(id)}
+              />
+            ) : (filteredServices?.length || 0) > 50 ? (
+              <ServicesListVirtualized
+                services={filteredServices || []}
+                onEdit={(id) => navigate(`/dashboard/services/${id}/edit`)}
+                onDelete={(id) => setDeleteServiceId(id)}
+                showActions={true}
+                itemHeight={300}
+                containerHeight="600px"
+              />
+            ) : (
+              <ServicesGrid
+                services={filteredServices || []}
+                loading={false}
+                onEdit={(id) => navigate(`/dashboard/services/${id}/edit`)}
+                onDelete={(id) => setDeleteServiceId(id)}
+              />
+            )}
 
             {/* Delete Confirmation */}
             <AlertDialog open={!!deleteServiceId} onOpenChange={(open) => !open && setDeleteServiceId(null)}>

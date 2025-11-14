@@ -3,8 +3,10 @@
  * Date: 27 octobre 2025
  * 
  * Inspiré de: Gumroad, Lemonsqueezy
+ * Optimisé avec React.memo et LazyImage pour performance mobile
  */
 
+import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +21,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { LazyImage } from '@/components/ui/LazyImage';
+import { getImageAttributesForPreset } from '@/lib/image-transform';
 
 interface DigitalProductCardProps {
   product: {
@@ -64,7 +68,7 @@ const LICENSE_TYPE_LABELS = {
   lifetime: 'À vie',
 };
 
-export const DigitalProductCard = ({
+const DigitalProductCardComponent = ({
   product,
   variant = 'default',
   showActions = true,
@@ -72,6 +76,11 @@ export const DigitalProductCard = ({
 }: DigitalProductCardProps) => {
   const isCompact = variant === 'compact';
   const isFeatured = variant === 'featured';
+
+  // Optimiser l'image avec LazyImage et presets
+  const imageAttrs = product.image_url 
+    ? getImageAttributesForPreset(product.image_url, 'productImage')
+    : null;
 
   return (
     <Card 
@@ -94,11 +103,14 @@ export const DigitalProductCard = ({
 
       {/* Image/Icon */}
       <div className="relative aspect-video bg-gradient-to-br from-primary/10 to-primary/5 overflow-hidden">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
+        {product.image_url && imageAttrs ? (
+          <LazyImage
+            {...imageAttrs}
             alt={product.name}
+            placeholder="skeleton"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            format="webp"
+            quality={85}
           />
         ) : (
           <div className="flex items-center justify-center h-full">
@@ -220,6 +232,25 @@ export const DigitalProductCard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const DigitalProductCard = React.memo(DigitalProductCardComponent, (prevProps, nextProps) => {
+  // Comparaison personnalisée pour éviter re-renders inutiles
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.is_active === nextProps.product.is_active &&
+    prevProps.product.image_url === nextProps.product.image_url &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.product.total_downloads === nextProps.product.total_downloads &&
+    prevProps.product.average_rating === nextProps.product.average_rating &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.onDownload === nextProps.onDownload
+  );
+});
+
+DigitalProductCard.displayName = 'DigitalProductCard';
 
 /**
  * Skeleton pour loading state

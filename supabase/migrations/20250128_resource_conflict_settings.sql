@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS public.resource_conflict_settings (
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_resource_conflict_settings_store_id ON public.resource_conflict_settings(store_id);
 
--- Trigger updated_at
+-- Trigger updated_at (supprimer d'abord s'il existe)
+DROP TRIGGER IF EXISTS update_resource_conflict_settings_updated_at ON public.resource_conflict_settings;
 CREATE TRIGGER update_resource_conflict_settings_updated_at
   BEFORE UPDATE ON public.resource_conflict_settings
   FOR EACH ROW
@@ -52,6 +53,12 @@ COMMENT ON TABLE public.resource_conflict_settings IS 'Paramètres de détection
 
 -- Activer RLS
 ALTER TABLE public.resource_conflict_settings ENABLE ROW LEVEL SECURITY;
+
+-- Supprimer les policies existantes si elles existent
+DROP POLICY IF EXISTS "Vendeurs peuvent lire leurs paramètres" ON public.resource_conflict_settings;
+DROP POLICY IF EXISTS "Vendeurs peuvent créer leurs paramètres" ON public.resource_conflict_settings;
+DROP POLICY IF EXISTS "Vendeurs peuvent modifier leurs paramètres" ON public.resource_conflict_settings;
+DROP POLICY IF EXISTS "Vendeurs peuvent supprimer leurs paramètres" ON public.resource_conflict_settings;
 
 -- Policy: Les vendeurs peuvent lire leurs paramètres
 CREATE POLICY "Vendeurs peuvent lire leurs paramètres"

@@ -3,8 +3,10 @@
  * Date: 28 octobre 2025
  * 
  * Card professionnelle pour produits physiques
+ * Optimisé avec React.memo et LazyImage pour performance mobile
  */
 
+import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,6 +30,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useInventory } from '@/hooks/physical/useInventory';
 import type { PhysicalProduct } from '@/hooks/physical/usePhysicalProducts';
+import { LazyImage } from '@/components/ui/LazyImage';
+import { getImageAttributesForPreset } from '@/lib/image-transform';
 
 interface PhysicalProductCardProps {
   product: PhysicalProduct & { product?: any };
@@ -35,7 +39,7 @@ interface PhysicalProductCardProps {
   onDelete?: (id: string) => void;
 }
 
-export const PhysicalProductCard = ({
+const PhysicalProductCardComponent = ({
   product,
   onEdit,
   onDelete,
@@ -60,15 +64,23 @@ export const PhysicalProductCard = ({
   const stockStatus = getStockStatus();
   const StockIcon = stockStatus.icon;
 
+  // Optimiser l'image avec LazyImage et presets
+  const imageAttrs = product.product?.image_url 
+    ? getImageAttributesForPreset(product.product.image_url, 'productImage')
+    : null;
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       {/* Product Image */}
       <div className="relative aspect-square bg-muted">
-        {product.product?.image_url ? (
-          <img
-            src={product.product.image_url}
+        {product.product?.image_url && imageAttrs ? (
+          <LazyImage
+            {...imageAttrs}
             alt={product.product.name}
+            placeholder="skeleton"
             className="w-full h-full object-cover"
+            format="webp"
+            quality={85}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -185,6 +197,24 @@ export const PhysicalProductCard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const PhysicalProductCard = React.memo(PhysicalProductCardComponent, (prevProps, nextProps) => {
+  // Comparaison personnalisée pour éviter re-renders inutiles
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.product_id === nextProps.product.product_id &&
+    prevProps.product.product?.price === nextProps.product.product?.price &&
+    prevProps.product.product?.image_url === nextProps.product.product?.image_url &&
+    prevProps.product.product?.name === nextProps.product.product?.name &&
+    prevProps.product.total_quantity_sold === nextProps.product.total_quantity_sold &&
+    prevProps.product.total_revenue === nextProps.product.total_revenue &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+PhysicalProductCard.displayName = 'PhysicalProductCard';
 
 /**
  * Grid of Physical Product Cards

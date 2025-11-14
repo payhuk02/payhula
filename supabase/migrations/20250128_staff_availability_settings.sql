@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS public.staff_availability_settings (
 CREATE INDEX IF NOT EXISTS idx_staff_availability_settings_store_id ON public.staff_availability_settings(store_id);
 CREATE INDEX IF NOT EXISTS idx_staff_availability_settings_service_id ON public.staff_availability_settings(service_id);
 
--- Trigger updated_at
+-- Trigger updated_at (supprimer d'abord s'il existe)
+DROP TRIGGER IF EXISTS update_staff_availability_settings_updated_at ON public.staff_availability_settings;
 CREATE TRIGGER update_staff_availability_settings_updated_at
   BEFORE UPDATE ON public.staff_availability_settings
   FOR EACH ROW
@@ -54,6 +55,12 @@ COMMENT ON TABLE public.staff_availability_settings IS 'Paramètres de disponibi
 
 -- Activer RLS
 ALTER TABLE public.staff_availability_settings ENABLE ROW LEVEL SECURITY;
+
+-- Supprimer les policies existantes si elles existent
+DROP POLICY IF EXISTS "Vendeurs peuvent lire leurs paramètres" ON public.staff_availability_settings;
+DROP POLICY IF EXISTS "Vendeurs peuvent créer leurs paramètres" ON public.staff_availability_settings;
+DROP POLICY IF EXISTS "Vendeurs peuvent modifier leurs paramètres" ON public.staff_availability_settings;
+DROP POLICY IF EXISTS "Vendeurs peuvent supprimer leurs paramètres" ON public.staff_availability_settings;
 
 -- Policy: Les vendeurs peuvent lire leurs propres paramètres
 CREATE POLICY "Vendeurs peuvent lire leurs paramètres"

@@ -1,3 +1,4 @@
+import React from "react";
 import { Product } from "@/hooks/useProducts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { getStockInfo, formatStockQuantity } from "@/lib/stockUtils";
+import { LazyImage } from "@/components/ui/LazyImage";
+import { getImageAttributesForPreset } from "@/lib/image-transform";
 
 interface ProductCardDashboardProps {
   product: Product;
@@ -43,7 +46,7 @@ interface ProductCardDashboardProps {
   onSelect?: (selected: boolean) => void;
 }
 
-const ProductCardDashboard = ({
+const ProductCardDashboardComponent = ({
   product,
   storeSlug,
   onEdit,
@@ -65,6 +68,11 @@ const ProductCardDashboard = ({
     product.low_stock_threshold,
     product.track_inventory ?? (product.product_type !== 'digital')
   );
+
+  // Optimiser l'image avec LazyImage et presets
+  const imageAttrs = product.image_url && !imageError
+    ? getImageAttributesForPreset(product.image_url, 'productImage')
+    : null;
 
   const handleCopyLink = async () => {
     try {
@@ -108,14 +116,16 @@ const ProductCardDashboard = ({
   return (
     <Card className={`group shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm flex flex-col min-h-[400px] md:min-h-[500px] lg:min-h-[600px] ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}>
       <CardHeader className="p-0 relative overflow-hidden rounded-t-lg flex-[0.6] min-h-[240px] md:min-h-[300px] lg:min-h-[360px]">
-        {product.image_url && !imageError ? (
+        {product.image_url && !imageError && imageAttrs ? (
           <div className="h-full w-full rounded-t-lg overflow-hidden bg-muted relative">
-            <img
-              src={product.image_url}
+            <LazyImage
+              {...imageAttrs}
               alt={product.name}
+              placeholder="skeleton"
               className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
               onError={() => setImageError(true)}
-              loading="lazy"
+              format="webp"
+              quality={85}
             />
             <div className="absolute top-2 left-2 z-10">
               {onSelect && (
@@ -336,5 +346,30 @@ const ProductCardDashboard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ProductCardDashboard = React.memo(ProductCardDashboardComponent, (prevProps, nextProps) => {
+  // Comparaison personnalisée pour éviter re-renders inutiles
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.is_active === nextProps.product.is_active &&
+    prevProps.product.image_url === nextProps.product.image_url &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.product.stock_quantity === nextProps.product.stock_quantity &&
+    prevProps.product.rating === nextProps.product.rating &&
+    prevProps.product.reviews_count === nextProps.product.reviews_count &&
+    prevProps.storeSlug === nextProps.storeSlug &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete &&
+    prevProps.onToggleStatus === nextProps.onToggleStatus &&
+    prevProps.onDuplicate === nextProps.onDuplicate &&
+    prevProps.onQuickView === nextProps.onQuickView &&
+    prevProps.onSelect === nextProps.onSelect
+  );
+});
+
+ProductCardDashboard.displayName = 'ProductCardDashboard';
 
 export default ProductCardDashboard;
