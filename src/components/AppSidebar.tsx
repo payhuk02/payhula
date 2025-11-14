@@ -55,6 +55,7 @@ import {
   Camera,
   Globe,
   Trophy,
+  AlertTriangle,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -212,6 +213,11 @@ const menuSections = [
         url: "/dashboard/digital-products",
         icon: BarChart,
       },
+      {
+        title: "Mises à jour Digitales",
+        url: "/dashboard/digital/updates",
+        icon: Sparkles,
+      },
     ]
   },
   {
@@ -266,6 +272,16 @@ const menuSections = [
         title: "Réservations Récurrentes",
         url: "/dashboard/recurring-bookings",
         icon: Repeat,
+      },
+      {
+        title: "Calendrier Staff",
+        url: "/dashboard/services/staff-availability",
+        icon: Users,
+      },
+      {
+        title: "Conflits Ressources",
+        url: "/dashboard/services/resource-conflicts",
+        icon: AlertTriangle,
       },
       {
         title: "Inventaire",

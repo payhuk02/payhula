@@ -46,10 +46,16 @@ export default function DigitalProductUpdatesDashboard() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   // Récupérer les produits digitaux du store
-  const { data: products = [], isLoading: isLoadingProducts } = useDigitalProducts(store?.id);
+  const { data: productsResponse, isLoading: isLoadingProducts } = useDigitalProducts(store?.id);
 
-  // Filtrer pour ne garder que les produits digitaux
-  const digitalProducts = products.filter((p: any) => p.product_type === 'digital');
+  // Extraire le tableau de produits (le hook peut retourner un objet paginé ou un tableau)
+  const products = Array.isArray(productsResponse) 
+    ? productsResponse 
+    : (productsResponse?.data || []);
+
+  // useDigitalProducts retourne déjà uniquement les produits digitaux
+  // Pas besoin de filtrer, mais on s'assure que c'est bien un tableau
+  const digitalProducts = Array.isArray(products) ? products : [];
 
   const selectedProduct = selectedProductId
     ? digitalProducts.find((p: any) => p.id === selectedProductId || p.product_id === selectedProductId)

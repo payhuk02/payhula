@@ -28,6 +28,8 @@ import {
   XCircle,
   Plus,
   Edit,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
