@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,7 @@ const PaymentsTableComponent = ({ payments, loading, onPaymentUpdated }: Payment
   const { toast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!deleteId) return;
 
     try {
@@ -46,9 +46,9 @@ const PaymentsTableComponent = ({ payments, loading, onPaymentUpdated }: Payment
     } finally {
       setDeleteId(null);
     }
-  };
+  }, [deleteId, onPaymentUpdated]); // Note: toast est stable, pas besoin de le mettre dans les dépendances
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
       pending: "secondary",
       completed: "default",

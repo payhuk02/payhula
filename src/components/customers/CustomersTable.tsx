@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -110,7 +110,7 @@ const CustomersTableComponent = ({ customers, onUpdate }: CustomersTableProps) =
   const [loading, setLoading] = useState(false);
   const tableRef = useScrollAnimation<HTMLDivElement>();
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!deleteId) return;
     setLoading(true);
 
@@ -138,7 +138,7 @@ const CustomersTableComponent = ({ customers, onUpdate }: CustomersTableProps) =
     } finally {
       setLoading(false);
     }
-  };
+  }, [deleteId, onUpdate]); // Note: toast est stable, pas besoin de le mettre dans les dépendances
 
   return (
     <>
