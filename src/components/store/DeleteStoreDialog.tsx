@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +36,7 @@ interface DeleteStoreDialogProps {
   onConfirmArchive?: () => Promise<void>;
 }
 
-export const DeleteStoreDialog = ({
+const DeleteStoreDialogComponent = ({
   open,
   onOpenChange,
   storeId,
@@ -64,7 +64,7 @@ export const DeleteStoreDialog = ({
     }
   }, [open, storeId]);
 
-  const checkProtection = async () => {
+  const checkProtection = useCallback(async () => {
     setChecking(true);
     try {
       const result = await checkStoreDeleteProtection(storeId);
@@ -79,9 +79,9 @@ export const DeleteStoreDialog = ({
     } finally {
       setChecking(false);
     }
-  };
+  }, [storeId]);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     setDeleting(true);
     try {
       await onConfirmDelete();
@@ -91,9 +91,9 @@ export const DeleteStoreDialog = ({
     } finally {
       setDeleting(false);
     }
-  };
+  }, [onConfirmDelete, onOpenChange, storeId]);
 
-  const handleArchive = async () => {
+  const handleArchive = useCallback(async () => {
     if (!onConfirmArchive) return;
     
     setArchiving(true);
@@ -105,7 +105,7 @@ export const DeleteStoreDialog = ({
     } finally {
       setArchiving(false);
     }
-  };
+  }, [onConfirmArchive, onOpenChange, storeId]);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -305,4 +305,20 @@ export const DeleteStoreDialog = ({
     </AlertDialog>
   );
 };
+
+DeleteStoreDialogComponent.displayName = 'DeleteStoreDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const DeleteStoreDialog = React.memo(DeleteStoreDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.storeId === nextProps.storeId &&
+    prevProps.storeName === nextProps.storeName &&
+    prevProps.onConfirmDelete === nextProps.onConfirmDelete &&
+    prevProps.onConfirmArchive === nextProps.onConfirmArchive
+  );
+});
+
+DeleteStoreDialog.displayName = 'DeleteStoreDialog';
 
