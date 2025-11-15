@@ -745,19 +745,13 @@ const Products = () => {
                                 <ProductCardDashboard
                                   product={product}
                                   storeSlug={store.slug}
-                                  onEdit={() => setEditingProduct(product)}
-                                  onDelete={() => setDeletingProductId(product.id)}
-                                  onToggleStatus={() => handleToggleStatus(product.id)}
-                                  onDuplicate={() => handleDuplicateProduct(product.id)}
-                                  onQuickView={() => setQuickViewProduct(product)}
+                                  onEdit={() => handleProductEdit(product)}
+                                  onDelete={() => handleProductDelete(product.id)}
+                                  onToggleStatus={() => handleProductToggleStatus(product.id)}
+                                  onDuplicate={() => handleProductDuplicate(product.id)}
+                                  onQuickView={() => handleProductQuickView(product)}
                                   isSelected={selectedProducts.includes(product.id)}
-                                  onSelect={(selected) => {
-                                    if (selected) {
-                                      setSelectedProducts([...selectedProducts, product.id]);
-                                    } else {
-                                      setSelectedProducts(selectedProducts.filter(id => id !== product.id));
-                                    }
-                                  }}
+                                  onSelect={(selected) => handleProductSelect(product.id, selected)}
                                 />
                               </div>
                             ))}
