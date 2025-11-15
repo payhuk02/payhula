@@ -249,7 +249,7 @@ const StaffCardComponent = ({
                         size="icon"
                         variant="outline"
                         asChild
-                        className="h-8 w-8"
+                        className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation"
                       >
                         <a
                           href={socialLinks.linkedin}
@@ -265,7 +265,7 @@ const StaffCardComponent = ({
                         size="icon"
                         variant="outline"
                         asChild
-                        className="h-8 w-8"
+                        className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation"
                       >
                         <a
                           href={socialLinks.twitter}
@@ -281,7 +281,7 @@ const StaffCardComponent = ({
                         size="icon"
                         variant="outline"
                         asChild
-                        className="h-8 w-8"
+                        className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation"
                       >
                         <a
                           href={socialLinks.facebook}
@@ -297,7 +297,7 @@ const StaffCardComponent = ({
                         size="icon"
                         variant="outline"
                         asChild
-                        className="h-8 w-8"
+                        className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation"
                       >
                         <a
                           href={socialLinks.instagram}
