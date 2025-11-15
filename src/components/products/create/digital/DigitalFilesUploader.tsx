@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, File, X, CheckCircle2, AlertCircle, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface DigitalFilesUploaderProps {
   formData: any;
@@ -46,7 +47,7 @@ export const DigitalFilesUploader = ({
 
       return data.publicUrl;
     } catch (error) {
-      console.error('Error uploading file:', error);
+      logger.error('Error uploading file', { error, fileName: file.name });
       return null;
     }
   };

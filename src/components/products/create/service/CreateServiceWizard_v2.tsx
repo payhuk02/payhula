@@ -272,7 +272,7 @@ export const CreateServiceWizard = ({
       localStorage.setItem('service-product-draft', JSON.stringify(dataToSave));
       logger.info('Brouillon service auto-sauvegardé', { step: currentStep });
     } catch (error) {
-      console.error('Auto-save error:', error);
+      logger.error('Auto-save error', { error, step: currentStep });
     } finally {
       setIsAutoSaving(false);
     }
@@ -289,7 +289,7 @@ export const CreateServiceWizard = ({
         setFormData(draft);
         logger.info('Brouillon service chargé depuis localStorage');
       } catch (error) {
-        console.error('Error loading draft:', error);
+        logger.error('Error loading draft', { error });
       }
     }
   }, []);
@@ -698,7 +698,7 @@ export const CreateServiceWizard = ({
         });
 
       if (affiliateError) {
-        console.error('Affiliate settings error:', affiliateError);
+        logger.error('Affiliate settings error', { error: affiliateError, productId });
       }
     }
 

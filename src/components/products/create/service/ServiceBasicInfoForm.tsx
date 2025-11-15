@@ -25,6 +25,7 @@ import { ImagePlus, X, Loader2, Gift, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadToSupabaseStorage } from '@/utils/uploadToSupabase';
 import type { ServiceProductFormData } from '@/types/service-product';
+import { logger } from '@/lib/logger';
 
 interface ServiceBasicInfoFormProps {
   data: Partial<ServiceProductFormData>;
@@ -72,7 +73,7 @@ export const ServiceBasicInfoForm = ({ data, onUpdate }: ServiceBasicInfoFormPro
       }
 
     } catch (error) {
-      console.error('Upload error:', error);
+      logger.error('Upload error', { error });
       toast({
         title: "❌ Erreur d'upload",
         description: error instanceof Error ? error.message : "Une erreur est survenue",

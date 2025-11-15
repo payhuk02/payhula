@@ -290,7 +290,7 @@ export const CreatePhysicalProductWizard = ({
       localStorage.setItem('physical-product-draft', JSON.stringify(dataToSave));
       logger.info('Brouillon produit physique auto-sauvegardé', { step: currentStep });
     } catch (error) {
-      console.error('Auto-save error:', error);
+      logger.error('Auto-save error', { error, step: currentStep });
     } finally {
       setIsAutoSaving(false);
     }
@@ -307,7 +307,7 @@ export const CreatePhysicalProductWizard = ({
         setFormData(draft);
         logger.info('Brouillon produit physique chargé depuis localStorage');
       } catch (error) {
-        console.error('Error loading draft:', error);
+        logger.error('Error loading draft', { error });
       }
     }
   }, []);
@@ -703,7 +703,7 @@ export const CreatePhysicalProductWizard = ({
         });
 
       if (affiliateError) {
-        console.error('Affiliate settings error:', affiliateError);
+        logger.error('Affiliate settings error', { error: affiliateError, productId });
       }
     }
 

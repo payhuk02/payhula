@@ -28,6 +28,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useStore } from '@/hooks/useStore';
 import { Ruler, Plus, Eye, Trash2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -63,7 +64,7 @@ export function PhysicalSizeChartSelector({
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching size charts:', error);
+        logger.error('Error fetching size charts', { error, storeId: store.id });
         return [];
       }
 

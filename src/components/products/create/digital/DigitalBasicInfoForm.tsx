@@ -17,6 +17,7 @@ import { generateSlug } from '@/lib/store-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import { AIContentGenerator } from '@/components/products/AIContentGenerator';
+import { logger } from '@/lib/logger';
 
 interface DigitalBasicInfoFormProps {
   formData: any;
@@ -73,7 +74,7 @@ export const DigitalBasicInfoForm = ({
       
       setSlugAvailable(data.length === 0);
     } catch (error) {
-      console.error('Error checking slug:', error);
+      logger.error('Error checking slug', { error, slug });
     } finally {
       setSlugChecking(false);
     }

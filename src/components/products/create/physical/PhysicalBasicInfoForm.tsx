@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { uploadToSupabaseStorage } from '@/utils/uploadToSupabase';
 import type { PhysicalProductFormData } from '@/types/physical-product';
 import { AIContentGenerator } from '@/components/products/AIContentGenerator';
+import { logger } from '@/lib/logger';
 
 interface PhysicalBasicInfoFormProps {
   data: Partial<PhysicalProductFormData>;
@@ -63,7 +64,7 @@ export const PhysicalBasicInfoForm = ({ data, onUpdate }: PhysicalBasicInfoFormP
       }
 
     } catch (error) {
-      console.error('Upload error:', error);
+      logger.error('Upload error', { error });
       toast({
         title: "❌ Erreur d'upload",
         description: error instanceof Error ? error.message : "Une erreur est survenue",
