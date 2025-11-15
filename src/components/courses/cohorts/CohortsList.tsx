@@ -98,3 +98,16 @@ const CohortsListComponent = ({ courseId, onCohortClick, className }: CohortsLis
   );
 };
 
+CohortsListComponent.displayName = 'CohortsListComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CohortsList = React.memo(CohortsListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.courseId === nextProps.courseId &&
+    prevProps.onCohortClick === nextProps.onCohortClick &&
+    prevProps.className === nextProps.className
+  );
+});
+
+CohortsList.displayName = 'CohortsList';
+
