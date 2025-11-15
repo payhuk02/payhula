@@ -1,10 +1,10 @@
+import React, { useMemo } from 'react';
 import { useProductRecommendations, useFrequentlyBoughtTogether, useUserProductRecommendations, ProductRecommendation, FrequentlyBoughtTogether } from '@/hooks/useProductRecommendations';
 import ProductCardModern from './ProductCardModern';
 import { ProductGrid } from '@/components/ui/ProductGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, ShoppingBag, TrendingUp } from 'lucide-react';
-import { useMemo } from 'react';
 
 interface ProductRecommendationsProps {
   productId: string;
@@ -18,7 +18,7 @@ interface ProductRecommendationsProps {
 /**
  * Composant pour afficher les recommandations de produits similaires
  */
-export function ProductRecommendations({
+const ProductRecommendationsComponent = ({
   productId,
   limit = 6,
   title = "Produits similaires",
@@ -112,10 +112,24 @@ export function ProductRecommendations({
   );
 }
 
+ProductRecommendationsComponent.displayName = 'ProductRecommendationsComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ProductRecommendations = React.memo(ProductRecommendationsComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.productId === nextProps.productId &&
+    prevProps.limit === nextProps.limit &&
+    prevProps.title === nextProps.title &&
+    prevProps.className === nextProps.className
+  );
+});
+
+ProductRecommendations.displayName = 'ProductRecommendations';
+
 /**
  * Composant pour afficher les produits fréquemment achetés ensemble
  */
-export function FrequentlyBoughtTogether({
+const FrequentlyBoughtTogetherComponent = ({
   productId,
   limit = 4,
   className = "",
@@ -213,10 +227,23 @@ export function FrequentlyBoughtTogether({
   );
 }
 
+FrequentlyBoughtTogetherComponent.displayName = 'FrequentlyBoughtTogetherComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const FrequentlyBoughtTogether = React.memo(FrequentlyBoughtTogetherComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.productId === nextProps.productId &&
+    prevProps.limit === nextProps.limit &&
+    prevProps.className === nextProps.className
+  );
+});
+
+FrequentlyBoughtTogether.displayName = 'FrequentlyBoughtTogether';
+
 /**
  * Composant pour afficher les recommandations personnalisées pour l'utilisateur
  */
-export function PersonalizedRecommendations({
+const PersonalizedRecommendationsComponent = ({
   userId,
   limit = 6,
   className = "",
