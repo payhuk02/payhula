@@ -1019,7 +1019,7 @@ const Products = () => {
 
               <Separator />
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">Note moyenne</span>
                   <p className="font-medium">{quickViewProduct.rating}/5</p>
