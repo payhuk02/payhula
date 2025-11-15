@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,8 +53,6 @@ import { BundlesSection } from "@/components/marketplace/BundlesSection";
 import { PersonalizedRecommendations } from "@/components/marketplace/ProductRecommendations";
 import { useActiveBundles } from "@/hooks/digital/useDigitalBundles";
 import { logger } from '@/lib/logger';
-import { initiateMonerooPayment } from '@/lib/moneroo-payment';
-import { safeRedirect } from '@/lib/url-validator';
 import { Product, FilterState, PaginationState } from '@/types/marketplace';
 import { useMarketplaceFavorites } from '@/hooks/useMarketplaceFavorites';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -67,6 +65,7 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 const Marketplace = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   // Récupérer les bundles actifs pour affichage
   const { data: activeBundles } = useActiveBundles(6);
@@ -463,7 +462,7 @@ const Marketplace = () => {
     return products.filter(p => favoriteIds.includes(p.id));
   }, [products, favorites]);
 
-  // Fonction d'achat (utilisée par UnifiedProductCard)
+  // Fonction d'achat (utilisée par UnifiedProductCard) - Redirige vers checkout
   const handleBuyProduct = useCallback(async (product: any) => {
     if (!product.store_id) {
       toast({
@@ -474,52 +473,27 @@ const Marketplace = () => {
       return;
     }
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user?.email) {
-        toast({
-          title: "Authentification requise",
-          description: "Veuillez vous connecter pour effectuer un achat",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const price = product.promo_price ?? product.price;
-      const result = await initiateMonerooPayment({
-        storeId: product.store_id,
-        productId: product.id,
-        amount: price,
-        currency: product.currency ?? "XOF",
-        description: `Achat de ${product.name}`,
-        customerEmail: user.email,
-        customerName: user.user_metadata?.full_name || user.email.split('@')[0],
-        metadata: { 
-          productName: product.name, 
-          storeSlug: product.store?.slug || '',
-          userId: user.id
-        },
-      });
-
-      if (result.checkout_url) {
-        safeRedirect(result.checkout_url, () => {
-          toast({
-            title: "Erreur de paiement",
-            description: "URL de paiement invalide. Veuillez réessayer.",
-            variant: "destructive",
-          });
-        });
-      }
-    } catch (error: any) {
-      logger.error("Erreur lors de l'achat:", error);
+    // Vérifier l'authentification
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user?.email) {
       toast({
-        title: "Erreur de paiement",
-        description: error.message || "Impossible d'initialiser le paiement",
+        title: "Authentification requise",
+        description: "Veuillez vous connecter pour effectuer un achat",
         variant: "destructive",
       });
+      navigate("/login");
+      return;
     }
-  }, [toast]);
+
+    // Rediriger vers la page de checkout
+    const checkoutParams = new URLSearchParams({
+      productId: product.id,
+      storeId: product.store_id,
+    });
+
+    navigate(`/checkout?${checkoutParams.toString()}`);
+  }, [toast, navigate]);
 
   // Partage de produit (utilisé par ProductCardModern)
   // Note: Cette fonction est disponible mais peut ne pas être utilisée directement ici

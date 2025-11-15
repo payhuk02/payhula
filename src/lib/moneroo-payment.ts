@@ -69,6 +69,32 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
     throw new MonerooValidationError("Amount must be greater than 0");
   }
 
+  // Validation des paramètres obligatoires
+  if (!storeId || typeof storeId !== 'string' || storeId.trim() === '') {
+    logger.error("Invalid storeId in initiateMonerooPayment:", { storeId, options });
+    throw new MonerooValidationError(`storeId invalide: ${storeId}. Doit être un UUID valide.`);
+  }
+
+  if (productId && (typeof productId !== 'string' || productId.trim() === '')) {
+    logger.error("Invalid productId in initiateMonerooPayment:", { productId, options });
+    throw new MonerooValidationError(`productId invalide: ${productId}. Doit être un UUID valide.`);
+  }
+
+  if (!customerEmail || typeof customerEmail !== 'string' || !customerEmail.includes('@')) {
+    logger.error("Invalid customerEmail in initiateMonerooPayment:", { customerEmail, options });
+    throw new MonerooValidationError(`customerEmail invalide: ${customerEmail}. Doit être une adresse email valide.`);
+  }
+
+  logger.log("initiateMonerooPayment - Paramètres validés:", {
+    storeId,
+    productId,
+    amount,
+    currency,
+    customerEmail,
+    hasDescription: !!description,
+    hasMetadata: Object.keys(metadata).length > 0,
+  });
+
   try {
     // Récupérer l'utilisateur actuel pour l'ajouter dans metadata
     const { data: { user } } = await supabase.auth.getUser();
@@ -182,15 +208,47 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
 
     logger.log("Transaction created:", transaction.id);
 
-    // 2. Log de création de transaction
-    await supabase.from("transaction_logs").insert([{
-      transaction_id: transaction.id,
-      event_type: "created",
-      status: "pending",
-      request_data: JSON.parse(JSON.stringify(options)),
-    }]);
+    // 2. Log de création de transaction (non-bloquant)
+    try {
+      await supabase.from("transaction_logs").insert([{
+        transaction_id: transaction.id,
+        event_type: "created",
+        status: "pending",
+        request_data: JSON.parse(JSON.stringify(options)),
+      }]);
+    } catch (logError: any) {
+      // Ne pas bloquer le processus si le log échoue
+      logger.warn("Failed to insert transaction log (non-critical):", logError);
+    }
 
     // 3. Initialiser le paiement Moneroo
+    // IMPORTANT: productId doit être passé directement dans data, pas seulement dans metadata
+    // L'Edge Function l'extraira et l'ajoutera à metadata.product_id
+    
+    // Nettoyer metadata : supprimer les valeurs null, undefined, et vides
+    // L'API Moneroo n'accepte que string, boolean ou integer dans metadata
+    const cleanMetadata: Record<string, unknown> = {
+      transaction_id: transaction.id,
+      store_id: storeId,
+      ...(productId && { product_id: productId }), // Ajouter product_id dans metadata aussi
+    };
+    
+    // Ajouter les métadonnées personnalisées en filtrant les valeurs null/undefined
+    Object.entries(metadata || {}).forEach(([key, value]) => {
+      // Ne pas inclure null, undefined, ou chaînes vides
+      if (value !== null && value !== undefined && value !== '') {
+        // Si c'est null, ne pas l'inclure
+        if (typeof value === 'object' && value !== null) {
+          // Pour les objets, vérifier qu'ils ne sont pas vides
+          if (Object.keys(value).length > 0) {
+            cleanMetadata[key] = value;
+          }
+        } else {
+          cleanMetadata[key] = value;
+        }
+      }
+    });
+    
     const checkoutData: MonerooCheckoutData = {
       amount,
       currency,
@@ -199,18 +257,50 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       customer_name: customerName,
       return_url: `${window.location.origin}/checkout/success?transaction_id=${transaction.id}`,
       cancel_url: `${window.location.origin}/checkout/cancel?transaction_id=${transaction.id}`,
-      metadata: {
-        transaction_id: transaction.id,
-        store_id: storeId,
-        ...metadata,
-      },
+      metadata: cleanMetadata,
+    };
+    
+    // Ajouter productId et storeId directement dans data pour que l'Edge Function puisse les extraire
+    // L'Edge Function vérifie data.productId et l'ajoute à metadata.product_id
+    const checkoutDataWithIds = {
+      ...checkoutData,
+      productId: productId, // Passer productId directement dans data
+      storeId: storeId,     // Passer storeId directement dans data
     };
 
-    logger.log("Initiating Moneroo checkout:", checkoutData);
+    logger.log("Initiating Moneroo checkout:", {
+      ...checkoutDataWithIds,
+      amount: typeof checkoutDataWithIds.amount === 'number' ? checkoutDataWithIds.amount : Number(checkoutDataWithIds.amount),
+      currency: checkoutDataWithIds.currency,
+      hasReturnUrl: !!checkoutDataWithIds.return_url,
+      hasCancelUrl: !!checkoutDataWithIds.cancel_url,
+      metadataKeys: Object.keys(checkoutDataWithIds.metadata || {}),
+      hasProductId: !!checkoutDataWithIds.productId,
+      hasStoreId: !!checkoutDataWithIds.storeId,
+    });
 
-    const monerooResponse = await monerooClient.createCheckout(checkoutData);
-
-    logger.log("Moneroo response:", monerooResponse);
+    let monerooResponse;
+    try {
+      logger.log("Calling monerooClient.createCheckout...");
+      // Passer checkoutDataWithIds qui contient productId et storeId directement
+      monerooResponse = await monerooClient.createCheckout(checkoutDataWithIds);
+      logger.log("Moneroo response received successfully:", {
+        hasResponse: !!monerooResponse,
+        responseType: typeof monerooResponse,
+        responseKeys: monerooResponse ? Object.keys(monerooResponse) : [],
+        fullResponse: monerooResponse,
+      });
+    } catch (checkoutError: any) {
+      logger.error("Error in monerooClient.createCheckout:", {
+        error: checkoutError,
+        errorMessage: checkoutError?.message,
+        errorName: checkoutError?.name,
+        errorStack: checkoutError?.stack,
+        checkoutData,
+      });
+      // Relancer l'erreur pour qu'elle soit gérée par le catch principal
+      throw checkoutError;
+    }
 
     // 4. Extraire les données de la réponse Moneroo
     // Selon la documentation Moneroo : https://docs.moneroo.io/
@@ -242,13 +332,18 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
       logger.error("Error updating transaction:", updateError);
     }
 
-    // 6. Log du paiement initié
-    await supabase.from("transaction_logs").insert([{
-      transaction_id: transaction.id,
-      event_type: "payment_initiated",
-      status: "processing",
-      response_data: monerooResponse,
-    }]);
+    // 6. Log du paiement initié (non-bloquant)
+    try {
+      await supabase.from("transaction_logs").insert([{
+        transaction_id: transaction.id,
+        event_type: "payment_initiated",
+        status: "processing",
+        response_data: monerooResponse,
+      }]);
+    } catch (logError: any) {
+      // Ne pas bloquer le processus si le log échoue
+      logger.warn("Failed to insert payment initiated log (non-critical):", logError);
+    }
 
     // 7. Retourner les données pour redirection
     return {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductReviews } from "@/hooks/useReviews";
@@ -20,9 +20,11 @@ import { Button } from "@/components/ui/button";
 import { SEOMeta, StoreSchema, BreadcrumbSchema, ItemListSchema } from "@/components/seo";
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useToast } from '@/hooks/use-toast';
 
 const Storefront = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [store, setStore] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +32,7 @@ const Storefront = () => {
   const [category, setCategory] = useState("all");
   const [productType, setProductType] = useState("all");
   const [licensingType, setLicensingType] = useState<'all' | 'standard' | 'plr' | 'copyrighted'>('all');
+  const { toast } = useToast();
 
   // Utiliser un ID stable pour éviter les violations des règles des hooks
   const storeId = store?.id || null;
@@ -164,6 +167,41 @@ const Storefront = () => {
   const headerRef = useScrollAnimation<HTMLElement>();
   const productsRef = useScrollAnimation<HTMLDivElement>();
 
+  // Handler pour l'achat - Redirige vers checkout (utilisé par UnifiedProductCard)
+  const handleBuyProduct = useCallback(async (action: 'view' | 'buy' | 'favorite', product: any) => {
+    if (action !== 'buy') return;
+    
+    if (!product.store_id) {
+      toast({
+        title: "Erreur",
+        description: "Boutique non disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Vérifier l'authentification
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user?.email) {
+      toast({
+        title: "Authentification requise",
+        description: "Veuillez vous connecter pour effectuer un achat",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
+    // Rediriger vers la page de checkout
+    const checkoutParams = new URLSearchParams({
+      productId: product.id,
+      storeId: product.store_id,
+    });
+
+    navigate(`/checkout?${checkoutParams.toString()}`);
+  }, [toast, navigate, store]);
+
   // MAINTENANT les early returns APRÈS tous les hooks
   if (loading) {
     return (
@@ -290,6 +328,7 @@ const Storefront = () => {
                                 variant="store"
                                 showAffiliate={true}
                                 showActions={true}
+                                onAction={handleBuyProduct}
                               />
                             </div>
                           );

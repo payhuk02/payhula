@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,7 +16,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { ShoppingCart, Star, ArrowLeft, CheckCircle2, Package, HelpCircle, ClipboardList, Download, Clock, RefreshCw, DollarSign, Gift, Lock, AlertTriangle, CalendarClock, Shield, AlertCircle, Eye } from "lucide-react";
+import { ShoppingCart, Star, ArrowLeft, CheckCircle2, Package, HelpCircle, ClipboardList, Download, Clock, RefreshCw, DollarSign, Gift, Lock, AlertTriangle, CalendarClock, Shield, AlertCircle, Eye, Loader2 } from "lucide-react";
 import ProductCard from "@/components/marketplace/ProductCard";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import StoreFooter from "@/components/storefront/StoreFooter";
@@ -32,14 +32,20 @@ import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { ProductRecommendations, FrequentlyBoughtTogether } from "@/components/marketplace/ProductRecommendations";
 import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
+import { formatPrice, getDisplayPrice, hasPromotion, calculateDiscount } from '@/lib/product-helpers';
+import { useToast } from '@/hooks/use-toast';
 
 const ProductDetails = () => {
   const { slug, productSlug } = useParams<{ slug: string; productSlug: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<any>(null);
   const [store, setStore] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVariantPrice, setSelectedVariantPrice] = useState<number | null>(null);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const { toast } = useToast();
 
   // ID stable pour éviter les violations des règles des hooks
   const storeId = store?.id || null;
@@ -117,13 +123,22 @@ const ProductDetails = () => {
           paidProduct = paidData;
         }
         
-        setProduct({
+        // S'assurer que store_id est présent (utiliser foundStore.id si manquant)
+        const productWithStore = {
           ...product,
+          store_id: product.store_id || foundStore.id,
           free_product: freeProduct,
           paid_product: paidProduct,
-        });
+        };
         
-        logger.info(`Produit chargé: ${product.name} (${productSlug})`);
+        setProduct(productWithStore);
+        
+        logger.info(`Produit chargé: ${product.name} (${productSlug})`, {
+          productId: product.id,
+          storeId: productWithStore.store_id,
+          price: product.price,
+          promotional_price: product.promotional_price,
+        });
       }
     } catch (error: any) {
       logger.error("Erreur lors du chargement du produit:", error);
@@ -156,6 +171,210 @@ const ProductDetails = () => {
     [product?.description]
   );
 
+  // Prix affiché cohérent avec Marketplace
+  const displayPriceInfo = useMemo(() => {
+    if (!product) return null;
+    return getDisplayPrice({
+      price: product.price,
+      promo_price: product.promotional_price,
+      currency: product.currency || 'FCFA'
+    } as any);
+  }, [product?.price, product?.promotional_price, product?.currency]);
+
+  const hasPromo = useMemo(() => {
+    if (!product) return false;
+    return hasPromotion({
+      price: product.price,
+      promo_price: product.promotional_price
+    } as any);
+  }, [product?.price, product?.promotional_price]);
+
+  const discountPercent = useMemo(() => {
+    if (!hasPromo || !product) return 0;
+    return calculateDiscount(product.price, product.promotional_price);
+  }, [hasPromo, product?.price, product?.promotional_price]);
+
+  // Handler pour l'achat avec Moneroo
+  const handleBuyNow = useCallback(async () => {
+    if (!product || !store) {
+      toast({
+        title: "Erreur",
+        description: "Produit ou boutique non disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Utiliser store.id si product.store_id n'est pas disponible (comme Marketplace/Storefront)
+    const storeId = product.store_id || store.id;
+    
+    if (!storeId) {
+      toast({
+        title: "Erreur",
+        description: "Boutique non disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!product.id) {
+      toast({
+        title: "Erreur",
+        description: "Produit non disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsPurchasing(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user?.email) {
+        toast({
+          title: "Authentification requise",
+          description: "Veuillez vous connecter pour effectuer un achat",
+          variant: "destructive",
+        });
+        setIsPurchasing(false);
+        return;
+      }
+
+      // Utiliser le prix de la variante sélectionnée ou le prix promo/normal (comme Marketplace et Storefront)
+      const basePrice = product.promotional_price || product.promo_price || product.price;
+      const price = selectedVariantPrice || basePrice;
+      
+      // S'assurer que le prix est un nombre valide
+      if (!price || isNaN(Number(price)) || Number(price) <= 0) {
+        toast({
+          title: "Erreur",
+          description: "Prix du produit invalide",
+          variant: "destructive",
+        });
+        setIsPurchasing(false);
+        return;
+      }
+      
+      // S'assurer que storeId et productId sont des strings (UUIDs)
+      const finalStoreId = String(storeId).trim();
+      const finalProductId = String(product.id).trim();
+      const finalAmount = Number(price);
+      const finalCurrency = (product.currency || "XOF").trim();
+      
+      // Validation finale avant l'appel
+      if (!finalStoreId || finalStoreId.length < 30) {
+        logger.error("Invalid storeId format:", { storeId: finalStoreId, store, product });
+        toast({
+          title: "Erreur",
+          description: "ID de boutique invalide",
+          variant: "destructive",
+        });
+        setIsPurchasing(false);
+        return;
+      }
+      
+      if (!finalProductId || finalProductId.length < 30) {
+        logger.error("Invalid productId format:", { productId: finalProductId, product });
+        toast({
+          title: "Erreur",
+          description: "ID de produit invalide",
+          variant: "destructive",
+        });
+        setIsPurchasing(false);
+        return;
+      }
+      
+      // Logger pour debug
+      logger.log("Initiating Moneroo payment from ProductDetail:", {
+        storeId: finalStoreId,
+        productId: finalProductId,
+        amount: finalAmount,
+        amountType: typeof finalAmount,
+        currency: finalCurrency,
+        productName: product.name,
+        storeSlug: store.slug,
+        userEmail: user.email,
+      });
+      
+      const result = await initiateMonerooPayment({
+        storeId: finalStoreId,
+        productId: finalProductId,
+        amount: finalAmount,
+        currency: finalCurrency,
+        description: `Achat de ${product.name}`,
+        customerEmail: user.email,
+        customerName: user.user_metadata?.full_name || user.email.split('@')[0],
+        metadata: { 
+          productName: product.name, 
+          storeSlug: store.slug || '',
+          userId: user.id,
+          // Ne pas inclure productType si c'est null (l'API Moneroo n'accepte pas null)
+          ...(product.product_type && { productType: product.product_type }),
+        },
+      });
+
+      if (result.checkout_url) {
+        safeRedirect(result.checkout_url, () => {
+          toast({
+            title: "Erreur de paiement",
+            description: "URL de paiement invalide. Veuillez réessayer.",
+            variant: "destructive",
+          });
+        });
+      }
+    } catch (error: any) {
+      logger.error("Erreur lors de l'achat:", error);
+      
+      // Extraire le message d'erreur et le formater
+      let errorMessage = error.message || "Impossible d'initialiser le paiement";
+      
+      // Si le message contient des instructions détaillées (Edge Function), les formater
+      if (errorMessage.includes('💡') || errorMessage.includes('Vérifiez:')) {
+        // Pour les erreurs Edge Function, afficher un message plus court dans le toast
+        // et logger le message complet
+        const shortMessage = errorMessage.split('\n')[0] || errorMessage;
+        const fullMessage = errorMessage;
+        
+        logger.error("Erreur détaillée Moneroo:", { fullMessage, error });
+        
+        toast({
+          title: "Erreur de paiement",
+          description: (
+            <div className="space-y-2">
+              <p className="font-semibold">{shortMessage}</p>
+              {fullMessage.includes('💡') && (
+                <div className="text-sm space-y-1 mt-2">
+                  <p className="font-medium">Instructions de dépannage :</p>
+                  <ul className="list-disc list-inside space-y-1 text-xs">
+                    {fullMessage.split('\n').filter(line => 
+                      line.trim().startsWith('1.') || 
+                      line.trim().startsWith('2.') || 
+                      line.trim().startsWith('3.') ||
+                      line.trim().startsWith('4.')
+                    ).map((line, idx) => (
+                      <li key={idx}>{line.trim()}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ),
+          variant: "destructive",
+          duration: 10000, // Afficher plus longtemps pour les erreurs importantes
+        });
+      } else {
+        toast({
+          title: "Erreur de paiement",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsPurchasing(false);
+    }
+  }, [product, store, selectedVariantPrice, displayPriceInfo, toast]);
+
   // SEO Meta données
   const seoData = useMemo(() => {
     if (!product || !store || !productUrl) return null;
@@ -180,11 +399,11 @@ const ProductDetails = () => {
       url: String(productUrl),
       image: String(product.image_url || `${window.location.origin}/og-default.jpg`),
       imageAlt: String(product.name || 'Produit') + ' - ' + String(store.name || 'Boutique'),
-      price: typeof product.price === 'number' ? product.price : undefined,
+      price: displayPriceInfo ? (typeof displayPriceInfo.price === 'number' ? displayPriceInfo.price : undefined) : undefined,
       currency: product.currency ? String(product.currency) : undefined,
       availability: product.is_active ? ('instock' as const) : ('outofstock' as const)
     };
-  }, [product, store, productUrl]);
+  }, [product, store, productUrl, displayPriceInfo]);
 
   // Breadcrumb
   const breadcrumbItems = useMemo(() => {
@@ -389,12 +608,24 @@ const ProductDetails = () => {
                 )}
 
                 <div className="space-y-2">
-                  <div className="text-4xl font-bold">
-                    {product.price.toLocaleString()}{" "}
-                    <span className="text-2xl text-muted-foreground">
-                      {product.currency}
-                    </span>
-                  </div>
+                  {/* Prix avec promotion cohérent avec Marketplace */}
+                  {displayPriceInfo && (
+                    <div className="flex items-baseline gap-3 flex-wrap">
+                      {displayPriceInfo.originalPrice && (
+                        <span className="text-2xl text-muted-foreground line-through">
+                          {formatPrice(displayPriceInfo.originalPrice, product.currency || 'FCFA')}
+                        </span>
+                      )}
+                      <div className="text-4xl font-bold text-primary">
+                        {formatPrice(displayPriceInfo.price, product.currency || 'FCFA')}
+                      </div>
+                      {hasPromo && discountPercent > 0 && (
+                        <Badge variant="destructive" className="text-sm font-semibold">
+                          -{discountPercent}%
+                        </Badge>
+                      )}
+                    </div>
+                  )}
 
                   {/* 🎯 NOUVEAU: Modèle de tarification */}
                   {product.pricing_model && (
@@ -460,7 +691,7 @@ const ProductDetails = () => {
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-sm"
                         >
                           <Package className="h-4 w-4" />
-                          Accéder à la version complète ({product.paid_product.price.toLocaleString()} {product.paid_product.currency})
+                          Accéder à la version complète ({formatPrice(product.paid_product.price, product.paid_product.currency || 'FCFA')})
                         </Link>
                       </div>
                     </div>
@@ -505,22 +736,37 @@ const ProductDetails = () => {
                 {product.variants && Array.isArray(product.variants) && product.variants.length > 0 && (
                   <ProductVariantSelector
                     variants={product.variants}
-                    basePrice={product.price}
+                    basePrice={displayPriceInfo?.price ?? product.price}
                     currency={product.currency || "XOF"}
                     onVariantChange={(variant, price) => {
                       setSelectedVariantPrice(price);
+                      setSelectedVariantId(variant?.id || null);
                     }}
                   />
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Acheter maintenant
-                    {selectedVariantPrice && selectedVariantPrice !== product.price && (
-                      <span className="ml-2">
-                        ({selectedVariantPrice.toLocaleString()} {product.currency})
-                      </span>
+                  <Button 
+                    size="lg" 
+                    className="w-full sm:w-auto"
+                    onClick={handleBuyNow}
+                    disabled={isPurchasing || !product || !product.is_active}
+                  >
+                    {isPurchasing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Traitement...
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Acheter maintenant
+                        {selectedVariantPrice && selectedVariantPrice !== (displayPriceInfo?.price ?? product.price) && (
+                          <span className="ml-2">
+                            ({formatPrice(selectedVariantPrice, product.currency || 'FCFA')})
+                          </span>
+                        )}
+                      </>
                     )}
                   </Button>
 
@@ -528,7 +774,7 @@ const ProductDetails = () => {
                   <PriceStockAlertButton
                     productId={product.id}
                     productName={product.name}
-                    currentPrice={selectedVariantPrice || product.promotional_price || product.price}
+                    currentPrice={selectedVariantPrice || (displayPriceInfo?.price ?? product.price)}
                     currency={product.currency || 'XOF'}
                     productType={product.product_type}
                     stockQuantity={(product as any).stock_quantity}

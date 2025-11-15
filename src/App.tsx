@@ -137,7 +137,7 @@ const Storefront = lazy(() => import("./pages/Storefront"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Cart = lazy(() => import("./pages/Cart"));
-const Checkout = lazy(() => import("./pages/Checkout"));
+const Checkout = lazy(() => import("./pages/checkout/Checkout"));
 const MultiStoreSummary = lazy(() => import("./pages/checkout/MultiStoreSummary"));
 const MultiStoreOrdersHistory = lazy(() => import("./pages/customer/MultiStoreOrdersHistory"));
 const CustomerPortal = lazy(() => import("./pages/customer/CustomerPortal"));
@@ -365,6 +365,7 @@ const AppContent = () => {
           {/* --- Routes Moneroo --- */}
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/cancel" element={<PaymentCancel />} />
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* --- Routes utilisateur (protégées) --- */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

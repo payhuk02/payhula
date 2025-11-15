@@ -188,6 +188,85 @@ serve(async (req) => {
           nameParts: customerNameParts,
         });
         
+        // Construire metadata en incluant productId et storeId si présents
+        // L'API Moneroo exige metadata.product_id
+        // IMPORTANT: L'API Moneroo n'accepte que string, boolean ou integer dans metadata
+        // Il faut filtrer les valeurs null, undefined, et objets vides
+        const rawMetadata = data.metadata || {};
+        const metadata: Record<string, string | number | boolean> = {};
+        
+        // Nettoyer les métadonnées : ne garder que les valeurs valides (string, number, boolean)
+        Object.entries(rawMetadata).forEach(([key, value]) => {
+          if (value !== null && value !== undefined && value !== '') {
+            // Convertir en type valide pour Moneroo
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+              metadata[key] = value;
+            } else if (typeof value === 'object') {
+              // Pour les objets, les convertir en string JSON
+              try {
+                metadata[key] = JSON.stringify(value);
+              } catch {
+                // Si la conversion échoue, ignorer cette clé
+                console.warn(`[Moneroo Edge Function] Cannot serialize metadata.${key}, skipping`);
+              }
+            }
+          }
+        });
+        
+        // Log AVANT l'ajout pour diagnostic
+        console.log('[Moneroo Edge Function] Before metadata construction:', {
+          dataKeys: Object.keys(data),
+          dataProductId: data.productId,
+          dataStoreId: data.storeId,
+          existingMetadata: { ...metadata },
+          existingMetadataKeys: Object.keys(metadata),
+        });
+        
+        // Ajouter productId à metadata si présent dans data
+        // IMPORTANT: Vérifier aussi product_id (snake_case) au cas où il serait déjà dans metadata
+        if (data.productId) {
+          metadata.product_id = String(data.productId); // S'assurer que c'est une string
+          console.log('[Moneroo Edge Function] Added product_id to metadata:', metadata.product_id);
+        } else if (data.product_id) {
+          metadata.product_id = String(data.product_id);
+          console.log('[Moneroo Edge Function] Using product_id from data:', metadata.product_id);
+        }
+        
+        // Ajouter storeId à metadata si présent dans data
+        if (data.storeId) {
+          metadata.store_id = String(data.storeId);
+          console.log('[Moneroo Edge Function] Added store_id to metadata:', metadata.store_id);
+        } else if (data.store_id) {
+          metadata.store_id = String(data.store_id);
+          console.log('[Moneroo Edge Function] Using store_id from data:', metadata.store_id);
+        }
+        
+        // Vérification finale - S'assurer que product_id est présent
+        if (!metadata.product_id) {
+          console.error('[Moneroo Edge Function] WARNING: product_id is missing from metadata!', {
+            dataProductId: data.productId,
+            dataProduct_id: data.product_id,
+            metadataKeys: Object.keys(metadata),
+            fullData: JSON.stringify(data, null, 2),
+          });
+        }
+        
+        // Log pour diagnostic - DÉTAILLÉ pour voir exactement ce qui se passe
+        console.log('[Moneroo Edge Function] Metadata construction:', {
+          originalMetadata: data.metadata,
+          productId: data.productId,
+          storeId: data.storeId,
+          hasProductId: !!data.productId,
+          hasStoreId: !!data.storeId,
+          productIdType: typeof data.productId,
+          storeIdType: typeof data.storeId,
+          metadataBefore: { ...metadata },
+          finalMetadata: metadata,
+          finalMetadataKeys: Object.keys(metadata),
+          finalMetadataProductId: metadata.product_id,
+          finalMetadataStoreId: metadata.store_id,
+        });
+        
         body = {
           amount: data.amount,
           currency: data.currency || 'XOF',
@@ -198,7 +277,7 @@ serve(async (req) => {
             last_name: lastName,
           },
           return_url: data.return_url,
-          metadata: data.metadata || {},
+          metadata: metadata,
           // methods est optionnel, peut être ajouté si spécifié dans data
           ...(data.methods && { methods: data.methods }),
         };
