@@ -109,7 +109,7 @@ const DeleteStoreDialogComponent = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <AlertDialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 text-xl">
             <AlertTriangle className="h-6 w-6 text-destructive" />

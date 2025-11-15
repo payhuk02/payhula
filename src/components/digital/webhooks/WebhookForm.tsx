@@ -172,7 +172,7 @@ export const WebhookForm = ({ webhookId, onSuccess, onCancel }: WebhookFormProps
 
       <div className="space-y-2">
         <Label>Événements à écouter *</Label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 border rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 p-4 border rounded-lg">
           {WEBHOOK_EVENTS.map((event) => (
             <div key={event} className="flex items-center space-x-2">
               <Checkbox
@@ -205,7 +205,7 @@ export const WebhookForm = ({ webhookId, onSuccess, onCancel }: WebhookFormProps
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="retry_count">Nombre de tentatives</Label>
           <Select
@@ -264,13 +264,14 @@ export const WebhookForm = ({ webhookId, onSuccess, onCancel }: WebhookFormProps
         />
       </div>
 
-      <div className="flex justify-end gap-2 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} className="w-full sm:w-auto">
           Annuler
         </Button>
         <Button
           type="submit"
           disabled={createWebhook.isPending || updateWebhook.isPending}
+          className="w-full sm:w-auto"
         >
           {(createWebhook.isPending || updateWebhook.isPending) && (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
