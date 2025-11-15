@@ -3,7 +3,7 @@
  * Date: 28 octobre 2025
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +39,7 @@ const statusConfig: Record<string, { label: string; color: string; variant: any 
   cancelled: { label: 'Annulé', color: 'bg-gray-500', variant: 'destructive' },
 };
 
-export function ShipmentCard({ shipment, onRefresh }: ShipmentCardProps) {
+const ShipmentCardComponent = ({ shipment, onRefresh }: ShipmentCardProps) => {
   const [showTimeline, setShowTimeline] = useState(false);
   const printLabel = usePrintLabel();
   const cancelShipment = useCancelShipment();
@@ -59,7 +59,7 @@ export function ShipmentCard({ shipment, onRefresh }: ShipmentCardProps) {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow" style={{ willChange: 'transform' }}>
       <CardContent className="p-6">
         <div className="space-y-4">
           {/* Header */}
@@ -222,5 +222,17 @@ export function ShipmentCard({ shipment, onRefresh }: ShipmentCardProps) {
       </CardContent>
     </Card>
   );
-}
+};
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ShipmentCard = React.memo(ShipmentCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.shipment.id === nextProps.shipment.id &&
+    prevProps.shipment.status === nextProps.shipment.status &&
+    prevProps.shipment.tracking_number === nextProps.shipment.tracking_number &&
+    prevProps.onRefresh === nextProps.onRefresh
+  );
+});
+
+ShipmentCard.displayName = 'ShipmentCard';
 

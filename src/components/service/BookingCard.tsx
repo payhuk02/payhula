@@ -5,6 +5,7 @@
  * Professional card for displaying service bookings
  */
 
+import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,7 +43,7 @@ interface BookingCardProps {
   showActions?: boolean;
 }
 
-export const BookingCard = ({
+const BookingCardComponent = ({
   booking,
   onConfirm,
   onCancel,
@@ -280,6 +281,24 @@ export const BookingCard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const BookingCard = React.memo(BookingCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.booking.id === nextProps.booking.id &&
+    prevProps.booking.status === nextProps.booking.status &&
+    prevProps.booking.start_time === nextProps.booking.start_time &&
+    prevProps.booking.end_time === nextProps.booking.end_time &&
+    prevProps.booking.total_price === nextProps.booking.total_price &&
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.onConfirm === nextProps.onConfirm &&
+    prevProps.onCancel === nextProps.onCancel &&
+    prevProps.onComplete === nextProps.onComplete &&
+    prevProps.onNoShow === nextProps.onNoShow
+  );
+});
+
+BookingCard.displayName = 'BookingCard';
 
 /**
  * Bookings List

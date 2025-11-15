@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Product } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,7 +34,7 @@ interface ProductCardProps {
   storeSlug: string;
 }
 
-const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
+const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
@@ -176,7 +176,7 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
   );
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg">
+    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg" style={{ willChange: 'transform' }}>
       {/* Image avec overlay et badges - 60% de la hauteur de la carte */}
       <div className="product-image-container relative overflow-hidden flex-[0.6] min-h-[300px] md:min-h-[360px] lg:min-h-[420px]">
         <OptimizedImage
@@ -426,5 +426,21 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ProductCard = React.memo(ProductCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    (prevProps.product as any).promotional_price === (nextProps.product as any).promotional_price &&
+    prevProps.product.image_url === nextProps.product.image_url &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.product.rating === nextProps.product.rating &&
+    prevProps.product.reviews_count === nextProps.product.reviews_count &&
+    prevProps.storeSlug === nextProps.storeSlug
+  );
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star, Heart, Eye, CheckCircle, Clock, TrendingUp, Loader2, BarChart3, Download, Shield, ShoppingBag } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
@@ -49,7 +49,7 @@ interface ProductCardProfessionalProps {
   isInComparison?: boolean;
 }
 
-const ProductCardProfessional = ({ 
+const ProductCardProfessionalComponent = ({ 
   product, 
   storeSlug,
   onAddToComparison,
@@ -227,7 +227,7 @@ const ProductCardProfessional = ({
   };
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg" role="article" aria-label={`Produit: ${product.name}`}>
+    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg" style={{ willChange: 'transform' }} role="article" aria-label={`Produit: ${product.name}`}>
       {/* Image avec overlay et badges - 60% de la hauteur de la carte */}
       <div className="product-image-container relative overflow-hidden flex-[0.6] min-h-[300px] md:min-h-[360px] lg:min-h-[420px]">
         <OptimizedImage
@@ -255,17 +255,17 @@ const ProductCardProfessional = ({
         {product && (product as any).licensing_type && (
           <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
             {(product as any).licensing_type === 'plr' && (
-              <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105" aria-label="Licence: PLR - Private Label Rights" title="PLR (Private Label Rights) : peut être modifié et revendu selon conditions">
+              <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ willChange: 'transform' }} aria-label="Licence: PLR - Private Label Rights" title="PLR (Private Label Rights) : peut être modifié et revendu selon conditions">
                 <Shield className="h-3.5 w-3.5 mr-1.5" /> PLR
               </Badge>
             )}
             {(product as any).licensing_type === 'copyrighted' && (
-              <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105" aria-label="Produit protégé par droit d'auteur" title="Protégé par droit d'auteur : revente/modification non autorisées">
+              <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ willChange: 'transform' }} aria-label="Produit protégé par droit d'auteur" title="Protégé par droit d'auteur : revente/modification non autorisées">
                 <Shield className="h-3.5 w-3.5 mr-1.5" /> Droit d'auteur
               </Badge>
             )}
             {(product as any).licensing_type === 'standard' && (
-              <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105" aria-label="Licence standard" title="Licence standard : utilisation personnelle uniquement">
+              <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ willChange: 'transform' }} aria-label="Licence standard" title="Licence standard : utilisation personnelle uniquement">
                 <Shield className="h-3.5 w-3.5 mr-1.5" /> Standard
               </Badge>
             )}
@@ -487,5 +487,23 @@ const ProductCardProfessional = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ProductCardProfessional = React.memo(ProductCardProfessionalComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.promotional_price === nextProps.product.promotional_price &&
+    prevProps.product.image_url === nextProps.product.image_url &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.product.rating === nextProps.product.rating &&
+    prevProps.product.reviews_count === nextProps.product.reviews_count &&
+    prevProps.storeSlug === nextProps.storeSlug &&
+    prevProps.isInComparison === nextProps.isInComparison &&
+    prevProps.onAddToComparison === nextProps.onAddToComparison
+  );
+});
+
+ProductCardProfessional.displayName = 'ProductCardProfessional';
 
 export default ProductCardProfessional;
