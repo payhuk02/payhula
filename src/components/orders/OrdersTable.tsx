@@ -137,7 +137,7 @@ const OrdersTableComponent = ({ orders, onUpdate, storeId, sortBy, sortDirection
     } finally {
       setLoading(false);
     }
-  };
+  }, [deleteId, onUpdate]); // Note: toast est stable
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
