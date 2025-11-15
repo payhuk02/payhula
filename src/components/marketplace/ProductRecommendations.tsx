@@ -18,12 +18,12 @@ interface ProductRecommendationsProps {
 /**
  * Composant pour afficher les recommandations de produits similaires
  */
-const ProductRecommendationsComponent = ({
+const ProductRecommendationsComponent: React.FC<ProductRecommendationsProps> = ({
   productId,
   limit = 6,
   title = "Produits similaires",
   className = "",
-}: ProductRecommendationsProps) {
+}) => {
   const { data: recommendations, isLoading, error } = useProductRecommendations(
     productId,
     limit,
@@ -129,11 +129,11 @@ ProductRecommendations.displayName = 'ProductRecommendations';
 /**
  * Composant pour afficher les produits fréquemment achetés ensemble
  */
-const FrequentlyBoughtTogetherComponent = ({
+const FrequentlyBoughtTogetherComponent: React.FC<ProductRecommendationsProps> = ({
   productId,
   limit = 4,
   className = "",
-}: ProductRecommendationsProps) {
+}) => {
   const { data: recommendations, isLoading, error } = useFrequentlyBoughtTogether(
     productId,
     limit,
@@ -240,18 +240,20 @@ export const FrequentlyBoughtTogether = React.memo(FrequentlyBoughtTogetherCompo
 
 FrequentlyBoughtTogether.displayName = 'FrequentlyBoughtTogether';
 
-/**
- * Composant pour afficher les recommandations personnalisées pour l'utilisateur
- */
-const PersonalizedRecommendationsComponent = ({
-  userId,
-  limit = 6,
-  className = "",
-}: {
+interface PersonalizedRecommendationsProps {
   userId: string | null;
   limit?: number;
   className?: string;
-}) {
+}
+
+/**
+ * Composant pour afficher les recommandations personnalisées pour l'utilisateur
+ */
+const PersonalizedRecommendationsComponent: React.FC<PersonalizedRecommendationsProps> = ({
+  userId,
+  limit = 6,
+  className = "",
+}) => {
   const { data: recommendations, isLoading, error } = useUserProductRecommendations(
     userId,
     limit,
