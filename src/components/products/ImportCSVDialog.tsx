@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +40,7 @@ interface ImportCSVDialogProps {
   onImportConfirmed: (products: any[]) => Promise<void>;
 }
 
-export const ImportCSVDialog = ({
+const ImportCSVDialogComponent = ({
   open,
   onOpenChange,
   onImportConfirmed,
@@ -54,7 +54,7 @@ export const ImportCSVDialog = ({
   const [validationResult, setValidationResult] = useState<any>(null);
   const [step, setStep] = useState<'upload' | 'preview'>('upload');
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -120,9 +120,9 @@ export const ImportCSVDialog = ({
     } finally {
       setImporting(false);
     }
-  };
+  }, [validationResult, onImportConfirmed]); // Note: toast est stable
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setParsedData(null);
     setValidationResult(null);
     setStep('upload');
@@ -130,9 +130,9 @@ export const ImportCSVDialog = ({
       fileInputRef.current.value = '';
     }
     onOpenChange(false);
-  };
+  }, [onOpenChange]);
 
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = useCallback(() => {
     const template = [
       ['name', 'slug', 'description', 'price', 'currency', 'product_type', 'category', 'licensing_type', 'license_terms', 'is_active', 'stock_quantity', 'sku', 'promotional_price', 'image_url'],
       ['Mon Produit', 'mon-produit', 'Description du produit', '10000', 'XOF', 'digital', 'Formation', 'standard', '', 'true', '100', 'SKU-001', '', ''],
@@ -382,4 +382,17 @@ export const ImportCSVDialog = ({
     </Dialog>
   );
 };
+
+ImportCSVDialogComponent.displayName = 'ImportCSVDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ImportCSVDialog = React.memo(ImportCSVDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.onImportConfirmed === nextProps.onImportConfirmed
+  );
+});
+
+ImportCSVDialog.displayName = 'ImportCSVDialog';
 

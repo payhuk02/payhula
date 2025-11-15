@@ -1,3 +1,4 @@
+import React, { useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ interface SEODetailDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogProps) => {
+const SEODetailDialogComponent = ({ page, open, onOpenChange }: SEODetailDialogProps) => {
   const navigate = useNavigate();
 
   if (!page) return null;
@@ -36,14 +37,14 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
     }
   };
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     onOpenChange(false);
     if (page.type === 'product') {
       navigate(`/dashboard/products/edit/${page.id}`);
     } else {
       navigate('/dashboard/store');
     }
-  };
+  }, [page, onOpenChange, navigate]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -186,3 +187,17 @@ export const SEODetailDialog = ({ page, open, onOpenChange }: SEODetailDialogPro
     </Dialog>
   );
 };
+
+SEODetailDialogComponent.displayName = 'SEODetailDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const SEODetailDialog = React.memo(SEODetailDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.page?.id === nextProps.page?.id &&
+    prevProps.page?.analysis.score.overall === nextProps.page?.analysis.score.overall
+  );
+});
+
+SEODetailDialog.displayName = 'SEODetailDialog';

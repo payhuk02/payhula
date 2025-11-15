@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ interface EditPixelDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const EditPixelDialog = ({ pixel, open, onOpenChange }: EditPixelDialogProps) => {
+const EditPixelDialogComponent = ({ pixel, open, onOpenChange }: EditPixelDialogProps) => {
   const { updatePixel } = usePixels();
   const [formData, setFormData] = useState({
     pixel_type: pixel.pixel_type,
@@ -34,13 +34,13 @@ export const EditPixelDialog = ({ pixel, open, onOpenChange }: EditPixelDialogPr
     });
   }, [pixel]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const success = await updatePixel(pixel.id, formData);
     if (success) {
       onOpenChange(false);
     }
-  };
+  }, [pixel.id, formData, updatePixel, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -130,3 +130,18 @@ export const EditPixelDialog = ({ pixel, open, onOpenChange }: EditPixelDialogPr
     </Dialog>
   );
 };
+
+EditPixelDialogComponent.displayName = 'EditPixelDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const EditPixelDialog = React.memo(EditPixelDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.pixel?.id === nextProps.pixel?.id &&
+    prevProps.pixel?.pixel_type === nextProps.pixel?.pixel_type &&
+    prevProps.pixel?.is_active === nextProps.pixel?.is_active
+  );
+});
+
+EditPixelDialog.displayName = 'EditPixelDialog';
