@@ -56,3 +56,16 @@ const AssignmentsListComponent = ({
   );
 };
 
+AssignmentsListComponent.displayName = 'AssignmentsListComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const AssignmentsList = React.memo(AssignmentsListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.courseId === nextProps.courseId &&
+    prevProps.enrollmentId === nextProps.enrollmentId &&
+    prevProps.onAssignmentClick === nextProps.onAssignmentClick
+  );
+});
+
+AssignmentsList.displayName = 'AssignmentsList';
+
