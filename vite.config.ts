@@ -12,22 +12,70 @@ export default defineConfig(({ mode }) => {
   const hasSentryToken = !!env.SENTRY_AUTH_TOKEN;
 
   // Plugin personnalisé pour garantir l'ordre de chargement des chunks
-  // TEMPORAIREMENT DÉSACTIVÉ pour éviter l'erreur forwardRef
-  // Le chunk principal (index) doit être chargé et exécuté AVANT tous les autres chunks
+  // CRITIQUE: Le chunk principal (index) doit être chargé et exécuté AVANT tous les autres chunks
+  // Cela évite l'erreur "Cannot read properties of undefined (reading 'forwardRef')"
   const ensureChunkOrderPlugin = (): Plugin => {
     return {
       name: 'ensure-chunk-order',
       transformIndexHtml: {
-        order: 'pre',
+        order: 'post',
         handler(html, ctx) {
-          // TEMPORAIREMENT DÉSACTIVÉ - Retourner le HTML tel quel
-          // Le code splitting est désactivé, donc il n'y a qu'un seul chunk
-          // Pas besoin de réorganiser l'ordre de chargement
-          return html;
+          if (!isProduction) return html;
           
-          // CODE DÉSACTIVÉ (sera réactivé quand le code splitting sera réactivé) :
-          // if (!isProduction) return html;
-          // ... reste du code commenté
+          // Extraire tous les scripts modules
+          const scriptRegex = /<script[^>]*type=["']module["'][^>]*src=["']([^"']+)["'][^>]*><\/script>/g;
+          const scripts: Array<{ src: string; fullTag: string }> = [];
+          let match;
+          
+          while ((match = scriptRegex.exec(html)) !== null) {
+            scripts.push({
+              src: match[1],
+              fullTag: match[0]
+            });
+          }
+          
+          if (scripts.length === 0) return html;
+          
+          // Trouver le script index (chunk principal contenant React)
+          const indexScript = scripts.find(s => 
+            s.src.includes('index-') || s.src.includes('/js/index-')
+          );
+          
+          if (!indexScript) return html;
+          
+          // Retirer tous les scripts de l'HTML
+          let newHtml = html;
+          scripts.forEach(script => {
+            newHtml = newHtml.replace(script.fullTag, '');
+          });
+          
+          // Ajouter modulepreload pour le chunk principal au début du <head>
+          // Cela garantit que React est préchargé avant tous les autres chunks
+          const modulePreloadTag = `    <link rel="modulepreload" href="${indexScript.src}">\n`;
+          const headStart = newHtml.indexOf('<head>');
+          if (headStart !== -1) {
+            const headAfterTag = newHtml.indexOf('>', headStart) + 1;
+            newHtml = newHtml.slice(0, headAfterTag) + modulePreloadTag + newHtml.slice(headAfterTag);
+          }
+          
+          // Réinsérer le script index en premier (dans le <head> ou <body>)
+          const indexScriptTag = indexScript.fullTag;
+          const headEnd = newHtml.indexOf('</head>');
+          if (headEnd !== -1) {
+            newHtml = newHtml.slice(0, headEnd) + `\n    ${indexScriptTag}` + newHtml.slice(headEnd);
+          }
+          
+          // Réinsérer les autres scripts après le script index
+          scripts.forEach(script => {
+            if (script !== indexScript) {
+              const headEnd = newHtml.indexOf('</head>');
+              if (headEnd !== -1) {
+                newHtml = newHtml.slice(0, headEnd) + `\n    ${script.fullTag}` + newHtml.slice(headEnd);
+              }
+            }
+          });
+          
+          return newHtml;
         },
       },
     };

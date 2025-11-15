@@ -1,3 +1,6 @@
+// CRITIQUE: Importer React explicitement en premier pour garantir qu'il est disponible
+// avant tous les autres imports qui pourraient utiliser React.forwardRef ou React.memo
+import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
