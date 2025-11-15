@@ -139,10 +139,12 @@ export interface ServicesListProps {
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <ServicesList 
  *   services={services}
- *   onEdit={(service) => console.log('Edit', service)}
- *   onDelete={(service) => console.log('Delete', service)}
+ *   onEdit={(service) => logger.info('Edit service', { serviceId: service.id })}
+ *   onDelete={(service) => logger.info('Delete service', { serviceId: service.id })}
  *   enableSelection={true}
  *   showStats={true}
  *   categories={['Coaching', 'Consultation', 'Formation']}

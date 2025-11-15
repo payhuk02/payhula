@@ -173,10 +173,12 @@ const EVENT_CONFIG: Record<
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <BookingHistory 
  *   events={events}
  *   showFilters={true}
- *   onExport={(events) => console.log('Export', events)}
+ *   onExport={(events) => logger.info('Export bookings', { count: events.length })}
  *   maxHeight="600px"
  * />
  * ```

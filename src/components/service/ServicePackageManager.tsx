@@ -160,9 +160,11 @@ const TIER_CONFIG: Record<
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <ServicePackageManager 
  *   packages={packages}
- *   onSave={(packages) => console.log('Saved', packages)}
+ *   onSave={(packages) => logger.info('Packages saved', { count: packages.length })}
  *   enableAutoGenerate={true}
  *   availableOptions={[
  *     { id: '1', name: 'Support prioritaire', included: false },

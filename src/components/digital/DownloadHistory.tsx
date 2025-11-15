@@ -167,9 +167,11 @@ const EVENT_CONFIG: Record<
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <DownloadHistory 
  *   events={downloadEvents}
- *   onEventClick={(event) => console.log('Event:', event)}
+ *   onEventClick={(event) => logger.info('Download event clicked', { eventId: event.id })}
  *   showFilters={true}
  *   showSearch={true}
  *   variant="timeline"

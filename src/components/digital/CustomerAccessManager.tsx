@@ -113,11 +113,13 @@ export interface CustomerAccessManagerProps {
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <CustomerAccessManager 
  *   customerAccess={accessList}
- *   onRevokeAccess={(id, reason) => console.log('Revoke:', id, reason)}
- *   onRestoreAccess={(id) => console.log('Restore:', id)}
- *   onUpdateLimit={(id, limit) => console.log('Update limit:', id, limit)}
+ *   onRevokeAccess={(id, reason) => logger.info('Revoke access', { accessId: id, reason })}
+ *   onRestoreAccess={(id) => logger.info('Restore access', { accessId: id })}
+ *   onUpdateLimit={(id, limit) => logger.info('Update limit', { accessId: id, limit })}
  * />
  * ```
  */

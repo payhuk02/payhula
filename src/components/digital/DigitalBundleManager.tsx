@@ -113,16 +113,18 @@ export interface DigitalBundleManagerProps {
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <DigitalBundleManager 
  *   availableProducts={products}
- *   onSave={(bundle) => console.log('Bundle saved:', bundle)}
+ *   onSave={(bundle) => logger.info('Bundle saved', { bundleId: bundle.id })}
  *   mode="create"
  * />
  * 
  * <DigitalBundleManager 
  *   bundle={existingBundle}
  *   availableProducts={products}
- *   onSave={(bundle) => console.log('Bundle updated:', bundle)}
+ *   onSave={(bundle) => logger.info('Bundle updated', { bundleId: bundle.id })}
  *   mode="edit"
  * />
  * ```

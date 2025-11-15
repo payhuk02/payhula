@@ -167,10 +167,12 @@ const CATEGORY_CONFIG: Record<DigitalCategory, { label: string; color: string }>
  * 
  * @example
  * ```tsx
+ * import { logger } from '@/lib/logger';
+ * 
  * <DigitalProductsList 
  *   products={digitalProducts}
- *   onEdit={(id) => console.log('Edit:', id)}
- *   onDelete={(id) => console.log('Delete:', id)}
+ *   onEdit={(id) => logger.info('Edit product', { productId: id })}
+ *   onDelete={(id) => logger.info('Delete product', { productId: id })}
  *   showBulkActions={true}
  *   showFilters={true}
  *   showSearch={true}

@@ -225,9 +225,9 @@ export function InventoryDashboard({ storeId, className }: InventoryDashboardPro
                 </div>
                 <PhysicalProductsList
                   storeId={storeId}
-                  onCreateProduct={() => console.log('Create product')}
-                  onEditProduct={(id) => console.log('Edit:', id)}
-                  onViewProduct={(id) => console.log('View:', id)}
+                  onCreateProduct={() => logger.info('Create product action')}
+                  onEditProduct={(id) => logger.info('Edit product', { productId: id })}
+                  onViewProduct={(id) => logger.info('View product', { productId: id })}
                 />
               </div>
             </TabsContent>
@@ -255,7 +255,7 @@ export function InventoryDashboard({ storeId, className }: InventoryDashboardPro
                 </div>
                 <BulkInventoryUpdate
                   storeId={storeId}
-                  onComplete={(count) => console.log(`Updated ${count} products`)}
+                  onComplete={(count) => logger.info('Bulk inventory update completed', { count })}
                 />
               </div>
             </TabsContent>
