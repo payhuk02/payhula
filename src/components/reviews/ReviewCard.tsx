@@ -26,7 +26,7 @@ interface ReviewCardProps {
   currentUserVote?: { is_helpful: boolean } | null;
 }
 
-export const ReviewCard: React.FC<ReviewCardProps> = ({
+const ReviewCardComponent: React.FC<ReviewCardProps> = ({
   review,
   onVote,
   onReply,
@@ -37,7 +37,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   const detailedFields = getDetailedRatingFields(review.product_type);
 
   return (
-    <Card>
+    <Card style={{ willChange: 'transform' }}>
       <CardContent className="pt-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -146,4 +146,22 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ReviewCard = React.memo(ReviewCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.review.id === nextProps.review.id &&
+    prevProps.review.rating === nextProps.review.rating &&
+    prevProps.review.helpful_count === nextProps.review.helpful_count &&
+    prevProps.review.reply_count === nextProps.review.reply_count &&
+    prevProps.review.created_at === nextProps.review.created_at &&
+    prevProps.showReplies === nextProps.showReplies &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.currentUserVote?.is_helpful === nextProps.currentUserVote?.is_helpful &&
+    prevProps.onVote === nextProps.onVote &&
+    prevProps.onReply === nextProps.onReply
+  );
+});
+
+ReviewCard.displayName = 'ReviewCard';
 

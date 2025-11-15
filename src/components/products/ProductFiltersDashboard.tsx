@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useState, RefObject } from "react";
+import React, { useState, RefObject } from "react";
 
 interface ProductFiltersDashboardProps {
   searchQuery: string;
@@ -41,7 +41,7 @@ interface ProductFiltersDashboardProps {
   activeProducts?: number;
 }
 
-const ProductFiltersDashboard = ({
+const ProductFiltersDashboardComponent = ({
   searchQuery,
   onSearchChange,
   searchInputRef,
@@ -372,5 +372,31 @@ const ProductFiltersDashboard = ({
     </div>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ProductFiltersDashboard = React.memo(ProductFiltersDashboardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.searchQuery === nextProps.searchQuery &&
+    prevProps.category === nextProps.category &&
+    prevProps.productType === nextProps.productType &&
+    prevProps.status === nextProps.status &&
+    prevProps.stockStatus === nextProps.stockStatus &&
+    prevProps.sortBy === nextProps.sortBy &&
+    prevProps.viewMode === nextProps.viewMode &&
+    prevProps.totalProducts === nextProps.totalProducts &&
+    prevProps.activeProducts === nextProps.activeProducts &&
+    prevProps.categories.length === nextProps.categories.length &&
+    prevProps.productTypes.length === nextProps.productTypes.length &&
+    prevProps.onSearchChange === nextProps.onSearchChange &&
+    prevProps.onCategoryChange === nextProps.onCategoryChange &&
+    prevProps.onProductTypeChange === nextProps.onProductTypeChange &&
+    prevProps.onStatusChange === nextProps.onStatusChange &&
+    prevProps.onStockStatusChange === nextProps.onStockStatusChange &&
+    prevProps.onSortByChange === nextProps.onSortByChange &&
+    prevProps.onViewModeChange === nextProps.onViewModeChange
+  );
+});
+
+ProductFiltersDashboard.displayName = 'ProductFiltersDashboard';
 
 export default ProductFiltersDashboard;

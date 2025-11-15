@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star, Percent, Loader2, Shield } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
@@ -26,7 +26,7 @@ interface ProductCardProps {
   storeSlug: string;
 }
 
-const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
+const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -97,6 +97,7 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
   return (
     <article 
       className="group relative flex flex-col rounded-2xl bg-card overflow-hidden transition-all duration-300 hover:-translate-y-1 product-card product-card-mobile sm:product-card-tablet lg:product-card-desktop min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg"
+      style={{ willChange: 'transform' }}
       role="article"
       aria-labelledby={`product-title-${product.id}`}
       aria-describedby={`product-description-${product.id}`}
@@ -230,5 +231,21 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
     </article>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ProductCard = React.memo(ProductCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.promo_price === nextProps.product.promo_price &&
+    prevProps.product.image_url === nextProps.product.image_url &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.product.rating === nextProps.product.rating &&
+    prevProps.product.reviews_count === nextProps.product.reviews_count &&
+    prevProps.storeSlug === nextProps.storeSlug
+  );
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;
