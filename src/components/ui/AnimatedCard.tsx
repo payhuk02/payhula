@@ -42,6 +42,19 @@ const AnimatedCardComponent: React.FC<AnimatedCardProps> = ({
   );
 };
 
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const AnimatedCard = React.memo(AnimatedCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.children === nextProps.children &&
+    prevProps.className === nextProps.className &&
+    prevProps.hoverEffect === nextProps.hoverEffect &&
+    prevProps.delay === nextProps.delay &&
+    prevProps.onClick === nextProps.onClick
+  );
+});
+
+AnimatedCard.displayName = 'AnimatedCard';
+
 interface AnimatedButtonProps {
   children: ReactNode;
   className?: string;
