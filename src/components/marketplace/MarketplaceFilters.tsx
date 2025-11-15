@@ -41,7 +41,7 @@ const MarketplaceFilters = ({
       {/* Desktop Filters */}
       <div className="hidden sm:flex flex-wrap gap-3">
         <Select value={categoryFilter} onValueChange={onCategoryChange}>
-          <SelectTrigger className="w-[180px] md:w-[200px] bg-card border-border">
+          <SelectTrigger className="w-full sm:w-[180px] md:w-[200px] bg-card border-border">
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent className="z-50 bg-background">
@@ -55,7 +55,7 @@ const MarketplaceFilters = ({
         </Select>
 
         <Select value={priceRange} onValueChange={onPriceChange}>
-          <SelectTrigger className="w-[180px] md:w-[200px] bg-card border-border">
+          <SelectTrigger className="w-full sm:w-[180px] md:w-[200px] bg-card border-border">
             <SelectValue placeholder="Prix" />
           </SelectTrigger>
           <SelectContent className="z-50 bg-background">
@@ -67,7 +67,7 @@ const MarketplaceFilters = ({
         </Select>
 
         <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-[180px] md:w-[200px] bg-card border-border">
+          <SelectTrigger className="w-full sm:w-[180px] md:w-[200px] bg-card border-border">
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Trier par" />
           </SelectTrigger>
