@@ -174,9 +174,11 @@ export default defineConfig(({ mode }) => {
           }
           
           // Radix UI components (groupe tous les composants UI)
-          // IMPORTANT: Chargé après React grâce à preserveEntrySignatures
+          // CRITIQUE: Garder dans le chunk principal avec React pour éviter les erreurs d'initialisation
+          // Radix UI doit avoir accès aux internes React (_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED)
+          // qui ne sont disponibles que si React est dans le même chunk
           if (id.includes('node_modules/@radix-ui')) {
-            return 'radix-ui';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Composants lourds - Charts
