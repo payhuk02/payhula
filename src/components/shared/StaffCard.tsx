@@ -425,7 +425,7 @@ const StaffCardComponent = ({
           {socialLinks && (
             <div className="flex justify-center gap-2">
               {socialLinks.linkedin && (
-                <Button size="icon" variant="outline" asChild className="h-8 w-8">
+                <Button size="icon" variant="outline" asChild className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation">
                   <a
                     href={socialLinks.linkedin}
                     target="_blank"
@@ -436,7 +436,7 @@ const StaffCardComponent = ({
                 </Button>
               )}
               {socialLinks.twitter && (
-                <Button size="icon" variant="outline" asChild className="h-8 w-8">
+                <Button size="icon" variant="outline" asChild className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation">
                   <a
                     href={socialLinks.twitter}
                     target="_blank"
@@ -447,7 +447,7 @@ const StaffCardComponent = ({
                 </Button>
               )}
               {socialLinks.facebook && (
-                <Button size="icon" variant="outline" asChild className="h-8 w-8">
+                <Button size="icon" variant="outline" asChild className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation">
                   <a
                     href={socialLinks.facebook}
                     target="_blank"
@@ -458,7 +458,7 @@ const StaffCardComponent = ({
                 </Button>
               )}
               {socialLinks.instagram && (
-                <Button size="icon" variant="outline" asChild className="h-8 w-8">
+                <Button size="icon" variant="outline" asChild className="h-8 w-8 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] touch-manipulation">
                   <a
                     href={socialLinks.instagram}
                     target="_blank"
