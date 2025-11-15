@@ -114,7 +114,10 @@ const ProductCardDashboardComponent = ({
   };
 
   return (
-    <Card className={`group shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm flex flex-col min-h-[400px] md:min-h-[500px] lg:min-h-[600px] ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}>
+    <Card 
+      className={`group shadow-sm hover:shadow-md transition-all duration-300 bg-card/50 backdrop-blur-sm flex flex-col min-h-[400px] md:min-h-[500px] lg:min-h-[600px] ${isSelected ? 'ring-2 ring-primary shadow-primary/20' : ''}`}
+      style={{ willChange: 'transform' }}
+    >
       <CardHeader className="p-0 relative overflow-hidden rounded-t-lg flex-[0.6] min-h-[240px] md:min-h-[300px] lg:min-h-[360px]">
         {product.image_url && !imageError && imageAttrs ? (
           <div className="h-full w-full rounded-t-lg overflow-hidden bg-muted relative">
@@ -122,7 +125,8 @@ const ProductCardDashboardComponent = ({
               {...imageAttrs}
               alt={product.name}
               placeholder="skeleton"
-              className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+              className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300 sm:duration-500 ease-out"
+              style={{ willChange: 'transform' }}
               onError={() => setImageError(true)}
               format="webp"
               quality={85}

@@ -121,6 +121,7 @@ const ProductFiltersDashboard = ({
               size="sm"
               onClick={() => onViewModeChange("grid")}
               className="h-7 sm:h-8 w-7 sm:w-8 p-0 transition-all duration-200 hover:scale-110"
+              style={{ willChange: 'transform' }}
               aria-label="Vue en grille"
             >
               <Grid3X3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -130,6 +131,7 @@ const ProductFiltersDashboard = ({
               size="sm"
               onClick={() => onViewModeChange("list")}
               className="h-7 sm:h-8 w-7 sm:w-8 p-0 transition-all duration-200 hover:scale-110"
+              style={{ willChange: 'transform' }}
               aria-label="Vue en liste"
             >
               <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -156,6 +158,7 @@ const ProductFiltersDashboard = ({
               size="sm"
               onClick={() => onSearchChange("")}
               className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-accent/50 transition-all duration-200"
+              style={{ willChange: 'transform' }}
               aria-label="Effacer la recherche"
             >
               <X className="h-3.5 w-3.5" />
@@ -168,6 +171,7 @@ const ProductFiltersDashboard = ({
             <Button 
               variant="outline" 
               className="relative h-9 sm:h-10 hover:bg-accent/50 transition-all duration-200 hover:scale-105 active:scale-95"
+              style={{ willChange: 'transform' }}
             >
               <SlidersHorizontal className="h-4 w-4 mr-1.5 sm:mr-2" />
               <span className="hidden sm:inline">Filtres</span>

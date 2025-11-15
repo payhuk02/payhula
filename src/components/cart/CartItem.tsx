@@ -1,8 +1,10 @@
 /**
  * Composant CartItem - Item individuel du panier
  * Date: 26 Janvier 2025
+ * Optimisé avec React.memo pour performance mobile
  */
 
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, Plus, Minus } from 'lucide-react';
@@ -15,7 +17,7 @@ interface CartItemProps {
   isLoading?: boolean;
 }
 
-export function CartItem({ item, onUpdateQuantity, onRemove, isLoading }: CartItemProps) {
+const CartItemComponent = ({ item, onUpdateQuantity, onRemove, isLoading }: CartItemProps) => {
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity < 1) {
       onRemove(item.id!);
@@ -113,5 +115,20 @@ export function CartItem({ item, onUpdateQuantity, onRemove, isLoading }: CartIt
       </div>
     </div>
   );
-}
+};
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CartItem = React.memo(CartItemComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.item.id === nextProps.item.id &&
+    prevProps.item.quantity === nextProps.item.quantity &&
+    prevProps.item.unit_price === nextProps.item.unit_price &&
+    prevProps.item.discount_amount === nextProps.item.discount_amount &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.onUpdateQuantity === nextProps.onUpdateQuantity &&
+    prevProps.onRemove === nextProps.onRemove
+  );
+});
+
+CartItem.displayName = 'CartItem';
 
