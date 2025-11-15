@@ -179,7 +179,7 @@ const CATEGORY_CONFIG: Record<DigitalCategory, { label: string; color: string }>
  * />
  * ```
  */
-export const DigitalProductsList: React.FC<DigitalProductsListProps> = ({
+const DigitalProductsListComponent: React.FC<DigitalProductsListProps> = ({
   products,
   onSelect,
   onEdit,
@@ -762,6 +762,27 @@ export const DigitalProductsList: React.FC<DigitalProductsListProps> = ({
     </div>
   );
 };
+
+DigitalProductsListComponent.displayName = 'DigitalProductsListComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const DigitalProductsList = React.memo(DigitalProductsListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.products.length === nextProps.products.length &&
+    prevProps.onSelect === nextProps.onSelect &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete &&
+    prevProps.onDuplicate === nextProps.onDuplicate &&
+    prevProps.onArchive === nextProps.onArchive &&
+    prevProps.onView === nextProps.onView &&
+    // Comparaison superficielle des products (comparer les IDs)
+    prevProps.products.every((product, index) => 
+      product.id === nextProps.products[index]?.id &&
+      product.is_active === nextProps.products[index]?.is_active &&
+      product.price === nextProps.products[index]?.price
+    )
+  );
+});
 
 DigitalProductsList.displayName = 'DigitalProductsList';
 

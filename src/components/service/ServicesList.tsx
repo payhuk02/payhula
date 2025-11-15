@@ -152,7 +152,7 @@ export interface ServicesListProps {
  * />
  * ```
  */
-export const ServicesList: React.FC<ServicesListProps> = ({
+const ServicesListComponent: React.FC<ServicesListProps> = ({
   services,
   onServiceSelect,
   onEdit,
@@ -654,6 +654,25 @@ export const ServicesList: React.FC<ServicesListProps> = ({
     </div>
   );
 };
+
+ServicesListComponent.displayName = 'ServicesListComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ServicesList = React.memo(ServicesListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.services.length === nextProps.services.length &&
+    prevProps.onSelect === nextProps.onSelect &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete &&
+    prevProps.onView === nextProps.onView &&
+    // Comparaison superficielle des services (comparer les IDs)
+    prevProps.services.every((service, index) => 
+      service.id === nextProps.services[index]?.id &&
+      service.is_active === nextProps.services[index]?.is_active &&
+      service.price === nextProps.services[index]?.price
+    )
+  );
+});
 
 ServicesList.displayName = 'ServicesList';
 

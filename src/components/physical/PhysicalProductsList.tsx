@@ -81,7 +81,7 @@ type SortBy = 'name' | 'created_at' | 'price' | 'stock' | 'revenue';
 // MAIN COMPONENT
 // ============================================================================
 
-export function PhysicalProductsList({
+function PhysicalProductsListComponent({
   storeId,
   onCreateProduct,
   onEditProduct,
@@ -464,4 +464,16 @@ export function PhysicalProductsList({
   );
 }
 
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const PhysicalProductsList = React.memo(PhysicalProductsListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.storeId === nextProps.storeId &&
+    prevProps.onCreateProduct === nextProps.onCreateProduct &&
+    prevProps.onEditProduct === nextProps.onEditProduct &&
+    prevProps.onViewProduct === nextProps.onViewProduct &&
+    prevProps.className === nextProps.className
+  );
+});
+
+PhysicalProductsList.displayName = 'PhysicalProductsList';
 
