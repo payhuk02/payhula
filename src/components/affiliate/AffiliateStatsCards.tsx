@@ -114,6 +114,7 @@ const AffiliateStatsCardsComponent = ({
           <Card
             key={index}
             className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+            style={{ willChange: 'transform' }}
           >
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">

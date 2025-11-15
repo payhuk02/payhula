@@ -125,6 +125,7 @@ const DigitalSubscriptionCardComponent = ({
         subscription.status === 'past_due' && "border-yellow-500",
         className
       )}
+      style={{ willChange: 'transform' }}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">

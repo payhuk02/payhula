@@ -106,7 +106,7 @@ const StaffCardComponent = ({
   // Variant Compact (pour listes)
   if (variant === 'compact') {
     return (
-      <Card className={cn('hover:shadow-md transition-shadow', className)}>
+      <Card className={cn('hover:shadow-md transition-shadow', className)} style={{ willChange: 'transform' }}>
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             {/* Avatar avec status indicator */}
@@ -157,7 +157,7 @@ const StaffCardComponent = ({
   // Variant Horizontal (pour détails)
   if (variant === 'horizontal') {
     return (
-      <Card className={cn('hover:shadow-lg transition-shadow', className)}>
+      <Card className={cn('hover:shadow-lg transition-shadow', className)} style={{ willChange: 'transform' }}>
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Avatar */}

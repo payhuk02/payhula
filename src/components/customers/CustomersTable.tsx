@@ -27,7 +27,7 @@ const CustomerCard = ({
   onDelete: (id: string) => void;
 }) => {
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+    <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4" style={{ willChange: 'transform' }}>
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">

@@ -337,6 +337,7 @@ const ServicesListComponent: React.FC<ServicesListProps> = ({
           'p-4 hover:shadow-md transition-shadow cursor-pointer',
           isSelected && 'ring-2 ring-primary'
         )}
+        style={{ willChange: 'transform' }}
         onClick={() => onServiceSelect?.(service)}
       >
         <div className="space-y-3">
