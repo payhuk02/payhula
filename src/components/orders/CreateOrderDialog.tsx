@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,7 @@ interface OrderItem {
   currency: string;
 }
 
-export const CreateOrderDialog = ({ open, onOpenChange, onSuccess, storeId }: CreateOrderDialogProps) => {
+const CreateOrderDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: CreateOrderDialogProps) => {
   const { toast } = useToast();
   const { customers } = useCustomers(storeId);
   const { products } = useProducts(storeId);
@@ -37,7 +37,7 @@ export const CreateOrderDialog = ({ open, onOpenChange, onSuccess, storeId }: Cr
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string>("cash");
 
-  const handleAddItem = () => {
+  const handleAddItem = useCallback(() => {
     if (!products || products.length === 0) {
       toast({
         title: "Attention",
@@ -67,34 +67,36 @@ export const CreateOrderDialog = ({ open, onOpenChange, onSuccess, storeId }: Cr
         currency: firstActiveProduct.currency || 'FCFA',
       },
     ]);
-  };
+  }, [products, items, toast]);
 
-  const handleRemoveItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
+  const handleRemoveItem = useCallback((index: number) => {
+    setItems(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
-  const handleItemChange = (index: number, field: keyof OrderItem, value: any) => {
-    const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
+  const handleItemChange = useCallback((index: number, field: keyof OrderItem, value: any) => {
+    setItems(prev => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], [field]: value };
 
-    // Si on change le produit, mettre à jour le prix et le nom
-    if (field === 'productId') {
-      const selectedProduct = products?.find(p => p.id === value);
-      if (selectedProduct) {
-        newItems[index].productName = selectedProduct.name;
-        newItems[index].unitPrice = Number(selectedProduct.price);
-        newItems[index].currency = selectedProduct.currency || 'FCFA';
+      // Si on change le produit, mettre à jour le prix et le nom
+      if (field === 'productId') {
+        const selectedProduct = products?.find(p => p.id === value);
+        if (selectedProduct) {
+          newItems[index].productName = selectedProduct.name;
+          newItems[index].unitPrice = Number(selectedProduct.price);
+          newItems[index].currency = selectedProduct.currency || 'FCFA';
+        }
       }
-    }
 
-    setItems(newItems);
-  };
+      return newItems;
+    });
+  }, [products]);
 
-  const calculateTotal = () => {
+  const calculateTotal = useMemo(() => {
     return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-  };
+  }, [items]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (items.length === 0) {
@@ -109,7 +111,7 @@ export const CreateOrderDialog = ({ open, onOpenChange, onSuccess, storeId }: Cr
     setLoading(true);
 
     try {
-      const totalAmount = calculateTotal();
+      const totalAmount = calculateTotal;
       const currency = items[0]?.currency || 'FCFA';
 
       // Generate order number
@@ -168,14 +170,14 @@ export const CreateOrderDialog = ({ open, onOpenChange, onSuccess, storeId }: Cr
     } finally {
       setLoading(false);
     }
-  };
+  }, [items, customerId, paymentMethod, notes, storeId, onSuccess, onOpenChange, toast, calculateTotal]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setCustomerId("");
     setItems([]);
     setNotes("");
     setPaymentMethod("cash");
-  };
+  }, []);
 
   const formatPrice = (price: number) => {
     return price.toLocaleString('fr-FR', {

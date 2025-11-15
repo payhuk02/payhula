@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ export const CreatePixelDialog = () => {
     is_active: true,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const success = await createPixel(formData);
     if (success) {
@@ -33,7 +33,11 @@ export const CreatePixelDialog = () => {
         is_active: true,
       });
     }
-  };
+  }, [formData, createPixel]);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -121,7 +125,7 @@ export const CreatePixelDialog = () => {
           </div>
 
           <div className="flex justify-end gap-2 pt-3 sm:pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="h-9 sm:h-10 text-xs sm:text-sm">
+            <Button type="button" variant="outline" onClick={handleClose} className="h-9 sm:h-10 text-xs sm:text-sm">
               Annuler
             </Button>
             <Button type="submit" className="h-9 sm:h-10 text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
