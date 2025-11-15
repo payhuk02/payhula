@@ -369,3 +369,17 @@ const CreateOrderDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: 
     </Dialog>
   );
 };
+
+CreateOrderDialogComponent.displayName = 'CreateOrderDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CreateOrderDialog = React.memo(CreateOrderDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.onSuccess === nextProps.onSuccess &&
+    prevProps.storeId === nextProps.storeId
+  );
+});
+
+CreateOrderDialog.displayName = 'CreateOrderDialog';
