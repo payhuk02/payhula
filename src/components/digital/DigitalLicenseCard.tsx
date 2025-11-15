@@ -261,6 +261,22 @@ const DigitalLicenseCardComponent = ({
   );
 };
 
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const DigitalLicenseCard = React.memo(DigitalLicenseCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.license.id === nextProps.license.id &&
+    prevProps.license.license_key === nextProps.license.license_key &&
+    prevProps.license.status === nextProps.license.status &&
+    prevProps.license.max_activations === nextProps.license.max_activations &&
+    prevProps.license.current_activations === nextProps.license.current_activations &&
+    prevProps.license.expires_at === nextProps.license.expires_at &&
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.onManage === nextProps.onManage
+  );
+});
+
+DigitalLicenseCard.displayName = 'DigitalLicenseCard';
+
 /**
  * Skeleton for loading state
  */

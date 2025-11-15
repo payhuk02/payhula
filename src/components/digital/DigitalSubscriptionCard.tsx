@@ -288,6 +288,23 @@ const DigitalSubscriptionCardComponent = ({
   );
 };
 
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const DigitalSubscriptionCard = React.memo(DigitalSubscriptionCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.subscription.id === nextProps.subscription.id &&
+    prevProps.subscription.status === nextProps.subscription.status &&
+    prevProps.subscription.current_period_end === nextProps.subscription.current_period_end &&
+    prevProps.subscription.amount === nextProps.subscription.amount &&
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.onCancel === nextProps.onCancel &&
+    prevProps.onReactivate === nextProps.onReactivate &&
+    prevProps.onViewPayments === nextProps.onViewPayments &&
+    prevProps.className === nextProps.className
+  );
+});
+
+DigitalSubscriptionCard.displayName = 'DigitalSubscriptionCard';
+
 /**
  * Subscriptions Grid - Grille d'abonnements
  */
