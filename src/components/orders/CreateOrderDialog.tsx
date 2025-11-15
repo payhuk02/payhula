@@ -316,7 +316,7 @@ const CreateOrderDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: 
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Total de la commande</span>
                 <span className="text-2xl font-bold">
-                  {formatPrice(calculateTotal())} {items[0]?.currency || 'FCFA'}
+                  {formatPrice(calculateTotal)} {items[0]?.currency || 'FCFA'}
                 </span>
               </div>
             </Card>
