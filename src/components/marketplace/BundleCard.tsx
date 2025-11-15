@@ -3,6 +3,7 @@
  * Date: 26 Janvier 2025
  */
 
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +18,7 @@ interface BundleCardProps {
   storeSlug: string;
 }
 
-export function BundleCard({ bundle, storeSlug }: BundleCardProps) {
+const BundleCardComponent = ({ bundle, storeSlug }: BundleCardProps) => {
   const { addItem } = useCart();
   const { toast } = useToast();
 
@@ -55,7 +56,7 @@ export function BundleCard({ bundle, storeSlug }: BundleCardProps) {
   };
 
   return (
-    <Card className="group relative overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary transition-all duration-300 hover:shadow-xl rounded-lg">
+    <Card className="group relative overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary transition-all duration-300 hover:shadow-xl rounded-lg" style={{ willChange: 'transform' }}>
       {/* Badge Bundle */}
       <div className="absolute top-3 left-3 z-10">
         <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
@@ -82,6 +83,7 @@ export function BundleCard({ bundle, storeSlug }: BundleCardProps) {
               src={bundle.image_url}
               alt={bundle.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+              style={{ willChange: 'transform' }}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
@@ -183,5 +185,20 @@ export function BundleCard({ bundle, storeSlug }: BundleCardProps) {
       </CardContent>
     </Card>
   );
-}
+};
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const BundleCard = React.memo(BundleCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.bundle.id === nextProps.bundle.id &&
+    prevProps.bundle.name === nextProps.bundle.name &&
+    prevProps.bundle.bundle_price === nextProps.bundle.bundle_price &&
+    prevProps.bundle.savings_percentage === nextProps.bundle.savings_percentage &&
+    prevProps.bundle.discount_percentage === nextProps.bundle.discount_percentage &&
+    prevProps.bundle.image_url === nextProps.bundle.image_url &&
+    prevProps.storeSlug === nextProps.storeSlug
+  );
+});
+
+BundleCard.displayName = 'BundleCard';
 

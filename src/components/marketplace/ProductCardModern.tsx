@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   ShoppingCart, 
@@ -69,7 +69,7 @@ interface ProductCardModernProps {
   shippingCost?: number;
 }
 
-const ProductCardModern = ({ 
+const ProductCardModernComponent = ({ 
   product, 
   storeSlug,
   affiliateCommissionRate,
@@ -252,6 +252,7 @@ const ProductCardModern = ({
   return (
     <article 
       className="group relative flex flex-col rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      style={{ willChange: 'transform' }}
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
@@ -263,7 +264,7 @@ const ProductCardModern = ({
             alt={product.name}
             width={400}
             height={300}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-300 sm:duration-500 group-hover:scale-110"
             priority={false}
             preset="productImage"
             responsive={true}
@@ -492,6 +493,26 @@ const ProductCardModern = ({
     </article>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const ProductCardModern = React.memo(ProductCardModernComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.promotional_price === nextProps.product.promotional_price &&
+    prevProps.product.image_url === nextProps.product.image_url &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.product.rating === nextProps.product.rating &&
+    prevProps.product.reviews_count === nextProps.product.reviews_count &&
+    prevProps.product.is_featured === nextProps.product.is_featured &&
+    prevProps.storeSlug === nextProps.storeSlug &&
+    prevProps.affiliateCommissionRate === nextProps.affiliateCommissionRate &&
+    prevProps.freeShipping === nextProps.freeShipping &&
+    prevProps.shippingCost === nextProps.shippingCost
+  );
+});
+
+ProductCardModern.displayName = 'ProductCardModern';
 
 export default ProductCardModern;
 export { ProductCardModern };

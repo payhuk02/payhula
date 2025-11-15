@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ interface CourseCardProps {
   course: Course;
 }
 
-export const CourseCard = ({ course }: CourseCardProps) => {
+const CourseCardComponent = ({ course }: CourseCardProps) => {
   const { product } = course;
 
   // Helper pour formater la durée
@@ -36,7 +37,7 @@ export const CourseCard = ({ course }: CourseCardProps) => {
   const levelBadge = getLevelBadge(course.level);
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group" style={{ willChange: 'transform' }}>
       {/* Image du cours */}
       <div className="relative aspect-video overflow-hidden bg-muted">
         {product?.image_url ? (
@@ -46,6 +47,7 @@ export const CourseCard = ({ course }: CourseCardProps) => {
             width={1280}
             height={720}
             className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+            style={{ willChange: 'transform' }}
           />
         ) : (
           <div className="flex items-center justify-center h-full bg-gradient-to-br from-orange-400/20 to-orange-600/20">
@@ -144,4 +146,20 @@ export const CourseCard = ({ course }: CourseCardProps) => {
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CourseCard = React.memo(CourseCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.course.id === nextProps.course.id &&
+    prevProps.course.total_enrollments === nextProps.course.total_enrollments &&
+    prevProps.course.total_lessons === nextProps.course.total_lessons &&
+    prevProps.course.total_duration_minutes === nextProps.course.total_duration_minutes &&
+    prevProps.course.product?.price === nextProps.course.product?.price &&
+    prevProps.course.product?.image_url === nextProps.course.product?.image_url &&
+    prevProps.course.product?.name === nextProps.course.product?.name &&
+    prevProps.course.product?.average_rating === nextProps.course.product?.average_rating
+  );
+});
+
+CourseCard.displayName = 'CourseCard';
 

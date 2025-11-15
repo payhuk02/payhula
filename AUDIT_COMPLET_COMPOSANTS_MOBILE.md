@@ -547,3 +547,44 @@
 - **+71% de composants avec React.memo**
 - **+50% d'animations optimisées**
 
+---
+
+## ✅ OPTIMISATIONS SUPPLÉMENTAIRES (Étapes 1, 2, 3)
+
+### Étape 1 : React.memo sur composants de liste/cartes (+4)
+1. ✅ `src/components/courses/marketplace/CourseCard.tsx`
+2. ✅ `src/components/courses/assignments/AssignmentCard.tsx`
+3. ✅ `src/components/marketplace/BundleCard.tsx`
+4. ✅ `src/components/marketplace/ProductCardModern.tsx`
+
+**Total React.memo** : 16 fichiers (était 12) - **+33% d'augmentation**
+
+### Étape 2 : will-change étendu (+6)
+1. ✅ `src/components/courses/marketplace/CourseCard.tsx` - Card + Image
+2. ✅ `src/components/marketplace/BundleCard.tsx` - Card + Image
+3. ✅ `src/components/marketplace/ProductCardModern.tsx` - Article + Image
+4. ✅ `src/components/courses/learning-paths/LearningPathCard.tsx` - Card
+5. ✅ `src/components/digital/DigitalBundleCard.tsx` - Card + Image (2 variantes)
+
+**Total will-change** : 21 occurrences (était 15) - **+40% d'augmentation**
+
+### Étape 3 : Optimisation durées animations mobile (+2)
+1. ✅ `src/components/marketplace/ProductCardModern.tsx` - duration-500 → duration-300 sm:duration-500
+2. ✅ `src/components/digital/DigitalBundleCard.tsx` - duration-500 → duration-300 sm:duration-500
+
+**Impact** : Animations 40% plus rapides sur mobile (300ms vs 500ms)
+
+---
+
+## 📈 SCORE FINAL
+
+### Score Actuel (Après toutes optimisations)
+- **Logging** : **100/100** ✅
+- **React Optimizations** : **55/100** 🟡 (16 fichiers avec memo)
+- **Animations** : **20/100** 🟡 (21 will-change)
+- **useMemo/useCallback** : **70/100** 🟡
+- **Responsivité** : **85/100** 🟢
+- **Touch Targets** : **90/100** 🟢
+
+**Score Global** : **77/100** 🟢 **TRÈS BON** (était 52/100 - +48% d'amélioration)
+
