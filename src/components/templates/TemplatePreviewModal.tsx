@@ -141,7 +141,11 @@ export function TemplatePreviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0">
+      <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0
+        pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]
+        pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]
+        overflow-x-hidden overflow-y-auto overscroll-contain
+        -webkit-overflow-scrolling-touch">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center gap-3">

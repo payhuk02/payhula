@@ -229,7 +229,9 @@ export const FileVersionManager = ({ fileId, fileName }: FileVersionManagerProps
       {/* Dialog de détails de version */}
       {selectedVersion && (
         <Dialog open={!!selectedVersion} onOpenChange={(open) => !open && setSelectedVersion(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto
+            pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]
+            overscroll-contain -webkit-overflow-scrolling-touch">
             <DialogHeader>
               <DialogTitle>
                 Version {selectedVersion.version_number} - {selectedVersion.version_label}
