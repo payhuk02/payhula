@@ -6,7 +6,7 @@
 
 Cet audit examine tous les sous-composants (formulaires, inputs, selects, textareas, dialogs) pour identifier les problèmes d'affichage mobile.
 
-**Score Global**: 95/100 (après corrections)
+**Score Global**: 98/100 (après toutes les corrections)
 
 ---
 
@@ -307,4 +307,72 @@ Tous les dialogs principaux ont maintenant `max-w-[95vw] sm:max-w-*`:
 - `OrderDetailDialog` ✅
 
 **Recommandation**: Toutes les corrections critiques ont été appliquées. L'expérience mobile est maintenant optimale.
+
+---
+
+## Corrections Complémentaires - Phase 2
+
+### ✅ Tous les Dialogs Restants (33 fichiers corrigés)
+
+**Dialogs Templates & Digital**:
+- `TemplateExporterDialog` ✅
+- `CreateUpdateDialog` ✅
+- `DigitalFilePreview` ✅
+- `DigitalDownloadButton` ✅
+- `FileVersionManager` ✅
+- `WebhookLogs` (digital) ✅
+
+**Dialogs Service**:
+- `ServiceBundleBuilder` ✅
+- `RecurringBookingManager` ✅
+- `ServicePackageManager` ✅
+- `AdvancedServiceCalendar` ✅
+- `ResourceConflictDetector` ✅
+- `StaffAvailabilityManager` ✅
+
+**Dialogs Products & Shipping**:
+- `AIContentGenerator` ✅
+- `CreateShipmentDialog` ✅
+- `PhysicalSizeChartSelector` ✅
+
+**Dialogs Physical Inventory**:
+- `ExpirationAlerts` ✅
+- `BundlesManager` (2 dialogs) ✅
+- `BackordersManager` (3 dialogs) ✅
+- `PreOrdersManager` ✅
+- `SerialNumbersManager` (3 dialogs) ✅
+- `LotsManager` (2 dialogs) ✅
+- `WarehouseManager` ✅
+- `StockAlerts` ✅
+- `WarehouseTransfers` ✅
+- `WarehousesManagement` ✅
+- `InventoryCSVManager` ✅
+- `WebhookLogs` (physical) ✅
+- `KitComponents` ✅
+- `WarrantiesManagement` ✅
+
+**Dialogs Other**:
+- `WishlistShareDialog` ✅
+- `OneClickUpsell` ✅
+- `MultiDomainManager` ✅
+- `MyReturns` ✅
+
+**Total**: 33 fichiers corrigés avec `max-w-[95vw] sm:max-w-*`
+
+---
+
+## Statut Final
+
+### ✅ Tous les Dialogs Principaux
+- **10 dialogs principaux** (Phase 1) ✅
+- **33 dialogs supplémentaires** (Phase 2) ✅
+- **Total: 43+ dialogs** optimisés pour mobile ✅
+
+### ✅ Tous les Composants UI de Base
+- Input, Select, Textarea: 100% responsive ✅
+
+### ✅ Tous les Formulaires
+- WebhookForm: Grilles et boutons optimisés ✅
+
+**Conclusion**: Tous les sous-composants et dialogs de la plateforme sont maintenant optimisés pour mobile avec des largeurs responsives.
 
