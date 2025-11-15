@@ -185,9 +185,11 @@ export default defineConfig(({ mode }) => {
             return undefined; // Garder dans le chunk principal avec React
           }
           
-          // Composants lourds - Charts
+          // Composants lourds - Charts - CRITIQUE: Garder dans le chunk principal avec React
+          // Recharts doit avoir accès aux internes React et peut avoir des problèmes d'initialisation
+          // si chargé avant React
           if (id.includes('node_modules/recharts')) {
-            return 'charts';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Composants lourds - Calendrier - CRITIQUE: Garder dans le chunk principal avec React
