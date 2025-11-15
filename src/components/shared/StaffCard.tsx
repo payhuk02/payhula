@@ -518,7 +518,7 @@ interface StaffListProps {
   className?: string;
 }
 
-export const StaffList = ({
+const StaffListComponent = ({
   staff,
   variant = 'default',
   columns = 3,
@@ -539,4 +539,24 @@ export const StaffList = ({
     </div>
   );
 };
+
+StaffListComponent.displayName = 'StaffListComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const StaffList = React.memo(StaffListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.staff.length === nextProps.staff.length &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.columns === nextProps.columns &&
+    prevProps.className === nextProps.className &&
+    // Comparaison superficielle des staff (comparer les IDs)
+    prevProps.staff.every((member, index) => 
+      member.id === nextProps.staff[index]?.id &&
+      member.name === nextProps.staff[index]?.name &&
+      member.availability === nextProps.staff[index]?.availability
+    )
+  );
+});
+
+StaffList.displayName = 'StaffList';
 

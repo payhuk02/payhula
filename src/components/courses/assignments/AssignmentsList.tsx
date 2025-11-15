@@ -3,6 +3,7 @@
  * Liste des assignments pour un cours avec soumissions étudiant
  */
 
+import React from 'react';
 import { FileText } from 'lucide-react';
 import { useStudentAssignments } from '@/hooks/courses/useAssignments';
 import { AssignmentCard } from './AssignmentCard';
@@ -14,7 +15,7 @@ interface AssignmentsListProps {
   onAssignmentClick?: (assignmentId: string) => void;
 }
 
-export const AssignmentsList = ({ 
+const AssignmentsListComponent = ({ 
   courseId, 
   enrollmentId,
   onAssignmentClick 
