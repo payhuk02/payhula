@@ -95,9 +95,9 @@ const ImportCSVDialogComponent = ({
         });
       },
     });
-  };
+  }, []); // Note: toast est stable, setParsing, setStep, setParsedData, setValidationResult sont stables
 
-  const handleConfirmImport = async () => {
+  const handleConfirmImport = useCallback(async () => {
     if (!validationResult || validationResult.successCount === 0) return;
 
     setImporting(true);
