@@ -1,0 +1,142 @@
+/**
+ * Transformateurs pour convertir les produits de la base de données
+ * vers le format UnifiedProduct
+ */
+
+import { UnifiedProduct, DigitalProduct, PhysicalProduct, ServiceProduct, CourseProduct } from '@/types/unified-product';
+
+/**
+ * Transforme un produit de la base de données vers UnifiedProduct
+ */
+export function transformToUnifiedProduct(product: any): UnifiedProduct {
+  const base: any = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description || product.short_description,
+    price: product.price || 0,
+    promo_price: product.promotional_price || product.promo_price,
+    currency: product.currency || 'FCFA',
+    image_url: product.image_url,
+    images: product.images || (product.image_url ? [product.image_url] : []),
+    store_id: product.store_id || product.stores?.id,
+    store: product.stores ? {
+      id: product.stores.id,
+      name: product.stores.name,
+      slug: product.stores.slug,
+      logo_url: product.stores.logo_url,
+    } : undefined,
+    type: product.product_type || 'digital',
+    rating: product.rating || product.average_rating,
+    review_count: product.reviews_count || product.total_reviews || 0,
+    purchases_count: product.purchases_count || 0,
+    tags: product.tags || [],
+    category: product.category,
+    status: product.is_active === false ? 'archived' : product.is_draft ? 'draft' : 'active',
+    created_at: product.created_at,
+    updated_at: product.updated_at || product.created_at,
+    
+    // Affiliation
+    is_affiliate: product.product_affiliate_settings?.[0]?.affiliate_enabled || false,
+    affiliate_percentage: product.product_affiliate_settings?.[0]?.commission_rate,
+    affiliate_enabled: product.product_affiliate_settings?.[0]?.affiliate_enabled || false,
+  };
+
+  // Transformer selon le type
+  switch (product.product_type) {
+    case 'digital':
+      return {
+        ...base,
+        type: 'digital',
+        digital_type: product.digital_type,
+        license_type: product.license_type,
+        files: product.downloadable_files || product.files || [],
+        formats: product.formats || extractFormatsFromFiles(product.downloadable_files),
+        file_size: product.file_size,
+        instant_delivery: product.instant_delivery !== false,
+        download_limit: product.download_limit,
+        total_downloads: product.total_downloads,
+        version: product.version,
+        licensing_type: product.licensing_type,
+      } as DigitalProduct;
+
+    case 'physical':
+      return {
+        ...base,
+        type: 'physical',
+        stock: product.stock || product.quantity_available,
+        weight: product.weight,
+        dimensions: product.dimensions ? {
+          length: product.dimensions.length || 0,
+          width: product.dimensions.width || 0,
+          height: product.dimensions.height || 0,
+        } : undefined,
+        shipping_required: product.collect_shipping_address !== false,
+        variants: product.variants || [],
+        sku: product.sku,
+        barcode: product.barcode,
+      } as PhysicalProduct;
+
+    case 'service':
+      return {
+        ...base,
+        type: 'service',
+        duration: product.duration,
+        duration_unit: product.duration_unit || 'hour',
+        booking_required: product.booking_required,
+        calendar_available: product.calendar_available,
+        staff_required: product.staff_required,
+        location_type: product.location_type,
+        service_type: product.service_type,
+      } as ServiceProduct;
+
+    case 'course':
+      return {
+        ...base,
+        type: 'course',
+        modules: product.modules || [],
+        video_preview: product.video_preview,
+        access_type: product.access_type || 'lifetime',
+        enrollment_count: product.enrollment_count,
+        total_duration: product.total_duration,
+        difficulty: product.difficulty,
+      } as CourseProduct;
+
+    default:
+      // Par défaut, traiter comme digital
+      return {
+        ...base,
+        type: 'digital',
+        digital_type: 'other',
+        instant_delivery: true,
+      } as DigitalProduct;
+  }
+}
+
+/**
+ * Extrait les formats depuis les fichiers
+ */
+function extractFormatsFromFiles(files: any[]): string[] {
+  if (!files || !Array.isArray(files)) return [];
+  
+  const formats = new Set<string>();
+  files.forEach((file: any) => {
+    if (file.format) {
+      formats.add(file.format);
+    } else if (file.name) {
+      const ext = file.name.split('.').pop()?.toUpperCase();
+      if (ext) formats.add(ext);
+    }
+  });
+  
+  return Array.from(formats);
+}
+
+/**
+ * Transforme un tableau de produits
+ */
+export function transformProducts(products: any[]): UnifiedProduct[] {
+  return products.map(transformToUnifiedProduct);
+}
+
+

@@ -45,11 +45,16 @@ import AdvancedFilters from "@/components/marketplace/AdvancedFilters";
 import ProductComparison from "@/components/marketplace/ProductComparison";
 import FavoritesManager from "@/components/marketplace/FavoritesManager";
 import ProductCardModern from "@/components/marketplace/ProductCardModern";
+import UnifiedProductCard from "@/components/products/UnifiedProductCard";
+import { transformToUnifiedProduct } from "@/lib/product-transform";
+import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { CategoryNavigationBar } from "@/components/marketplace/CategoryNavigationBar";
 import { BundlesSection } from "@/components/marketplace/BundlesSection";
 import { PersonalizedRecommendations } from "@/components/marketplace/ProductRecommendations";
 import { useActiveBundles } from "@/hooks/digital/useDigitalBundles";
 import { logger } from '@/lib/logger';
+import { initiateMonerooPayment } from '@/lib/moneroo-payment';
+import { safeRedirect } from '@/lib/url-validator';
 import { Product, FilterState, PaginationState } from '@/types/marketplace';
 import { useMarketplaceFavorites } from '@/hooks/useMarketplaceFavorites';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -454,8 +459,63 @@ const Marketplace = () => {
     return products.filter(p => favoriteIds.includes(p.id));
   }, [products, favorites]);
 
-  // Fonction d'achat (utilisée par ProductCardModern)
-  // Note: Cette fonction est disponible mais peut ne pas être utilisée directement ici
+  // Fonction d'achat (utilisée par UnifiedProductCard)
+  const handleBuyProduct = useCallback(async (product: any) => {
+    if (!product.store_id) {
+      toast({
+        title: "Erreur",
+        description: "Boutique non disponible",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user?.email) {
+        toast({
+          title: "Authentification requise",
+          description: "Veuillez vous connecter pour effectuer un achat",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const price = product.promo_price ?? product.price;
+      const result = await initiateMonerooPayment({
+        storeId: product.store_id,
+        productId: product.id,
+        amount: price,
+        currency: product.currency ?? "XOF",
+        description: `Achat de ${product.name}`,
+        customerEmail: user.email,
+        customerName: user.user_metadata?.full_name || user.email.split('@')[0],
+        metadata: { 
+          productName: product.name, 
+          storeSlug: product.store?.slug || '',
+          userId: user.id
+        },
+      });
+
+      if (result.checkout_url) {
+        safeRedirect(result.checkout_url, () => {
+          toast({
+            title: "Erreur de paiement",
+            description: "URL de paiement invalide. Veuillez réessayer.",
+            variant: "destructive",
+          });
+        });
+      }
+    } catch (error: any) {
+      logger.error("Erreur lors de l'achat:", error);
+      toast({
+        title: "Erreur de paiement",
+        description: error.message || "Impossible d'initialiser le paiement",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
 
   // Partage de produit (utilisé par ProductCardModern)
   // Note: Cette fonction est disponible mais peut ne pas être utilisée directement ici
@@ -1048,8 +1108,8 @@ const Marketplace = () => {
       >
         <div className="w-full mx-auto max-w-7xl px-0 sm:px-4">
           {isLoadingProducts ? (
-            <ProductGrid loading={true} skeletonCount={pagination.itemsPerPage}>
-              {null}
+            <ProductGrid>
+              <ProductCardSkeleton variant="marketplace" count={pagination.itemsPerPage} />
             </ProductGrid>
           ) : error ? (
             <div className="text-center py-8 sm:py-12 lg:py-16 px-2" role="alert" aria-live="polite">
@@ -1088,20 +1148,24 @@ const Marketplace = () => {
 
               <ProductGrid>
                 {displayProducts.map((product) => {
-                  // Récupérer le taux de commission d'affiliation
-                  const affiliateSettings = (product as any).product_affiliate_settings;
-                  const affiliateCommissionRate = affiliateSettings?.[0]?.affiliate_enabled 
-                    ? affiliateSettings[0].commission_rate 
-                    : undefined;
+                  // Transformer le produit vers le format unifié
+                  const unifiedProduct = transformToUnifiedProduct(product);
                   
                   return (
-                    <ProductCardModern
+                    <UnifiedProductCard
                       key={product.id}
-                      product={product}
-                      storeSlug={product.stores?.slug || 'default'}
-                      affiliateCommissionRate={affiliateCommissionRate}
-                      freeShipping={product.product_type === 'physical' ? product.free_shipping ?? undefined : undefined}
-                      shippingCost={product.product_type === 'physical' ? product.shipping_cost ?? undefined : undefined}
+                      product={unifiedProduct}
+                      variant="marketplace"
+                      showAffiliate={true}
+                      showActions={true}
+                      onAction={(action, prod) => {
+                        if (action === 'view') {
+                          // Navigation gérée par le Link dans UnifiedProductCard
+                        } else if (action === 'buy') {
+                          // Logique d'achat existante
+                          handleBuyProduct(prod);
+                        }
+                      }}
                     />
                   );
                 })}

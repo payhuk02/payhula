@@ -6,6 +6,9 @@ import { useProductReviews } from "@/hooks/useReviews";
 import StoreHeader from "@/components/storefront/StoreHeader";
 import StoreTabs from "@/components/storefront/StoreTabs";
 import ProductCardModern from "@/components/marketplace/ProductCardModern";
+import UnifiedProductCard from "@/components/products/UnifiedProductCard";
+import { transformToUnifiedProduct } from "@/lib/product-transform";
+import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import ProductFilters from "@/components/storefront/ProductFilters";
 import StoreFooter from "@/components/storefront/StoreFooter";
 import ContactForm from "@/components/storefront/ContactForm";
@@ -262,25 +265,31 @@ const Storefront = () => {
                   />
 
                   {productsLoading ? (
-                    <ProductGrid loading={true} skeletonCount={6} />
+                    <ProductGrid>
+                      <ProductCardSkeleton variant="store" count={6} />
+                    </ProductGrid>
                   ) : filteredProducts.length > 0 ? (
                     <div ref={productsRef}>
                       <ProductGrid>
                         {filteredProducts.map((product, index) => {
-                          // Récupérer le taux de commission d'affiliation
-                          const affiliateSettings = (product as any).product_affiliate_settings;
-                          const affiliateCommissionRate = affiliateSettings?.[0]?.affiliate_enabled 
-                            ? affiliateSettings[0].commission_rate 
-                            : undefined;
+                          // Transformer le produit vers le format unifié
+                          const unifiedProduct = transformToUnifiedProduct({
+                            ...product,
+                            stores: store ? {
+                              id: store.id,
+                              name: store.name,
+                              slug: store.slug,
+                              logo_url: store.logo_url,
+                            } : undefined,
+                          });
                           
                           return (
                             <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
-                              <ProductCardModern
-                                product={product}
-                                storeSlug={store.slug}
-                                affiliateCommissionRate={affiliateCommissionRate}
-                                freeShipping={product.product_type === 'physical' ? (product as any).free_shipping : undefined}
-                                shippingCost={product.product_type === 'physical' ? (product as any).shipping_cost : undefined}
+                              <UnifiedProductCard
+                                product={unifiedProduct}
+                                variant="store"
+                                showAffiliate={true}
+                                showActions={true}
                               />
                             </div>
                           );
