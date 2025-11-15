@@ -61,7 +61,7 @@ const OrdersTableComponent = ({ orders, onUpdate, storeId, sortBy, sortDirection
     );
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
+  const handleStatusChange = useCallback(async (orderId: string, newStatus: string) => {
     try {
       const { error } = await supabase
         .from('orders')
@@ -83,9 +83,9 @@ const OrdersTableComponent = ({ orders, onUpdate, storeId, sortBy, sortDirection
         variant: "destructive",
       });
     }
-  };
+  }, [onUpdate]); // Note: toast est stable
 
-  const handlePaymentStatusChange = async (orderId: string, newStatus: string) => {
+  const handlePaymentStatusChange = useCallback(async (orderId: string, newStatus: string) => {
     try {
       const { error } = await supabase
         .from('orders')
@@ -107,9 +107,9 @@ const OrdersTableComponent = ({ orders, onUpdate, storeId, sortBy, sortDirection
         variant: "destructive",
       });
     }
-  };
+  }, [onUpdate]); // Note: toast est stable
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!deleteId) return;
     setLoading(true);
 
