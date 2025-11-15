@@ -5,6 +5,7 @@
  * Updated: 2025-02-02 - Responsive design with Mes Templates style
  */
 
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   TrendingUp,
@@ -28,7 +29,7 @@ interface AffiliateStatsCardsProps {
   paidCommission: number;
 }
 
-export const AffiliateStatsCards = ({
+const AffiliateStatsCardsComponent = ({
   totalCourses,
   totalLinks,
   totalClicks,
@@ -133,4 +134,20 @@ export const AffiliateStatsCards = ({
     </div>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const AffiliateStatsCards = React.memo(AffiliateStatsCardsComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.totalCourses === nextProps.totalCourses &&
+    prevProps.totalLinks === nextProps.totalLinks &&
+    prevProps.totalClicks === nextProps.totalClicks &&
+    prevProps.totalConversions === nextProps.totalConversions &&
+    prevProps.conversionRate === nextProps.conversionRate &&
+    prevProps.totalCommission === nextProps.totalCommission &&
+    prevProps.pendingCommission === nextProps.pendingCommission &&
+    prevProps.paidCommission === nextProps.paidCommission
+  );
+});
+
+AffiliateStatsCards.displayName = 'AffiliateStatsCards';
 
