@@ -1,3 +1,4 @@
+import React, { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,17 @@ interface CustomerFiltersProps {
   onSortChange: (value: string) => void;
 }
 
-export const CustomerFilters = ({
+const CustomerFiltersComponent = ({
   searchQuery,
   onSearchChange,
   sortBy,
   onSortChange,
 }: CustomerFiltersProps) => {
   const filtersRef = useScrollAnimation<HTMLDivElement>();
+
+  const handleClearSearch = useCallback(() => {
+    onSearchChange("");
+  }, [onSearchChange]);
 
   return (
     <div 
@@ -37,7 +42,7 @@ export const CustomerFilters = ({
             variant="ghost"
             size="icon"
             className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
-            onClick={() => onSearchChange("")}
+            onClick={handleClearSearch}
           >
             <X className="h-3.5 w-3.5" />
           </Button>
@@ -57,3 +62,17 @@ export const CustomerFilters = ({
     </div>
   );
 };
+
+CustomerFiltersComponent.displayName = 'CustomerFiltersComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CustomerFilters = React.memo(CustomerFiltersComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.searchQuery === nextProps.searchQuery &&
+    prevProps.sortBy === nextProps.sortBy &&
+    prevProps.onSearchChange === nextProps.onSearchChange &&
+    prevProps.onSortChange === nextProps.onSortChange
+  );
+});
+
+CustomerFilters.displayName = 'CustomerFilters';
