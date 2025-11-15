@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,24 +32,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleNameChange = (value: string) => {
-    setName(value);
-    const generatedSlug = generateSlug(value);
-    setSlug(generatedSlug);
-    if (generatedSlug) {
-      checkSlugAvailability(generatedSlug);
-    }
-  };
-
-  const handleSlugChange = (value: string) => {
-    const cleanSlug = generateSlug(value);
-    setSlug(cleanSlug);
-    if (cleanSlug) {
-      checkSlugAvailability(cleanSlug);
-    }
-  };
-
-  const checkSlugAvailability = async (slugToCheck: string) => {
+  const checkSlugAvailability = useCallback(async (slugToCheck: string) => {
     if (!slugToCheck) {
       setSlugAvailable(null);
       return;
@@ -70,9 +53,26 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
     } finally {
       setIsCheckingSlug(false);
     }
-  };
+  }, [initialData?.id]); // Note: toast est stable
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleNameChange = useCallback((value: string) => {
+    setName(value);
+    const generatedSlug = generateSlug(value);
+    setSlug(generatedSlug);
+    if (generatedSlug) {
+      checkSlugAvailability(generatedSlug);
+    }
+  }, [checkSlugAvailability]);
+
+  const handleSlugChange = useCallback((value: string) => {
+    const cleanSlug = generateSlug(value);
+    setSlug(cleanSlug);
+    if (cleanSlug) {
+      checkSlugAvailability(cleanSlug);
+    }
+  }, [checkSlugAvailability]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name || !slug) {
@@ -150,7 +150,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [name, slug, slugAvailable, defaultCurrency, description, initialData, onSuccess]); // Note: toast est stable
 
   return (
     <Card>

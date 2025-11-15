@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -111,13 +111,13 @@ const PromotionCard = ({
   );
 };
 
-export const PromotionsTable = ({ promotions, onUpdate }: PromotionsTableProps) => {
+const PromotionsTableComponent = ({ promotions, onUpdate }: PromotionsTableProps) => {
   const { toast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const tableRef = useScrollAnimation<HTMLDivElement>();
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!deleteId) return;
     setLoading(true);
 
@@ -145,15 +145,15 @@ export const PromotionsTable = ({ promotions, onUpdate }: PromotionsTableProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [deleteId, onUpdate]); // Note: toast est stable
 
-  const handleCopyCode = (code: string) => {
+  const handleCopyCode = useCallback((code: string) => {
     navigator.clipboard.writeText(code);
     toast({
       title: "Code copié",
       description: `Le code "${code}" a été copié dans le presse-papier`,
     });
-  };
+  }, []); // Note: toast est stable
 
   return (
     <>
@@ -269,3 +269,21 @@ export const PromotionsTable = ({ promotions, onUpdate }: PromotionsTableProps) 
     </>
   );
 };
+
+PromotionsTableComponent.displayName = 'PromotionsTableComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const PromotionsTable = React.memo(PromotionsTableComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.promotions.length === nextProps.promotions.length &&
+    prevProps.onUpdate === nextProps.onUpdate &&
+    // Comparaison superficielle des promotions (comparer les IDs et statuts)
+    prevProps.promotions.every((promotion, index) => 
+      promotion.id === nextProps.promotions[index]?.id &&
+      promotion.is_active === nextProps.promotions[index]?.is_active &&
+      promotion.discount_type === nextProps.promotions[index]?.discount_type
+    )
+  );
+});
+
+PromotionsTable.displayName = 'PromotionsTable';

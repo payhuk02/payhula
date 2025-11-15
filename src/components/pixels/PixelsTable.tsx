@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,23 +28,23 @@ const pixelLabels = {
   custom: 'Code personnalisé',
 };
 
-export const PixelsTable = ({ pixels }: { pixels: Pixel[] }) => {
+const PixelsTableComponent = ({ pixels }: { pixels: Pixel[] }) => {
   const { deletePixel, togglePixel } = usePixels();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedPixel, setSelectedPixel] = useState<Pixel | null>(null);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (selectedPixel) {
       await deletePixel(selectedPixel.id);
       setDeleteDialogOpen(false);
       setSelectedPixel(null);
     }
-  };
+  }, [selectedPixel, deletePixel]);
 
-  const handleToggle = async (pixel: Pixel, checked: boolean) => {
+  const handleToggle = useCallback(async (pixel: Pixel, checked: boolean) => {
     await togglePixel(pixel.id, checked);
-  };
+  }, [togglePixel]);
 
   if (pixels.length === 0) {
     return (
@@ -258,3 +258,20 @@ export const PixelsTable = ({ pixels }: { pixels: Pixel[] }) => {
     </>
   );
 };
+
+PixelsTableComponent.displayName = 'PixelsTableComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const PixelsTable = React.memo(PixelsTableComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.pixels.length === nextProps.pixels.length &&
+    // Comparaison superficielle des pixels (comparer les IDs et statuts)
+    prevProps.pixels.every((pixel, index) => 
+      pixel.id === nextProps.pixels[index]?.id &&
+      pixel.is_active === nextProps.pixels[index]?.is_active &&
+      pixel.pixel_name === nextProps.pixels[index]?.pixel_name
+    )
+  );
+});
+
+PixelsTable.displayName = 'PixelsTable';

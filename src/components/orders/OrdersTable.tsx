@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ interface OrdersTableProps {
   onSort: (column: SortColumn) => void;
 }
 
-export const OrdersTable = ({ orders, onUpdate, storeId, sortBy, sortDirection, onSort }: OrdersTableProps) => {
+const OrdersTableComponent = ({ orders, onUpdate, storeId, sortBy, sortDirection, onSort }: OrdersTableProps) => {
   const { toast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -320,3 +320,25 @@ export const OrdersTable = ({ orders, onUpdate, storeId, sortBy, sortDirection, 
     </>
   );
 };
+
+OrdersTableComponent.displayName = 'OrdersTableComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const OrdersTable = React.memo(OrdersTableComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.orders.length === nextProps.orders.length &&
+    prevProps.storeId === nextProps.storeId &&
+    prevProps.sortBy === nextProps.sortBy &&
+    prevProps.sortDirection === nextProps.sortDirection &&
+    prevProps.onUpdate === nextProps.onUpdate &&
+    prevProps.onSort === nextProps.onSort &&
+    // Comparaison superficielle des orders (comparer les IDs)
+    prevProps.orders.every((order, index) => 
+      order.id === nextProps.orders[index]?.id &&
+      order.status === nextProps.orders[index]?.status &&
+      order.total === nextProps.orders[index]?.total
+    )
+  );
+});
+
+OrdersTable.displayName = 'OrdersTable';
