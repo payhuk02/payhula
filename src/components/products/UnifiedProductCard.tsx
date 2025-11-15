@@ -61,25 +61,36 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
   return (
     <Card
       className={cn(
-        'group relative flex flex-col overflow-hidden transition-all duration-300',
-        'hover:shadow-lg hover:-translate-y-1',
-        isCompact ? 'min-h-[400px]' : 'min-h-[500px]',
+        // Base structure
+        'group relative flex flex-col h-full',
+        'bg-card border border-border',
+        'rounded-xl overflow-hidden',
+        
+        // Shadows progressive
+        'shadow-sm sm:shadow-md lg:shadow-lg',
+        'hover:shadow-xl hover:shadow-primary/5',
+        
+        // Transitions élégantes
+        'transition-all duration-300 ease-out',
+        'hover:-translate-y-1',
+        'hover:border-primary/20',
+        
+        // Height responsive
+        'min-h-[420px] sm:min-h-[480px] lg:min-h-[520px]',
+        
         className
       )}
       style={{ willChange: 'transform' }}
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
-      {/* Image Section */}
-      <div className={cn(
-        'relative overflow-hidden bg-muted',
-        isCompact ? 'h-48' : 'h-64'
-      )}>
+      {/* Image Section - Ratio constant 16:9 */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {imageAttrs ? (
           <LazyImage
             {...imageAttrs}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
             placeholder="skeleton"
           />
         ) : (
@@ -122,28 +133,30 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
         </div>
       </div>
 
-      {/* Content Section */}
-      <div className="flex-1 flex flex-col p-4">
-        {/* Title */}
+      {/* Content Section - Spacing professionnel responsive */}
+      <div className="flex-1 flex flex-col p-4 sm:p-5 lg:p-6">
+        {/* Title - Typographie hiérarchisée */}
         <h3
           id={`product-title-${product.id}`}
           className={cn(
-            'font-semibold mb-2 line-clamp-2 group-hover:text-primary transition-colors',
-            isCompact ? 'text-sm' : 'text-base'
+            'font-semibold leading-tight line-clamp-2 mb-2',
+            'text-base sm:text-lg',
+            'group-hover:text-primary transition-colors duration-200',
+            isCompact && 'text-sm'
           )}
         >
           {product.name}
         </h3>
 
-        {/* Rating */}
+        {/* Rating - Spacing cohérent */}
         {ratingInfo.hasRating && (
-          <div className="flex items-center gap-1 mb-2">
+          <div className="flex items-center gap-1.5 mb-3">
             <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
                   className={cn(
-                    'h-3 w-3',
+                    'h-3.5 w-3.5 sm:h-4 sm:w-4 transition-colors',
                     star <= Math.round(ratingInfo.rating)
                       ? 'fill-yellow-400 text-yellow-400'
                       : 'text-muted-foreground'
@@ -151,56 +164,54 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                 />
               ))}
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs sm:text-sm text-muted-foreground">
               {ratingInfo.display}
             </span>
           </div>
         )}
 
-        {/* Key Info */}
+        {/* Key Info - Spacing vertical cohérent */}
         {!isCompact && keyInfo.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2 mb-4">
             {keyInfo.slice(0, 2).map((info, index) => {
               const Icon = info.icon;
               return (
                 <div
                   key={index}
                   className={cn(
-                    'flex items-center gap-1 text-xs',
+                    'flex items-center gap-1.5 text-xs sm:text-sm',
                     info.badge ? 'text-primary font-medium' : 'text-muted-foreground'
                   )}
                 >
-                  {Icon && <Icon className="h-3 w-3" />}
-                  <span>{info.value}</span>
+                  {Icon && <Icon className="h-3.5 w-3.5 flex-shrink-0" />}
+                  <span className="truncate">{info.value}</span>
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Price */}
-        <div className="mt-auto pt-3 border-t">
-          <div className="flex items-baseline justify-between mb-3">
-            <div className="flex items-baseline gap-2">
-              {priceInfo.originalPrice && (
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPrice(priceInfo.originalPrice, product.currency)}
-                </span>
-              )}
-              <span className="text-lg font-bold text-primary">
-                {formatPrice(priceInfo.price, product.currency)}
+        {/* Price et Actions - Séparateur élégant */}
+        <div className="mt-auto pt-4 border-t border-border/50">
+          <div className="flex items-baseline gap-2 mb-4">
+            {priceInfo.originalPrice && (
+              <span className="text-sm sm:text-base text-muted-foreground line-through">
+                {formatPrice(priceInfo.originalPrice, product.currency)}
               </span>
-            </div>
+            )}
+            <span className="text-xl sm:text-2xl font-bold text-primary">
+              {formatPrice(priceInfo.price, product.currency)}
+            </span>
           </div>
 
-          {/* Actions */}
+          {/* Actions - Boutons premium */}
           {showActions && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:gap-3">
               <Link to={productUrl} className="flex-1">
                 <Button
                   variant="outline"
                   size={isCompact ? 'sm' : 'default'}
-                  className="w-full"
+                  className="w-full transition-all duration-200 hover:bg-accent/50"
                   onClick={() => handleAction('view')}
                 >
                   <Eye className="h-4 w-4 mr-2" />
@@ -209,7 +220,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
               </Link>
               <Button
                 size={isCompact ? 'sm' : 'default'}
-                className="flex-1"
+                className="flex-1 transition-all duration-200 hover:scale-[1.02]"
                 onClick={(e) => handleAction('buy', e)}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
@@ -218,10 +229,10 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
             </div>
           )}
 
-          {/* Store Info */}
+          {/* Store Info - Typographie subtile */}
           {product.store && !isCompact && (
-            <div className="mt-2 text-xs text-muted-foreground">
-              Par {product.store.name}
+            <div className="mt-3 text-xs sm:text-sm text-muted-foreground truncate">
+              Par <span className="font-medium">{product.store.name}</span>
             </div>
           )}
         </div>

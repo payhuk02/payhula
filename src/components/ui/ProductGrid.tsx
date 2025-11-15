@@ -72,8 +72,8 @@ export const ProductGrid = ({
         ref={gridRef}
         className={cn(
           "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
-          // Responsive: 1 produit mobile, 2 produits tablette, 3-4 produits desktop
-          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 lg:gap-6 w-full max-w-full",
+          // Responsive exact: 1 mobile (<640px), 2 tablette (≥640px <1024px), 3 desktop (≥1024px)
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 w-full max-w-full",
           className
         )}
       >
@@ -87,12 +87,12 @@ export const ProductGrid = ({
   return (
     <div 
       ref={gridRef}
-      className={cn(
-        "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
-        // Responsive: 1 produit mobile, 2 produits tablette, 3-4 produits desktop
-        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 lg:gap-6 w-full max-w-full",
-        className
-      )}
+        className={cn(
+          "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
+          // Responsive exact: 1 mobile (<640px), 2 tablette (≥640px <1024px), 3 desktop (≥1024px)
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 w-full max-w-full",
+          className
+        )}
     >
       {isVisible ? children : (
         // Placeholder pendant le lazy loading

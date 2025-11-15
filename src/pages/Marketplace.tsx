@@ -87,6 +87,10 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Refs pour scroll animation (déclarés tôt pour éviter les erreurs d'initialisation)
+  const heroRef = useScrollAnimation<HTMLDivElement>();
+  const productsRef = useScrollAnimation<HTMLDivElement>();
+
   // Récupérer l'utilisateur connecté
   useEffect(() => {
     const fetchUser = async () => {
@@ -581,9 +585,7 @@ const Marketplace = () => {
     }));
   }, [displayProducts]);
 
-  // Animations au scroll
-  const heroRef = useScrollAnimation<HTMLDivElement>();
-  const productsRef = useScrollAnimation<HTMLDivElement>();
+  // Animations au scroll (déjà déclarées plus haut)
 
   // Préparer les bundles pour l'affichage
   const bundlesToDisplay = useMemo(() => {

@@ -25,18 +25,16 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
         <Card
           key={index}
           className={cn(
-            'overflow-hidden',
-            isCompact ? 'min-h-[400px]' : 'min-h-[500px]'
+            'overflow-hidden rounded-xl',
+            'shadow-sm sm:shadow-md lg:shadow-lg',
+            'min-h-[420px] sm:min-h-[480px] lg:min-h-[520px]'
           )}
         >
-          {/* Image Skeleton */}
-          <Skeleton className={cn(
-            'w-full bg-muted',
-            isCompact ? 'h-48' : 'h-64'
-          )} />
+          {/* Image Skeleton - Ratio constant 16:9 */}
+          <Skeleton className="w-full aspect-[16/9] bg-muted" />
 
-          {/* Content Skeleton */}
-          <div className="p-4 space-y-3">
+          {/* Content Skeleton - Spacing responsive */}
+          <div className="p-4 sm:p-5 lg:p-6 space-y-3">
             {/* Badge Skeleton */}
             <div className="flex gap-2">
               <Skeleton className="h-5 w-16" />

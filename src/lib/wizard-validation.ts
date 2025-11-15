@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { validateSlug, validateEmail, validatePhone, validateUrl } from './validation-utils';
+import { validateSlug, validateEmail, validatePhone, validateURL } from './validation-utils';
 import { logger } from './logger';
 
 /**
@@ -267,7 +267,7 @@ export const formatValidators = {
   },
 
   url: (value: string): ValidationResult => {
-    const result = validateUrl(value, { required: false });
+    const result = validateURL(value, { required: false });
     return {
       valid: result.valid,
       errors: result.error
