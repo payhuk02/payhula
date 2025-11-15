@@ -320,7 +320,7 @@ const StaffCardComponent = ({
 
   // Variant Default (carte verticale)
   return (
-    <Card className={cn('hover:shadow-lg transition-shadow h-full', className)}>
+    <Card className={cn('hover:shadow-lg transition-shadow h-full', className)} style={{ willChange: 'transform' }}>
       <CardHeader className="text-center pb-4">
         {/* Avatar */}
         <div className="relative mx-auto mb-4">
