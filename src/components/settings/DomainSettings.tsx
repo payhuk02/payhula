@@ -22,6 +22,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { logger } from "@/lib/logger";
 import { 
   Globe, 
   Check, 
@@ -218,7 +219,7 @@ export const DomainSettings = () => {
         setActiveTab("dns");
       }
     } catch (error) {
-      console.error('Error connecting domain:', error);
+      logger.error('Error connecting domain', { error, domain: domainConfig.custom_domain });
       toast({
         title: "Erreur",
         description: "Impossible de connecter le domaine.",
@@ -258,7 +259,7 @@ export const DomainSettings = () => {
         variant: propagationCheck.isPropagated ? "default" : "destructive"
       });
     } catch (error) {
-      console.error('Error checking propagation:', error);
+      logger.error('Error checking propagation', { error, domain: domainConfig.custom_domain });
       setPropagationStatus(prev => ({ ...prev, isChecking: false }));
       toast({
         title: "Erreur",
@@ -296,7 +297,7 @@ export const DomainSettings = () => {
         setActiveTab("overview");
       }
     } catch (error) {
-      console.error('Error disconnecting domain:', error);
+      logger.error('Error disconnecting domain', { error, domain: domainConfig.custom_domain });
       toast({
         title: "Erreur",
         description: "Impossible de déconnecter le domaine.",
@@ -390,7 +391,7 @@ export const DomainSettings = () => {
         lastCheck: new Date()
       };
     } catch (error) {
-      console.error('Error checking DNS propagation:', error);
+      logger.error('Error checking DNS propagation', { error, domain });
       return {
         isPropagated: false,
         details: {
@@ -480,7 +481,7 @@ export const DomainSettings = () => {
         });
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification:', error);
+      logger.error('Erreur lors de la vérification', { error, domain: domainConfig.custom_domain });
       
       const success = await updateStore(currentStore.id, {
         domain_status: 'error',
@@ -526,7 +527,7 @@ export const DomainSettings = () => {
         });
       }
     } catch (error) {
-      console.error('Error updating SSL:', error);
+      logger.error('Error updating SSL', { error, domain: domainConfig.custom_domain });
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour les paramètres SSL.",
@@ -554,7 +555,7 @@ export const DomainSettings = () => {
         });
       }
     } catch (error) {
-      console.error('Error updating redirect HTTPS:', error);
+      logger.error('Error updating redirect HTTPS', { error, domain: domainConfig.custom_domain });
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la redirection HTTPS.",
@@ -582,7 +583,7 @@ export const DomainSettings = () => {
         });
       }
     } catch (error) {
-      console.error('Error updating redirect WWW:', error);
+      logger.error('Error updating redirect WWW', { error, domain: domainConfig.custom_domain });
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la redirection WWW.",

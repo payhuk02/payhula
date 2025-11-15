@@ -217,8 +217,7 @@ export const EnhancedProductTypeSelector = ({
         setStats(newStats);
         logger.info('Statistiques produits chargées', { stats: newStats });
       } catch (error) {
-        logger.error('Erreur lors du chargement des statistiques', error);
-        console.error('Failed to load product stats:', error);
+        logger.error('Erreur lors du chargement des statistiques', { error });
       } finally {
         setLoading(false);
       }

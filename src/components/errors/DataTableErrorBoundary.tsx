@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Database } from 'lucide-react';
 import { AlertCircleIcon } from '@/components/icons/AlertCircleIcon';
 import * as Sentry from '@sentry/react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -69,7 +70,7 @@ export class DataTableErrorBoundary extends Component<Props, State> {
       this.props.onError(error, errorInfo);
     }
 
-    console.error(`DataTable Error (${this.props.tableName || 'unknown'}):`, error, errorInfo);
+    logger.error(`DataTable Error (${this.props.tableName || 'unknown'})`, { error, errorInfo });
   }
 
   handleReset = () => {

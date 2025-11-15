@@ -22,6 +22,7 @@ import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useAnalyticsReports } from '@/hooks/useProductAnalytics';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface ReportsSectionProps {
   productId: string;
@@ -95,7 +96,7 @@ export const ReportsSection: React.FC<ReportsSectionProps> = ({ productId }) => 
       }, 2000);
 
     } catch (error) {
-      console.error('Erreur lors de la génération du rapport:', error);
+      logger.error('Erreur lors de la génération du rapport', { error, productId, reportType });
       toast({
         title: "Erreur",
         description: "Impossible de générer le rapport. Veuillez réessayer.",

@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { logger } from "@/lib/logger";
 import { 
   User, 
   Mail, 
@@ -140,7 +141,7 @@ export const AdvancedProfileSettings = () => {
       setReferralInfo(referral);
       setReferredProfiles(referred);
     } catch (error) {
-      console.error('Error loading advanced data:', error);
+      logger.error('Error loading advanced data', { error });
     }
   };
 
@@ -167,7 +168,7 @@ export const AdvancedProfileSettings = () => {
         await loadAdvancedData();
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile', { error });
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { AlertCircleIcon } from './AlertCircleIcon';
+import { logger } from '@/lib/logger';
 
 // Essayer d'importer AlertCircle de lucide-react, mais utiliser AlertCircleIcon en fallback
 let AlertCircle: React.ComponentType<any> | null = null;
@@ -18,7 +19,7 @@ try {
   }
 } catch (error) {
   // Si l'import échoue, on utilisera AlertCircleIcon
-  console.debug('AlertCircle from lucide-react not available, using AlertCircleIcon fallback');
+  logger.debug('AlertCircle from lucide-react not available, using AlertCircleIcon fallback');
 }
 
 interface AlertCircleSafeProps {

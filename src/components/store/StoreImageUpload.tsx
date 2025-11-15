@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { uploadImage, validateImageFile, replaceImage, ImageType } from "@/lib/image-upload";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { logger } from "@/lib/logger";
 
 interface StoreImageUploadProps {
   label: string;
@@ -128,7 +129,7 @@ const StoreImageUpload = ({
         });
       }
     } catch (error: any) {
-      console.error("Upload error:", error);
+      logger.error("Upload error", { error });
       const errorMessage = error.message || "Impossible d'uploader l'image. Réessayez.";
       setError(errorMessage);
       toast({

@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Save, MoreVertical, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { generateSlug } from "@/lib/store-utils";
+import { logger } from "@/lib/logger";
 import "@/styles/product-creation.css";
 
 // 🚀 Lazy loading des onglets pour optimiser les performances (-40% temps de chargement)
@@ -372,7 +373,7 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
       if (error) throw error;
       return data.length === 0;
     } catch (error) {
-      console.error('Error checking slug availability:', error);
+      logger.error('Error checking slug availability', { error, slug, productId });
       return false;
     }
   };
@@ -526,7 +527,7 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
         }
       }
     } catch (error) {
-      console.error('Error saving product:', error);
+      logger.error('Error saving product', { error, productId });
       if (!options?.silent) {
         toast({
           title: "Erreur",

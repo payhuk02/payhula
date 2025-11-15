@@ -4,6 +4,7 @@
  */
 
 import React, { Component, ReactNode } from 'react';
+import { logger } from '@/lib/logger';
 
 interface GamificationErrorBoundaryProps {
   children: ReactNode;
@@ -40,9 +41,9 @@ export class GamificationErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log simple dans la console pour éviter les dépendances
+    // Log avec logger
     if (process.env.NODE_ENV === 'development') {
-      console.error('Gamification Error:', error, errorInfo);
+      logger.error('Gamification Error', { error, errorInfo });
     }
 
     // Callback personnalisé si fourni

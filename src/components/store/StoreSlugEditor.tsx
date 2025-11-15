@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Copy, ExternalLink, Edit, Check, X, Globe, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/useDebounce";
+import { logger } from "@/lib/logger";
 
 interface StoreSlugEditorProps {
   currentSlug: string;
@@ -62,7 +63,7 @@ const StoreSlugEditor = ({ currentSlug, onSlugChange, onCheckAvailability, store
       const available = await onCheckAvailability(slug, storeId);
       setIsAvailable(available);
     } catch (error) {
-      console.error("Error checking slug availability:", error);
+      logger.error("Error checking slug availability", { error, slug, storeId });
       setIsAvailable(false);
     } finally {
       setIsChecking(false);
@@ -86,7 +87,7 @@ const StoreSlugEditor = ({ currentSlug, onSlugChange, onCheckAvailability, store
         });
       }
     } catch (error) {
-      console.error("Error updating slug:", error);
+      logger.error("Error updating slug", { error, newSlug, storeId });
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le lien de votre boutique.",

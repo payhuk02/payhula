@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Camera, X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { BarcodeScanResult } from '@/hooks/physical/useBarcodeScanner';
+import { logger } from '@/lib/logger';
 
 interface BarcodeScannerProps {
   onScanSuccess: (result: BarcodeScanResult) => void;
@@ -122,7 +123,7 @@ export function BarcodeScanner({
         await scannerRef.current.stop();
         await scannerRef.current.clear();
       } catch (err) {
-        console.error('Erreur lors de l\'arrêt du scanner:', err);
+        logger.error('Erreur lors de l\'arrêt du scanner', { error: err });
       }
       scannerRef.current = null;
     }

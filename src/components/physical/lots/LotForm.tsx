@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useCreateLot, useUpdateLot, useLot } from '@/hooks/physical/useLotsExpiration';
 import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 const lotFormSchema = z.object({
   lot_number: z.string().min(1, 'Le numéro de lot est requis'),
@@ -129,7 +130,7 @@ export function LotForm({ lotId, physicalProductId, variantId, warehouseId, onSu
 
       onSuccess();
     } catch (error) {
-      console.error('Error saving lot:', error);
+      logger.error('Error saving lot', { error });
     }
   };
 

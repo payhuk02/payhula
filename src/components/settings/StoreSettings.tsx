@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { DeleteStoreDialog } from "@/components/store/DeleteStoreDialog";
 import { deleteStoreWithDependencies, archiveStore } from "@/lib/store-delete-protection";
+import { logger } from "@/lib/logger";
 import { 
   Store, 
   Settings, 
@@ -77,7 +78,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
       setIsCreating(false);
       setActiveTab("list");
     } catch (error) {
-      console.error('Erreur lors de la création:', error);
+      logger.error('Erreur lors de la création', { error });
     } finally {
       setSaving(false);
     }
@@ -116,7 +117,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
         });
       }
     } catch (error: any) {
-      console.error('Erreur lors de la suppression:', error);
+      logger.error('Erreur lors de la suppression', { error, storeId: storeToDelete.id });
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue",
@@ -147,7 +148,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
         });
       }
     } catch (error: any) {
-      console.error('Erreur lors de l\'archivage:', error);
+      logger.error('Erreur lors de l\'archivage', { error, storeId });
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue",

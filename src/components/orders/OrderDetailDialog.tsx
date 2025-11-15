@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
+import { logger } from "@/lib/logger";
 
 interface OrderDetailDialogProps {
   open: boolean;
@@ -47,7 +48,7 @@ export const OrderDetailDialog = ({ open, onOpenChange, order }: OrderDetailDial
         if (error) throw error;
         setItems(data || []);
       } catch (error) {
-        console.error('Erreur chargement items:', error);
+        logger.error('Erreur chargement items', { error, orderId: order.id });
       } finally {
         setLoading(false);
       }

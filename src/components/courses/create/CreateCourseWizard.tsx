@@ -261,7 +261,7 @@ export const CreateCourseWizard = ({
       }));
       logger.info('Brouillon cours auto-sauvegardé', { step: currentStep });
     } catch (error) {
-      console.error('Auto-save error:', error);
+      logger.error('Auto-save error', { error, step: currentStep });
     } finally {
       setIsAutoSaving(false);
     }
@@ -283,7 +283,7 @@ export const CreateCourseWizard = ({
         setPixelsData(draft.pixelsData || pixelsData);
         logger.info('Brouillon cours chargé depuis localStorage');
       } catch (error) {
-        console.error('Error loading draft:', error);
+        logger.error('Error loading draft', { error });
       }
     }
   }, []);

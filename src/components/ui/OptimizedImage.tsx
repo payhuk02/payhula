@@ -11,6 +11,7 @@
 import { useState, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { getOptimizedImageUrl, getResponsiveSrcSet, getImageAttributesForPreset, IMAGE_PRESETS, isSupabaseStorageUrl } from '@/lib/image-transform';
+import { logger } from '@/lib/logger';
 
 interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet' | 'sizes'> {
   src: string;
@@ -129,7 +130,7 @@ export const OptimizedImage = ({
   };
 
   const handleError = () => {
-    console.error(`[OptimizedImage] Failed to load: ${src}`);
+    logger.error('[OptimizedImage] Failed to load', { src });
     setError(true);
     setIsLoading(false);
   };

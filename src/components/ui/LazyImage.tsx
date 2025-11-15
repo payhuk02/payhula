@@ -9,6 +9,7 @@
 import { useState, useEffect, useRef, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { getOptimizedImageUrl, isSupabaseStorageUrl } from '@/lib/image-transform';
+import { logger } from '@/lib/logger';
 
 /**
  * Types de placeholders disponibles
@@ -192,7 +193,7 @@ export function LazyImage({
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('[LazyImage] Failed to load:', src);
+    logger.error('[LazyImage] Failed to load', { src });
     setHasError(true);
     setIsLoaded(false);
     
@@ -354,7 +355,7 @@ export function useBlurDataURL(imageUrl: string): string | undefined {
           reader.readAsDataURL(blob);
         })
         .catch((error) => {
-          console.warn('[LazyImage] Failed to generate blur data URL:', error);
+          logger.warn('[LazyImage] Failed to generate blur data URL', { error });
         });
     }
   }, [imageUrl]);

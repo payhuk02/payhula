@@ -17,6 +17,7 @@ import {
 import { useStore } from "@/hooks/useStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 interface StoreAnalyticsProps {
   storeId: string;
@@ -138,7 +139,7 @@ const StoreAnalytics = ({ storeId }: StoreAnalyticsProps) => {
       });
 
     } catch (err: any) {
-      console.error("Error fetching analytics:", err);
+      logger.error("Error fetching analytics", { error: err, storeId });
       setError(err.message || "Impossible de charger les statistiques");
     } finally {
       setLoading(false);

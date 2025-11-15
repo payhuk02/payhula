@@ -4,6 +4,7 @@
  */
 
 import { Helmet } from 'react-helmet';
+import { logger } from '@/lib/logger';
 
 interface StoreSchemaProps {
   store: {
@@ -27,7 +28,7 @@ interface StoreSchemaProps {
 export const StoreSchema = ({ store, url }: StoreSchemaProps) => {
   // Vérifier que store existe
   if (!store) {
-    console.warn('[StoreSchema] Store is missing');
+    logger.warn('[StoreSchema] Store is missing');
     return null;
   }
 

@@ -14,6 +14,7 @@ import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { generateSlug } from '@/lib/store-utils';
+import { logger } from '@/lib/logger';
 
 // Steps components
 import { DigitalBasicInfoForm } from './DigitalBasicInfoForm';
@@ -295,7 +296,7 @@ export const CreateDigitalProductWizard = ({
           });
 
         if (affiliateError) {
-          console.error('Affiliate settings error:', affiliateError);
+          logger.error('Affiliate settings error', { error: affiliateError, productId });
           // Don't throw, affiliate is optional
         }
       }
@@ -311,7 +312,7 @@ export const CreateDigitalProductWizard = ({
         navigate(`/${storeSlug}/products/${slug}`);
       }
     } catch (error: any) {
-      console.error('Error creating digital product:', error);
+      logger.error('Error creating digital product', { error });
       toast({
         title: '❌ Erreur',
         description: error.message || 'Une erreur est survenue lors de la création',

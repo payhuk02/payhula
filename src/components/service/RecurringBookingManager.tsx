@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { logger } from '@/lib/logger';
 import {
   Calendar,
   Clock,
@@ -178,7 +179,7 @@ export const RecurringBookingManager: React.FC<RecurringBookingManagerProps> = (
       setIsDialogOpen(false);
       setEditingBooking(null);
     } catch (error) {
-      console.error('Error saving recurring booking:', error);
+      logger.error('Error saving recurring booking', { error, bookingId: editingBooking?.id });
     } finally {
       setIsSaving(false);
     }

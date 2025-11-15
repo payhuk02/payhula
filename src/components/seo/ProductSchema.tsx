@@ -5,6 +5,7 @@
  */
 
 import { Helmet } from 'react-helmet';
+import { logger } from '@/lib/logger';
 
 interface ProductSchemaProps {
   product: {
@@ -35,7 +36,7 @@ interface ProductSchemaProps {
 export const ProductSchema = ({ product, store, url }: ProductSchemaProps) => {
   // Vérifier que product et store existent
   if (!product || !store) {
-    console.warn('[ProductSchema] Product or Store is missing:', { product, store });
+    logger.warn('[ProductSchema] Product or Store is missing', { product, store });
     return null;
   }
 

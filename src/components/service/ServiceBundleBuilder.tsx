@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { logger } from '@/lib/logger';
 import {
   Package,
   Plus,
@@ -234,7 +235,7 @@ export const ServiceBundleBuilder: React.FC<ServiceBundleBuilderProps> = ({
       setIsDialogOpen(false);
       setEditingBundle(null);
     } catch (error) {
-      console.error('Error saving bundle:', error);
+      logger.error('Error saving bundle', { error, bundleId: editingBundle?.id });
     } finally {
       setIsSaving(false);
     }

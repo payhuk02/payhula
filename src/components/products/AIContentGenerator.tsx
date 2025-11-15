@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { logger } from '@/lib/logger';
 import {
   Sparkles,
   Wand2,
@@ -103,7 +104,7 @@ export const AIContentGenerator = ({
         description: `Score qualité: ${analysis.score}/100`,
       });
     } catch (error: any) {
-      console.error('Generation error:', error);
+      logger.error('Generation error', { error, type: selectedType });
       toast({
         title: 'Erreur de génération',
         description: error.message || 'Une erreur est survenue',

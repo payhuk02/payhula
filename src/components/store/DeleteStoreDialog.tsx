@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { checkStoreDeleteProtection, StoreDependencies } from "@/lib/store-delete-protection";
 import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 
 interface DeleteStoreDialogProps {
   open: boolean;
@@ -72,7 +73,7 @@ export const DeleteStoreDialog = ({
       setWarnings(result.warnings);
       setErrors(result.errors || []);
     } catch (error) {
-      console.error('Error checking protection:', error);
+      logger.error('Error checking protection', { error, storeId });
       setCanDelete(false);
       setErrors(['Impossible de vérifier les dépendances. Veuillez réessayer.']);
     } finally {
@@ -86,7 +87,7 @@ export const DeleteStoreDialog = ({
       await onConfirmDelete();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error deleting store:', error);
+      logger.error('Error deleting store', { error, storeId });
     } finally {
       setDeleting(false);
     }
@@ -100,7 +101,7 @@ export const DeleteStoreDialog = ({
       await onConfirmArchive();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error archiving store:', error);
+      logger.error('Error archiving store', { error, storeId });
     } finally {
       setArchiving(false);
     }

@@ -47,6 +47,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { logger } from '@/lib/logger';
 import {
   Tooltip,
   TooltipContent,
@@ -132,7 +133,8 @@ export function TemplatePreviewModal({
           url: window.location.href,
         });
       } catch (err) {
-        console.log('Share cancelled');
+        // User cancelled share - not an error
+        logger.debug('Share cancelled by user');
       }
     }
   };

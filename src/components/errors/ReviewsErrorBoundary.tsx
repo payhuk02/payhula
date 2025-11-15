@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import * as Sentry from '@sentry/react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: React.ReactNode;
@@ -54,7 +55,7 @@ export class ReviewsErrorBoundary extends Component<Props, State> {
       this.props.onError(error, errorInfo);
     }
 
-    console.error('Reviews Error:', error, errorInfo);
+    logger.error('Reviews Error', { error, errorInfo });
   }
 
   handleReset = () => {

@@ -16,6 +16,7 @@ import {
 import { Download, Loader2 } from 'lucide-react';
 import { exportReviewsToCSV } from '@/utils/exportReviewsCSV';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import type { Review } from '@/types/review';
 
 interface ExportReviewsButtonProps {
@@ -60,7 +61,7 @@ export const ExportReviewsButton: React.FC<ExportReviewsButtonProps> = ({
         description: `${reviews.length} avis exportés vers ${filename}`,
       });
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error', { error, reviewCount: reviews.length });
       toast({
         title: '❌ Erreur d\'export',
         description: 'Une erreur s\'est produite lors de l\'export.',

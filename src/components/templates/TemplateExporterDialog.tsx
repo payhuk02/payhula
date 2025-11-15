@@ -25,6 +25,7 @@ import {
   ChevronUp,
   Loader2,
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -129,7 +130,7 @@ export function TemplateExporterDialog({
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', { error, templateId: template?.id });
     } finally {
       setIsExporting(false);
     }

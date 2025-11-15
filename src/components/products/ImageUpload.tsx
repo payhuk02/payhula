@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 interface ImageUploadProps {
   value: string;
@@ -72,7 +73,7 @@ const ImageUpload = ({ value, onChange, disabled = false }: ImageUploadProps) =>
         description: "Image téléchargée avec succès",
       });
     } catch (error: any) {
-      console.error("Error uploading image:", error);
+      logger.error("Error uploading image", { error });
       toast({
         title: "Erreur",
         description: error.message || "Impossible de télécharger l'image",

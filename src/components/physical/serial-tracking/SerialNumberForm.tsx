@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useCreateSerialNumber, useUpdateSerialNumber, useSerialNumber } from '@/hooks/physical/useSerialTracking';
 import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 const serialFormSchema = z.object({
   serial_number: z.string().min(1, 'Le numéro de série est requis'),
@@ -125,7 +126,7 @@ export function SerialNumberForm({ serialNumberId, physicalProductId, variantId,
 
       onSuccess();
     } catch (error) {
-      console.error('Error saving serial number:', error);
+      logger.error('Error saving serial number', { error });
     }
   };
 

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Loader2, Shield, CheckCircle2 } from 'lucide-react';
 import { useGenerateDownloadToken, useLogDownload } from '@/hooks/digital/useSecureDownload';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -97,7 +98,7 @@ export function SecureDownloadButton({
       setTimeout(() => setDownloadSuccess(false), 3000);
 
     } catch (error: any) {
-      console.error('Download error:', error);
+      logger.error('Download error', { error, productId, fileUrl });
       
       // Log the failed download
       logDownload({

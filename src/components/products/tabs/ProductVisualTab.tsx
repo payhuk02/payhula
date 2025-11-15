@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { logger } from "@/lib/logger";
 import { 
   Image as ImageIcon, 
   Video, 
@@ -83,7 +84,7 @@ export const ProductVisualTab = ({ formData, updateFormData, storeId }: ProductV
         if (await validateImage(u)) {
           valids.push(u);
         } else {
-          console.warn('Image rejetée: ratio non conforme 16:9 (1280x720 attendu)', u);
+          logger.warn('Image rejetée: ratio non conforme 16:9 (1280x720 attendu)', { url: u });
           toast({
             title: "Format d'image non valide",
             description: "Veuillez utiliser une image 1280×720 (ratio 16:9).",

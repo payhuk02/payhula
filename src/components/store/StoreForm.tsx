@@ -8,6 +8,7 @@ import { CurrencySelect } from "@/components/ui/currency-select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateSlug } from "@/lib/store-utils";
+import { logger } from "@/lib/logger";
 import { Loader2, Check, X } from "lucide-react";
 
 interface StoreFormProps {
@@ -64,7 +65,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
       if (error) throw error;
       setSlugAvailable(data);
     } catch (error: any) {
-      console.error("Error checking slug:", error);
+      logger.error("Error checking slug", { error, slug: slugToCheck });
       setSlugAvailable(null);
     } finally {
       setIsCheckingSlug(false);

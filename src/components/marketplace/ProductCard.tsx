@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { safeRedirect } from "@/lib/url-validator";
 import { ProductBanner } from "@/components/ui/ResponsiveProductImage";
+import { logger } from "@/lib/logger";
 
 interface ProductCardProps {
   product: {
@@ -82,7 +83,7 @@ const ProductCard = ({ product, storeSlug }: ProductCardProps) => {
         });
       }
     } catch (error: any) {
-      console.error("Erreur Moneroo:", error);
+      logger.error("Erreur Moneroo", { error, productId: product.id });
       toast({
         title: "Erreur de paiement",
         description: error.message || "Impossible d'initialiser le paiement",

@@ -28,8 +28,8 @@ import { useGenerateDownloadLink, useTrackDownload } from '@/hooks/digital/useDo
 import { useRemainingDownloads } from '@/hooks/digital/useDigitalProducts';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { useToast } from '@/hooks/use-toast';
 
 interface DigitalDownloadButtonProps {
   digitalProductId: string;
@@ -337,7 +337,7 @@ export const DigitalDownloadButtonCompact = ({
       // Download
       window.open(result.url, '_blank');
     } catch (error) {
-      console.error('Quick download error:', error);
+      logger.error('Quick download error', { error, productId: digitalProductId });
     }
   };
 

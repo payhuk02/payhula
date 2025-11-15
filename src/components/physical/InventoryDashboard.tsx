@@ -15,6 +15,7 @@ import {
   DollarSign,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // Import our components
 import { PhysicalProductsList } from './PhysicalProductsList';
@@ -70,7 +71,7 @@ export function InventoryDashboard({ storeId, className }: InventoryDashboardPro
 
   const handleExportReport = () => {
     // Export functionality
-    console.log('Exporting inventory report...');
+    logger.info('Exporting inventory report');
   };
 
   return (

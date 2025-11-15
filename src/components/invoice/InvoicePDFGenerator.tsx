@@ -10,6 +10,7 @@ import autoTable from 'jspdf-autotable';
 import type { Invoice, InvoiceItem } from '@/types/invoice';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 /**
  * Génère un PDF professionnel pour une facture
@@ -39,7 +40,7 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
       doc.addImage(img, 'PNG', margin, yPosition, logoWidth, Math.min(logoHeight, 20));
       yPosition += Math.min(logoHeight, 20) + 5;
     } catch (error) {
-      console.error('Error loading logo:', error);
+      logger.error('Error loading logo', { error, logoUrl: invoice.store_info.logo_url });
     }
   }
 

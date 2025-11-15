@@ -24,6 +24,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 interface SecondaryDomain {
   id: string;
@@ -86,7 +87,7 @@ export const MultiDomainManager = ({
         });
       }
     } catch (error) {
-      console.error('Error adding domain:', error);
+      logger.error('Error adding domain', { error, domain: newDomain, type: newDomainType });
     } finally {
       setIsAddingDomain(false);
     }
@@ -105,7 +106,7 @@ export const MultiDomainManager = ({
         });
       }
     } catch (error) {
-      console.error('Error removing domain:', error);
+      logger.error('Error removing domain', { error, domain });
     }
   };
 
