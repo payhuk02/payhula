@@ -6,7 +6,7 @@ import { Calendar, User, CreditCard, Package, MapPin, Phone, Mail, FileText, Mes
 import { Order } from "@/hooks/useOrders";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
@@ -26,7 +26,7 @@ interface OrderItem {
   total_price: number;
 }
 
-export const OrderDetailDialog = ({ open, onOpenChange, order }: OrderDetailDialogProps) => {
+const OrderDetailDialogComponent = ({ open, onOpenChange, order }: OrderDetailDialogProps) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -403,4 +403,19 @@ export const OrderDetailDialog = ({ open, onOpenChange, order }: OrderDetailDial
     </Dialog>
   );
 };
+
+OrderDetailDialogComponent.displayName = 'OrderDetailDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const OrderDetailDialog = React.memo(OrderDetailDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.order?.id === nextProps.order?.id &&
+    prevProps.order?.status === nextProps.order?.status &&
+    prevProps.order?.total === nextProps.order?.total
+  );
+});
+
+OrderDetailDialog.displayName = 'OrderDetailDialog';
 

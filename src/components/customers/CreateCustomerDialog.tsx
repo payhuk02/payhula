@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ interface CreateCustomerDialogProps {
   storeId: string;
 }
 
-export const CreateCustomerDialog = ({ open, onOpenChange, onSuccess, storeId }: CreateCustomerDialogProps) => {
+const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: CreateCustomerDialogProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,7 +27,19 @@ export const CreateCustomerDialog = ({ open, onOpenChange, onSuccess, storeId }:
     notes: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const resetForm = useCallback(() => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      country: "",
+      notes: "",
+    });
+  }, []);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -58,19 +70,7 @@ export const CreateCustomerDialog = ({ open, onOpenChange, onSuccess, storeId }:
     } finally {
       setLoading(false);
     }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      country: "",
-      notes: "",
-    });
-  };
+  }, [formData, storeId, onSuccess, onOpenChange, resetForm]); // Note: toast est stable
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -172,3 +172,17 @@ export const CreateCustomerDialog = ({ open, onOpenChange, onSuccess, storeId }:
     </Dialog>
   );
 };
+
+CreateCustomerDialogComponent.displayName = 'CreateCustomerDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CreateCustomerDialog = React.memo(CreateCustomerDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.onSuccess === nextProps.onSuccess &&
+    prevProps.storeId === nextProps.storeId
+  );
+});
+
+CreateCustomerDialog.displayName = 'CreateCustomerDialog';
