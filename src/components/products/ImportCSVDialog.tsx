@@ -151,7 +151,7 @@ const ImportCSVDialogComponent = ({
       title: "Template téléchargé",
       description: "Utilisez ce fichier comme modèle pour votre import",
     });
-  };
+  }, []); // Note: toast est stable
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
