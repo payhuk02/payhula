@@ -165,9 +165,11 @@ export default defineConfig(({ mode }) => {
             return undefined; // Garder dans le chunk principal avec React
           }
           
-          // TanStack Query (React Query)
+          // TanStack Query (React Query) - CRITIQUE: Garder dans le chunk principal avec React
+          // React Query doit avoir accès aux internes React (_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED)
+          // qui ne sont disponibles que si React est dans le même chunk
           if (id.includes('node_modules/@tanstack/react-query')) {
-            return 'react-query';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Supabase client
@@ -198,9 +200,16 @@ export default defineConfig(({ mode }) => {
             return 'editor';
           }
           
-          // Framer Motion (animations)
+          // Framer Motion (animations) - CRITIQUE: Garder dans le chunk principal avec React
+          // Framer Motion doit avoir accès aux internes React pour les animations
           if (id.includes('node_modules/framer-motion')) {
-            return 'animations';
+            return undefined; // Garder dans le chunk principal avec React
+          }
+          
+          // react-hook-form - CRITIQUE: Garder dans le chunk principal avec React
+          // react-hook-form doit avoir accès aux internes React
+          if (id.includes('node_modules/react-hook-form') || id.includes('node_modules/@hookform')) {
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Date utilities
