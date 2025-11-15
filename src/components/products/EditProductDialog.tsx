@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,7 +26,7 @@ interface EditProductDialogProps {
   onProductUpdated: () => void;
 }
 
-const EditProductDialog = ({
+const EditProductDialogComponent = ({
   product,
   storeSlug,
   open,
@@ -56,7 +56,7 @@ const EditProductDialog = ({
     setIsActive(product.is_active);
   }, [product]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     const success = await updateProduct(product.id, {
@@ -74,11 +74,11 @@ const EditProductDialog = ({
       onOpenChange(false);
       onProductUpdated();
     }
-  };
+  }, [product.id, name, slug, description, price, category, productType, imageUrl, isActive, updateProduct, onOpenChange, onProductUpdated]);
 
-  const handleCheckAvailability = async (slugToCheck: string) => {
+  const handleCheckAvailability = useCallback(async (slugToCheck: string) => {
     return await checkSlugAvailability(slugToCheck, product.id);
-  };
+  }, [checkSlugAvailability, product.id]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -210,5 +210,23 @@ const EditProductDialog = ({
     </Dialog>
   );
 };
+
+EditProductDialogComponent.displayName = 'EditProductDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const EditProductDialog = React.memo(EditProductDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.onProductUpdated === nextProps.onProductUpdated &&
+    prevProps.storeSlug === nextProps.storeSlug &&
+    prevProps.product?.id === nextProps.product?.id &&
+    prevProps.product?.name === nextProps.product?.name &&
+    prevProps.product?.price === nextProps.product?.price &&
+    prevProps.product?.is_active === nextProps.product?.is_active
+  );
+});
+
+EditProductDialog.displayName = 'EditProductDialog';
 
 export default EditProductDialog;

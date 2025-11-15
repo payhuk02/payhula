@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ interface OrderItem {
   currency: string;
 }
 
-export const OrderEditDialog = ({ open, onOpenChange, onSuccess, order, storeId }: OrderEditDialogProps) => {
+const OrderEditDialogComponent = ({ open, onOpenChange, onSuccess, order, storeId }: OrderEditDialogProps) => {
   const { toast } = useToast();
   const { products } = useProducts(storeId);
   const [loading, setLoading] = useState(false);
@@ -79,7 +79,7 @@ export const OrderEditDialog = ({ open, onOpenChange, onSuccess, order, storeId 
     loadOrderData();
   }, [order, open]);
 
-  const handleAddItem = () => {
+  const handleAddItem = useCallback(() => {
     if (!products || products.length === 0) {
       toast({
         title: "Attention",
@@ -99,8 +99,8 @@ export const OrderEditDialog = ({ open, onOpenChange, onSuccess, order, storeId 
       return;
     }
 
-    setItems([
-      ...items,
+    setItems(prev => [
+      ...prev,
       {
         productId: firstActiveProduct.id,
         productName: firstActiveProduct.name,
@@ -109,33 +109,35 @@ export const OrderEditDialog = ({ open, onOpenChange, onSuccess, order, storeId 
         currency: order?.currency || 'FCFA',
       },
     ]);
-  };
+  }, [products, order?.currency]); // Note: toast est stable
 
-  const handleRemoveItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
+  const handleRemoveItem = useCallback((index: number) => {
+    setItems(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
-  const handleItemChange = (index: number, field: keyof OrderItem, value: any) => {
-    const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
+  const handleItemChange = useCallback((index: number, field: keyof OrderItem, value: any) => {
+    setItems(prev => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], [field]: value };
 
-    if (field === 'productId') {
-      const selectedProduct = products?.find(p => p.id === value);
-      if (selectedProduct) {
-        newItems[index].productName = selectedProduct.name;
-        newItems[index].unitPrice = Number(selectedProduct.price);
-        newItems[index].currency = selectedProduct.currency || 'FCFA';
+      if (field === 'productId') {
+        const selectedProduct = products?.find(p => p.id === value);
+        if (selectedProduct) {
+          newItems[index].productName = selectedProduct.name;
+          newItems[index].unitPrice = Number(selectedProduct.price);
+          newItems[index].currency = selectedProduct.currency || 'FCFA';
+        }
       }
-    }
 
-    setItems(newItems);
-  };
+      return newItems;
+    });
+  }, [products]);
 
   const calculateTotal = () => {
     return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!order) return;
@@ -209,7 +211,7 @@ export const OrderEditDialog = ({ open, onOpenChange, onSuccess, order, storeId 
     } finally {
       setLoading(false);
     }
-  };
+  }, [order, items, paymentMethod, status, paymentStatus, notes, onSuccess, onOpenChange]); // Note: toast est stable
 
   const formatPrice = (price: number) => {
     return price.toLocaleString('fr-FR', {
@@ -412,4 +414,21 @@ export const OrderEditDialog = ({ open, onOpenChange, onSuccess, order, storeId 
     </Dialog>
   );
 };
+
+OrderEditDialogComponent.displayName = 'OrderEditDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const OrderEditDialog = React.memo(OrderEditDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.onSuccess === nextProps.onSuccess &&
+    prevProps.storeId === nextProps.storeId &&
+    prevProps.order?.id === nextProps.order?.id &&
+    prevProps.order?.status === nextProps.order?.status &&
+    prevProps.order?.total === nextProps.order?.total
+  );
+});
+
+OrderEditDialog.displayName = 'OrderEditDialog';
 

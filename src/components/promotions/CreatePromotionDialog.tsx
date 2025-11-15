@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ interface CreatePromotionDialogProps {
   storeId: string;
 }
 
-export const CreatePromotionDialog = ({ open, onOpenChange, onSuccess, storeId }: CreatePromotionDialogProps) => {
+const CreatePromotionDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: CreatePromotionDialogProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,7 +31,7 @@ export const CreatePromotionDialog = ({ open, onOpenChange, onSuccess, storeId }
     is_active: true,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -70,7 +70,7 @@ export const CreatePromotionDialog = ({ open, onOpenChange, onSuccess, storeId }
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, storeId, onSuccess, onOpenChange]); // Note: toast est stable
 
   const resetForm = () => {
     setFormData({
@@ -225,3 +225,17 @@ export const CreatePromotionDialog = ({ open, onOpenChange, onSuccess, storeId }
     </Dialog>
   );
 };
+
+CreatePromotionDialogComponent.displayName = 'CreatePromotionDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CreatePromotionDialog = React.memo(CreatePromotionDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.onOpenChange === nextProps.onOpenChange &&
+    prevProps.onSuccess === nextProps.onSuccess &&
+    prevProps.storeId === nextProps.storeId
+  );
+});
+
+CreatePromotionDialog.displayName = 'CreatePromotionDialog';

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,7 +24,7 @@ interface CreateProductDialogProps {
   onProductCreated: () => void;
 }
 
-const CreateProductDialog = ({
+const CreateProductDialogComponent = ({
   storeId,
   storeSlug,
   onProductCreated,
@@ -41,7 +41,7 @@ const CreateProductDialog = ({
   const { createProduct, checkSlugAvailability, loading } =
     useProductManagement(storeId);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     const success = await createProduct({
@@ -65,7 +65,7 @@ const CreateProductDialog = ({
       setImageUrl("");
       onProductCreated();
     }
-  };
+  }, [name, slug, description, price, category, productType, imageUrl, createProduct, onProductCreated]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -194,5 +194,18 @@ const CreateProductDialog = ({
     </Dialog>
   );
 };
+
+CreateProductDialogComponent.displayName = 'CreateProductDialogComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const CreateProductDialog = React.memo(CreateProductDialogComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.storeId === nextProps.storeId &&
+    prevProps.storeSlug === nextProps.storeSlug &&
+    prevProps.onProductCreated === nextProps.onProductCreated
+  );
+});
+
+CreateProductDialog.displayName = 'CreateProductDialog';
 
 export default CreateProductDialog;
