@@ -158,9 +158,11 @@ export default defineConfig(({ mode }) => {
             return undefined; // Garder dans le chunk principal
           }
           
-          // React Router dans un chunk séparé
+          // React Router - CRITIQUE: Garder dans le chunk principal avec React
+          // React Router doit avoir accès aux internes React (_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED)
+          // qui ne sont disponibles que si React est dans le même chunk
           if (id.includes('node_modules/react-router')) {
-            return 'router';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // TanStack Query (React Query)
