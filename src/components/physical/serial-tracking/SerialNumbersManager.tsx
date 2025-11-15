@@ -142,7 +142,7 @@ export function SerialNumbersManager({ physicalProductId, variantId }: SerialNum
               <span className="sm:hidden">Ajouter</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Ajouter un Numéro de Série</DialogTitle>
             </DialogHeader>
@@ -344,7 +344,7 @@ export function SerialNumbersManager({ physicalProductId, variantId }: SerialNum
       {/* Edit Dialog */}
       {editingSerial && (
         <Dialog open={!!editingSerial} onOpenChange={() => setEditingSerial(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Modifier le Numéro de Série</DialogTitle>
             </DialogHeader>
@@ -361,7 +361,7 @@ export function SerialNumbersManager({ physicalProductId, variantId }: SerialNum
       {/* Traceability Dialog */}
       {viewingTraceability && (
         <Dialog open={!!viewingTraceability} onOpenChange={() => setViewingTraceability(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Traçabilité Complète</DialogTitle>
             </DialogHeader>

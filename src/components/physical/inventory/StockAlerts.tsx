@@ -395,7 +395,7 @@ export const StockAlerts: React.FC = () => {
 
       {/* Resolve Dialog */}
       <Dialog open={!!selectedAlert} onOpenChange={(open) => !open && setSelectedAlert(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Résoudre l'alerte</DialogTitle>
             <DialogDescription>

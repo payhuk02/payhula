@@ -172,7 +172,7 @@ export const MyReturns = () => {
                   Nouvelle demande
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-[95vw] sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Demander un retour</DialogTitle>
                   <DialogDescription>

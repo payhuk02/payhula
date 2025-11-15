@@ -408,7 +408,7 @@ export const ServiceBundleBuilder: React.FC<ServiceBundleBuilderProps> = ({
 
       {/* Dialog d'édition */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingBundle?.id ? 'Modifier' : 'Nouveau'} pack de services

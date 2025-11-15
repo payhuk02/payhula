@@ -614,7 +614,7 @@ export const StaffAvailabilityManager = ({
 
       {/* Time Off Dialog */}
       <Dialog open={isTimeOffDialogOpen} onOpenChange={setIsTimeOffDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {selectedTimeOff ? 'Modifier le congé' : 'Ajouter un congé'}
@@ -641,7 +641,7 @@ export const StaffAvailabilityManager = ({
 
       {/* Custom Hours Dialog */}
       <Dialog open={isCustomHoursDialogOpen} onOpenChange={setIsCustomHoursDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {selectedCustomHours ? 'Modifier les heures' : 'Ajouter des heures personnalisées'}

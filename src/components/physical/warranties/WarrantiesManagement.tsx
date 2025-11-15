@@ -353,7 +353,7 @@ export default function WarrantiesManagement() {
 
       {/* Dialog Create/Edit */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingWarranty ? 'Modifier la garantie' : 'Nouvelle garantie'}

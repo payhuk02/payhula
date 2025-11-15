@@ -127,7 +127,7 @@ export function LotsManager({ physicalProductId, variantId, warehouseId }: LotsM
               <span className="sm:hidden">Nouveau</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Créer un Nouveau Lot</DialogTitle>
             </DialogHeader>
@@ -270,7 +270,7 @@ export function LotsManager({ physicalProductId, variantId, warehouseId }: LotsM
 
       {editingLot && (
         <Dialog open={!!editingLot} onOpenChange={() => setEditingLot(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Modifier le Lot</DialogTitle>
             </DialogHeader>

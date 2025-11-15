@@ -421,7 +421,7 @@ export default function WarehouseTransfers() {
 
       {/* Dialog Create Transfer */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nouveau transfert entrepôt</DialogTitle>
             <DialogDescription>

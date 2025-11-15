@@ -501,7 +501,7 @@ export function BackordersManager() {
 
       {/* Dialog Clients */}
       <Dialog open={showCustomers} onOpenChange={setShowCustomers}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Clients - {selectedBackorder?.product?.name}</DialogTitle>
             <DialogDescription>
@@ -577,7 +577,7 @@ export function BackordersManager() {
 
       {/* Dialog Recevoir Stock */}
       <Dialog open={showReceiveDialog} onOpenChange={setShowReceiveDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Recevoir du Stock</DialogTitle>
             <DialogDescription>
@@ -623,7 +623,7 @@ export function BackordersManager() {
 
       {/* Dialog Marquer Commandé */}
       <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Marquer comme Commandé</DialogTitle>
             <DialogDescription>

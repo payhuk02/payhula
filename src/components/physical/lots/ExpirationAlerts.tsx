@@ -237,7 +237,7 @@ export function ExpirationAlerts() {
                               <span className="text-xs sm:text-sm">Résoudre</span>
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle>Résoudre l'Alerte</DialogTitle>
                             </DialogHeader>

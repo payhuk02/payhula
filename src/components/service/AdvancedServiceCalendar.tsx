@@ -649,7 +649,7 @@ export default function AdvancedServiceCalendar({
 
       {/* Dialog Détails Réservation - Responsive */}
       <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl">Détails de la Réservation</DialogTitle>
             <DialogDescription className="text-xs sm:text-sm">

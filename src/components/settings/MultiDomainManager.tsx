@@ -194,7 +194,7 @@ export const MultiDomainManager = ({
                   Ajouter
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="max-w-[95vw] sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Ajouter un Domaine Secondaire</DialogTitle>
                   <DialogDescription>

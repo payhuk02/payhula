@@ -104,7 +104,7 @@ export const FileVersionManager = ({ fileId, fileName }: FileVersionManagerProps
                   Nouvelle version
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Créer une nouvelle version</DialogTitle>
                   <DialogDescription>

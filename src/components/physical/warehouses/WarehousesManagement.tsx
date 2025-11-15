@@ -470,7 +470,7 @@ export default function WarehousesManagement() {
 
       {/* Dialog Create/Edit */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingWarehouse ? 'Modifier l\'entrepôt' : 'Nouvel entrepôt'}

@@ -439,7 +439,7 @@ export function BundlesManager() {
 
       {/* Dialog Création Bundle */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Créer un Bundle</DialogTitle>
             <DialogDescription>
@@ -681,7 +681,7 @@ export function BundlesManager() {
 
       {/* Dialog Promotion */}
       <Dialog open={showPromotionDialog} onOpenChange={setShowPromotionDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Appliquer une Promotion</DialogTitle>
             <DialogDescription>

@@ -234,7 +234,7 @@ export const DigitalDownloadButton = ({
 
       {/* Download Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
               {isDownloading ? 'Téléchargement en cours...' : error ? 'Erreur' : 'Téléchargement terminé'}

@@ -169,7 +169,7 @@ export const WebhookLogs = ({ webhookId }: WebhookLogsProps) => {
       {/* Log Details Dialog */}
       {selectedLog && (
         <Dialog open={!!selectedLog} onOpenChange={() => setSelectedLog(null)}>
-          <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Détails du log</DialogTitle>
               <DialogDescription>

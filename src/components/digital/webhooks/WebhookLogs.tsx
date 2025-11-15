@@ -156,7 +156,7 @@ export const WebhookLogs = ({ webhookId }: WebhookLogsProps) => {
                             <Eye className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Détails du webhook</DialogTitle>
                             <DialogDescription>

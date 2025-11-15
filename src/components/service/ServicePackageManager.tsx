@@ -555,7 +555,7 @@ export const ServicePackageManager: React.FC<ServicePackageManagerProps> = ({
 
       {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingPackage?.name ? `Modifier ${editingPackage.name}` : 'Nouveau package'}
