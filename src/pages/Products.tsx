@@ -330,6 +330,35 @@ const Products = () => {
     });
   }, [refetch, toast]);
 
+  // Handlers génériques mémorisés pour les actions sur produits (utilisés dans map)
+  const handleProductEdit = useCallback((product: any) => {
+    setEditingProduct(product);
+  }, []);
+
+  const handleProductDelete = useCallback((productId: string) => {
+    setDeletingProductId(productId);
+  }, []);
+
+  const handleProductToggleStatus = useCallback((productId: string) => {
+    handleToggleStatus(productId);
+  }, [handleToggleStatus]);
+
+  const handleProductDuplicate = useCallback((productId: string) => {
+    handleDuplicateProduct(productId);
+  }, [handleDuplicateProduct]);
+
+  const handleProductQuickView = useCallback((product: any) => {
+    setQuickViewProduct(product);
+  }, []);
+
+  const handleProductSelect = useCallback((productId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedProducts(prev => [...prev, productId]);
+    } else {
+      setSelectedProducts(prev => prev.filter(id => id !== productId));
+    }
+  }, []);
+
   const handleDuplicateProduct = useCallback(async (productId: string) => {
     try {
       logger.info('Duplication du produit', { productId });
