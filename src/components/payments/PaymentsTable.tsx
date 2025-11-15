@@ -68,9 +68,9 @@ const PaymentsTableComponent = ({ payments, loading, onPaymentUpdated }: Payment
         {labels[status] || status}
       </Badge>
     );
-  };
+  }, []);
 
-  const getMethodLabel = (method: string) => {
+  const getMethodLabel = useCallback((method: string) => {
     const labels: Record<string, string> = {
       cash: "Espèces",
       card: "Carte bancaire",
@@ -81,7 +81,7 @@ const PaymentsTableComponent = ({ payments, loading, onPaymentUpdated }: Payment
     };
 
     return labels[method] || method;
-  };
+  }, []);
 
   if (loading) {
     return <div className="text-center py-8">Chargement...</div>;
