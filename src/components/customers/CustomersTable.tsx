@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -104,7 +104,7 @@ const CustomerCard = ({
   );
 };
 
-export const CustomersTable = ({ customers, onUpdate }: CustomersTableProps) => {
+const CustomersTableComponent = ({ customers, onUpdate }: CustomersTableProps) => {
   const { toast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -254,3 +254,20 @@ export const CustomersTable = ({ customers, onUpdate }: CustomersTableProps) => 
     </>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const CustomersTable = React.memo(CustomersTableComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.customers.length === nextProps.customers.length &&
+    prevProps.onUpdate === nextProps.onUpdate &&
+    // Comparaison superficielle des customers (comparer les IDs)
+    prevProps.customers.every((customer, index) => 
+      customer.id === nextProps.customers[index]?.id &&
+      customer.name === nextProps.customers[index]?.name &&
+      customer.total_orders === nextProps.customers[index]?.total_orders &&
+      customer.total_spent === nextProps.customers[index]?.total_spent
+    )
+  );
+});
+
+CustomersTable.displayName = 'CustomersTable';
