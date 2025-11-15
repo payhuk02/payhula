@@ -18,7 +18,7 @@ interface ReviewsListProps {
   onReplyToReview?: (reviewId: string) => void;
 }
 
-export const ReviewsList: React.FC<ReviewsListProps> = ({
+const ReviewsListComponent: React.FC<ReviewsListProps> = ({
   productId,
   onReplyToReview,
 }) => {
@@ -81,4 +81,14 @@ export const ReviewsList: React.FC<ReviewsListProps> = ({
     </div>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ReviewsList = React.memo(ReviewsListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.productId === nextProps.productId &&
+    prevProps.onReplyToReview === nextProps.onReplyToReview
+  );
+});
+
+ReviewsList.displayName = 'ReviewsList';
 

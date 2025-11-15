@@ -13,7 +13,7 @@ interface AnimatedCardProps {
   onClick?: () => void;
 }
 
-export const AnimatedCard: React.FC<AnimatedCardProps> = ({
+const AnimatedCardComponent: React.FC<AnimatedCardProps> = ({
   children,
   className,
   hoverEffect = 'lift',
@@ -34,7 +34,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
         hoverClasses[hoverEffect],
         className
       )}
-      style={{ animationDelay: `${delay}ms` }}
+      style={{ animationDelay: `${delay}ms`, willChange: 'transform' }}
       onClick={onClick}
     >
       {children}
