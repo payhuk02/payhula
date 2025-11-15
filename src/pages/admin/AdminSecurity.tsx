@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Copy, Check } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function AdminSecurity() {
   const [enrolling, setEnrolling] = useState(false);
@@ -36,7 +37,7 @@ export default function AdminSecurity() {
     try {
       const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
       if (error) {
-        console.error('MFA enroll error:', error);
+        logger.error('MFA enroll error', { error });
         throw error;
       }
       if (!data) {
@@ -88,7 +89,7 @@ export default function AdminSecurity() {
     try {
       const { error } = await supabase.auth.mfa.verify({ factorId, code: verifyCode });
       if (error) {
-        console.error('MFA verify error:', error);
+        logger.error('MFA verify error', { error });
         // Si le facteur n'existe plus (expiré ou invalidé), proposer de relancer
         if (error.message?.includes('not found') || error.message?.includes('challenge ID')) {
           toast({

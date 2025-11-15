@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -99,6 +99,9 @@ const Products = () => {
   const debouncedPriceRange = useDebounce(priceRange, 300);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   
+  // Ref pour l'input de recherche (pour les raccourcis clavier)
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  
   // Utiliser le hook optimisé avec pagination serveur
   const {
     products,
@@ -186,9 +189,8 @@ const Products = () => {
       // Cmd/Ctrl + K : Focus sur la recherche
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
-        if (searchInput) {
-          searchInput.focus();
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
         }
       }
 
@@ -218,9 +220,8 @@ const Products = () => {
       // / : Focus sur la recherche
       if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
-        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
-        if (searchInput) {
-          searchInput.focus();
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
         }
       }
     };
@@ -627,6 +628,7 @@ const Products = () => {
                     <ProductFiltersDashboard
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
+                    searchInputRef={searchInputRef}
                     category={category}
                     onCategoryChange={setCategory}
                     productType={productType}

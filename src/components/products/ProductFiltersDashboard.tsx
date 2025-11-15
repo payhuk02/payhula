@@ -17,11 +17,12 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, RefObject } from "react";
 
 interface ProductFiltersDashboardProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  searchInputRef?: RefObject<HTMLInputElement>;
   category: string;
   onCategoryChange: (value: string) => void;
   productType: string;
@@ -43,6 +44,7 @@ interface ProductFiltersDashboardProps {
 const ProductFiltersDashboard = ({
   searchQuery,
   onSearchChange,
+  searchInputRef,
   category,
   onCategoryChange,
   productType,
@@ -141,6 +143,7 @@ const ProductFiltersDashboard = ({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
+            ref={searchInputRef}
             type="search"
             placeholder="Rechercher un produit..."
             value={searchQuery}

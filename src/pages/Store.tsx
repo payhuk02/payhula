@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Store as StoreIcon, ExternalLink, Plus, Settings } from "lucide-react";
 import { useStores } from "@/hooks/useStores";
 import StoreDetails from "@/components/store/StoreDetails";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Store = () => {
@@ -37,17 +37,17 @@ const Store = () => {
                 </h1>
               </div>
               {!loading && stores.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(`/stores/${stores[0].slug}`, '_blank')}
-                  className="touch-manipulation min-h-[44px] whitespace-nowrap text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0"
+                <Link
+                  to={`/stores/${stores[0].slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-manipulation min-h-[44px] whitespace-nowrap text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0 inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
                   aria-label={`Ouvrir la boutique ${stores[0].name} dans un nouvel onglet`}
                 >
                   <ExternalLink className="h-3 w-3 mr-1 sm:mr-2" aria-hidden="true" />
                   <span className="hidden sm:inline">Voir ma boutique</span>
                   <span className="sm:hidden">Voir</span>
-                </Button>
+                </Link>
               )}
             </div>
           </header>

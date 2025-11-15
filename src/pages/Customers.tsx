@@ -18,6 +18,7 @@ import { CustomerFilters } from "@/components/customers/CustomerFilters";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { logger } from "@/lib/logger";
 
 const Customers = () => {
   const { store, loading: storeLoading } = useStore();
@@ -42,7 +43,7 @@ const Customers = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "customers", filter: `store_id=eq.${store.id}` },
         (payload) => {
-          console.log("🧩 Realtime customers payload:", payload);
+          logger.info("Realtime customers payload", { payload });
 
           setCustomers((prev: any[]) => {
             if (payload.eventType === "INSERT") {

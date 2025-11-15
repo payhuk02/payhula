@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -471,15 +471,14 @@ const Marketplace = () => {
     
     // Scroll vers le début de la liste de produits (au lieu du top de page)
     setTimeout(() => {
-      const mainContent = document.getElementById('main-content');
-      if (mainContent) {
-        mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (productsRef.current) {
+        productsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
-        // Fallback si ID non trouvé
+        // Fallback si ref non disponible
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }, 100); // Délai pour permettre le re-render
-  }, [totalPages]);
+  }, [totalPages, productsRef]);
 
   // Statistiques (basées sur le total réel, pas seulement la page actuelle)
   const stats = useMemo(() => ({

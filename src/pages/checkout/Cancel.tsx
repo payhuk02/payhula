@@ -4,7 +4,7 @@ import { XCircle, RotateCcw, Loader2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { logger } from "@/lib/logger";
 
 const CheckoutCancel = () => {
   const [searchParams] = useSearchParams();
@@ -50,7 +50,7 @@ const CheckoutCancel = () => {
           }
         }
       } catch (err) {
-        console.error("Error updating transaction:", err);
+        logger.error("Error updating transaction", { error: err });
       } finally {
         setLoading(false);
       }

@@ -11,6 +11,7 @@ import { GamificationDashboard } from '@/components/gamification/GamificationDas
 import { GamificationErrorBoundary } from '@/components/gamification/GamificationErrorBoundary';
 import { Trophy, Menu } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useNavigate } from 'react-router-dom';
 
 // Composant interne pour utiliser useSidebar
 function MobileHeader() {
@@ -43,6 +44,7 @@ function MobileHeader() {
 
 
 export default function GamificationPage() {
+  const navigate = useNavigate();
   const headerRef = useScrollAnimation<HTMLDivElement>();
 
   return (
@@ -100,7 +102,7 @@ export default function GamificationPage() {
                           Une erreur s'est produite lors du chargement de la page de gamification.
                         </p>
                         <button
-                          onClick={() => window.location.reload()}
+                          onClick={() => navigate(0)}
                           className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                         >
                           <svg

@@ -5,6 +5,7 @@ import { verifyTransactionStatus } from "@/lib/moneroo-payment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -41,7 +42,7 @@ const CheckoutSuccess = () => {
           if (prod) setProduct(prod);
         }
       } catch (err: any) {
-        console.error("Verification error:", err);
+        logger.error("Verification error", { error: err });
         setError(err.message || "Erreur lors de la vérification du paiement");
       } finally {
         setLoading(false);
