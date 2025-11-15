@@ -11,6 +11,7 @@
  * - Responsive variants
  */
 
+import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,7 +55,7 @@ interface StaffCardProps {
   onContact?: () => void;
 }
 
-export const StaffCard = ({
+const StaffCardComponent = ({
   name,
   role,
   bio,
@@ -474,6 +475,30 @@ export const StaffCard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const StaffCard = React.memo(StaffCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.name === nextProps.name &&
+    prevProps.role === nextProps.role &&
+    prevProps.bio === nextProps.bio &&
+    prevProps.avatar_url === nextProps.avatar_url &&
+    prevProps.email === nextProps.email &&
+    prevProps.phone === nextProps.phone &&
+    prevProps.rating === nextProps.rating &&
+    prevProps.reviewCount === nextProps.reviewCount &&
+    prevProps.yearsExperience === nextProps.yearsExperience &&
+    prevProps.location === nextProps.location &&
+    prevProps.availability === nextProps.availability &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.className === nextProps.className &&
+    JSON.stringify(prevProps.skills) === JSON.stringify(nextProps.skills) &&
+    JSON.stringify(prevProps.socialLinks) === JSON.stringify(nextProps.socialLinks) &&
+    prevProps.onContact === nextProps.onContact
+  );
+});
+
+StaffCard.displayName = 'StaffCard';
 
 /**
  * Staff List Component (for displaying multiple staff members)

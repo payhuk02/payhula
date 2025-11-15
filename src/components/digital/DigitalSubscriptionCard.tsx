@@ -5,6 +5,7 @@
  * Composant pour afficher une carte d'abonnement de produit digital
  */
 
+import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -87,7 +88,7 @@ const INTERVAL_LABELS = {
   yearly: 'Annuel',
 };
 
-export const DigitalSubscriptionCard = ({
+const DigitalSubscriptionCardComponent = ({
   subscription,
   showActions = true,
   onCancel,

@@ -5,6 +5,7 @@
  * Affichage et gestion des licenses
  */
 
+import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -85,7 +86,7 @@ const LICENSE_TYPE_LABELS = {
   lifetime: 'À vie',
 };
 
-export const DigitalLicenseCard = ({
+const DigitalLicenseCardComponent = ({
   license,
   showActions = true,
   onManage,

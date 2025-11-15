@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Package } from "lucide-react";
@@ -15,7 +16,7 @@ interface TopProductsCardProps {
   products: Product[];
 }
 
-export const TopProductsCard = ({ products }: TopProductsCardProps) => {
+const TopProductsCardComponent = ({ products }: TopProductsCardProps) => {
   const navigate = useNavigate();
 
   if (products.length === 0) {
@@ -60,6 +61,7 @@ export const TopProductsCard = ({ products }: TopProductsCardProps) => {
             <div
               key={product.id}
               className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/50 transition-smooth cursor-pointer"
+              style={{ willChange: 'transform' }}
               onClick={() => navigate("/dashboard/products")}
             >
               <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
@@ -92,3 +94,21 @@ export const TopProductsCard = ({ products }: TopProductsCardProps) => {
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const TopProductsCard = React.memo(TopProductsCardComponent, (prevProps, nextProps) => {
+  if (prevProps.products.length !== nextProps.products.length) return false;
+  
+  return prevProps.products.every((product, index) => {
+    const nextProduct = nextProps.products[index];
+    return (
+      product.id === nextProduct.id &&
+      product.name === nextProduct.name &&
+      product.price === nextProduct.price &&
+      product.image_url === nextProduct.image_url &&
+      product.orderCount === nextProduct.orderCount
+    );
+  });
+});
+
+TopProductsCard.displayName = 'TopProductsCard';

@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -19,7 +20,7 @@ interface RecentOrdersCardProps {
   orders: Order[];
 }
 
-export const RecentOrdersCard = ({ orders }: RecentOrdersCardProps) => {
+const RecentOrdersCardComponent = ({ orders }: RecentOrdersCardProps) => {
   const navigate = useNavigate();
 
   const getStatusBadge = (status: string) => {
@@ -76,6 +77,7 @@ export const RecentOrdersCard = ({ orders }: RecentOrdersCardProps) => {
             <div
               key={order.id}
               className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-smooth cursor-pointer"
+              style={{ willChange: 'transform' }}
               onClick={() => navigate("/dashboard/orders")}
             >
               <div className="flex-1">
@@ -98,3 +100,22 @@ export const RecentOrdersCard = ({ orders }: RecentOrdersCardProps) => {
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const RecentOrdersCard = React.memo(RecentOrdersCardComponent, (prevProps, nextProps) => {
+  if (prevProps.orders.length !== nextProps.orders.length) return false;
+  
+  return prevProps.orders.every((order, index) => {
+    const nextOrder = nextProps.orders[index];
+    return (
+      order.id === nextOrder.id &&
+      order.order_number === nextOrder.order_number &&
+      order.status === nextOrder.status &&
+      order.total_amount === nextOrder.total_amount &&
+      order.created_at === nextOrder.created_at &&
+      order.customers?.name === nextOrder.customers?.name
+    );
+  });
+});
+
+RecentOrdersCard.displayName = 'RecentOrdersCard';
