@@ -51,7 +51,7 @@ interface SEOPagesListProps {
   isLoading: boolean;
 }
 
-export const SEOPagesList = ({ data, isLoading }: SEOPagesListProps) => {
+const SEOPagesListComponent = ({ data, isLoading }: SEOPagesListProps) => {
   const listRef = useScrollAnimation<HTMLDivElement>();
   const [selectedPage, setSelectedPage] = useState<SEOPageData | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -456,3 +456,21 @@ export const SEOPagesList = ({ data, isLoading }: SEOPagesListProps) => {
     </div>
   );
 };
+
+SEOPagesListComponent.displayName = 'SEOPagesListComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const SEOPagesList = React.memo(SEOPagesListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data?.length === nextProps.data?.length &&
+    // Comparaison superficielle des données (comparer les IDs)
+    (!prevProps.data || !nextProps.data || 
+     prevProps.data.every((page, index) => 
+       page.id === nextProps.data?.[index]?.id &&
+       page.analysis.score.overall === nextProps.data?.[index]?.analysis.score.overall
+     ))
+  );
+});
+
+SEOPagesList.displayName = 'SEOPagesList';
