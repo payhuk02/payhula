@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,9 +15,9 @@ const Store = () => {
   const navigate = useNavigate();
   const headerRef = useScrollAnimation<HTMLDivElement>();
 
-  const handleCreateStoreRedirect = () => {
+  const handleCreateStoreRedirect = useCallback(() => {
     navigate('/dashboard/settings?tab=boutique&action=create');
-  };
+  }, [navigate]);
 
   return (
     <SidebarProvider>
