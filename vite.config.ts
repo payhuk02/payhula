@@ -190,9 +190,11 @@ export default defineConfig(({ mode }) => {
             return 'charts';
           }
           
-          // Composants lourds - Calendrier
+          // Composants lourds - Calendrier - CRITIQUE: Garder dans le chunk principal avec React
+          // react-big-calendar doit avoir accès aux internes React et peut avoir des problèmes d'initialisation
+          // si chargé avant React
           if (id.includes('node_modules/react-big-calendar')) {
-            return 'calendar';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Éditeurs de texte riches
