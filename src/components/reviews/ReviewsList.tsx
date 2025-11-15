@@ -4,7 +4,7 @@
  * Date : 27 octobre 2025
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ReviewCard } from './ReviewCard';
 import { ReviewFilter } from './ReviewFilter';
 import { Button } from '@/components/ui/button';
@@ -31,16 +31,16 @@ const ReviewsListComponent: React.FC<ReviewsListProps> = ({
   const { data: reviews, isLoading } = useProductReviews(productId, filters);
   const voteReview = useVoteReview();
 
-  const handleVote = (reviewId: string, isHelpful: boolean) => {
+  const handleVote = useCallback((reviewId: string, isHelpful: boolean) => {
     voteReview.mutate({ reviewId, isHelpful });
-  };
+  }, [voteReview]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     setFilters(prev => ({
       ...prev,
       offset: (prev.offset || 0) + (prev.limit || 10),
     }));
-  };
+  }, []);
 
   if (isLoading) {
     return <ReviewsListSkeleton count={3} />;
