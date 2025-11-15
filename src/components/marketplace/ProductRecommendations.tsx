@@ -346,3 +346,16 @@ const PersonalizedRecommendationsComponent = ({
   );
 }
 
+PersonalizedRecommendationsComponent.displayName = 'PersonalizedRecommendationsComponent';
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const PersonalizedRecommendations = React.memo(PersonalizedRecommendationsComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.userId === nextProps.userId &&
+    prevProps.limit === nextProps.limit &&
+    prevProps.className === nextProps.className
+  );
+});
+
+PersonalizedRecommendations.displayName = 'PersonalizedRecommendations';
+
