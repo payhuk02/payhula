@@ -39,6 +39,7 @@ import {
   Gift,
   Star,
   Percent,
+  MessageSquare,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -71,6 +72,7 @@ const menuSections = [
       { icon: BoxIcon, label: 'Commandes', path: '/admin/orders' },
       { icon: Warehouse, label: 'Inventaire', path: '/admin/inventory' },
       { icon: Truck, label: 'Expéditions', path: '/admin/shipping' },
+      { icon: MessageSquare, label: 'Conversations Livraison', path: '/admin/shipping-conversations' },
       { icon: RotateCcw, label: 'Retours', path: '/admin/returns' },
     ]
   },

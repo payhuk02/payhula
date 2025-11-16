@@ -66,21 +66,12 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
         'bg-card border border-border',
         'rounded-xl overflow-hidden',
         
-        // Shadows progressive
-        'shadow-sm sm:shadow-md lg:shadow-lg',
-        'hover:shadow-xl hover:shadow-primary/5',
-        
-        // Transitions élégantes
-        'transition-all duration-300 ease-out',
-        'hover:-translate-y-1',
-        'hover:border-primary/20',
         
         // Height responsive
         'min-h-[420px] sm:min-h-[480px] lg:min-h-[520px]',
         
         className
       )}
-      style={{ willChange: 'transform' }}
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
@@ -90,7 +81,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
           <LazyImage
             {...imageAttrs}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+            className="w-full h-full object-cover"
             placeholder="skeleton"
           />
         ) : (

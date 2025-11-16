@@ -56,6 +56,7 @@ import {
   Globe,
   Trophy,
   AlertTriangle,
+  Phone,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -292,6 +293,16 @@ const menuSections = [
         title: "Expéditions",
         url: "/dashboard/shipping",
         icon: Truck,
+      },
+      {
+        title: "Services de Livraison",
+        url: "/dashboard/shipping-services",
+        icon: Settings,
+      },
+      {
+        title: "Contacter un Service",
+        url: "/dashboard/contact-shipping-service",
+        icon: Phone,
       },
       {
         title: "Expéditions Batch",

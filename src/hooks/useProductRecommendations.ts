@@ -49,19 +49,44 @@ export function useProductRecommendations(
         });
 
         if (error) {
-          logger.error('Error fetching product recommendations:', error);
-          throw error;
+          // Codes d'erreur PostgreSQL/Supabase courants
+          const errorCode = error.code;
+          const errorMessage = error.message || '';
+          
+          // Fonction n'existe pas (42883 = undefined_function)
+          if (errorCode === '42883' || 
+              errorMessage.includes('does not exist') || 
+              (errorMessage.includes('function') && errorMessage.includes('does not exist'))) {
+            logger.warn('get_product_recommendations function does not exist. This is normal if not yet created.');
+            return [];
+          }
+          
+          // Erreur 400 Bad Request
+          if (errorCode === 'PGRST116' || errorMessage.includes('Bad Request') || errorMessage.includes('400')) {
+            logger.warn('Bad Request error for get_product_recommendations. This may indicate the function needs to be created.');
+            return [];
+          }
+          
+          // Pour toutes les autres erreurs, logger en warning (non-critique)
+          logger.warn('Error fetching product recommendations (non-critical):', {
+            code: errorCode,
+            message: errorMessage,
+          });
+          
+          return [];
         }
 
         return (data || []) as ProductRecommendation[];
       } catch (error) {
-        logger.error('Error in useProductRecommendations:', error);
+        // Capturer toutes les erreurs et retourner un tableau vide
+        logger.warn('Error in useProductRecommendations (non-critical):', error);
         return [];
       }
     },
     enabled: enabled && !!productId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+    retry: false, // Ne pas réessayer en cas d'erreur pour éviter le spam
   });
 }
 
@@ -179,19 +204,53 @@ export function useFrequentlyBoughtTogether(
         });
 
         if (error) {
-          logger.error('Error fetching frequently bought together:', error);
-          throw error;
+          // Codes d'erreur PostgreSQL/Supabase courants
+          const errorCode = error.code;
+          const errorMessage = error.message || '';
+          
+          // Fonction n'existe pas (42883 = undefined_function)
+          if (errorCode === '42883' || 
+              errorMessage.includes('does not exist') || 
+              (errorMessage.includes('function') && errorMessage.includes('does not exist'))) {
+            logger.warn('get_frequently_bought_together function does not exist. This is normal if not yet created.');
+            return [];
+          }
+          
+          // Erreur 400 Bad Request (généralement problème de format ou de validation)
+          if (errorCode === 'PGRST116' || errorMessage.includes('Bad Request') || errorMessage.includes('400')) {
+            logger.warn('Bad Request error for get_frequently_bought_together. This may indicate the function needs to be created or tables are missing.');
+            return [];
+          }
+          
+          // Erreur de permissions (42501 = insufficient_privilege)
+          if (errorCode === '42501' || errorMessage.includes('permission denied')) {
+            logger.warn('Permission denied for get_frequently_bought_together. Check RLS policies.');
+            return [];
+          }
+          
+          // Pour toutes les autres erreurs, logger en warning (non-critique)
+          logger.warn('Error fetching frequently bought together (non-critical):', {
+            code: errorCode,
+            message: errorMessage,
+            details: error.details,
+            hint: error.hint,
+          });
+          
+          // Retourner un tableau vide au lieu de lever une erreur pour ne pas bloquer l'UI
+          return [];
         }
 
         return (data || []) as FrequentlyBoughtTogether[];
       } catch (error) {
-        logger.error('Error in useFrequentlyBoughtTogether:', error);
+        // Capturer toutes les erreurs et retourner un tableau vide
+        logger.warn('Error in useFrequentlyBoughtTogether (non-critical):', error);
         return [];
       }
     },
     enabled: enabled && !!productId,
     staleTime: 15 * 60 * 1000, // 15 minutes (moins fréquent)
     refetchOnWindowFocus: false,
+    retry: false, // Ne pas réessayer en cas d'erreur pour éviter le spam
   });
 }
 

@@ -176,7 +176,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   );
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg" style={{ willChange: 'transform' }}>
+    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
       {/* Image avec overlay et badges - 60% de la hauteur de la carte */}
       <div className="product-image-container relative overflow-hidden flex-[0.6] min-h-[300px] md:min-h-[360px] lg:min-h-[420px]">
         <OptimizedImage
@@ -203,14 +203,14 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
         {/* Badges Nouveau et Vedette */}
         <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
           {isNew() && (
-            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 shadow-lg">
+            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
               <Sparkles className="h-3 w-3 mr-1" />
               Nouveau
             </Badge>
           )}
           
           {(product as any).is_featured && (
-            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 shadow-lg">
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
               <Crown className="h-3 w-3 mr-1" />
               Vedette
             </Badge>
@@ -221,17 +221,17 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
         {(product as any).licensing_type && (
           <div className="absolute top-3 left-3 flex flex-col gap-1 z-10" style={{ marginTop: (isNew() || (product as any).is_featured) ? '48px' : '0px' }}>
             {(product as any).licensing_type === 'plr' && (
-              <Badge className="bg-emerald-500 text-white border-0 shadow-lg hover:bg-emerald-600 transition-colors" title="PLR (Private Label Rights) : peut être modifié et revendu selon conditions" aria-label="Licence PLR - Droits de label privé">
+              <Badge className="bg-emerald-500 text-white border-0 hover:bg-emerald-600" title="PLR (Private Label Rights) : peut être modifié et revendu selon conditions" aria-label="Licence PLR - Droits de label privé">
                 <Shield className="h-3 w-3 mr-1" /> PLR
               </Badge>
             )}
             {(product as any).licensing_type === 'copyrighted' && (
-              <Badge className="bg-red-500 text-white border-0 shadow-lg hover:bg-red-600 transition-colors" title="Protégé par droit d'auteur : revente/modification non autorisées" aria-label="Protégé par droit d'auteur">
+              <Badge className="bg-red-500 text-white border-0 hover:bg-red-600" title="Protégé par droit d'auteur : revente/modification non autorisées" aria-label="Protégé par droit d'auteur">
                 <Shield className="h-3 w-3 mr-1" /> Droit d'auteur
               </Badge>
             )}
             {(product as any).licensing_type === 'standard' && (
-              <Badge className="bg-blue-500 text-white border-0 shadow-lg hover:bg-blue-600 transition-colors" title="Licence standard : utilisation personnelle uniquement" aria-label="Licence standard">
+              <Badge className="bg-blue-500 text-white border-0 hover:bg-blue-600" title="Licence standard : utilisation personnelle uniquement" aria-label="Licence standard">
                 <Shield className="h-3 w-3 mr-1" /> Standard
               </Badge>
             )}
@@ -405,7 +405,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             onClick={handleBuyNow}
             disabled={loading}
             size="sm"
-            className="product-action-button flex-1 h-10 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium shadow-sm hover:shadow-md"
+            className="product-action-button flex-1 h-10 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium"
           >
             <div className="flex items-center justify-center gap-1.5">
               {loading ? (

@@ -433,7 +433,7 @@ const Checkout = () => {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <Button asChild variant="ghost" className="mb-4">
-            <Link to={product ? `/store/${store.slug}/product/${product.slug}` : "/marketplace"}>
+            <Link to={product && store ? `/stores/${store.slug}/products/${product.slug}` : "/marketplace"}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour
             </Link>

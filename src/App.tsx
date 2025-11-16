@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ScrollToTop } from "@/components/navigation/ScrollToTop";
@@ -140,6 +140,9 @@ const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/checkout/Checkout"));
 const MultiStoreSummary = lazy(() => import("./pages/checkout/MultiStoreSummary"));
 const MultiStoreOrdersHistory = lazy(() => import("./pages/customer/MultiStoreOrdersHistory"));
+const ShippingServices = lazy(() => import("./pages/shipping/ShippingServices"));
+const ContactShippingService = lazy(() => import("./pages/shipping/ContactShippingService"));
+const ShippingServiceMessages = lazy(() => import("./pages/shipping/ShippingServiceMessages"));
 const CustomerPortal = lazy(() => import("./pages/customer/CustomerPortal"));
 const CustomerMyOrders = lazy(() => import("./pages/customer/MyOrders"));
 const CustomerMyDownloads = lazy(() => import("./pages/customer/MyDownloads"));
@@ -186,6 +189,7 @@ const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
 const AdminShipping = lazy(() => import("./pages/admin/AdminShipping"));
+const AdminShippingConversations = lazy(() => import("./pages/admin/AdminShippingConversations"));
 const AdminCourses = lazy(() => import("./pages/admin/AdminCourses"));
 const AdminSecurity = lazy(() => import("./pages/admin/AdminSecurity"));
 const AdminAudit = lazy(() => import("./pages/admin/AdminAudit"));
@@ -294,6 +298,12 @@ const AdminErrorMonitoring = lazy(() => import("./pages/admin/AdminErrorMonitori
 // Page de test i18n (à supprimer en production)
 const I18nTest = lazy(() => import("./pages/I18nTest"));
 
+// Composant de redirection pour l'ancienne route
+const OldProductRouteRedirect = () => {
+  const { slug, productSlug } = useParams<{ slug: string; productSlug: string }>();
+  return <Navigate to={`/stores/${slug}/products/${productSlug}`} replace />;
+};
+
 const AppContent = () => {
   useScrollRestoration();
   useDarkMode(); // Active le mode sombre globalement
@@ -349,6 +359,9 @@ const AppContent = () => {
           <Route path="/account/returns" element={<ProtectedRoute><CustomerMyReturns /></ProtectedRoute>} />
           <Route path="/account/loyalty" element={<ProtectedRoute><CustomerLoyaltyPage /></ProtectedRoute>} />
           <Route path="/account/gift-cards" element={<ProtectedRoute><CustomerMyGiftCardsPage /></ProtectedRoute>} />
+          
+          {/* Redirection de l'ancienne route vers la nouvelle */}
+          <Route path="/store/:slug/product/:productSlug" element={<OldProductRouteRedirect />} />
           
           <Route path="/stores/:slug" element={<Storefront />} />
           <Route path="/stores/:slug/products/:productSlug" element={<ProductDetail />} />
@@ -461,6 +474,9 @@ const AppContent = () => {
           <Route path="/dashboard/payment-management" element={<ProtectedRoute><PaymentManagementList /></ProtectedRoute>} />
           <Route path="/dashboard/pay-balance" element={<ProtectedRoute><PayBalanceList /></ProtectedRoute>} />
           <Route path="/dashboard/shipping" element={<ProtectedRoute><ShippingDashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/shipping-services" element={<ProtectedRoute><ShippingServices /></ProtectedRoute>} />
+          <Route path="/dashboard/contact-shipping-service" element={<ProtectedRoute><ContactShippingService /></ProtectedRoute>} />
+          <Route path="/dashboard/shipping-service-messages/:conversationId" element={<ProtectedRoute><ShippingServiceMessages /></ProtectedRoute>} />
           <Route path="/dashboard/inventory" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
           <Route path="/dashboard/bookings" element={<ProtectedRoute><BookingsManagement /></ProtectedRoute>} />
           <Route path="/dashboard/advanced-calendar" element={<ProtectedRoute><AdvancedCalendarPage /></ProtectedRoute>} />
@@ -503,6 +519,7 @@ const AppContent = () => {
           <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
           <Route path="/admin/payments" element={<ProtectedRoute><AdminPayments /></ProtectedRoute>} />
           <Route path="/admin/shipping" element={<ProtectedRoute><AdminShipping /></ProtectedRoute>} />
+          <Route path="/admin/shipping-conversations" element={<ProtectedRoute><AdminShippingConversations /></ProtectedRoute>} />
           <Route path="/admin/courses" element={<ProtectedRoute><AdminCourses /></ProtectedRoute>} />
           <Route path="/admin/security" element={<ProtectedRoute><AdminSecurity /></ProtectedRoute>} />
           <Route path="/admin/audit" element={<ProtectedRoute><AdminAudit /></ProtectedRoute>} />

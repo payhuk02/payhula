@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 import type {
   Review,
   ReviewReply,
@@ -93,14 +94,32 @@ export const useProductReviews = (
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching product reviews:', error);
-        throw error;
+        // Erreur 400/404 sont normales si les tables n'existent pas encore
+        const errorCode = error.code;
+        const errorMessage = error.message || '';
+        
+        // Erreur 400 Bad Request (table ou relation n'existe pas)
+        if (errorCode === 'PGRST116' || errorMessage.includes('Bad Request') || errorMessage.includes('400')) {
+          logger.warn('Reviews table or relations may not exist yet:', errorMessage);
+          return [];
+        }
+        
+        // Erreur 404 Not Found
+        if (errorCode === 'PGRST301' || errorMessage.includes('Not Found') || errorMessage.includes('404')) {
+          logger.warn('Reviews endpoint not found:', errorMessage);
+          return [];
+        }
+        
+        // Pour les autres erreurs, logger en warning (non-critique)
+        logger.warn('Error fetching product reviews (non-critical):', error);
+        return [];
       }
 
-      return data as Review[];
+      return (data || []) as Review[];
     },
     enabled: !!productId,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false, // Ne pas réessayer en cas d'erreur pour éviter le spam
   });
 };
 
@@ -120,14 +139,32 @@ export const useProductReviewStats = (productId?: string) => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching product review stats:', error);
-        throw error;
+        // Erreur 404 est normale si la vue/table n'existe pas encore
+        const errorCode = error.code;
+        const errorMessage = error.message || '';
+        
+        // Erreur 404 Not Found (table/vue n'existe pas)
+        if (errorCode === 'PGRST301' || errorMessage.includes('Not Found') || errorMessage.includes('404')) {
+          logger.warn('product_review_stats view may not exist yet:', errorMessage);
+          return null;
+        }
+        
+        // Erreur 400 Bad Request
+        if (errorCode === 'PGRST116' || errorMessage.includes('Bad Request') || errorMessage.includes('400')) {
+          logger.warn('Bad Request for product_review_stats:', errorMessage);
+          return null;
+        }
+        
+        // Pour les autres erreurs, logger en warning (non-critique)
+        logger.warn('Error fetching product review stats (non-critical):', error);
+        return null;
       }
 
       return data as ProductReviewStats | null;
     },
     enabled: !!productId,
     staleTime: 1000 * 60 * 10, // 10 minutes
+    retry: false, // Ne pas réessayer en cas d'erreur pour éviter le spam
   });
 };
 

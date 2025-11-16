@@ -194,7 +194,7 @@ const ProductDetails = () => {
     return calculateDiscount(product.price, product.promotional_price);
   }, [hasPromo, product?.price, product?.promotional_price]);
 
-  // Handler pour l'achat avec Moneroo
+  // Handler pour l'achat - redirection vers checkout
   const handleBuyNow = useCallback(async () => {
     if (!product || !store) {
       toast({
@@ -205,22 +205,13 @@ const ProductDetails = () => {
       return;
     }
 
-    // Utiliser store.id si product.store_id n'est pas disponible (comme Marketplace/Storefront)
+    // Utiliser store.id si product.store_id n'est pas disponible
     const storeId = product.store_id || store.id;
     
-    if (!storeId) {
+    if (!storeId || !product.id) {
       toast({
         title: "Erreur",
-        description: "Boutique non disponible",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!product.id) {
-      toast({
-        title: "Erreur",
-        description: "Produit non disponible",
+        description: "Produit ou boutique non disponible",
         variant: "destructive",
       });
       return;
@@ -229,151 +220,28 @@ const ProductDetails = () => {
     try {
       setIsPurchasing(true);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user?.email) {
-        toast({
-          title: "Authentification requise",
-          description: "Veuillez vous connecter pour effectuer un achat",
-          variant: "destructive",
-        });
-        setIsPurchasing(false);
-        return;
-      }
-
-      // Utiliser le prix de la variante sélectionnée ou le prix promo/normal (comme Marketplace et Storefront)
-      const basePrice = product.promotional_price || product.promo_price || product.price;
-      const price = selectedVariantPrice || basePrice;
-      
-      // S'assurer que le prix est un nombre valide
-      if (!price || isNaN(Number(price)) || Number(price) <= 0) {
-        toast({
-          title: "Erreur",
-          description: "Prix du produit invalide",
-          variant: "destructive",
-        });
-        setIsPurchasing(false);
-        return;
-      }
-      
-      // S'assurer que storeId et productId sont des strings (UUIDs)
-      const finalStoreId = String(storeId).trim();
-      const finalProductId = String(product.id).trim();
-      const finalAmount = Number(price);
-      const finalCurrency = (product.currency || "XOF").trim();
-      
-      // Validation finale avant l'appel
-      if (!finalStoreId || finalStoreId.length < 30) {
-        logger.error("Invalid storeId format:", { storeId: finalStoreId, store, product });
-        toast({
-          title: "Erreur",
-          description: "ID de boutique invalide",
-          variant: "destructive",
-        });
-        setIsPurchasing(false);
-        return;
-      }
-      
-      if (!finalProductId || finalProductId.length < 30) {
-        logger.error("Invalid productId format:", { productId: finalProductId, product });
-        toast({
-          title: "Erreur",
-          description: "ID de produit invalide",
-          variant: "destructive",
-        });
-        setIsPurchasing(false);
-        return;
-      }
-      
-      // Logger pour debug
-      logger.log("Initiating Moneroo payment from ProductDetail:", {
-        storeId: finalStoreId,
-        productId: finalProductId,
-        amount: finalAmount,
-        amountType: typeof finalAmount,
-        currency: finalCurrency,
-        productName: product.name,
-        storeSlug: store.slug,
-        userEmail: user.email,
+      // Rediriger vers la page checkout avec les paramètres nécessaires
+      const checkoutParams = new URLSearchParams({
+        productId: String(product.id).trim(),
+        storeId: String(storeId).trim(),
       });
       
-      const result = await initiateMonerooPayment({
-        storeId: finalStoreId,
-        productId: finalProductId,
-        amount: finalAmount,
-        currency: finalCurrency,
-        description: `Achat de ${product.name}`,
-        customerEmail: user.email,
-        customerName: user.user_metadata?.full_name || user.email.split('@')[0],
-        metadata: { 
-          productName: product.name, 
-          storeSlug: store.slug || '',
-          userId: user.id,
-          // Ne pas inclure productType si c'est null (l'API Moneroo n'accepte pas null)
-          ...(product.product_type && { productType: product.product_type }),
-        },
-      });
-
-      if (result.checkout_url) {
-        safeRedirect(result.checkout_url, () => {
-          toast({
-            title: "Erreur de paiement",
-            description: "URL de paiement invalide. Veuillez réessayer.",
-            variant: "destructive",
-          });
-        });
+      if (selectedVariantId) {
+        checkoutParams.append('variantId', selectedVariantId);
       }
+      
+      navigate(`/checkout?${checkoutParams.toString()}`);
     } catch (error: any) {
-      logger.error("Erreur lors de l'achat:", error);
-      
-      // Extraire le message d'erreur et le formater
-      let errorMessage = error.message || "Impossible d'initialiser le paiement";
-      
-      // Si le message contient des instructions détaillées (Edge Function), les formater
-      if (errorMessage.includes('💡') || errorMessage.includes('Vérifiez:')) {
-        // Pour les erreurs Edge Function, afficher un message plus court dans le toast
-        // et logger le message complet
-        const shortMessage = errorMessage.split('\n')[0] || errorMessage;
-        const fullMessage = errorMessage;
-        
-        logger.error("Erreur détaillée Moneroo:", { fullMessage, error });
-        
-        toast({
-          title: "Erreur de paiement",
-          description: (
-            <div className="space-y-2">
-              <p className="font-semibold">{shortMessage}</p>
-              {fullMessage.includes('💡') && (
-                <div className="text-sm space-y-1 mt-2">
-                  <p className="font-medium">Instructions de dépannage :</p>
-                  <ul className="list-disc list-inside space-y-1 text-xs">
-                    {fullMessage.split('\n').filter(line => 
-                      line.trim().startsWith('1.') || 
-                      line.trim().startsWith('2.') || 
-                      line.trim().startsWith('3.') ||
-                      line.trim().startsWith('4.')
-                    ).map((line, idx) => (
-                      <li key={idx}>{line.trim()}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ),
-          variant: "destructive",
-          duration: 10000, // Afficher plus longtemps pour les erreurs importantes
-        });
-      } else {
-        toast({
-          title: "Erreur de paiement",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
+      logger.error("Erreur lors de la redirection vers checkout:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de rediriger vers la page de paiement. Veuillez réessayer.",
+        variant: "destructive",
+      });
     } finally {
       setIsPurchasing(false);
     }
-  }, [product, store, selectedVariantPrice, displayPriceInfo, toast]);
+  }, [product, store, selectedVariantId, navigate, toast]);
 
   // SEO Meta données
   const seoData = useMemo(() => {

@@ -39,46 +39,18 @@
 .products-grid-mobile,
 .products-grid-tablet,
 .products-grid-desktop {
-  animation: fadeInUp 0.6s ease-out;
+  /* Animations supprimées */
 }
 
-/* Carte produit avec animations */
+/* Carte produit - animations supprimées */
 .product-card-professional {
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: fadeInUp 0.5s ease-out backwards;
 }
 
-.product-card-professional:nth-child(1) {
-  animation-delay: 0.1s;
-}
+/* Hover effects supprimés */
 
-.product-card-professional:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.product-card-professional:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.product-card-professional:nth-child(4) {
-  animation-delay: 0.4s;
-}
-
-/* Hover effects avancés - Ombre retirée sur demande */
-.product-card-professional:hover {
-  transform: translateY(-8px) scale(1.02);
-  /* Ombre retirée pour meilleure visibilité de l'image */
-}
-
-.product-card-professional:hover .product-image-overlay {
-  opacity: 1;
-}
-
-.product-card-professional:hover .product-image {
-  transform: scale(1.1);
-}
+/* Hover effects supprimés */
 
 /* Image avec effet parallaxe au hover */
 .product-image-container {
@@ -88,8 +60,7 @@
 }
 
 .product-image {
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
+  /* Animations supprimées */
 }
 
 .product-image-overlay {
@@ -102,20 +73,17 @@
     transparent 100%
   );
   opacity: 0;
-  transition: opacity 0.4s ease;
+  /* Animations supprimées */
   pointer-events: none;
 }
 
-/* Badges avec animation */
+/* Badges - animations supprimées */
 .product-badge {
-  animation: scaleIn 0.4s ease-out backwards;
   backdrop-filter: blur(8px);
 }
 
 .product-badge-promo {
-  animation-delay: 0.2s;
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
 }
 
 /* Boutons d'action avec effets */
@@ -226,7 +194,7 @@
   }
   
   .product-card-professional:hover {
-    transform: translateY(-4px);
+    /* Animations supprimées */
   }
 }
 
@@ -246,7 +214,6 @@
 .product-card-professional,
 .product-image,
 .product-action-button {
-  will-change: transform;
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

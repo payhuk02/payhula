@@ -240,7 +240,7 @@ const ProductCardModernComponent = ({
     if (!badge) return null;
 
     return (
-      <Badge className={`${badge.className} border-0 text-xs px-2 py-0.5 shadow-sm`}>
+      <Badge className={`${badge.className} border-0 text-xs px-2 py-0.5`}>
         {badge.icon}
         <span className="ml-1">{badge.label}</span>
       </Badge>
@@ -251,8 +251,7 @@ const ProductCardModernComponent = ({
 
   return (
     <article 
-      className="group relative flex flex-col rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-      style={{ willChange: 'transform' }}
+      className="group relative flex flex-col rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden"
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
@@ -264,7 +263,7 @@ const ProductCardModernComponent = ({
             alt={product.name}
             width={400}
             height={300}
-            className="w-full h-full object-cover transition-transform duration-300 sm:duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover"
             priority={false}
             preset="productImage"
             responsive={true}
@@ -272,19 +271,19 @@ const ProductCardModernComponent = ({
         </Link>
         
         {/* Overlay gradient au hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100" />
         
         {/* Badges en haut à gauche */}
         <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
           {isNew() && (
-            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 text-xs px-2 py-0.5 shadow-lg">
+            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 text-xs px-2 py-0.5">
               <Sparkles className="h-3 w-3 mr-1" />
               Nouveau
             </Badge>
           )}
           
           {product.is_featured && (
-            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 text-xs px-2 py-0.5 shadow-lg">
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 text-xs px-2 py-0.5">
               <Star className="h-3 w-3 mr-1 fill-white" />
               Vedette
             </Badge>
@@ -296,7 +295,7 @@ const ProductCardModernComponent = ({
         {/* Badge promotion en haut à droite */}
         {hasPromo && (
           <div className="absolute top-2 right-2 z-10">
-            <Badge className="bg-red-500 text-white border-0 text-xs font-bold px-2.5 py-1 shadow-lg">
+            <Badge className="bg-red-500 text-white border-0 text-xs font-bold px-2.5 py-1">
               <Percent className="h-3 w-3 mr-1" />
               -{discountPercent}%
             </Badge>
@@ -306,7 +305,7 @@ const ProductCardModernComponent = ({
         {/* Bouton favori en bas à droite */}
         <button
           onClick={handleFavorite}
-          className="absolute bottom-2 right-2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors z-10 shadow-lg"
+          className="absolute bottom-2 right-2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 z-10"
           aria-label={isFavorite ? `Retirer ${product.name} des favoris` : `Ajouter ${product.name} aux favoris`}
           aria-pressed={isFavorite}
         >
@@ -457,7 +456,7 @@ const ProductCardModernComponent = ({
               onClick={handleBuyNow}
               disabled={loading}
               size="sm"
-              className="flex-1 h-9 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-sm hover:shadow-md disabled:opacity-50"
+              className="flex-1 h-9 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50"
               aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
             >
               {loading ? (
