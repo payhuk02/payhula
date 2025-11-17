@@ -241,6 +241,101 @@ export default function VendorMessaging() {
     );
   }
 
+  // Si pas de storeId spécifique, afficher la liste des conversations
+  if (!finalStoreId && conversations.length > 0 && !currentConversation) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar />
+          <main className="flex-1 overflow-x-hidden">
+            <div className="container mx-auto p-6 max-w-7xl">
+              <div className="mb-6">
+                <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+                  <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                  Messages Clients
+                </h1>
+                <p className="text-muted-foreground mt-1">
+                  Gérez toutes vos conversations avec vos clients
+                </p>
+              </div>
+
+              <div className="grid lg:grid-cols-[350px_1fr] gap-6">
+                {/* Liste des conversations */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Conversations ({conversations.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="h-[calc(100vh-280px)]">
+                      <div className="space-y-1">
+                        {conversations.map((conv) => (
+                          <button
+                            key={conv.id}
+                            onClick={() => openConversation(conv.id)}
+                            className="w-full text-left p-3 hover:bg-accent transition-colors border-b last:border-b-0"
+                          >
+                            <div className="flex items-start gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={conv.store?.logo_url || undefined} />
+                                <AvatarFallback>
+                                  <Store className="h-4 w-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="font-medium text-sm truncate">
+                                    {conv.store?.name || 'Boutique'}
+                                  </p>
+                                  {conv.unread_count && conv.unread_count > 0 && (
+                                    <Badge variant="destructive" className="text-xs">
+                                      {conv.unread_count}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {conv.product && (
+                                  <p className="text-xs text-muted-foreground truncate mb-1">
+                                    {conv.product.name}
+                                  </p>
+                                )}
+                                {conv.last_message && (
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {conv.last_message.content || 'Pièce jointe'}
+                                  </p>
+                                )}
+                                {conv.last_message_at && (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {format(new Date(conv.last_message_at), 'dd MMM yyyy HH:mm', { locale: fr })}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+
+                {/* Zone de message vide */}
+                <Card>
+                  <CardContent className="flex items-center justify-center min-h-[60vh]">
+                    <div className="text-center">
+                      <MessageSquare className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">Sélectionnez une conversation</h3>
+                      <p className="text-muted-foreground">
+                        Choisissez une conversation dans la liste pour commencer à échanger
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </main>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
   if (!currentConversation && conversations.length === 0) {
     return (
       <SidebarProvider>
@@ -263,7 +358,9 @@ export default function VendorMessaging() {
                     <MessageSquare className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-xl font-semibold mb-2">Aucune conversation</h3>
                     <p className="text-muted-foreground mb-4">
-                      Vous n'avez pas encore de conversation avec ce vendeur
+                      {finalStoreId 
+                        ? "Vous n'avez pas encore de conversation avec ce vendeur"
+                        : "Vous n'avez pas encore de conversation avec vos clients"}
                     </p>
                   </div>
                 </CardContent>
@@ -297,13 +394,15 @@ export default function VendorMessaging() {
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
                     <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                    Contacter le vendeur
+                    {finalStoreId ? 'Contacter le vendeur' : 'Messages Clients'}
                   </h1>
                   <p className="text-muted-foreground mt-1">
                     {currentConversation?.store?.name ? (
                       <>Communication avec <span className="font-medium">{currentConversation.store.name}</span></>
-                    ) : (
+                    ) : finalStoreId ? (
                       'Communication sécurisée avec le vendeur'
+                    ) : (
+                      'Gérez toutes vos conversations avec vos clients'
                     )}
                   </p>
                 </div>
@@ -328,7 +427,62 @@ export default function VendorMessaging() {
             </div>
 
             {/* Main Chat Interface */}
-            <div className="grid lg:grid-cols-[1fr_300px] gap-6">
+            <div className="grid lg:grid-cols-[350px_1fr_300px] gap-6">
+              {/* Liste des conversations (si pas de storeId spécifique) */}
+              {!finalStoreId && conversations.length > 1 && (
+                <Card className="hidden lg:block">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Conversations</CardTitle>
+                    <CardDescription>{conversations.length} conversation(s)</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="h-[calc(100vh-280px)]">
+                      <div className="space-y-1">
+                        {conversations.map((conv) => (
+                          <button
+                            key={conv.id}
+                            onClick={() => openConversation(conv.id)}
+                            className={`w-full text-left p-3 hover:bg-accent transition-colors border-b last:border-b-0 ${
+                              currentConversation?.id === conv.id ? 'bg-accent' : ''
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={conv.store?.logo_url || undefined} />
+                                <AvatarFallback>
+                                  <Store className="h-4 w-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="font-medium text-sm truncate">
+                                    {conv.store?.name || 'Boutique'}
+                                  </p>
+                                  {conv.unread_count && conv.unread_count > 0 && (
+                                    <Badge variant="destructive" className="text-xs">
+                                      {conv.unread_count}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {conv.product && (
+                                  <p className="text-xs text-muted-foreground truncate mb-1">
+                                    {conv.product.name}
+                                  </p>
+                                )}
+                                {conv.last_message && (
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {conv.last_message.content || 'Pièce jointe'}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              )}
               {/* Messages Thread */}
               <Card className="flex flex-col h-[calc(100vh-280px)] min-h-[500px]">
                 <CardHeader className="border-b">
