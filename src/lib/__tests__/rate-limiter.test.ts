@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { checkRateLimit, useRateLimit, withRateLimit } from '../rate-limiter';
+import { checkRateLimit, useRateLimit, withRateLimit, clearRateLimitCache } from '../rate-limiter';
 import { supabase } from '@/integrations/supabase/client';
 import * as Sentry from '@sentry/react';
 
@@ -35,10 +35,14 @@ const waitForCacheExpiry = () => new Promise(resolve => setTimeout(resolve, 1100
 describe('Rate Limiter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Nettoyer le cache avant chaque test pour l'isolation
+    clearRateLimitCache();
   });
 
   afterEach(() => {
     vi.clearAllMocks();
+    // Nettoyer le cache après chaque test
+    clearRateLimitCache();
   });
 
   describe('checkRateLimit', () => {
@@ -110,14 +114,15 @@ describe('Rate Limiter', () => {
       });
 
       // Premier appel
-      const firstResult = await checkRateLimit('default');
+      const firstResult = await checkRateLimit('api');
       
       // Deuxième appel immédiatement (devrait utiliser le cache)
-      const secondResult = await checkRateLimit('default');
+      const secondResult = await checkRateLimit('api');
 
       expect(firstResult.allowed).toBe(true);
       expect(secondResult.allowed).toBe(true);
       expect(secondResult.remaining).toBe(90);
+      expect(secondResult.limit).toBe(100);
       // Le cache devrait être utilisé, donc un seul appel
       expect(supabase.functions.invoke).toHaveBeenCalledTimes(1);
     });
@@ -142,13 +147,15 @@ describe('Rate Limiter', () => {
         .mockResolvedValueOnce({ data: mockResponse2, error: null });
 
       // Premier appel
-      await checkRateLimit('default', undefined, false);
+      await checkRateLimit('webhook', undefined, false);
       
       // Deuxième appel avec bypassCache
-      const result = await checkRateLimit('default', undefined, true);
+      const result = await checkRateLimit('webhook', undefined, true);
 
+      expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(85);
-      // Devrait avoir été appelé deux fois
+      expect(result.limit).toBe(100);
+      // Devrait avoir été appelé deux fois car bypassCache est true
       expect(supabase.functions.invoke).toHaveBeenCalledTimes(2);
     });
 
@@ -160,10 +167,10 @@ describe('Rate Limiter', () => {
         error: mockError,
       });
 
-      const result = await checkRateLimit('default');
+      const result = await checkRateLimit('payment');
 
       expect(result.allowed).toBe(true); // Fail open
-      expect(result.remaining).toBe(10); // Limite réduite
+      expect(result.remaining).toBe(10); // Limite réduite en cas d'erreur
       expect(result.limit).toBe(10);
       expect(Sentry.captureException).toHaveBeenCalled();
     });
@@ -198,10 +205,10 @@ describe('Rate Limiter', () => {
 
       (supabase.functions.invoke as any).mockRejectedValue(mockError);
 
-      const result = await checkRateLimit('default');
+      const result = await checkRateLimit('upload');
 
       expect(result.allowed).toBe(true); // Fail open
-      expect(result.remaining).toBe(10); // Limite réduite
+      expect(result.remaining).toBe(10); // Limite réduite en cas d'exception
       expect(result.limit).toBe(10);
       expect(Sentry.captureException).toHaveBeenCalled();
     });
@@ -245,13 +252,11 @@ describe('Rate Limiter', () => {
 
       const action = vi.fn().mockResolvedValue('success');
 
-      try {
-        await withRateLimit('default', action);
-        expect.fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.message).toContain('Rate limit exceeded');
-        expect(action).not.toHaveBeenCalled();
-      }
+      await expect(
+        withRateLimit('search', action)
+      ).rejects.toThrow('Rate limit exceeded');
+      
+      expect(action).not.toHaveBeenCalled();
     });
 
     it('devrait retry avec exponential backoff si retry est activé', async () => {
@@ -275,17 +280,27 @@ describe('Rate Limiter', () => {
 
       const action = vi.fn().mockResolvedValue('success');
 
-      // Note: Le retry avec backoff nécessite un délai réel, donc on vérifie juste que le retry fonctionne
-      const result = await withRateLimit('default', action, {
+      // Note: Le retry avec backoff nécessite un délai réel
+      // On utilise vi.useFakeTimers pour contrôler le temps dans les tests
+      vi.useFakeTimers();
+      
+      const promise = withRateLimit('auth', action, {
         retry: true,
         maxRetries: 3,
-        retryDelay: 10, // Délai court pour les tests
+        retryDelay: 50, // Délai court pour les tests
       });
+
+      // Avancer le temps pour simuler les délais de retry
+      await vi.advanceTimersByTimeAsync(100);
+      
+      const result = await promise;
 
       expect(result).toBe('success');
       expect(action).toHaveBeenCalledTimes(1);
-      // Devrait avoir appelé checkRateLimit au moins 2 fois (premier bloqué, deuxième autorisé)
+      // Devrait avoir appelé checkRateLimit 2 fois (premier bloqué, deuxième autorisé après retry)
       expect(supabase.functions.invoke).toHaveBeenCalledTimes(2);
+      
+      vi.useRealTimers();
     });
   });
 

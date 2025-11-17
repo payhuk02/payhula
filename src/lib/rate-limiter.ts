@@ -43,6 +43,16 @@ const cleanCache = (): void => {
 };
 
 /**
+ * Nettoie complètement le cache (utilisé uniquement pour les tests)
+ * @internal
+ */
+export function clearRateLimitCache(): void {
+  Object.keys(rateLimitCache).forEach(key => {
+    delete rateLimitCache[key];
+  });
+}
+
+/**
  * Génère une clé de cache pour un endpoint
  */
 const getCacheKey = (endpoint: RateLimitEndpoint, userId?: string): string => {
