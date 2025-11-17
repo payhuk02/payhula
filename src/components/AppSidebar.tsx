@@ -115,11 +115,6 @@ const menuSections = [
         icon: ShoppingCart,
       },
       {
-        title: "Commandes Multi-Stores",
-        url: "/account/orders/multi-store",
-        icon: ShoppingBag,
-      },
-      {
         title: "Mes Téléchargements",
         url: "/account/downloads",
         icon: Download,
@@ -840,7 +835,6 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { isAdmin } = useAdmin();
   const isCollapsed = state === "collapsed";
-  
   // Détecte si on est sur une page admin
   const isOnAdminPage = location.pathname.startsWith('/admin');
 
@@ -899,6 +893,8 @@ export function AppSidebar() {
                     logger.warn(`Menu item missing icon: ${item.title}`);
                     return null;
                   }
+                  
+                  // Menu items normaux
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>

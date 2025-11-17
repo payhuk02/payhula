@@ -121,7 +121,26 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
           description: "Votre boutique a été mise à jour avec succès",
         });
       } else {
-        // Create new store
+        // Create new store - Vérifier si l'utilisateur a déjà une boutique
+        const { data: existingStores, error: checkError } = await supabase
+          .from('stores')
+          .select('id')
+          .eq('user_id', user.id)
+          .limit(1);
+
+        if (checkError) {
+          throw checkError;
+        }
+
+        if (existingStores && existingStores.length > 0) {
+          toast({
+            title: "Boutique existante",
+            description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         const { error } = await supabase
           .from('stores')
           .insert({
@@ -132,7 +151,18 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
             default_currency: defaultCurrency,
           });
 
-        if (error) throw error;
+        if (error) {
+          // Gérer l'erreur spécifique de limite de la base de données
+          if (error.message && (error.message.includes('Limite de 3 boutiques') || error.message.includes('déjà une boutique'))) {
+            toast({
+              title: "Boutique existante",
+              description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+              variant: "destructive",
+            });
+            return;
+          }
+          throw error;
+        }
 
         toast({
           title: "Boutique créée",

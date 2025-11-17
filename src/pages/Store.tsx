@@ -11,7 +11,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Store = () => {
-  const { stores, loading, canCreateStore, getRemainingStores } = useStores();
+  const { stores, loading } = useStores();
   const navigate = useNavigate();
   const headerRef = useScrollAnimation<HTMLDivElement>();
 
@@ -102,15 +102,15 @@ const Store = () => {
                         </div>
                         <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">Créer une nouvelle boutique</CardTitle>
                         <CardDescription className="mt-4 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed text-muted-foreground">
-                          {canCreateStore() 
-                            ? `Vous pouvez créer ${getRemainingStores()} boutique(s) supplémentaire(s). Configurez votre nouvelle boutique dans les paramètres.`
-                            : `Vous avez atteint la limite de 3 boutiques. Supprimez une boutique existante pour en créer une nouvelle.`
+                          {stores.length === 0
+                            ? "Configurez votre nouvelle boutique dans les paramètres."
+                            : "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Supprimez votre boutique existante si vous souhaitez en créer une nouvelle."
                           }
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="text-center pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6">
                         <div className="space-y-6 sm:space-y-8">
-                          {canCreateStore() ? (
+                          {stores.length === 0 ? (
                             <Button
                               onClick={handleCreateStoreRedirect}
                               className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 touch-manipulation text-xs sm:text-sm px-6 sm:px-8 py-2 sm:py-3 transition-all duration-300 hover:scale-105"
@@ -120,13 +120,13 @@ const Store = () => {
                             </Button>
                           ) : (
                             <div className="p-4 sm:p-6 lg:p-8 bg-muted/30 rounded-xl text-left max-w-2xl mx-auto border border-border/50">
-                              <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6 text-destructive">Limite atteinte</p>
+                              <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6 text-destructive">Boutique existante</p>
                               <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mb-3 sm:mb-4">
-                                Vous avez atteint la limite de 3 boutiques par utilisateur. 
-                                Pour créer une nouvelle boutique, vous devez d'abord supprimer une boutique existante.
+                                Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. 
+                                Pour créer une nouvelle boutique, vous devez d'abord supprimer votre boutique existante.
                               </p>
                               <div className="text-xs sm:text-sm text-muted-foreground">
-                                <p className="font-medium mb-2">Vos boutiques actuelles :</p>
+                                <p className="font-medium mb-2">Votre boutique actuelle :</p>
                                 <ul className="space-y-1">
                                   {stores.map((store) => (
                                     <li key={store.id} className="flex items-center gap-2">

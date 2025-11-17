@@ -124,6 +124,7 @@ export const useDashboardStats = () => {
 
   const fetchStats = useCallback(async () => {
     if (!store) {
+      logger.info('⚠️ [useDashboardStats] Pas de boutique, utilisation des stats par défaut');
       setStats(getFallbackStats());
       setLoading(false);
       return;
@@ -131,7 +132,7 @@ export const useDashboardStats = () => {
 
     try {
       setError(null);
-      logger.info('Fetching dashboard stats for store:', store.id);
+      logger.info('🔄 [useDashboardStats] Récupération des stats pour la boutique:', store.id, store.name);
 
       // Utiliser des requêtes simples et sécurisées
       const queries = await Promise.allSettled([

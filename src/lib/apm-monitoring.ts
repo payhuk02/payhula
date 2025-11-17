@@ -6,6 +6,11 @@
 import * as Sentry from '@sentry/react';
 import { onCLS, onINP, onLCP, onFCP, onTTFB, Metric } from 'web-vitals';
 import { logger } from './logger';
+import { 
+  startMemoryMonitoring, 
+  startErrorRateMonitoring,
+  recordMetric 
+} from './monitoring-enhanced';
 
 /**
  * Configuration APM
@@ -269,12 +274,6 @@ export const initAPMMonitoring = (): void => {
 
     // Initialiser le monitoring amélioré
     try {
-      const { 
-        startMemoryMonitoring, 
-        startErrorRateMonitoring,
-        recordMetric 
-      } = require('./monitoring-enhanced');
-      
       // Démarrer le monitoring de la mémoire
       startMemoryMonitoring(60000); // Toutes les minutes
       

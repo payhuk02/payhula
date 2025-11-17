@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface Store {
   id: string;
@@ -38,8 +39,6 @@ export const useStores = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const MAX_STORES_PER_USER = 3;
-
   const fetchStores = async () => {
     try {
       setLoading(true);
@@ -63,7 +62,7 @@ export const useStores = () => {
       setStores(data || []);
       setError(null);
     } catch (err: any) {
-      console.error('Erreur lors du chargement des boutiques:', err.message);
+      logger.error('Erreur lors du chargement des boutiques:', err);
       setError(err.message);
       toast({
         title: "Erreur",
@@ -75,14 +74,6 @@ export const useStores = () => {
     }
   };
 
-  const canCreateStore = () => {
-    return stores.length < MAX_STORES_PER_USER;
-  };
-
-  const getRemainingStores = () => {
-    return MAX_STORES_PER_USER - stores.length;
-  };
-
   const createStore = async (storeData: Partial<Store>) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -91,8 +82,19 @@ export const useStores = () => {
         throw new Error('Utilisateur non authentifié');
       }
 
-      if (!canCreateStore()) {
-        throw new Error(`Vous ne pouvez créer que ${MAX_STORES_PER_USER} boutiques maximum`);
+      // Vérifier si l'utilisateur a déjà une boutique
+      const { data: existingStores, error: checkError } = await supabase
+        .from('stores')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+
+      if (checkError) {
+        throw checkError;
+      }
+
+      if (existingStores && existingStores.length > 0) {
+        throw new Error('Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.');
       }
 
       const { data, error } = await supabase
@@ -119,7 +121,7 @@ export const useStores = () => {
 
       return data;
     } catch (err: any) {
-      console.error('Erreur lors de la création de la boutique:', err.message);
+      logger.error('Erreur lors de la création de la boutique:', err);
       toast({
         title: "Erreur",
         description: err.message || "Impossible de créer la boutique",
@@ -152,7 +154,7 @@ export const useStores = () => {
 
       return data;
     } catch (err: any) {
-      console.error('Erreur lors de la mise à jour de la boutique:', err.message);
+      logger.error('Erreur lors de la mise à jour de la boutique:', err);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la boutique",
@@ -181,7 +183,7 @@ export const useStores = () => {
         description: "La boutique a été supprimée avec succès"
       });
     } catch (err: any) {
-      console.error('Erreur lors de la suppression de la boutique:', err.message);
+      logger.error('Erreur lors de la suppression de la boutique:', err);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer la boutique",
@@ -199,8 +201,6 @@ export const useStores = () => {
     stores,
     loading,
     error,
-    canCreateStore,
-    getRemainingStores,
     createStore,
     updateStore,
     deleteStore,

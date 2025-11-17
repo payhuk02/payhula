@@ -16,7 +16,7 @@ import { Require2FABanner } from "@/components/auth/Require2FABanner";
 import { AffiliateLinkTracker } from "@/components/affiliate/AffiliateLinkTracker";
 import { ReferralTracker } from "@/components/referral/ReferralTracker";
 import { CurrencyRatesInitializer } from "@/components/currency/CurrencyRatesInitializer";
-import { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { initSentry } from "@/lib/sentry";
 import { initWebVitals } from "@/lib/web-vitals";
 import * as Sentry from "@sentry/react";
@@ -139,7 +139,6 @@ const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/checkout/Checkout"));
 const MultiStoreSummary = lazy(() => import("./pages/checkout/MultiStoreSummary"));
-const MultiStoreOrdersHistory = lazy(() => import("./pages/customer/MultiStoreOrdersHistory"));
 const ShippingServices = lazy(() => import("./pages/shipping/ShippingServices"));
 const ContactShippingService = lazy(() => import("./pages/shipping/ContactShippingService"));
 const ShippingServiceMessages = lazy(() => import("./pages/shipping/ShippingServiceMessages"));
@@ -253,8 +252,8 @@ const NotificationSettings = lazy(() => import("./pages/settings/NotificationSet
 // Pages Produits Digitaux - Lazy loading
 const DigitalProductsList = lazy(() => import("./pages/digital/DigitalProductsList"));
 const DigitalProductDetail = lazy(() => import("./pages/digital/DigitalProductDetail"));
-const DigitalProductsSearch = lazy(() => import("./pages/digital/DigitalProductsSearch"));
-const DigitalProductsCompare = lazy(() => import("./pages/digital/DigitalProductsCompare"));
+const DigitalProductsSearch = lazy(() => import("./pages/digital/DigitalProductsSearch").then((m: { DigitalProductsSearch: React.ComponentType<any> }) => ({ default: m.DigitalProductsSearch })));
+const DigitalProductsCompare = lazy(() => import("./pages/digital/DigitalProductsCompare").then((m: { DigitalProductsCompare: React.ComponentType<any> }) => ({ default: m.DigitalProductsCompare })));
 const SharedWishlist = lazy(() => import("./pages/customer/SharedWishlist"));
 const MyDownloads = lazy(() => import("./pages/digital/MyDownloads"));
 const CreateBundle = lazy(() => import("./pages/digital/CreateBundle"));
@@ -351,7 +350,6 @@ const AppContent = () => {
           {/* --- Routes Customer Portal --- */}
           <Route path="/account" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
           <Route path="/account/orders" element={<ProtectedRoute><CustomerMyOrders /></ProtectedRoute>} />
-          <Route path="/account/orders/multi-store" element={<ProtectedRoute><MultiStoreOrdersHistory /></ProtectedRoute>} />
           <Route path="/account/downloads" element={<ProtectedRoute><CustomerMyDownloads /></ProtectedRoute>} />
           <Route path="/account/digital" element={<ProtectedRoute><CustomerDigitalPortal /></ProtectedRoute>} />
           <Route path="/account/physical" element={<ProtectedRoute><CustomerPhysicalPortal /></ProtectedRoute>} />

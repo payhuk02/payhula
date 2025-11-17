@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 export const StoreSettings = ({ action }: { action?: string | null }) => {
-  const { stores, loading: storesLoading, canCreateStore, getRemainingStores, createStore, updateStore, deleteStore, refetch } = useStores();
+  const { stores, loading: storesLoading, createStore, updateStore, deleteStore, refetch } = useStores();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("list");
@@ -191,18 +191,20 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
       {/* Header avec statistiques */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold">Gestion des boutiques</h2>
+          <h2 className="text-xl sm:text-2xl font-bold">Gestion de la boutique</h2>
           <p className="text-sm text-muted-foreground">
-            Vous avez {stores.length} boutique(s) sur {3} maximum
+            {stores.length > 0 ? "Votre boutique" : "Créez votre boutique pour commencer"}
           </p>
         </div>
       </div>
 
       {/* Onglets */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="list">Mes boutiques</TabsTrigger>
-          <TabsTrigger value="create">Créer</TabsTrigger>
+        <TabsList className={stores.length > 0 ? "grid w-full grid-cols-1" : "grid w-full grid-cols-2"}>
+          <TabsTrigger value="list">{stores.length > 0 ? "Ma boutique" : "Liste"}</TabsTrigger>
+          {stores.length === 0 && (
+            <TabsTrigger value="create">Créer</TabsTrigger>
+          )}
         </TabsList>
 
         {/* Liste des boutiques */}
@@ -213,14 +215,12 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
                 <Store className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Aucune boutique</h3>
                 <p className="text-muted-foreground mb-4">
-                  Vous n'avez pas encore créé de boutique. Créez votre première boutique pour commencer à vendre.
+                  Vous n'avez pas encore créé de boutique. Créez votre boutique pour commencer à vendre.
                 </p>
-                {canCreateStore() && (
-                  <Button onClick={() => setActiveTab("create")}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Créer ma première boutique
-                  </Button>
-                )}
+                <Button onClick={() => setActiveTab("create")}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Créer ma boutique
+                </Button>
           </CardContent>
         </Card>
           ) : (
@@ -290,19 +290,19 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
 
         {/* Création de boutique */}
         <TabsContent value="create" className="space-y-4">
-          {!canCreateStore() ? (
+          {stores.length > 0 ? (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Vous avez atteint la limite de 3 boutiques. Supprimez une boutique existante pour en créer une nouvelle.
+                Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Supprimez votre boutique existante si vous souhaitez en créer une nouvelle.
               </AlertDescription>
             </Alert>
           ) : (
         <Card>
           <CardHeader>
-                <CardTitle>Créer une nouvelle boutique</CardTitle>
+                <CardTitle>Créer votre boutique</CardTitle>
             <CardDescription>
-                  Vous pouvez créer {getRemainingStores()} boutique(s) supplémentaire(s)
+                  Configurez votre boutique pour commencer à vendre vos produits
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

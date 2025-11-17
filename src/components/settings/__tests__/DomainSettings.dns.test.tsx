@@ -14,8 +14,6 @@ vi.mock('@/hooks/useStores', () => ({
     updateStore: vi.fn().mockResolvedValue(true),
     createStore: vi.fn(),
     deleteStore: vi.fn(),
-    canCreateStore: () => true,
-    getRemainingStores: () => 2,
     refetch: vi.fn()
   })
 }));

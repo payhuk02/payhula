@@ -93,45 +93,46 @@ export const useStore = () => {
 
   const fetchStore = useCallback(async () => {
     try {
-      console.log('🔍 [useStore] fetchStore appelé', { authLoading, userId: user?.id });
+      logger.info('🔍 [useStore] fetchStore appelé', { authLoading, userId: user?.id });
       
       // Attendre que l'authentification soit chargée
       if (authLoading) {
-        console.log('⏳ [useStore] En attente de l\'auth...');
+        logger.info('⏳ [useStore] En attente de l\'auth...');
         return;
       }
 
       setLoading(true);
-      console.log('🔄 [useStore] setLoading(true)');
+      logger.info('🔄 [useStore] setLoading(true)');
       
       if (!user) {
-        console.log('❌ [useStore] Pas d\'utilisateur, setStore(null)');
+        logger.info('❌ [useStore] Pas d\'utilisateur, setStore(null)');
         setStore(null);
         setLoading(false);
         return;
       }
 
-      console.log('📡 [useStore] Récupération du store pour user:', user.id);
+      // Récupérer la première boutique de l'utilisateur
+      logger.info('📡 [useStore] Récupération de la première boutique pour user:', user.id);
       const { data, error } = await supabase
         .from('stores')
         .select('*')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
         .limit(1);
 
       if (error) {
-        console.error('❌ [useStore] Erreur:', error);
-        logger.error('Error fetching store:', error);
+        logger.error('❌ [useStore] Erreur:', error);
         setStore(null);
+        setLoading(false);
         return;
       }
       
       // Prendre le premier résultat s'il y en a un
       const storeData = data && data.length > 0 ? data[0] : null;
-      console.log('✅ [useStore] Store récupéré:', storeData?.id || 'null');
+      logger.info('✅ [useStore] Première boutique récupérée:', storeData?.id || 'null', storeData?.name);
       setStore(storeData);
     } catch (error) {
-      console.error('💥 [useStore] Exception:', error);
-      logger.error('Error fetching store:', error);
+      logger.error('💥 [useStore] Exception:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger votre boutique",
@@ -139,13 +140,34 @@ export const useStore = () => {
       });
     } finally {
       setLoading(false);
-      console.log('✅ [useStore] setLoading(false)');
+      logger.info('✅ [useStore] setLoading(false)');
     }
-  }, [user, authLoading]); // L'objet user est nécessaire dans le corps de la fonction
+  }, [user, authLoading, toast]);
 
   const createStore = async (name: string, description?: string) => {
     try {
       if (!user) throw new Error("Non authentifié");
+
+      // Vérifier si l'utilisateur a déjà une boutique
+      const { data: existingStores, error: checkError } = await supabase
+        .from('stores')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+
+      if (checkError) {
+        logger.error('Error checking existing stores:', checkError);
+        throw checkError;
+      }
+
+      if (existingStores && existingStores.length > 0) {
+        toast({
+          title: "Boutique existante",
+          description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+          variant: "destructive"
+        });
+        return false;
+      }
 
       const slug = generateSlug(name);
       
@@ -181,6 +203,20 @@ export const useStore = () => {
       return true;
     } catch (error) {
       logger.error('Error creating store:', error);
+      
+      // Gérer l'erreur spécifique de limite de la base de données
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorMessage = (error as any).message;
+        if (errorMessage && (errorMessage.includes('Limite de 3 boutiques') || errorMessage.includes('déjà une boutique'))) {
+          toast({
+            title: "Boutique existante",
+            description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+            variant: "destructive"
+          });
+          return false;
+        }
+      }
+      
       toast({
         title: "Erreur",
         description: "Impossible de créer votre boutique",
