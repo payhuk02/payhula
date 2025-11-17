@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star, Heart, Eye, CheckCircle, Clock, TrendingUp, Loader2, BarChart3, Download, Shield, ShoppingBag } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { useMarketplaceFavorites } from "@/hooks/useMarketplaceFavorites";
 import { useCart } from "@/hooks/cart/useCart";
+import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
 import "@/styles/product-grid-professional.css";
 
 interface ProductCardProfessionalProps {
@@ -56,12 +57,22 @@ const ProductCardProfessionalComponent = ({
   isInComparison = false
 }: ProductCardProfessionalProps) => {
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const { addItem } = useCart();
   
   // Hook centralisé pour favoris synchronisés
   const { favorites, toggleFavorite } = useMarketplaceFavorites();
   const isFavorite = favorites.has(product.id);
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   const price = product.promotional_price ?? product.price;
   const hasPromo = product.promotional_price && product.promotional_price < product.price;
@@ -412,15 +423,27 @@ const ProductCardProfessionalComponent = ({
 
         {/* Prix et actions */}
         <div className="flex items-center justify-between">
-          <div className="flex flex-col" role="group" aria-label="Prix du produit">
-            {hasPromo && (
-              <span className="text-sm text-gray-500 line-through" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'FCFA'}`}>
-                {formatPrice(product.price)} {product.currency || 'FCFA'}
+          <div className="flex items-center gap-2" role="group" aria-label="Prix du produit">
+            <div className="flex flex-col">
+              {hasPromo && (
+                <span className="text-sm text-gray-500 line-through" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'FCFA'}`}>
+                  {formatPrice(product.price)} {product.currency || 'FCFA'}
+                </span>
+              )}
+              <span className="text-lg font-bold text-gray-900">
+                {formatPrice(price)} {product.currency || 'FCFA'}
               </span>
-            )}
-            <span className="text-lg font-bold text-gray-900">
-              {formatPrice(price)} {product.currency || 'FCFA'}
-            </span>
+            </div>
+            <PriceStockAlertButton
+              productId={product.id}
+              productName={product.name}
+              currentPrice={price}
+              currency={product.currency || 'XOF'}
+              productType={product.product_type || 'digital'}
+              variant="outline"
+              size="sm"
+              className="flex-shrink-0 h-7"
+            />
           </div>
           
           <div className="flex items-center gap-1 text-sm text-gray-500" aria-label={`${product.purchases_count || 0} vente${(product.purchases_count || 0) !== 1 ? 's' : ''}`}>

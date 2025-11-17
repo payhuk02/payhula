@@ -6,7 +6,7 @@
  * Optimisé avec React.memo et LazyImage pour performance mobile
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,8 @@ import type { ServiceProduct } from '@/hooks/service';
 import type { Product } from '@/types/product';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { getImageAttributesForPreset } from '@/lib/image-transform';
+import { PriceStockAlertButton } from '@/components/marketplace/PriceStockAlertButton';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ServiceCardProps {
   service: ServiceProduct & { product?: Product };
@@ -50,6 +52,16 @@ const ServiceCardComponent = ({
   showActions = true,
 }: ServiceCardProps) => {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   const getLocationIcon = () => {
     switch (service.location_type) {
@@ -178,15 +190,29 @@ const ServiceCardComponent = ({
       <CardContent className="pb-3">
         <div className="space-y-3">
           {/* Price */}
-          <div>
-            <p className="text-2xl font-bold text-primary">
-              {service.product?.price?.toLocaleString() || 0} XOF
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {service.pricing_type === 'fixed' && 'Prix fixe'}
-              {service.pricing_type === 'hourly' && 'Tarif horaire'}
-              {service.pricing_type === 'per_participant' && 'Par participant'}
-            </p>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-2xl font-bold text-primary">
+                {service.product?.price?.toLocaleString() || 0} XOF
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {service.pricing_type === 'fixed' && 'Prix fixe'}
+                {service.pricing_type === 'hourly' && 'Tarif horaire'}
+                {service.pricing_type === 'per_participant' && 'Par participant'}
+              </p>
+            </div>
+            {service.product?.id && (
+              <PriceStockAlertButton
+                productId={service.product.id}
+                productName={service.product.name}
+                currentPrice={service.product.price || 0}
+                currency={service.product.currency || 'XOF'}
+                productType="service"
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 h-7"
+              />
+            )}
           </div>
 
           {/* Stats */}

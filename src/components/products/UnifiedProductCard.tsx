@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, ShoppingCart, Eye, Heart, Percent } from 'lucide-react';
+import { Star, ShoppingCart, Eye, Heart, Percent, MessageSquare } from 'lucide-react';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { UnifiedProduct, UnifiedProductCardProps, DigitalProduct } from '@/types/unified-product';
 import {
@@ -26,6 +26,7 @@ import {
 } from '@/lib/product-helpers';
 import { cn } from '@/lib/utils';
 import { getImageAttributesForPreset } from '@/lib/image-transform';
+import { PriceStockAlertButton } from '@/components/marketplace/PriceStockAlertButton';
 
 const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
   product,
@@ -184,15 +185,27 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
 
         {/* Price et Actions - Séparateur élégant */}
         <div className="mt-auto pt-4 border-t border-border/50">
-          <div className="flex items-baseline gap-2 mb-4">
-            {priceInfo.originalPrice && (
-              <span className="text-sm sm:text-base text-muted-foreground line-through">
-                {formatPrice(priceInfo.originalPrice, product.currency)}
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-baseline gap-2">
+              {priceInfo.originalPrice && (
+                <span className="text-sm sm:text-base text-muted-foreground line-through">
+                  {formatPrice(priceInfo.originalPrice, product.currency)}
+                </span>
+              )}
+              <span className="text-xl sm:text-2xl font-bold text-primary">
+                {formatPrice(priceInfo.price, product.currency)}
               </span>
-            )}
-            <span className="text-xl sm:text-2xl font-bold text-primary">
-              {formatPrice(priceInfo.price, product.currency)}
-            </span>
+            </div>
+            <PriceStockAlertButton
+              productId={product.id}
+              productName={product.name}
+              currentPrice={priceInfo.price}
+              currency={product.currency || 'XOF'}
+              productType={product.type}
+              variant="outline"
+              size="sm"
+              className="flex-shrink-0 h-7"
+            />
           </div>
 
           {/* Actions - Boutons premium */}
@@ -209,6 +222,18 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                   Voir
                 </Button>
               </Link>
+              {product.store?.id && (
+                <Link to={`/vendor/messaging/${product.store.id}?productId=${product.id}`} className="flex-1">
+                  <Button
+                    variant="outline"
+                    size={isCompact ? 'sm' : 'default'}
+                    className="w-full transition-all duration-200 hover:bg-accent/50"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Contacter</span>
+                  </Button>
+                </Link>
+              )}
               <Button
                 size={isCompact ? 'sm' : 'default'}
                 className="flex-1 transition-all duration-200 hover:scale-[1.02]"

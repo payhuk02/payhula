@@ -6,7 +6,7 @@
  * Optimisé avec React.memo et LazyImage pour performance mobile
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,8 @@ import { useInventory } from '@/hooks/physical/useInventory';
 import type { PhysicalProduct } from '@/hooks/physical/usePhysicalProducts';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { getImageAttributesForPreset } from '@/lib/image-transform';
+import { PriceStockAlertButton } from '@/components/marketplace/PriceStockAlertButton';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PhysicalProductCardProps {
   product: PhysicalProduct & { product?: any };
@@ -46,6 +48,16 @@ const PhysicalProductCardComponent = ({
 }: PhysicalProductCardProps) => {
   const navigate = useNavigate();
   const { data: inventory } = useInventory(product.id);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   const getStockStatus = () => {
     // Get stock level from inventory data
@@ -153,10 +165,25 @@ const PhysicalProductCardComponent = ({
       <CardContent className="pb-3">
         <div className="space-y-3">
           {/* Price */}
-          <div>
-            <p className="text-2xl font-bold text-primary">
-              {product.product?.price?.toLocaleString() || 0} XOF
-            </p>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-2xl font-bold text-primary">
+                {product.product?.price?.toLocaleString() || 0} XOF
+              </p>
+            </div>
+            {product.product?.id && (
+              <PriceStockAlertButton
+                productId={product.product.id}
+                productName={product.product.name}
+                currentPrice={product.product.price || 0}
+                currency={product.product.currency || 'XOF'}
+                productType="physical"
+                stockQuantity={inventory?.reduce((total, inv) => total + (inv.quantity_available || 0), 0) || 0}
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 h-7"
+              />
+            )}
           </div>
 
           {/* Stats */}

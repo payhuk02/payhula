@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Clock, Users, BookOpen, Play, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Course } from "@/types/courses";
+import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CourseCardProps {
   course: Course;
@@ -12,6 +14,16 @@ interface CourseCardProps {
 
 const CourseCardComponent = ({ course }: CourseCardProps) => {
   const { product } = course;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   // Helper pour formater la durée
   const formatDuration = (minutes: number) => {
@@ -119,20 +131,34 @@ const CourseCardComponent = ({ course }: CourseCardProps) => {
 
       <CardFooter className="flex items-center justify-between border-t pt-4">
         {/* Prix */}
-        <div>
-          {product?.promotional_price && product.promotional_price < product.price ? (
-            <>
-              <div className="text-2xl font-bold text-orange-600">
-                {product.promotional_price} {product.currency}
+        <div className="flex items-center gap-2">
+          <div>
+            {product?.promotional_price && product.promotional_price < product.price ? (
+              <>
+                <div className="text-2xl font-bold text-orange-600">
+                  {product.promotional_price} {product.currency}
+                </div>
+                <div className="text-sm text-muted-foreground line-through">
+                  {product.price} {product.currency}
+                </div>
+              </>
+            ) : (
+              <div className="text-2xl font-bold">
+                {product?.price || 0} {product?.currency || 'XOF'}
               </div>
-              <div className="text-sm text-muted-foreground line-through">
-                {product.price} {product.currency}
-              </div>
-            </>
-          ) : (
-            <div className="text-2xl font-bold">
-              {product?.price || 0} {product?.currency || 'XOF'}
-            </div>
+            )}
+          </div>
+          {product?.id && (
+            <PriceStockAlertButton
+              productId={product.id}
+              productName={product.name}
+              currentPrice={product.promotional_price && product.promotional_price < product.price ? product.promotional_price : (product.price || 0)}
+              currency={product.currency || 'XOF'}
+              productType="course"
+              variant="outline"
+              size="sm"
+              className="flex-shrink-0 h-7"
+            />
           )}
         </div>
 

@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star, Percent, Loader2, Shield } from "lucide-react";
+import { ShoppingCart, Star, Percent, Loader2, Shield, MessageSquare } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { safeRedirect } from "@/lib/url-validator";
 import { ProductBanner } from "@/components/ui/ResponsiveProductImage";
 import { logger } from "@/lib/logger";
+import { PriceStockAlertButton } from "./PriceStockAlertButton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCardProps {
   product: {
@@ -28,7 +30,17 @@ interface ProductCardProps {
 
 const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   const price = product.promo_price ?? product.price;
   const hasPromo = product.promo_price && product.promo_price < product.price;
@@ -160,15 +172,28 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             <div className="h-5 mb-3" />
           )}
 
-          <div className="flex items-baseline gap-2 mb-2" aria-label="Prix du produit">
-            {hasPromo && (
-              <span className="text-sm text-muted-foreground line-through" aria-label="Prix original">
-                {product.price.toLocaleString()} {product.currency ?? "FCFA"}
+          <div className="flex items-center justify-between gap-2 mb-2" aria-label="Prix du produit">
+            <div className="flex items-baseline gap-2">
+              {hasPromo && (
+                <span className="text-sm text-muted-foreground line-through" aria-label="Prix original">
+                  {product.price.toLocaleString()} {product.currency ?? "FCFA"}
+                </span>
+              )}
+              <span className="product-price" aria-label="Prix actuel">
+                {price.toLocaleString()} {product.currency ?? "FCFA"}
               </span>
-            )}
-            <span className="product-price" aria-label="Prix actuel">
-              {price.toLocaleString()} {product.currency ?? "FCFA"}
-            </span>
+            </div>
+            <PriceStockAlertButton
+              productId={product.id}
+              productName={product.name}
+              currentPrice={price}
+              currency={product.currency || 'XOF'}
+              productType={(product as any).product_type || 'digital'}
+              stockQuantity={(product as any).stock_quantity}
+              variant="outline"
+              size="sm"
+              className="flex-shrink-0 h-7"
+            />
           </div>
 
           {/* Licensing details (amélioré) */}
@@ -206,6 +231,19 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               Voir le produit
             </Button>
           </Link>
+
+          {product.store_id && (
+            <Link to={`/vendor/messaging/${product.store_id}?productId=${product.id}`} className="flex-1">
+              <Button 
+                variant="outline" 
+                className="product-button product-button-secondary"
+                aria-label={`Contacter le vendeur pour ${product.name}`}
+              >
+                <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Contacter</span>
+              </Button>
+            </Link>
+          )}
 
           <Button
             onClick={handleBuyNow}

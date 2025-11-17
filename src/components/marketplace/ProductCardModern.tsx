@@ -14,7 +14,8 @@ import {
   Percent,
   Package,
   Store,
-  Sparkles
+  Sparkles,
+  MessageSquare
 } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
 import { Button } from "@/components/ui/button";
@@ -421,15 +422,28 @@ const ProductCardModernComponent = ({
 
         {/* Prix */}
         <div className="flex items-baseline justify-between mb-3">
-          <div className="flex flex-col">
-            {hasPromo && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 line-through" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>
-                {formatPrice(product.price)} {product.currency || 'XOF'}
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center gap-2">
+              {hasPromo && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 line-through" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>
+                  {formatPrice(product.price)} {product.currency || 'XOF'}
+                </span>
+              )}
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-100" aria-label={`Prix actuel: ${formatPrice(price)} ${product.currency || 'XOF'}`}>
+                {formatPrice(price)} {product.currency || 'XOF'}
               </span>
-            )}
-            <span className="text-lg font-bold text-gray-900 dark:text-gray-100" aria-label={`Prix actuel: ${formatPrice(price)} ${product.currency || 'XOF'}`}>
-              {formatPrice(price)} {product.currency || 'XOF'}
-            </span>
+              <PriceStockAlertButton
+                productId={product.id}
+                productName={product.name}
+                currentPrice={price}
+                currency={product.currency || 'XOF'}
+                productType={product.product_type || 'digital'}
+                stockQuantity={(product as any).stock_quantity}
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 h-7"
+              />
+            </div>
           </div>
         </div>
 
@@ -452,6 +466,24 @@ const ProductCardModernComponent = ({
               </Link>
             </Button>
             
+            {product.store_id && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 h-9 text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                asChild
+              >
+                <Link 
+                  to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}
+                  aria-label={`Contacter le vendeur pour ${product.name}`}
+                  className="flex items-center justify-center gap-1.5"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="hidden sm:inline">Contacter</span>
+                </Link>
+              </Button>
+            )}
+            
             <Button
               onClick={handleBuyNow}
               disabled={loading}
@@ -472,21 +504,6 @@ const ProductCardModernComponent = ({
               )}
             </Button>
           </div>
-
-          {/* Boutons d'alerte (si utilisateur connecté) */}
-          {userId && (
-            <PriceStockAlertButton
-              productId={product.id}
-              productName={product.name}
-              currentPrice={price}
-              currency={product.currency || 'XOF'}
-              productType={product.product_type}
-              stockQuantity={(product as any).stock_quantity}
-              variant="ghost"
-              size="sm"
-              className="w-full justify-center"
-            />
-          )}
         </div>
       </div>
     </article>

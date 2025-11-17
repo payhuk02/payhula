@@ -195,10 +195,18 @@ export function PriceStockAlertButton({
     }
   };
 
-  // Si pas d'utilisateur, ne pas afficher
-  if (!userId) {
-    return null;
-  }
+  // Gérer le clic si l'utilisateur n'est pas connecté
+  const handlePriceAlertClick = () => {
+    if (!userId) {
+      toast({
+        title: 'Authentification requise',
+        description: 'Veuillez vous connecter pour créer une alerte',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setPriceDialogOpen(true);
+  };
 
   return (
     <div className={`flex gap-2 ${className}`}>
@@ -208,15 +216,15 @@ export function PriceStockAlertButton({
           variant={variant}
           size={size}
           onClick={handleDeletePriceAlert}
-          disabled={deletePriceAlert.isPending}
-          className="flex items-center gap-2"
+          disabled={deletePriceAlert.isPending || !userId}
+          className="flex items-center gap-1.5"
         >
           {deletePriceAlert.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <BellOff className="h-4 w-4" />
+            <BellOff className="h-3.5 w-3.5" />
           )}
-          <span className="hidden sm:inline">Retirer alerte prix</span>
+          <span className="text-xs hidden sm:inline">Retirer alerte</span>
         </Button>
       ) : (
         <Dialog open={priceDialogOpen} onOpenChange={setPriceDialogOpen}>
@@ -224,10 +232,16 @@ export function PriceStockAlertButton({
             <Button
               variant={variant}
               size={size}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5 h-7 px-2"
+              onClick={(e) => {
+                if (!userId) {
+                  e.preventDefault();
+                  handlePriceAlertClick();
+                }
+              }}
             >
-              <DollarSign className="h-4 w-4" />
-              <span className="hidden sm:inline">Alerte prix</span>
+              <DollarSign className="h-3.5 w-3.5 flex-shrink-0" />
+              <span className="text-xs whitespace-nowrap">Alerte prix</span>
             </Button>
           </DialogTrigger>
           <DialogContent>

@@ -6,7 +6,7 @@
  * Optimisé avec React.memo et LazyImage pour performance mobile
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,8 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { getImageAttributesForPreset } from '@/lib/image-transform';
+import { PriceStockAlertButton } from '@/components/marketplace/PriceStockAlertButton';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DigitalProductCardProps {
   product: {
@@ -76,6 +78,16 @@ const DigitalProductCardComponent = ({
 }: DigitalProductCardProps) => {
   const isCompact = variant === 'compact';
   const isFeatured = variant === 'featured';
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   // Optimiser l'image avec LazyImage et presets
   const imageAttrs = product.image_url 
@@ -200,10 +212,22 @@ const DigitalProductCardComponent = ({
         )}
 
         {/* Price */}
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-primary">
-            {product.price === 0 ? 'Gratuit' : `${product.price} ${product.currency}`}
-          </span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-primary">
+              {product.price === 0 ? 'Gratuit' : `${product.price} ${product.currency}`}
+            </span>
+          </div>
+          <PriceStockAlertButton
+            productId={product.id}
+            productName={product.name}
+            currentPrice={product.price}
+            currency={product.currency}
+            productType="digital"
+            variant="outline"
+            size="sm"
+            className="flex-shrink-0 h-7"
+          />
         </div>
       </CardContent>
 

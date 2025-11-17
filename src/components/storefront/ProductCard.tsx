@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Product } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +19,8 @@ import {
   TrendingUp,
   CheckCircle,
   Loader2,
-  Shield
+  Shield,
+  MessageSquare
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
@@ -27,6 +28,7 @@ import { initiateMonerooPayment } from "@/lib/moneroo-payment";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { safeRedirect } from "@/lib/url-validator";
+import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
 import "@/styles/product-grid-professional.css";
 
 interface ProductCardProps {
@@ -37,7 +39,17 @@ interface ProductCardProps {
 const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Récupérer l'utilisateur pour les alertes
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   const price = (product as any).promotional_price ?? product.price;
   const hasPromo = (product as any).promotional_price && (product as any).promotional_price < product.price;
@@ -365,23 +377,35 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
 
         {/* Prix et ventes */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-col">
-            {hasPromo && (
-              <span className="text-sm text-gray-500 line-through">
-                {formatPrice(product.price)} {product.currency || 'XOF'}
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              {hasPromo && (
+                <span className="text-sm text-gray-500 line-through">
+                  {formatPrice(product.price)} {product.currency || 'XOF'}
+                </span>
+              )}
+              <span className="text-lg font-bold text-gray-900">
+                {formatPrice(price)} {product.currency || 'XOF'}
               </span>
-            )}
-            <span className="text-lg font-bold text-gray-900">
-              {formatPrice(price)} {product.currency || 'XOF'}
-            </span>
-          </div>
-          
-          {(product as any).purchases_count !== undefined && (
-            <div className="flex items-center gap-1 text-sm text-gray-500">
-              <TrendingUp className="h-4 w-4" />
-              <span>{(product as any).purchases_count || 0}</span>
+              <PriceStockAlertButton
+                productId={product.id}
+                productName={product.name}
+                currentPrice={price}
+                currency={product.currency || 'XOF'}
+                productType={product.product_type || 'digital'}
+                stockQuantity={(product as any).stock_quantity}
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 h-7"
+              />
             </div>
-          )}
+            {(product as any).purchases_count !== undefined && (
+              <div className="flex items-center gap-1 text-sm text-gray-500">
+                <TrendingUp className="h-4 w-4" />
+                <span>{(product as any).purchases_count || 0}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Boutons d'action */}
@@ -400,6 +424,23 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               <span className="font-medium">Voir</span>
             </Link>
           </Button>
+          
+          {product.store_id && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="product-action-button flex-1 h-10 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+              asChild
+            >
+              <Link 
+                to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}
+                className="flex items-center justify-center gap-1.5"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span className="font-medium hidden sm:inline">Contacter</span>
+              </Link>
+            </Button>
+          )}
           
           <Button
             onClick={handleBuyNow}

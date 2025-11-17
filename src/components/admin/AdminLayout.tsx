@@ -73,6 +73,7 @@ const menuSections = [
       { icon: Warehouse, label: 'Inventaire', path: '/admin/inventory' },
       { icon: Truck, label: 'Expéditions', path: '/admin/shipping' },
       { icon: MessageSquare, label: 'Conversations Livraison', path: '/admin/shipping-conversations' },
+      { icon: MessageSquare, label: 'Conversations Clients-Vendeurs', path: '/admin/vendor-conversations' },
       { icon: RotateCcw, label: 'Retours', path: '/admin/returns' },
     ]
   },

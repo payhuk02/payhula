@@ -16,7 +16,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { ShoppingCart, Star, ArrowLeft, CheckCircle2, Package, HelpCircle, ClipboardList, Download, Clock, RefreshCw, DollarSign, Gift, Lock, AlertTriangle, CalendarClock, Shield, AlertCircle, Eye, Loader2 } from "lucide-react";
+import { ShoppingCart, Star, ArrowLeft, CheckCircle2, Package, HelpCircle, ClipboardList, Download, Clock, RefreshCw, DollarSign, Gift, Lock, AlertTriangle, CalendarClock, Shield, AlertCircle, Eye, Loader2, MessageSquare } from "lucide-react";
 import ProductCard from "@/components/marketplace/ProductCard";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import StoreFooter from "@/components/storefront/StoreFooter";
@@ -637,6 +637,21 @@ const ProductDetails = () => {
                       </>
                     )}
                   </Button>
+
+                  {/* Bouton Contacter le vendeur */}
+                  {product.store_id && (
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      asChild
+                    >
+                      <Link to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}>
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Contacter le vendeur
+                      </Link>
+                    </Button>
+                  )}
 
                   {/* Boutons d'alerte prix/stock */}
                   <PriceStockAlertButton
