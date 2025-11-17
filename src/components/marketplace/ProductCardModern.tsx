@@ -322,24 +322,26 @@ const ProductCardModernComponent = ({
       {/* Contenu de la carte - 40% de la hauteur */}
       <div className="flex-1 flex flex-col p-4">
         {/* Logo et nom de la boutique */}
-        <div className="flex items-center gap-2 mb-2">
-          {product.stores?.logo_url ? (
-            <img 
-              src={product.stores.logo_url} 
-              alt={`Logo de ${product.stores.name}`}
-              className="w-5 h-5 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-            />
-          ) : (
-            <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-              <Store className="h-3 w-3 text-gray-500" />
-            </div>
-          )}
-          <span className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
-            {product.stores?.name || 'Vendeur'}
-          </span>
-          <CheckCircle className="h-3 w-3 text-green-500 flex-shrink-0" aria-label="Vendeur vérifié" />
-        </div>
-
+        {product.stores && (
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+            {product.stores.logo_url ? (
+              <img 
+                src={product.stores.logo_url} 
+                alt={`Logo de ${product.stores.name}`}
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+              />
+            ) : (
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
+              </div>
+            )}
+            <span className="text-xs sm:text-sm font-semibold text-white truncate">
+              {product.stores.name}
+            </span>
+            <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
+          </div>
+        )}
+        
         {/* Titre du produit */}
         <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`}>
           <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 leading-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors" id={`product-title-${product.id}`}>
@@ -421,48 +423,46 @@ const ProductCardModernComponent = ({
         </div>
 
         {/* Prix */}
-        <div className="flex items-baseline justify-between mb-3">
-          <div className="flex flex-col flex-1">
-            <div className="flex items-center gap-2">
-              {hasPromo && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 line-through" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>
-                  {formatPrice(product.price)} {product.currency || 'XOF'}
-                </span>
-              )}
-              <span className="text-lg font-bold text-gray-900 dark:text-gray-100" aria-label={`Prix actuel: ${formatPrice(price)} ${product.currency || 'XOF'}`}>
-                {formatPrice(price)} {product.currency || 'XOF'}
+        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+          <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
+            {hasPromo && (
+              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-through flex-shrink-0 whitespace-nowrap" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>
+                {formatPrice(product.price)} {product.currency || 'XOF'}
               </span>
-              <PriceStockAlertButton
-                productId={product.id}
-                productName={product.name}
-                currentPrice={price}
-                currency={product.currency || 'XOF'}
-                productType={product.product_type || 'digital'}
-                stockQuantity={(product as any).stock_quantity}
-                variant="outline"
-                size="sm"
-                className="flex-shrink-0 h-7"
-              />
-            </div>
+            )}
+            <span className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap" aria-label={`Prix actuel: ${formatPrice(price)} ${product.currency || 'XOF'}`}>
+              {formatPrice(price)} {product.currency || 'XOF'}
+            </span>
           </div>
+          <PriceStockAlertButton
+            productId={product.id}
+            productName={product.name}
+            currentPrice={price}
+            currency={product.currency || 'XOF'}
+            productType={product.product_type || 'digital'}
+            stockQuantity={(product as any).stock_quantity}
+            variant="outline"
+            size="sm"
+            className="flex-shrink-0"
+          />
         </div>
 
         {/* Boutons d'action */}
-        <div className="flex flex-col gap-2 mt-auto">
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-1.5 sm:gap-2 mt-auto">
+          <div className="flex gap-1.5 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-9 text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-2 sm:px-3"
               asChild
             >
               <Link 
                 to={`/stores/${currentStoreSlug}/products/${product.slug}`}
                 aria-label={`Voir les détails de ${product.name}`}
-                className="flex items-center justify-center gap-1.5"
+                className="flex items-center justify-center gap-1 sm:gap-1.5"
               >
-                <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Voir</span>
+                <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" aria-hidden="true" />
+                <span className="whitespace-nowrap">Voir</span>
               </Link>
             </Button>
             
@@ -470,16 +470,17 @@ const ProductCardModernComponent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 h-9 text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-2 sm:px-3"
                 asChild
               >
                 <Link 
                   to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}
                   aria-label={`Contacter le vendeur pour ${product.name}`}
-                  className="flex items-center justify-center gap-1.5"
+                  className="flex items-center justify-center gap-1 sm:gap-1.5"
                 >
-                  <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span className="hidden sm:inline">Contacter</span>
+                  <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" aria-hidden="true" />
+                  <span className="hidden sm:inline whitespace-nowrap">Contacter</span>
+                  <span className="sm:hidden">Msg</span>
                 </Link>
               </Button>
             )}
@@ -488,18 +489,18 @@ const ProductCardModernComponent = ({
               onClick={handleBuyNow}
               disabled={loading}
               size="sm"
-              className="flex-1 h-9 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50"
+              className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50 px-2 sm:px-3"
               aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                  <span>Paiement...</span>
+                  <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin flex-shrink-0" aria-hidden="true" />
+                  <span className="whitespace-nowrap">Paiement...</span>
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>Acheter</span>
+                  <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" aria-hidden="true" />
+                  <span className="whitespace-nowrap">Acheter</span>
                 </>
               )}
             </Button>

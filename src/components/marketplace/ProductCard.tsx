@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star, Percent, Loader2, Shield, MessageSquare } from "lucide-react";
+import { ShoppingCart, Star, Percent, Loader2, Shield, MessageSquare, Eye, Store, CheckCircle } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +31,7 @@ interface ProductCardProps {
 const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [storeInfo, setStoreInfo] = useState<{ name: string; logo_url?: string | null } | null>(null);
   const { toast } = useToast();
 
   // Récupérer l'utilisateur pour les alertes
@@ -41,6 +42,28 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
     };
     fetchUser();
   }, []);
+
+  // Récupérer les informations de la boutique
+  useEffect(() => {
+    const fetchStoreInfo = async () => {
+      if (product.store_id) {
+        try {
+          const { data, error } = await supabase
+            .from('stores')
+            .select('name, logo_url')
+            .eq('id', product.store_id)
+            .single();
+          
+          if (!error && data) {
+            setStoreInfo(data);
+          }
+        } catch (error) {
+          logger.error('Error fetching store info', { error });
+        }
+      }
+    };
+    fetchStoreInfo();
+  }, [product.store_id]);
 
   const price = product.promo_price ?? product.price;
   const hasPromo = product.promo_price && product.promo_price < product.price;
@@ -146,10 +169,31 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             </div>
           }
         />
+        
       </div>
 
       <div className="product-card-content flex-[0.4] flex flex-col">
         <div className="flex-1">
+          {/* Logo et nom de la boutique */}
+          {storeInfo && (
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+              {storeInfo.logo_url ? (
+                <img 
+                  src={storeInfo.logo_url} 
+                  alt={`Logo de ${storeInfo.name}`}
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+                />
+              ) : (
+                <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
+                </div>
+              )}
+              <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                {storeInfo.name}
+              </span>
+              <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
+            </div>
+          )}
           {product.category && (
             <span className="text-xs font-medium text-primary uppercase tracking-wide mb-2 block" aria-label={`Catégorie: ${product.category}`}>
               {product.category}
@@ -173,13 +217,13 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           )}
 
           <div className="flex items-center justify-between gap-2 mb-2" aria-label="Prix du produit">
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
               {hasPromo && (
-                <span className="text-sm text-muted-foreground line-through" aria-label="Prix original">
+                <span className="text-[10px] sm:text-xs text-muted-foreground line-through flex-shrink-0 whitespace-nowrap" aria-label="Prix original">
                   {product.price.toLocaleString()} {product.currency ?? "FCFA"}
                 </span>
               )}
-              <span className="product-price" aria-label="Prix actuel">
+              <span className="product-price text-sm sm:text-base md:text-lg font-bold whitespace-nowrap" aria-label="Prix actuel">
                 {price.toLocaleString()} {product.currency ?? "FCFA"}
               </span>
             </div>
@@ -192,7 +236,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               stockQuantity={(product as any).stock_quantity}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 h-7"
+              className="flex-shrink-0"
             />
           </div>
 
@@ -221,14 +265,16 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           </span>
         </div>
 
-        <div className="product-actions" role="group" aria-label="Actions du produit">
+        <div className="product-actions flex gap-1.5 sm:gap-2" role="group" aria-label="Actions du produit">
           <Link to={`/stores/${storeSlug}/products/${product.slug}`} className="flex-1">
             <Button 
               variant="outline" 
-              className="product-button product-button-secondary"
+              size="sm"
+              className="product-button product-button-secondary h-7 sm:h-8 text-[10px] sm:text-xs px-2 sm:px-3"
               aria-label={`Voir les détails du produit ${product.name}`}
             >
-              Voir le produit
+              <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5 flex-shrink-0" aria-hidden="true" />
+              <span className="whitespace-nowrap">Voir</span>
             </Button>
           </Link>
 
@@ -236,11 +282,13 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             <Link to={`/vendor/messaging/${product.store_id}?productId=${product.id}`} className="flex-1">
               <Button 
                 variant="outline" 
-                className="product-button product-button-secondary"
+                size="sm"
+                className="product-button product-button-secondary h-7 sm:h-8 text-[10px] sm:text-xs px-2 sm:px-3"
                 aria-label={`Contacter le vendeur pour ${product.name}`}
               >
-                <MessageSquare className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Contacter</span>
+                <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5 flex-shrink-0" aria-hidden="true" />
+                <span className="hidden sm:inline whitespace-nowrap">Contacter</span>
+                <span className="sm:hidden whitespace-nowrap">Msg</span>
               </Button>
             </Link>
           )}
@@ -248,18 +296,19 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           <Button
             onClick={handleBuyNow}
             disabled={loading}
-            className="product-button product-button-primary"
+            size="sm"
+            className="product-button product-button-primary h-7 sm:h-8 text-[10px] sm:text-xs px-2 sm:px-3"
             aria-label={`Acheter le produit ${product.name} pour ${price.toLocaleString()} ${product.currency ?? "FCFA"}`}
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                <span>Paiement...</span>
+                <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin mr-1 sm:mr-1.5 flex-shrink-0" aria-hidden="true" />
+                <span className="whitespace-nowrap">Paiement...</span>
               </>
             ) : (
               <>
-                <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-                <span>Acheter</span>
+                <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5 flex-shrink-0" aria-hidden="true" />
+                <span className="whitespace-nowrap">Acheter</span>
               </>
             )}
           </Button>

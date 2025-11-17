@@ -213,8 +213,8 @@ const DigitalProductCardComponent = ({
 
         {/* Price */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-primary">
+          <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <span className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-primary whitespace-nowrap">
               {product.price === 0 ? 'Gratuit' : `${product.price} ${product.currency}`}
             </span>
           </div>
@@ -226,7 +226,7 @@ const DigitalProductCardComponent = ({
             productType="digital"
             variant="outline"
             size="sm"
-            className="flex-shrink-0 h-7"
+            className="flex-shrink-0"
           />
         </div>
       </CardContent>

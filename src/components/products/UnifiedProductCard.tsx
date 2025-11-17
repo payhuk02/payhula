@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, ShoppingCart, Eye, Heart, Percent, MessageSquare } from 'lucide-react';
+import { Star, ShoppingCart, Eye, Heart, Percent, MessageSquare, Store, CheckCircle } from 'lucide-react';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { UnifiedProduct, UnifiedProductCardProps, DigitalProduct } from '@/types/unified-product';
 import {
@@ -123,10 +123,32 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
             </Badge>
           )}
         </div>
+
       </div>
 
       {/* Content Section - Spacing professionnel responsive */}
       <div className="flex-1 flex flex-col p-4 sm:p-5 lg:p-6">
+        {/* Logo et nom de la boutique */}
+        {product.store && (
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+            {product.store.logo_url ? (
+              <img 
+                src={product.store.logo_url} 
+                alt={`Logo de ${product.store.name}`}
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+              />
+            ) : (
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
+              </div>
+            )}
+            <span className="text-xs sm:text-sm font-semibold text-white truncate">
+              {product.store.name}
+            </span>
+            <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
+          </div>
+        )}
+
         {/* Title - Typographie hiérarchisée */}
         <h3
           id={`product-title-${product.id}`}
@@ -184,15 +206,15 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
         )}
 
         {/* Price et Actions - Séparateur élégant */}
-        <div className="mt-auto pt-4 border-t border-border/50">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <div className="flex items-baseline gap-2">
+        <div className="mt-auto pt-3 sm:pt-4 border-t border-border/50">
+          <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+            <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
               {priceInfo.originalPrice && (
-                <span className="text-sm sm:text-base text-muted-foreground line-through">
+                <span className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-through flex-shrink-0 whitespace-nowrap">
                   {formatPrice(priceInfo.originalPrice, product.currency)}
                 </span>
               )}
-              <span className="text-xl sm:text-2xl font-bold text-primary">
+              <span className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-primary whitespace-nowrap">
                 {formatPrice(priceInfo.price, product.currency)}
               </span>
             </div>
@@ -204,43 +226,44 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
               productType={product.type}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 h-7"
+              className="flex-shrink-0"
             />
           </div>
 
           {/* Actions - Boutons premium */}
           {showActions && (
-            <div className="flex gap-2 sm:gap-3">
+            <div className="flex gap-1.5 sm:gap-2 md:gap-3">
               <Link to={productUrl} className="flex-1">
                 <Button
                   variant="outline"
-                  size={isCompact ? 'sm' : 'default'}
-                  className="w-full transition-all duration-200 hover:bg-accent/50"
+                  size="sm"
+                  className="w-full h-7 sm:h-8 md:h-9 text-[10px] sm:text-xs transition-all duration-200 hover:bg-accent/50 px-2 sm:px-3"
                   onClick={() => handleAction('view')}
                 >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Voir
+                  <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Voir</span>
                 </Button>
               </Link>
               {product.store?.id && (
                 <Link to={`/vendor/messaging/${product.store.id}?productId=${product.id}`} className="flex-1">
                   <Button
                     variant="outline"
-                    size={isCompact ? 'sm' : 'default'}
-                    className="w-full transition-all duration-200 hover:bg-accent/50"
+                    size="sm"
+                    className="w-full h-7 sm:h-8 md:h-9 text-[10px] sm:text-xs transition-all duration-200 hover:bg-accent/50 px-2 sm:px-3"
                   >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Contacter</span>
+                    <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0" />
+                    <span className="hidden sm:inline whitespace-nowrap">Contacter</span>
+                    <span className="sm:hidden">Msg</span>
                   </Button>
                 </Link>
               )}
               <Button
-                size={isCompact ? 'sm' : 'default'}
-                className="flex-1 transition-all duration-200 hover:scale-[1.02]"
+                size="sm"
+                className="flex-1 h-7 sm:h-8 md:h-9 text-[10px] sm:text-xs transition-all duration-200 hover:scale-[1.02] px-2 sm:px-3"
                 onClick={(e) => handleAction('buy', e)}
               >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Acheter
+                <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0" />
+                <span className="whitespace-nowrap">Acheter</span>
               </Button>
             </div>
           )}

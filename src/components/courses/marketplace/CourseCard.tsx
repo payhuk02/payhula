@@ -129,23 +129,23 @@ const CourseCardComponent = ({ course }: CourseCardProps) => {
         )}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t pt-4">
+      <CardFooter className="flex items-center justify-between border-t pt-4 gap-2">
         {/* Prix */}
-        <div className="flex items-center gap-2">
-          <div>
+        <div className="flex items-center justify-between gap-2 min-w-0 flex-1">
+          <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
             {product?.promotional_price && product.promotional_price < product.price ? (
               <>
-                <div className="text-2xl font-bold text-orange-600">
-                  {product.promotional_price} {product.currency}
-                </div>
-                <div className="text-sm text-muted-foreground line-through">
+                <span className="text-[10px] sm:text-xs text-muted-foreground line-through flex-shrink-0 whitespace-nowrap">
                   {product.price} {product.currency}
-                </div>
+                </span>
+                <span className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-orange-600 whitespace-nowrap">
+                  {product.promotional_price} {product.currency}
+                </span>
               </>
             ) : (
-              <div className="text-2xl font-bold">
+              <span className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold whitespace-nowrap">
                 {product?.price || 0} {product?.currency || 'XOF'}
-              </div>
+              </span>
             )}
           </div>
           {product?.id && (
@@ -157,7 +157,7 @@ const CourseCardComponent = ({ course }: CourseCardProps) => {
               productType="course"
               variant="outline"
               size="sm"
-              className="flex-shrink-0 h-7"
+              className="flex-shrink-0"
             />
           )}
         </div>

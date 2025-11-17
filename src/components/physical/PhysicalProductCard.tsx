@@ -166,9 +166,9 @@ const PhysicalProductCardComponent = ({
         <div className="space-y-3">
           {/* Price */}
           <div className="flex items-center justify-between gap-2">
-            <div>
-              <p className="text-2xl font-bold text-primary">
-                {product.product?.price?.toLocaleString() || 0} XOF
+            <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-primary whitespace-nowrap">
+                {product.product?.price?.toLocaleString() || 0} {product.product?.currency || 'XOF'}
               </p>
             </div>
             {product.product?.id && (
@@ -181,7 +181,7 @@ const PhysicalProductCardComponent = ({
                 stockQuantity={inventory?.reduce((total, inv) => total + (inv.quantity_available || 0), 0) || 0}
                 variant="outline"
                 size="sm"
-                className="flex-shrink-0 h-7"
+                className="flex-shrink-0"
               />
             )}
           </div>

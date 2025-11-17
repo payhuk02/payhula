@@ -191,11 +191,13 @@ const ServiceCardComponent = ({
         <div className="space-y-3">
           {/* Price */}
           <div className="flex items-center justify-between gap-2">
-            <div>
-              <p className="text-2xl font-bold text-primary">
-                {service.product?.price?.toLocaleString() || 0} XOF
-              </p>
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex items-baseline gap-1.5 sm:gap-2">
+                <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-primary whitespace-nowrap">
+                  {service.product?.price?.toLocaleString() || 0} {service.product?.currency || 'XOF'}
+                </p>
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
                 {service.pricing_type === 'fixed' && 'Prix fixe'}
                 {service.pricing_type === 'hourly' && 'Tarif horaire'}
                 {service.pricing_type === 'per_participant' && 'Par participant'}
@@ -210,7 +212,7 @@ const ServiceCardComponent = ({
                 productType="service"
                 variant="outline"
                 size="sm"
-                className="flex-shrink-0 h-7"
+                className="flex-shrink-0"
               />
             )}
           </div>

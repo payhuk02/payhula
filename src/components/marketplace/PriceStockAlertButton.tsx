@@ -209,7 +209,7 @@ export function PriceStockAlertButton({
   };
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className={`flex-shrink-0 ${className}`}>
       {/* Bouton Alerte Prix */}
       {hasPriceAlert ? (
         <Button
@@ -217,15 +217,15 @@ export function PriceStockAlertButton({
           size={size}
           onClick={handleDeletePriceAlert}
           disabled={deletePriceAlert.isPending || !userId}
-          className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs border-2 h-6 sm:h-7 px-2 whitespace-nowrap"
         >
           {deletePriceAlert.isPending ? (
-            <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin flex-shrink-0" />
+            <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin flex-shrink-0" />
           ) : (
-            <BellOff className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <BellOff className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
           )}
-          <span className="hidden sm:inline">Retirer alerte</span>
-          <span className="sm:hidden">Retirer</span>
+          <span className="hidden sm:inline whitespace-nowrap">Retirer alerte</span>
+          <span className="sm:hidden whitespace-nowrap">Retirer</span>
         </Button>
       ) : (
         <Dialog open={priceDialogOpen} onOpenChange={setPriceDialogOpen}>
@@ -233,7 +233,7 @@ export function PriceStockAlertButton({
             <Button
               variant={variant}
               size={size}
-              className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
+              className="flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs border-2 h-6 sm:h-7 px-2 whitespace-nowrap"
               onClick={(e) => {
                 if (!userId) {
                   e.preventDefault();
@@ -241,7 +241,7 @@ export function PriceStockAlertButton({
                 }
               }}
             >
-              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
               <span className="whitespace-nowrap">Alerte prix</span>
             </Button>
           </DialogTrigger>
@@ -302,15 +302,15 @@ export function PriceStockAlertButton({
             size={size}
             onClick={handleDeleteStockAlert}
             disabled={deleteStockAlert.isPending}
-            className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
+            className="flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs border-2 h-6 sm:h-7 px-2 whitespace-nowrap"
           >
             {deleteStockAlert.isPending ? (
-              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin flex-shrink-0" />
+              <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin flex-shrink-0" />
             ) : (
-              <BellOff className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <BellOff className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
             )}
-            <span className="hidden sm:inline">Retirer alerte stock</span>
-            <span className="sm:hidden">Retirer stock</span>
+            <span className="hidden sm:inline whitespace-nowrap">Retirer alerte stock</span>
+            <span className="sm:hidden whitespace-nowrap">Retirer stock</span>
           </Button>
         ) : (
           <Dialog open={stockDialogOpen} onOpenChange={setStockDialogOpen}>
@@ -318,12 +318,12 @@ export function PriceStockAlertButton({
               <Button
                 variant={variant}
                 size={size}
-                className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
+                className="flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs border-2 h-6 sm:h-7 px-2 whitespace-nowrap"
                 disabled={stockQuantity !== null && stockQuantity > 0}
               >
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                <span className="hidden sm:inline">Alerte stock</span>
-                <span className="sm:hidden">Stock</span>
+                <Package className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">Alerte stock</span>
+                <span className="sm:hidden whitespace-nowrap">Stock</span>
               </Button>
             </DialogTrigger>
             <DialogContent>

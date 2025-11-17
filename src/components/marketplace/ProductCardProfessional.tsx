@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star, Heart, Eye, CheckCircle, Clock, TrendingUp, Loader2, BarChart3, Download, Shield, ShoppingBag } from "lucide-react";
+import { ShoppingCart, Star, Heart, Eye, CheckCircle, Clock, TrendingUp, Loader2, BarChart3, Download, Shield, ShoppingBag, Store } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -336,26 +336,26 @@ const ProductCardProfessionalComponent = ({
 
       {/* Contenu de la carte - 40% de la hauteur de la carte */}
       <CardContent className="p-6 flex-[0.4] flex flex-col">
-        {/* Informations du vendeur */}
-        <div className="flex items-center gap-2 mb-4" role="group" aria-label="Informations du vendeur">
-          {product.stores?.logo_url ? (
-            <img 
-              src={product.stores.logo_url} 
-              alt={`Logo de ${product.stores.name}`}
-              className="w-6 h-6 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center" aria-hidden="true">
-              <span className="text-xs font-semibold text-gray-600">
-                {product.stores?.name?.charAt(0) || 'S'}
-              </span>
-            </div>
-          )}
-          <span className="text-sm font-medium text-gray-700">
-            {product.stores?.name || 'Vendeur'}
-          </span>
-          <CheckCircle className="h-4 w-4 text-green-500" aria-label="Vendeur vérifié" />
-        </div>
+        {/* Logo et nom de la boutique */}
+        {product.stores && (
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4" role="group" aria-label="Informations du vendeur">
+            {product.stores.logo_url ? (
+              <img 
+                src={product.stores.logo_url} 
+                alt={`Logo de ${product.stores.name}`}
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+              />
+            ) : (
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
+              </div>
+            )}
+            <span className="text-xs sm:text-sm font-semibold text-white truncate">
+              {product.stores.name}
+            </span>
+            <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
+          </div>
+        )}
 
         {/* Titre du produit */}
         <h3 className="font-semibold text-lg text-gray-900 mb-3 line-clamp-2 leading-tight" id={`product-title-${product.id}`}>
@@ -422,15 +422,15 @@ const ProductCardProfessionalComponent = ({
         )}
 
         {/* Prix et actions */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2" role="group" aria-label="Prix du produit">
-            <div className="flex flex-col">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1" role="group" aria-label="Prix du produit">
               {hasPromo && (
-                <span className="text-sm text-gray-500 line-through" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'FCFA'}`}>
+                <span className="text-[10px] sm:text-xs text-gray-500 line-through flex-shrink-0 whitespace-nowrap" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'FCFA'}`}>
                   {formatPrice(product.price)} {product.currency || 'FCFA'}
                 </span>
               )}
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-sm sm:text-base md:text-lg font-bold text-gray-900 whitespace-nowrap">
                 {formatPrice(price)} {product.currency || 'FCFA'}
               </span>
             </div>
@@ -442,14 +442,17 @@ const ProductCardProfessionalComponent = ({
               productType={product.product_type || 'digital'}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 h-7"
+              className="flex-shrink-0"
             />
           </div>
           
-          <div className="flex items-center gap-1 text-sm text-gray-500" aria-label={`${product.purchases_count || 0} vente${(product.purchases_count || 0) !== 1 ? 's' : ''}`}>
-            <TrendingUp className="h-4 w-4" aria-hidden="true" />
-            <span aria-hidden="true">{product.purchases_count || 0}</span>
-          </div>
+          {/* Nombre de ventes */}
+          {product.purchases_count !== undefined && product.purchases_count > 0 && (
+            <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500" aria-label={`${product.purchases_count} vente${product.purchases_count !== 1 ? 's' : ''}`}>
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
+              <span aria-hidden="true">{product.purchases_count} vente{product.purchases_count !== 1 ? 's' : ''}</span>
+            </div>
+          )}
         </div>
 
         {/* Boutons d'action - OPTIMISÉS SANS DÉBORDEMENT */}
