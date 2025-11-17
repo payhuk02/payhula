@@ -209,7 +209,7 @@ export function PriceStockAlertButton({
   };
 
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={`w-full ${className}`}>
       {/* Bouton Alerte Prix */}
       {hasPriceAlert ? (
         <Button
@@ -217,14 +217,15 @@ export function PriceStockAlertButton({
           size={size}
           onClick={handleDeletePriceAlert}
           disabled={deletePriceAlert.isPending || !userId}
-          className="flex items-center gap-1.5"
+          className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
         >
           {deletePriceAlert.isPending ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin flex-shrink-0" />
           ) : (
-            <BellOff className="h-3.5 w-3.5" />
+            <BellOff className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
           )}
-          <span className="text-xs hidden sm:inline">Retirer alerte</span>
+          <span className="hidden sm:inline">Retirer alerte</span>
+          <span className="sm:hidden">Retirer</span>
         </Button>
       ) : (
         <Dialog open={priceDialogOpen} onOpenChange={setPriceDialogOpen}>
@@ -232,7 +233,7 @@ export function PriceStockAlertButton({
             <Button
               variant={variant}
               size={size}
-              className="flex items-center gap-1.5 h-7 px-2"
+              className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
               onClick={(e) => {
                 if (!userId) {
                   e.preventDefault();
@@ -240,8 +241,8 @@ export function PriceStockAlertButton({
                 }
               }}
             >
-              <DollarSign className="h-3.5 w-3.5 flex-shrink-0" />
-              <span className="text-xs whitespace-nowrap">Alerte prix</span>
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <span className="whitespace-nowrap">Alerte prix</span>
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -301,14 +302,15 @@ export function PriceStockAlertButton({
             size={size}
             onClick={handleDeleteStockAlert}
             disabled={deleteStockAlert.isPending}
-            className="flex items-center gap-2"
+            className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
           >
             {deleteStockAlert.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin flex-shrink-0" />
             ) : (
-              <BellOff className="h-4 w-4" />
+              <BellOff className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             )}
             <span className="hidden sm:inline">Retirer alerte stock</span>
+            <span className="sm:hidden">Retirer stock</span>
           </Button>
         ) : (
           <Dialog open={stockDialogOpen} onOpenChange={setStockDialogOpen}>
@@ -316,11 +318,12 @@ export function PriceStockAlertButton({
               <Button
                 variant={variant}
                 size={size}
-                className="flex items-center gap-2"
+                className="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base border-2"
                 disabled={stockQuantity !== null && stockQuantity > 0}
               >
-                <Package className="h-4 w-4" />
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 <span className="hidden sm:inline">Alerte stock</span>
+                <span className="sm:hidden">Stock</span>
               </Button>
             </DialogTrigger>
             <DialogContent>

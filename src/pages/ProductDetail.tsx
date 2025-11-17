@@ -307,11 +307,11 @@ const ProductDetails = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <Skeleton className="h-6 w-32 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Skeleton className="h-80" />
-            <Skeleton className="h-80" />
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+          <Skeleton className="h-5 sm:h-6 w-24 sm:w-32 mb-4 sm:mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+            <Skeleton className="h-64 sm:h-72 md:h-80" />
+            <Skeleton className="h-64 sm:h-72 md:h-80" />
           </div>
         </div>
       </div>
@@ -323,24 +323,24 @@ const ProductDetails = () => {
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" role="alert" aria-live="polite">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="h-20 w-20 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
-            <AlertCircle className="h-10 w-10 text-red-500" aria-hidden="true" />
+        <div className="text-center max-w-md mx-auto px-4 sm:px-6">
+          <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-red-500/10 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
+            <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-red-500" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl font-bold mb-2 text-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-foreground">
             {error?.includes("Boutique") ? "Boutique introuvable" : "Produit introuvable"}
           </h1>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 break-words">
             {error || "Ce produit n'existe pas ou n'est plus disponible."}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
             {error && (
               <Button
                 onClick={() => {
                   setError(null);
                   fetchData();
                 }}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105 touch-manipulation min-h-[44px] text-sm sm:text-base"
                 aria-label="Réessayer le chargement"
               >
                 Réessayer
@@ -348,16 +348,18 @@ const ProductDetails = () => {
             )}
             {slug && (
               <Link to={`/stores/${slug}`}>
-                <Button variant="outline" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto touch-manipulation min-h-[44px] text-sm sm:text-base">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour à la boutique
+                  <span className="hidden sm:inline">Retour à la boutique</span>
+                  <span className="sm:hidden">Boutique</span>
                 </Button>
               </Link>
             )}
             <Link to="/marketplace">
-              <Button variant="outline" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full sm:w-auto touch-manipulation min-h-[44px] text-sm sm:text-base">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour au marketplace
+                <span className="hidden sm:inline">Retour au marketplace</span>
+                <span className="sm:hidden">Marketplace</span>
               </Button>
             </Link>
           </div>
@@ -400,32 +402,35 @@ const ProductDetails = () => {
       <div className="min-h-screen flex flex-col bg-background">
         {/* Header */}
         <header ref={headerRef} className="border-b bg-card shadow-sm sticky top-0 z-10" role="banner">
-          <div className="max-w-6xl mx-auto px-4 py-3">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
             <Link
               to={`/stores/${store.slug}`}
-              className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="inline-flex items-center text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors touch-manipulation min-h-[44px]"
               aria-label={`Retour à la boutique ${store.name}`}
             >
-              <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
-              Retour à {store.name}
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" aria-hidden="true" />
+              <span className="hidden sm:inline">Retour à {store.name}</span>
+              <span className="sm:hidden">Retour</span>
             </Link>
           </div>
         </header>
 
         {/* Contenu principal */}
         <main className="flex-1" role="main">
-          <div className="max-w-6xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
               {/* 🖼️ Bannière principale et bannières secondaires */}
-              <div ref={galleryRef} className="space-y-4" role="group" aria-label="Bannières du produit">
+              <div ref={galleryRef} className="space-y-3 sm:space-y-4" role="group" aria-label="Bannières du produit">
                 {/* Bannière principale */}
                 {product.image_url && (
-                  <div className="rounded-lg overflow-hidden border border-border shadow-sm">
+                  <div className="rounded-lg overflow-hidden border border-border shadow-sm bg-card">
                     <img
                       src={product.image_url}
                       alt={product.name}
-                      className="w-full h-auto object-contain"
+                      className="w-full h-auto object-contain max-h-[500px] sm:max-h-[600px] md:max-h-[700px]"
                       loading="eager"
+                      decoding="async"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
                     />
                   </div>
                 )}
@@ -451,14 +456,16 @@ const ProductDetails = () => {
                   
                   if (bannersToShow.length > 0) {
                     return (
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {bannersToShow.map((bannerUrl, index) => (
-                          <div key={index} className="rounded-lg overflow-hidden border border-border shadow-sm">
+                          <div key={index} className="rounded-lg overflow-hidden border border-border shadow-sm bg-card">
                             <img
                               src={bannerUrl}
                               alt={`${product.name} - Bannière ${index + 2}`}
-                              className="w-full h-auto object-contain"
+                              className="w-full h-auto object-contain max-h-[400px] sm:max-h-[500px]"
                               loading="lazy"
+                              decoding="async"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
                             />
                           </div>
                         ))}
@@ -470,34 +477,35 @@ const ProductDetails = () => {
 
                 {/* 🎥 Vidéo produit */}
                 {product.video_url && (
-                  <div className="aspect-video rounded-lg overflow-hidden border border-border shadow-sm">
+                  <div className="aspect-video rounded-lg overflow-hidden border border-border shadow-sm bg-card">
                     <iframe
                       src={product.video_url}
                       title={`Vidéo de ${product.name}`}
                       className="w-full h-full"
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      loading="lazy"
                     />
                   </div>
                 )}
               </div>
 
               {/* Infos produit */}
-              <div ref={detailsRef} className="space-y-6">
-                <h1 className="text-3xl font-bold" id="product-title">{product.name}</h1>
+              <div ref={detailsRef} className="space-y-4 sm:space-y-5 md:space-y-6">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight" id="product-title">{product.name}</h1>
 
                 {/* Licensing banner */}
                 {product.licensing_type && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg border bg-muted/50">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${product.licensing_type === 'plr' ? 'bg-emerald-100' : product.licensing_type === 'copyrighted' ? 'bg-red-100' : 'bg-gray-100'}`}>
-                      <Shield className={`h-4 w-4 ${product.licensing_type === 'plr' ? 'text-emerald-700' : product.licensing_type === 'copyrighted' ? 'text-red-700' : 'text-gray-700'}`} />
+                  <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border bg-muted/50">
+                    <div className={`h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center flex-shrink-0 ${product.licensing_type === 'plr' ? 'bg-emerald-100' : product.licensing_type === 'copyrighted' ? 'bg-red-100' : 'bg-gray-100'}`}>
+                      <Shield className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${product.licensing_type === 'plr' ? 'text-emerald-700' : product.licensing_type === 'copyrighted' ? 'text-red-700' : 'text-gray-700'}`} />
                     </div>
-                    <div className="text-sm">
+                    <div className="text-xs sm:text-sm min-w-0 flex-1">
                       <p className="font-semibold">
                         {product.licensing_type === 'plr' ? 'Licence PLR (droits de label privé)' : product.licensing_type === 'copyrighted' ? "Protégé par droit d'auteur" : 'Licence standard'}
                       </p>
                       {product.license_terms && (
-                        <p className="text-muted-foreground mt-1 whitespace-pre-wrap">{product.license_terms}</p>
+                        <p className="text-muted-foreground mt-1 whitespace-pre-wrap break-words">{product.license_terms}</p>
                       )}
                     </div>
                   </div>
@@ -512,20 +520,20 @@ const ProductDetails = () => {
                   </div>
                 )}
 
-                <div className="space-y-2">
+                <div className="space-y-2 sm:space-y-3">
                   {/* Prix avec promotion cohérent avec Marketplace */}
                   {displayPriceInfo && (
-                    <div className="flex items-baseline gap-3 flex-wrap">
+                    <div className="flex items-baseline gap-2 sm:gap-3 flex-wrap">
                       {displayPriceInfo.originalPrice && (
-                        <span className="text-2xl text-muted-foreground line-through">
+                        <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through">
                           {formatPrice(displayPriceInfo.originalPrice, product.currency || 'FCFA')}
                         </span>
                       )}
-                      <div className="text-4xl font-bold text-primary">
+                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">
                         {formatPrice(displayPriceInfo.price, product.currency || 'FCFA')}
                       </div>
                       {hasPromo && discountPercent > 0 && (
-                        <Badge variant="destructive" className="text-sm font-semibold">
+                        <Badge variant="destructive" className="text-xs sm:text-sm font-semibold px-2 py-1">
                           -{discountPercent}%
                         </Badge>
                       )}
@@ -650,24 +658,28 @@ const ProductDetails = () => {
                   />
                 )}
 
-                <div className="flex flex-col sm:flex-row gap-3">
+                {/* Boutons d'action - Responsive optimisé */}
+                <div className="space-y-2 sm:space-y-0">
+                  {/* Bouton principal - Acheter maintenant */}
                   <Button 
                     size="lg" 
-                    className="w-full sm:w-auto"
+                    className="w-full touch-manipulation min-h-[48px] sm:min-h-[44px] text-sm sm:text-base font-semibold shadow-md hover:shadow-lg transition-shadow"
                     onClick={handleBuyNow}
                     disabled={isPurchasing || !product || !product.is_active}
                   >
                     {isPurchasing ? (
                       <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Traitement...
+                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
+                        <span className="hidden sm:inline">Traitement...</span>
+                        <span className="sm:hidden">Chargement...</span>
                       </>
                     ) : (
                       <>
-                        <ShoppingCart className="h-4 w-4 mr-2" />
-                        Acheter maintenant
+                        <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                        <span className="hidden sm:inline">Acheter maintenant</span>
+                        <span className="sm:hidden">Acheter</span>
                         {selectedVariantPrice && selectedVariantPrice !== (displayPriceInfo?.price ?? product.price) && (
-                          <span className="ml-2">
+                          <span className="ml-2 hidden sm:inline">
                             ({formatPrice(selectedVariantPrice, product.currency || 'FCFA')})
                           </span>
                         )}
@@ -675,32 +687,39 @@ const ProductDetails = () => {
                     )}
                   </Button>
 
-                  {/* Bouton Contacter le vendeur */}
-                  {product.store_id && (
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full sm:w-auto"
-                      asChild
-                    >
-                      <Link to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}>
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Contacter le vendeur
-                      </Link>
-                    </Button>
-                  )}
+                  {/* Boutons secondaires - Ligne horizontale sur desktop */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
+                    {/* Bouton Contacter le vendeur */}
+                    {product.store_id && (
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="flex-1 sm:flex-1 touch-manipulation min-h-[48px] sm:min-h-[44px] text-sm sm:text-base border-2"
+                        asChild
+                      >
+                        <Link to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}>
+                          <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                          <span className="hidden sm:inline">Contacter le vendeur</span>
+                          <span className="sm:hidden">Contacter</span>
+                        </Link>
+                      </Button>
+                    )}
 
-                  {/* Boutons d'alerte prix/stock */}
-                  <PriceStockAlertButton
-                    productId={product.id}
-                    productName={product.name}
-                    currentPrice={selectedVariantPrice || (displayPriceInfo?.price ?? product.price)}
-                    currency={product.currency || 'XOF'}
-                    productType={product.product_type}
-                    stockQuantity={(product as any).stock_quantity}
-                    variant="outline"
-                    size="lg"
-                  />
+                    {/* Bouton Alerte prix */}
+                    <div className="flex-1 sm:flex-1">
+                      <PriceStockAlertButton
+                        productId={product.id}
+                        productName={product.name}
+                        currentPrice={selectedVariantPrice || (displayPriceInfo?.price ?? product.price)}
+                        currency={product.currency || 'XOF'}
+                        productType={product.product_type}
+                        stockQuantity={(product as any).stock_quantity}
+                        variant="outline"
+                        size="lg"
+                        className="w-full touch-manipulation min-h-[48px] sm:min-h-[44px]"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* 🔒 NOUVEAU: Badges informatifs (Phase 4) */}
@@ -708,25 +727,28 @@ const ProductDetails = () => {
                   <div className="flex flex-wrap gap-2">
                     {/* Protection par mot de passe */}
                     {product.password_protected && (
-                      <Badge variant="outline" className="text-sm bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                      <Badge variant="outline" className="text-xs sm:text-sm bg-yellow-500/10 text-yellow-700 border-yellow-500/20 px-2 py-1">
                         <Lock className="h-3 w-3 mr-1" />
-                        Accès protégé
+                        <span className="hidden sm:inline">Accès protégé</span>
+                        <span className="sm:hidden">Protégé</span>
                       </Badge>
                     )}
 
                     {/* Limite d'achat */}
                     {product.purchase_limit && product.purchase_limit > 0 && (
-                      <Badge variant="outline" className="text-sm bg-orange-500/10 text-orange-700 border-orange-500/20">
+                      <Badge variant="outline" className="text-xs sm:text-sm bg-orange-500/10 text-orange-700 border-orange-500/20 px-2 py-1">
                         <AlertTriangle className="h-3 w-3 mr-1" />
-                        Max {product.purchase_limit} par personne
+                        <span className="hidden sm:inline">Max {product.purchase_limit} par personne</span>
+                        <span className="sm:hidden">Max {product.purchase_limit}</span>
                       </Badge>
                     )}
 
                     {/* Précommande */}
                     {product.preorder_allowed && (
-                      <Badge variant="outline" className="text-sm bg-blue-500/10 text-blue-700 border-blue-500/20">
+                      <Badge variant="outline" className="text-xs sm:text-sm bg-blue-500/10 text-blue-700 border-blue-500/20 px-2 py-1">
                         <CalendarClock className="h-3 w-3 mr-1" />
-                        Précommande disponible
+                        <span className="hidden sm:inline">Précommande disponible</span>
+                        <span className="sm:hidden">Précommande</span>
                       </Badge>
                     )}
                   </div>
@@ -734,11 +756,11 @@ const ProductDetails = () => {
 
                 {/* Messages détaillés */}
                 {product.password_protected && (
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
-                    <Lock className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
+                  <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                    <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-xs sm:text-sm min-w-0 flex-1">
                       <p className="font-semibold text-yellow-700 mb-1">Produit à accès restreint</p>
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground break-words">
                         Un mot de passe sera requis après l'achat pour accéder à ce produit.
                       </p>
                     </div>
@@ -746,11 +768,11 @@ const ProductDetails = () => {
                 )}
 
                 {product.purchase_limit && product.purchase_limit > 0 && (
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
-                    <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
+                  <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-xs sm:text-sm min-w-0 flex-1">
                       <p className="font-semibold text-orange-700 mb-1">Limite d'achat par personne</p>
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground break-words">
                         Vous pouvez acheter maximum {product.purchase_limit} {product.purchase_limit === 1 ? 'exemplaire' : 'exemplaires'} de ce produit.
                       </p>
                     </div>
@@ -759,16 +781,16 @@ const ProductDetails = () => {
 
                 {/* ✨ NOUVEAU: Caractéristiques principales */}
                 {product.features && Array.isArray(product.features) && product.features.length > 0 && (
-                  <div className="pt-6 border-t border-border">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Package className="h-5 w-5 text-primary" />
-                      <h2 className="text-xl font-semibold">Caractéristiques principales</h2>
+                  <div className="pt-4 sm:pt-6 border-t border-border">
+                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                      <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                      <h2 className="text-lg sm:text-xl font-semibold">Caractéristiques principales</h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                       {product.features.map((feature: string, index: number) => (
-                        <div key={index} className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                          <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm leading-relaxed">{feature}</span>
+                        <div key={index} className="flex items-start gap-2 p-2 sm:p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                          <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-xs sm:text-sm leading-relaxed break-words">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -880,10 +902,10 @@ const ProductDetails = () => {
 
             {/* ✅ Description complète du produit */}
             {safeDescription && (
-              <div className="mb-12 pt-8 border-t border-border">
-                <h2 className="text-2xl font-semibold mb-4">Description</h2>
+              <div className="mb-8 sm:mb-10 md:mb-12 pt-6 sm:pt-8 border-t border-border">
+                <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Description</h2>
                 <div
-                  className="text-muted-foreground leading-relaxed prose max-w-none"
+                  className="text-sm sm:text-base text-muted-foreground leading-relaxed prose prose-sm sm:prose-base max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-strong:text-foreground"
                   dangerouslySetInnerHTML={{ __html: safeDescription }}
                 />
               </div>
@@ -891,22 +913,22 @@ const ProductDetails = () => {
 
             {/* 📖 NOUVEAU: FAQ Section */}
             {product.faqs && Array.isArray(product.faqs) && product.faqs.length > 0 && (
-              <div className="mb-12">
-                <div className="flex items-center gap-2 mb-6">
-                  <HelpCircle className="h-6 w-6 text-primary" />
-                  <h2 className="text-2xl font-bold">Questions fréquentes</h2>
+              <div className="mb-8 sm:mb-10 md:mb-12">
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <HelpCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  <h2 className="text-xl sm:text-2xl font-bold">Questions fréquentes</h2>
                 </div>
                 <Accordion type="single" collapsible className="w-full space-y-2">
                   {product.faqs.map((faq: any, index: number) => (
                     <AccordionItem 
                       key={index} 
                       value={`faq-${index}`}
-                      className="border border-border rounded-lg px-4 bg-card"
+                      className="border border-border rounded-lg px-3 sm:px-4 bg-card"
                     >
-                      <AccordionTrigger className="text-left hover:no-underline">
-                        <span className="font-medium">{faq.question}</span>
+                      <AccordionTrigger className="text-left hover:no-underline text-sm sm:text-base py-3 sm:py-4">
+                        <span className="font-medium break-words pr-4">{faq.question}</span>
                       </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground leading-relaxed">
+                      <AccordionContent className="text-xs sm:text-sm text-muted-foreground leading-relaxed pb-3 sm:pb-4 break-words">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
@@ -917,7 +939,7 @@ const ProductDetails = () => {
 
             {/* Reviews & Ratings */}
             {product && (
-              <div ref={reviewsRef} className="mb-12" role="region" aria-labelledby="reviews-heading">
+              <div ref={reviewsRef} className="mb-8 sm:mb-10 md:mb-12" role="region" aria-labelledby="reviews-heading">
                 <h2 id="reviews-heading" className="sr-only">Avis et évaluations</h2>
                 <ProductReviewsSummary
                   productId={product.id}
@@ -928,7 +950,7 @@ const ProductDetails = () => {
 
             {/* Produits fréquemment achetés ensemble */}
             {product && (
-              <div className="mb-12">
+              <div className="mb-8 sm:mb-10 md:mb-12">
                 <FrequentlyBoughtTogether
                   productId={product.id}
                   limit={4}
@@ -938,7 +960,7 @@ const ProductDetails = () => {
 
             {/* Produits similaires - Recommandations intelligentes */}
             {product && (
-              <div className="mb-12">
+              <div className="mb-8 sm:mb-10 md:mb-12">
                 <ProductRecommendations
                   productId={product.id}
                   productCategory={product.category}
@@ -950,8 +972,8 @@ const ProductDetails = () => {
 
             {/* Produits similaires (fallback si pas de recommandations) */}
             {relatedProducts.length > 0 && (
-              <div role="region" aria-labelledby="related-products-heading" className="mb-12">
-                <h2 id="related-products-heading" className="text-2xl font-bold mb-6">Autres produits de cette boutique</h2>
+              <div role="region" aria-labelledby="related-products-heading" className="mb-8 sm:mb-10 md:mb-12">
+                <h2 id="related-products-heading" className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 px-2 sm:px-0">Autres produits de cette boutique</h2>
                 <ProductGrid>
                   {relatedProducts.map((related, index) => (
                     <div 
