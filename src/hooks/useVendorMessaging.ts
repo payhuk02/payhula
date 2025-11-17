@@ -116,8 +116,24 @@ export const useVendorMessaging = (
       if (profile?.role === 'admin') {
         // Les admins voient tout
       } else {
-        // Les clients voient leurs conversations, les vendeurs voient celles de leur boutique
-        query = query.or(`customer_user_id.eq.${user.id},store_user_id.eq.${user.id},store_id.in.(SELECT id FROM stores WHERE user_id = '${user.id}')`);
+        // Récupérer d'abord les stores de l'utilisateur
+        const { data: userStores } = await supabase
+          .from("stores")
+          .select("id")
+          .eq("user_id", user.id);
+
+        const storeIds = userStores?.map(s => s.id) || [];
+
+        // Construire le filtre : client OU vendeur direct OU propriétaire de la boutique
+        if (storeIds.length > 0) {
+          // Si l'utilisateur a des boutiques, inclure les conversations de ces boutiques
+          query = query.or(
+            `customer_user_id.eq.${user.id},store_user_id.eq.${user.id},store_id.in.(${storeIds.join(',')})`
+          );
+        } else {
+          // Sinon, seulement client ou vendeur direct
+          query = query.or(`customer_user_id.eq.${user.id},store_user_id.eq.${user.id}`);
+        }
       }
 
       const { data, error } = await query;
