@@ -40,6 +40,8 @@ import {
   Star,
   Percent,
   MessageSquare,
+  Activity,
+  Accessibility,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -117,6 +119,8 @@ const menuSections = [
       { icon: FileText, label: 'Audit', path: '/admin/audit' },
       { icon: Headphones, label: 'Support', path: '/admin/support' },
       { icon: Bell, label: 'Notifications', path: '/admin/notifications' },
+      { icon: Activity, label: 'Monitoring', path: '/admin/monitoring' },
+      { icon: Accessibility, label: 'Accessibilité', path: '/admin/accessibility' },
     ]
   },
   {

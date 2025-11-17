@@ -296,6 +296,8 @@ const AdminTemplates = lazy(() => import("./pages/admin/AdminTemplates"));
 const AdminTemplatesPremium = lazy(() => import("./pages/admin/AdminTemplatesPremium"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminErrorMonitoring = lazy(() => import("./pages/admin/AdminErrorMonitoring"));
+const AdminMonitoring = lazy(() => import("./pages/admin/AdminMonitoring"));
+const AdminAccessibilityReport = lazy(() => import("./pages/admin/AdminAccessibilityReport"));
 
 // Page de test i18n (à supprimer en production)
 const I18nTest = lazy(() => import("./pages/I18nTest"));
@@ -546,6 +548,8 @@ const AppContent = () => {
           <Route path="/admin/templates" element={<ProtectedRoute><AdminTemplates /></ProtectedRoute>} />
           <Route path="/admin/templates-premium" element={<ProtectedRoute><AdminTemplatesPremium /></ProtectedRoute>} />
           <Route path="/admin/error-monitoring" element={<ProtectedRoute><AdminErrorMonitoring /></ProtectedRoute>} />
+          <Route path="/admin/monitoring" element={<ProtectedRoute><AdminMonitoring /></ProtectedRoute>} />
+          <Route path="/admin/accessibility" element={<ProtectedRoute><AdminAccessibilityReport /></ProtectedRoute>} />
 
           {/* --- Route de fallback --- */}
           <Route path="*" element={<NotFound />} />
