@@ -416,22 +416,59 @@ const ProductDetails = () => {
         <main className="flex-1" role="main">
           <div className="max-w-6xl mx-auto px-4 py-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              {/* 🖼️ AMÉLIORÉ: Galerie d'images complète (toutes sources) */}
-              <div ref={galleryRef} className="space-y-4" role="group" aria-label="Galerie d'images du produit">
-                <ProductImageGallery
-                  images={[
-                    product.image_url,
-                    ...(Array.isArray(product.images) ? product.images : []),
-                    ...(Array.isArray(product.gallery_images) ? product.gallery_images : [])
-                  ].filter(Boolean)}
-                  alt={product.name}
-                  context="detail"
-                  priority={true}
-                  showZoom={true}
-                  showThumbnails={true}
-                />
+              {/* 🖼️ Bannière principale et bannières secondaires */}
+              <div ref={galleryRef} className="space-y-4" role="group" aria-label="Bannières du produit">
+                {/* Bannière principale */}
+                {product.image_url && (
+                  <div className="rounded-lg overflow-hidden border border-border shadow-sm">
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-auto object-contain"
+                      loading="eager"
+                    />
+                  </div>
+                )}
 
-                {/* 🎥 NOUVEAU: Vidéo produit */}
+                {/* Bannières secondaires (max 3) */}
+                {(() => {
+                  // Extraire les bannières secondaires (max 3)
+                  const secondaryBanners: string[] = [];
+                  
+                  // Récupérer depuis product.images (tableau JSONB)
+                  if (Array.isArray(product.images)) {
+                    product.images.forEach((img: any) => {
+                      if (typeof img === 'string' && img && img !== product.image_url) {
+                        secondaryBanners.push(img);
+                      } else if (typeof img === 'object' && img?.url && img.url !== product.image_url) {
+                        secondaryBanners.push(img.url);
+                      }
+                    });
+                  }
+                  
+                  // Limiter à 3 bannières maximum
+                  const bannersToShow = secondaryBanners.slice(0, 3);
+                  
+                  if (bannersToShow.length > 0) {
+                    return (
+                      <div className="space-y-4">
+                        {bannersToShow.map((bannerUrl, index) => (
+                          <div key={index} className="rounded-lg overflow-hidden border border-border shadow-sm">
+                            <img
+                              src={bannerUrl}
+                              alt={`${product.name} - Bannière ${index + 2}`}
+                              className="w-full h-auto object-contain"
+                              loading="lazy"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+                {/* 🎥 Vidéo produit */}
                 {product.video_url && (
                   <div className="aspect-video rounded-lg overflow-hidden border border-border shadow-sm">
                     <iframe
@@ -738,16 +775,6 @@ const ProductDetails = () => {
                   </div>
                 )}
 
-                {/* ✅ Description HTML nettoyée */}
-                {safeDescription && (
-                  <div className="pt-6 border-t border-border">
-                    <h2 className="text-xl font-semibold mb-3">Description</h2>
-                    <div
-                      className="text-muted-foreground leading-relaxed prose max-w-none"
-                      dangerouslySetInnerHTML={{ __html: safeDescription }}
-                    />
-                  </div>
-                )}
 
                 {/* 📜 Conditions de licence */}
                 {product.licensing_type && (
@@ -850,6 +877,17 @@ const ProductDetails = () => {
                 </div>
               </div>
             </div>
+
+            {/* ✅ Description complète du produit */}
+            {safeDescription && (
+              <div className="mb-12 pt-8 border-t border-border">
+                <h2 className="text-2xl font-semibold mb-4">Description</h2>
+                <div
+                  className="text-muted-foreground leading-relaxed prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: safeDescription }}
+                />
+              </div>
+            )}
 
             {/* 📖 NOUVEAU: FAQ Section */}
             {product.faqs && Array.isArray(product.faqs) && product.faqs.length > 0 && (

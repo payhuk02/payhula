@@ -1,159 +1,140 @@
 /**
- * Configuration CDN pour optimiser le chargement des assets
- * Support pour Cloudflare, AWS CloudFront, Vercel Edge Network
+ * Configuration CDN pour assets statiques
+ * Améliore les performances en servant les assets depuis un CDN
  */
 
 export interface CDNConfig {
-  enabled: boolean;
+  /**
+   * URL de base du CDN
+   */
   baseUrl: string;
-  imageOptimization: boolean;
-  videoOptimization: boolean;
-  fontOptimization: boolean;
+  
+  /**
+   * Si true, utilise le CDN pour les assets
+   */
+  enabled: boolean;
+  
+  /**
+   * Domaines autorisés pour les images
+   */
+  allowedImageDomains: string[];
 }
 
 /**
  * Configuration CDN par défaut
  * Peut être surchargée via variables d'environnement
  */
-export const getCDNConfig = (): CDNConfig => {
-  const cdnBaseUrl = import.meta.env.VITE_CDN_BASE_URL || '';
-  const cdnEnabled = import.meta.env.VITE_CDN_ENABLED === 'true' || !!cdnBaseUrl;
-
-  return {
-    enabled: cdnEnabled,
-    baseUrl: cdnBaseUrl,
-    imageOptimization: import.meta.env.VITE_CDN_IMAGE_OPTIMIZATION !== 'false',
-    videoOptimization: import.meta.env.VITE_CDN_VIDEO_OPTIMIZATION !== 'false',
-    fontOptimization: import.meta.env.VITE_CDN_FONT_OPTIMIZATION !== 'false',
-  };
+const defaultCDNConfig: CDNConfig = {
+  baseUrl: import.meta.env.VITE_CDN_URL || '',
+  enabled: import.meta.env.VITE_CDN_ENABLED === 'true',
+  allowedImageDomains: [
+    'supabase.co',
+    'storage.googleapis.com',
+    'vercel.app',
+    ...(import.meta.env.VITE_CDN_ALLOWED_DOMAINS?.split(',') || []),
+  ],
 };
+
+let cdnConfig: CDNConfig = defaultCDNConfig;
+
+/**
+ * Configure le CDN
+ */
+export function configureCDN(config: Partial<CDNConfig>) {
+  cdnConfig = { ...cdnConfig, ...config };
+}
+
+/**
+ * Retourne la configuration CDN actuelle
+ */
+export function getCDNConfig(): CDNConfig {
+  return cdnConfig;
+}
 
 /**
  * Génère une URL CDN pour un asset
+ * @param path - Chemin de l'asset (relatif ou absolu)
+ * @returns URL complète avec CDN si activé
  */
-export const getCDNUrl = (path: string): string => {
-  const config = getCDNConfig();
-  
-  if (!config.enabled || !config.baseUrl) {
+export function getCDNUrl(path: string): string {
+  if (!cdnConfig.enabled || !cdnConfig.baseUrl) {
     return path;
   }
 
-  // Si le path est déjà une URL complète, retourner tel quel
+  // Si le chemin est déjà une URL complète, retourner tel quel
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
 
-  // Nettoyer le path (enlever le slash initial si présent)
+  // Nettoyer le chemin (enlever le slash initial si présent)
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-  
+
   // Construire l'URL CDN
-  const baseUrl = config.baseUrl.endsWith('/') 
-    ? config.baseUrl.slice(0, -1) 
-    : config.baseUrl;
-  
+  const baseUrl = cdnConfig.baseUrl.endsWith('/') 
+    ? cdnConfig.baseUrl.slice(0, -1) 
+    : cdnConfig.baseUrl;
+
   return `${baseUrl}/${cleanPath}`;
-};
+}
 
 /**
- * Génère une URL CDN optimisée pour les images
- * Support pour Cloudflare Images, Cloudinary, etc.
+ * Vérifie si une URL d'image est autorisée
  */
-export const getOptimizedImageUrl = (
-  path: string,
+export function isImageUrlAllowed(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    return cdnConfig.allowedImageDomains.some(domain => 
+      urlObj.hostname.includes(domain)
+    );
+  } catch {
+    // Si l'URL n'est pas valide, retourner false
+    return false;
+  }
+}
+
+/**
+ * Optimise une URL d'image avec paramètres CDN
+ * @param url - URL de l'image
+ * @param options - Options d'optimisation (width, height, quality, format)
+ */
+export function optimizeImageUrl(
+  url: string,
   options?: {
     width?: number;
     height?: number;
     quality?: number;
     format?: 'webp' | 'avif' | 'jpg' | 'png';
   }
-): string => {
-  const config = getCDNConfig();
-  
-  if (!config.imageOptimization) {
-    return getCDNUrl(path);
+): string {
+  if (!options || Object.keys(options).length === 0) {
+    return url;
   }
 
-  // Si Cloudflare Images
-  if (config.baseUrl.includes('cloudflare') || import.meta.env.VITE_CDN_PROVIDER === 'cloudflare') {
-    const params = new URLSearchParams();
-    if (options?.width) params.append('width', options.width.toString());
-    if (options?.height) params.append('height', options.height.toString());
-    if (options?.quality) params.append('quality', options.quality.toString());
-    if (options?.format) params.append('format', options.format);
-    
-    const queryString = params.toString();
-    return `${getCDNUrl(path)}${queryString ? `?${queryString}` : ''}`;
+  // Si le CDN n'est pas activé, retourner l'URL originale
+  if (!cdnConfig.enabled) {
+    return url;
   }
 
-  // Si Cloudinary
-  if (config.baseUrl.includes('cloudinary') || import.meta.env.VITE_CDN_PROVIDER === 'cloudinary') {
-    const transformations: string[] = [];
-    if (options?.width) transformations.push(`w_${options.width}`);
-    if (options?.height) transformations.push(`h_${options.height}`);
-    if (options?.quality) transformations.push(`q_${options.quality}`);
-    if (options?.format) transformations.push(`f_${options.format}`);
-    
-    const transformString = transformations.length > 0 ? `${transformations.join(',')}/` : '';
-    return `${getCDNUrl(path)}`.replace('/upload/', `/upload/${transformString}`);
-  }
-
-  // Par défaut, retourner l'URL CDN standard
-  return getCDNUrl(path);
-};
-
-/**
- * Précharge une ressource via CDN
- */
-export const preloadCDNResource = (url: string, as: 'image' | 'script' | 'style' | 'font' | 'video'): void => {
-  if (typeof document === 'undefined') return;
-
-  const link = document.createElement('link');
-  link.rel = 'preload';
-  link.href = url;
-  link.as = as;
+  // Construire les paramètres de requête
+  const params = new URLSearchParams();
   
-  if (as === 'font') {
-    link.crossOrigin = 'anonymous';
+  if (options.width) {
+    params.set('w', options.width.toString());
   }
   
-  document.head.appendChild(link);
-};
-
-/**
- * Préconnecte à un domaine CDN
- */
-export const preconnectCDN = (domain: string): void => {
-  if (typeof document === 'undefined') return;
-
-  const link = document.createElement('link');
-  link.rel = 'preconnect';
-  link.href = domain;
-  link.crossOrigin = 'anonymous';
-  
-  document.head.appendChild(link);
-};
-
-/**
- * Initialise les connexions CDN au chargement de la page
- */
-export const initCDNConnections = (): void => {
-  const config = getCDNConfig();
-  
-  if (!config.enabled || !config.baseUrl) return;
-
-  try {
-    const cdnDomain = new URL(config.baseUrl).origin;
-    preconnectCDN(cdnDomain);
-    
-    // DNS prefetch pour améliorer les performances
-    const dnsPrefetch = document.createElement('link');
-    dnsPrefetch.rel = 'dns-prefetch';
-    dnsPrefetch.href = cdnDomain;
-    document.head.appendChild(dnsPrefetch);
-  } catch (error) {
-    console.warn('[CDN] Erreur lors de l\'initialisation:', error);
+  if (options.height) {
+    params.set('h', options.height.toString());
   }
-};
+  
+  if (options.quality) {
+    params.set('q', options.quality.toString());
+  }
+  
+  if (options.format) {
+    params.set('f', options.format);
+  }
 
-
-
+  // Ajouter les paramètres à l'URL
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}${params.toString()}`;
+}

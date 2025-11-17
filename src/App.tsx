@@ -368,8 +368,10 @@ const AppContent = () => {
           <Route path="/stores/:slug" element={<Storefront />} />
           <Route path="/stores/:slug/products/:productSlug" element={<ProductDetail />} />
           
-          {/* --- Route de test i18n (à supprimer en production) --- */}
-          <Route path="/i18n-test" element={<I18nTest />} />
+          {/* --- Route de test i18n (uniquement en développement) --- */}
+          {import.meta.env.DEV && (
+            <Route path="/i18n-test" element={<I18nTest />} />
+          )}
 
           {/* --- Routes Légales (publiques) --- */}
           <Route path="/legal/terms" element={<TermsOfService />} />
@@ -380,7 +382,6 @@ const AppContent = () => {
           {/* --- Routes Moneroo --- */}
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/cancel" element={<PaymentCancel />} />
-          <Route path="/checkout" element={<Checkout />} />
 
           {/* --- Routes utilisateur (protégées) --- */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
