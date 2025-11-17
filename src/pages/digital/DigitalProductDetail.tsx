@@ -43,7 +43,7 @@ import {
 } from '@/components/digital/DigitalProductRecommendations';
 import { useDigitalProduct } from '@/hooks/digital/useDigitalProducts';
 import { useHasDownloadAccess } from '@/hooks/digital/useDigitalProducts';
-import { sanitizeHTML } from '@/lib/html-sanitizer';
+import { sanitizeProductDescription } from '@/lib/html-sanitizer';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ProductReviewsSummary } from '@/components/reviews/ProductReviewsSummary';
 import { ReviewsList } from '@/components/reviews/ReviewsList';
@@ -184,7 +184,14 @@ export default function DigitalProductDetail() {
           orderId: result.orderId,
           checkoutUrl: result.checkoutUrl,
         });
-        window.location.href = result.checkoutUrl;
+        const { safeRedirect } = await import('@/lib/url-validator');
+        safeRedirect(result.checkoutUrl, (error) => {
+          toast({
+            title: 'Erreur de redirection',
+            description: error,
+            variant: 'destructive',
+          });
+        });
       } else {
         throw new Error('URL de paiement non disponible');
       }
@@ -540,7 +547,7 @@ export default function DigitalProductDetail() {
               <CardContent>
                 <div 
                   className="prose dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(product.description || '', 'productDescription') }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description || '') }}
                 />
               </CardContent>
             </Card>

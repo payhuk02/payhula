@@ -58,16 +58,10 @@ class MonerooClient {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError) {
-        console.warn('[MonerooClient] Auth check warning:', authError);
+        // Auth check warning - non-blocking
       }
       
-      console.log('[MonerooClient] Calling Edge Function:', { 
-        action, 
-        hasData: !!data,
-        dataKeys: data ? Object.keys(data) : [],
-        isAuthenticated: !!user,
-        userId: user?.id,
-      });
+      // Calling Edge Function - log via logger if needed
       
       // Vérifier que Supabase est configuré
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -77,20 +71,14 @@ class MonerooClient {
         );
       }
       
-      console.log('[MonerooClient] Supabase URL:', supabaseUrl);
-      console.log('[MonerooClient] Edge Function URL:', `${supabaseUrl}/functions/v1/moneroo`);
-      console.log('[MonerooClient] Request body:', JSON.stringify({ action, data }, null, 2));
+      // Edge Function details - log via logger if needed
       
       // Appel à l'Edge Function avec timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes timeout
       
       try {
-        console.log('[MonerooClient] Invoking Edge Function with:', {
-          functionName: 'moneroo',
-          body: { action, data },
-          hasSignal: !!controller.signal,
-        });
+        // Invoking Edge Function - log via logger if needed
         
         const { data: response, error } = await supabase.functions.invoke("moneroo", {
           body: { action, data },
@@ -99,28 +87,12 @@ class MonerooClient {
         
         clearTimeout(timeoutId);
         
-        console.log('[MonerooClient] Edge Function response:', {
-          hasResponse: !!response,
-          hasError: !!error,
-          responseType: typeof response,
-          errorType: typeof error,
-          responseKeys: response ? Object.keys(response) : [],
-          errorKeys: error ? Object.keys(error) : [],
-          errorContext: (error as any)?.context,
-          errorContextType: (error as any)?.context ? typeof (error as any).context : 'none',
-        });
+        // Edge Function response - log via logger if needed
         
         if (error) {
           // Erreur de communication Supabase
           const errorMessage = error.message || 'Erreur inconnue';
-          console.error('[MonerooClient] Supabase function error:', {
-            error,
-            message: errorMessage,
-            context: (error as any)?.context,
-            data: (error as any)?.data,
-            name: error.name,
-            stack: (error as any)?.stack,
-          });
+          // Supabase function error - log via logger if needed
           
           // Gérer l'erreur "Failed to fetch" spécifiquement
           if (errorMessage.includes('Failed to fetch') || 
@@ -129,14 +101,7 @@ class MonerooClient {
               errorMessage.includes('network') ||
               errorMessage.toLowerCase().includes('network request failed')) {
             
-            console.error('[MonerooClient] Network error details:', {
-              errorMessage,
-              error,
-              supabaseUrl,
-              edgeFunctionUrl: `${supabaseUrl}/functions/v1/moneroo`,
-              action,
-              timestamp: new Date().toISOString(),
-            });
+            // Network error details - log via logger if needed
             
             throw new MonerooNetworkError(
               `Erreur de connexion: Impossible de se connecter à l'Edge Function Moneroo.\n\n` +
@@ -172,7 +137,7 @@ class MonerooClient {
                     errorDetails = { message: responseText, raw: responseText };
                   }
                 } catch (e) {
-                  console.warn('[MonerooClient] Could not read error response body:', e);
+                  // Could not read error response body - non-blocking
                 }
               }
             } else if ((error as any)?.data) {
@@ -201,13 +166,7 @@ class MonerooClient {
             }
             
             // Log complet pour debug
-            console.error('[MonerooClient] Full error details:', {
-              error,
-              errorDetails,
-              detailedMessage,
-              context: (error as any)?.context,
-              status: errorDetails.status || (errorDetails as any)?.statusCode,
-            });
+            // Full error details - log via logger if needed
             
             // Vérifier si c'est une erreur de configuration API
             if (detailedMessage.includes('Configuration API manquante') || 

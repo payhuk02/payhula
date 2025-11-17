@@ -6,6 +6,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,6 +51,7 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 // Composant séparé pour éviter les erreurs de hooks conditionnels
 const AdvancedOrderContent: React.FC<{ store: Store }> = ({ store }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("payments");
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>();
@@ -563,7 +565,7 @@ const AdvancedOrderManagement = () => {
               </CardHeader>
               <CardContent className="text-center p-6 sm:p-8 pt-0">
                 <Button 
-                  onClick={() => window.location.href = '/dashboard/store'}
+                  onClick={() => navigate('/dashboard/store')}
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   {t('advancedOrders.noStore.createStore', 'Créer ma boutique')}

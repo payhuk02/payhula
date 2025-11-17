@@ -6,6 +6,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +49,7 @@ type ViewMode = 'grid' | 'list';
 
 const Orders = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { store, loading: storeLoading } = useStore();
   const { toast } = useToast();
   const [page, setPage] = useState(0);
@@ -276,7 +278,7 @@ const Orders = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => window.location.href = '/dashboard/store'}>
+                <Button onClick={() => navigate('/dashboard/store')}>
                   {t('orders.noStore.createStore', 'Créer une boutique')}
                 </Button>
               </CardContent>

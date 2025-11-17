@@ -21,7 +21,7 @@ import ProductCard from "@/components/marketplace/ProductCard";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import StoreFooter from "@/components/storefront/StoreFooter";
 import { useProducts } from "@/hooks/useProducts";
-import { sanitizeHTML } from "@/lib/html-sanitizer";
+import { sanitizeProductDescription } from "@/lib/html-sanitizer";
 import { ProductImageGallery } from "@/components/ui/ProductImageGallery";
 import { CountdownTimer } from "@/components/ui/countdown-timer";
 import { CustomFieldsDisplay } from "@/components/products/CustomFieldsDisplay";
@@ -167,7 +167,7 @@ const ProductDetails = () => {
   );
 
   const safeDescription = useMemo(() => 
-    product?.description ? sanitizeHTML(product.description, 'productDescription') : "",
+    product?.description ? sanitizeProductDescription(product.description) : "",
     [product?.description]
   );
 

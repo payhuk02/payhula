@@ -146,7 +146,7 @@ export function sanitizeURL(url: string | null | undefined): string {
   
   for (const protocol of dangerousProtocols) {
     if (lowerUrl.startsWith(protocol)) {
-      console.error('🚨 SECURITY: Protocole dangereux bloqué:', protocol);
+      // Protocole dangereux bloqué - log via logger si nécessaire
       return '#';
     }
   }
@@ -245,7 +245,7 @@ export function configureDOMPurify(): void {
     }
   });
   
-  console.log('✅ DOMPurify configuré');
+  // DOMPurify configuré - pas besoin de log
 }
 
 // ============================================================================

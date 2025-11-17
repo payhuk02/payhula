@@ -6,6 +6,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,6 +61,7 @@ import {
 
 export default function InventoryDashboard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { store, loading: storeLoading } = useStore();
   const { toast } = useToast();
   
@@ -218,7 +220,7 @@ export default function InventoryDashboard() {
                 <p className="text-muted-foreground mb-6">
                   Vous devez créer une boutique avant de gérer l'inventaire.
                 </p>
-                <Button onClick={() => (window.location.href = '/store')}>
+                <Button onClick={() => navigate('/store')}>
                   Créer ma boutique
                 </Button>
               </CardContent>

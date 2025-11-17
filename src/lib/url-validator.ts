@@ -5,6 +5,8 @@
  * Utilisé principalement pour les redirections de paiement (Moneroo, PayDunya)
  */
 
+import { logger } from './logger';
+
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
@@ -144,18 +146,20 @@ export function safeRedirect(
   
   if (result.isValid) {
     // URL valide, redirection sécurisée
-    console.log('✅ Redirection sécurisée vers:', url);
+    logger.info('✅ Redirection sécurisée vers:', { url });
     window.location.href = url;
   } else {
     // URL invalide, bloquer et notifier
-    console.error('🚨 SECURITY: Redirection bloquée vers URL non autorisée:', url);
-    console.error('Raison:', result.error);
+    logger.error('🚨 SECURITY: Redirection bloquée vers URL non autorisée', { 
+      url, 
+      error: result.error 
+    });
     
     if (onError) {
       onError(result.error || 'URL non autorisée');
     } else {
       // Fallback : rediriger vers le dashboard
-      console.warn('Fallback: redirection vers /dashboard');
+      logger.warn('Fallback: redirection vers /dashboard');
       window.location.href = '/dashboard';
     }
   }
@@ -199,13 +203,13 @@ export function extractAndValidateUrl(
  */
 export function addAllowedDomain(domain: string): void {
   if (import.meta.env.PROD) {
-    console.error('❌ Impossible d\'ajouter des domaines en production');
+    logger.error('❌ Impossible d\'ajouter des domaines en production');
     return;
   }
   
   if (!ALLOWED_PAYMENT_DOMAINS.includes(domain)) {
     ALLOWED_PAYMENT_DOMAINS.push(domain);
-    console.log(`✅ Domaine ajouté pour tests: ${domain}`);
+    logger.info(`✅ Domaine ajouté pour tests: ${domain}`);
   }
 }
 

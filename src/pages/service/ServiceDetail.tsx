@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { sanitizeHTML } from '@/lib/html-sanitizer';
+import { safeRedirect } from '@/lib/url-validator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -389,7 +390,13 @@ export default function ServiceDetail() {
 
       // Rediriger vers Moneroo pour le paiement
       if (result.checkoutUrl) {
-        window.location.href = result.checkoutUrl;
+        safeRedirect(result.checkoutUrl, (error) => {
+          toast({
+            title: 'Erreur de redirection',
+            description: error,
+            variant: 'destructive',
+          });
+        });
       } else {
         // Si pas de paiement requis (service gratuit)
         toast({
@@ -604,7 +611,7 @@ export default function ServiceDetail() {
                       <CardContent>
                         <div
                           className="prose dark:prose-invert max-w-none"
-                          dangerouslySetInnerHTML={{ __html: sanitizeHTML(service.description, 'productDescription') }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(service.description || '') }}
                         />
                       </CardContent>
                     </Card>
