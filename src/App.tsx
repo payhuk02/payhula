@@ -130,6 +130,8 @@ const Customers = lazy(() => import("./pages/Customers"));
 const Promotions = lazy(() => import("./pages/Promotions"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Payments = lazy(() => import("./pages/Payments"));
+const Withdrawals = lazy(() => import("./pages/Withdrawals"));
+const PaymentMethods = lazy(() => import("./pages/PaymentMethods"));
 const Settings = lazy(() => import("./pages/Settings"));
 const CreateProduct = lazy(() => import("./pages/CreateProduct"));
 const EditProduct = lazy(() => import("./pages/EditProduct"));
@@ -183,6 +185,7 @@ const TransactionMonitoring = lazy(() => import("./pages/admin/TransactionMonito
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 const AdminDisputes = lazy(() => import("./pages/admin/AdminDisputes"));
 const AdminAffiliates = lazy(() => import("./pages/admin/AdminAffiliates"));
+const AdminStoreWithdrawals = lazy(() => import("./pages/admin/AdminStoreWithdrawals"));
 const AdminReviews = lazy(() => import("./pages/admin/AdminReviews").then(m => ({ default: m.AdminReviews })));
 const AdminInventory = lazy(() => import("./pages/admin/AdminInventory"));
 const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
@@ -388,6 +391,8 @@ const AppContent = () => {
           <Route path="/dashboard/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
           <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
           <Route path="/dashboard/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/dashboard/withdrawals" element={<ProtectedRoute><Withdrawals /></ProtectedRoute>} />
+          <Route path="/dashboard/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
           <Route path="/dashboard/advanced-orders" element={<ProtectedRoute><AdvancedOrderManagement /></ProtectedRoute>} />
           <Route path="/dashboard/advanced-orders-test" element={<ProtectedRoute><AdvancedOrderManagementSimple /></ProtectedRoute>} />
           <Route path="/dashboard/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
@@ -518,6 +523,7 @@ const AppContent = () => {
           <Route path="/admin/kyc" element={<ProtectedRoute><AdminKYC /></ProtectedRoute>} />
           <Route path="/admin/disputes" element={<ProtectedRoute><AdminDisputes /></ProtectedRoute>} />
           <Route path="/admin/affiliates" element={<ProtectedRoute><AdminAffiliates /></ProtectedRoute>} />
+          <Route path="/admin/store-withdrawals" element={<ProtectedRoute><AdminStoreWithdrawals /></ProtectedRoute>} />
           <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviews /></ProtectedRoute>} />
           <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
           <Route path="/admin/support" element={<ProtectedRoute><AdminSupport /></ProtectedRoute>} />

@@ -57,6 +57,7 @@ import {
   Trophy,
   AlertTriangle,
   Phone,
+  Wallet,
 } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -243,6 +244,16 @@ const menuSections = [
         title: "Commandes",
         url: "/dashboard/orders",
         icon: ShoppingCart,
+      },
+      {
+        title: "Retraits",
+        url: "/dashboard/withdrawals",
+        icon: DollarSign,
+      },
+      {
+        title: "Méthodes de paiement",
+        url: "/dashboard/payment-methods",
+        icon: CreditCard,
       },
       {
         title: "Commandes Avancées",
@@ -685,6 +696,11 @@ const adminMenuSections = [
         title: "Paiements",
         url: "/admin/payments",
         icon: CreditCard,
+      },
+      {
+        title: "Retraits Vendeurs",
+        url: "/admin/store-withdrawals",
+        icon: Wallet,
       },
       {
         title: "Taxes",
