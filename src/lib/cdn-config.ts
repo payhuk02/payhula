@@ -138,3 +138,23 @@ export function optimizeImageUrl(
   const separator = url.includes('?') ? '&' : '?';
   return `${url}${separator}${params.toString()}`;
 }
+
+/**
+ * Initialise les connexions CDN au démarrage de l'application
+ * Configure le CDN avec les paramètres d'environnement
+ */
+export function initCDNConnections(): void {
+  // La configuration est déjà initialisée avec defaultCDNConfig
+  // Cette fonction peut être étendue pour des initialisations supplémentaires
+  // comme la préconnexion aux domaines CDN, etc.
+  
+  if (cdnConfig.enabled && cdnConfig.baseUrl) {
+    // Optionnel: Préconnexion au CDN pour améliorer les performances
+    if ('dns-prefetch' in document.createElement('link')) {
+      const link = document.createElement('link');
+      link.rel = 'dns-prefetch';
+      link.href = cdnConfig.baseUrl;
+      document.head.appendChild(link);
+    }
+  }
+}
