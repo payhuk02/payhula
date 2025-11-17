@@ -266,6 +266,57 @@ export const initAPMMonitoring = (): void => {
         },
       });
     });
+
+    // Initialiser le monitoring amélioré
+    try {
+      const { 
+        startMemoryMonitoring, 
+        startErrorRateMonitoring,
+        recordMetric 
+      } = require('./monitoring-enhanced');
+      
+      // Démarrer le monitoring de la mémoire
+      startMemoryMonitoring(60000); // Toutes les minutes
+      
+      // Démarrer le monitoring du taux d'erreur
+      startErrorRateMonitoring();
+      
+      // Enregistrer les Web Vitals dans le système amélioré
+      const originalOnCLS = onCLS;
+      const originalOnLCP = onLCP;
+      const originalOnFCP = onFCP;
+      
+      onCLS((metric) => {
+        recordMetric({
+          name: 'Cumulative Layout Shift',
+          type: 'page_load',
+          value: metric.value,
+          unit: 'ratio',
+        });
+      });
+      
+      onLCP((metric) => {
+        recordMetric({
+          name: 'Largest Contentful Paint',
+          type: 'page_load',
+          value: metric.value,
+          unit: 'ms',
+        });
+      });
+      
+      onFCP((metric) => {
+        recordMetric({
+          name: 'First Contentful Paint',
+          type: 'page_load',
+          value: metric.value,
+          unit: 'ms',
+        });
+      });
+      
+      logger.info('[APM] Monitoring amélioré initialisé');
+    } catch (error) {
+      logger.warn('[APM] Impossible d\'initialiser le monitoring amélioré', error);
+    }
   }
   
   logger.info('[APM] APM monitoring initialisé avec succès', {
