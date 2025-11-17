@@ -255,6 +255,11 @@ const menuSections = [
         icon: MessageSquare,
       },
       {
+        title: "Messages Clients",
+        url: "/vendor/messaging",
+        icon: MessageSquare,
+      },
+      {
         title: "Réservations",
         url: "/dashboard/bookings",
         icon: Calendar,
