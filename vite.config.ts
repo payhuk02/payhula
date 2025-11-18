@@ -92,13 +92,13 @@ export default defineConfig(({ mode }) => {
     }),
     // Plugin pour garantir l'ordre de chargement des chunks (production uniquement)
     isProduction && ensureChunkOrderPlugin(),
-    // Visualizer seulement en dev
-    !isProduction && visualizer({
-      filename: './dist/stats.html',
-      open: false,
-      gzipSize: false,
-      brotliSize: false,
-    }),
+    // Visualizer désactivé pour accélérer le build (peut être activé manuellement si besoin)
+    // !isProduction && visualizer({
+    //   filename: './dist/stats.html',
+    //   open: false,
+    //   gzipSize: false,
+    //   brotliSize: false,
+    // }),
     
     // Sentry plugin pour source maps (seulement en production avec token)
     isProduction && hasSentryToken && sentryVitePlugin({
@@ -336,22 +336,23 @@ export default defineConfig(({ mode }) => {
       },
     },
     // Optimisations pour vitesse de build
-    target: 'es2015',
-    minify: 'esbuild', // Plus rapide que terser
+    target: 'esnext', // Utiliser esnext pour un build plus rapide (Vercel supporte esnext)
+    minify: 'esbuild', // Plus rapide que terser (2-3x plus rapide)
     // Chunk size warnings - optimisé pour code splitting
     chunkSizeWarningLimit: 500, // Avertir si un chunk dépasse 500KB (code splitting activé)
-    reportCompressedSize: true, // Activé pour voir la taille compressée
+    reportCompressedSize: !isProduction, // Désactivé en production pour accélérer le build
     sourcemap: isProduction && hasSentryToken, // Seulement si Sentry configuré
     // Optimisations supplémentaires
     cssCodeSplit: true, // Split CSS par chunk
     cssMinify: true, // Minifier le CSS
-    // Tree shaking - moins agressif pour éviter les problèmes de référence circulaire
+    // Tree shaking - optimisé pour vitesse et stabilité
     treeshake: {
       moduleSideEffects: 'no-external', // Préserver les side effects internes
       propertyReadSideEffects: false,
-      tryCatchDeoptimization: false,
-      // Préserver l'ordre d'initialisation pour éviter "Cannot access before initialization"
+      tryCatchDeoptimization: false, // Désactivé pour accélérer le build
       preserveComments: false,
+      // Optimisations agressives pour accélérer le build
+      unknownGlobalSideEffects: false, // Supposer que les globals n'ont pas de side effects
     },
     // CommonJS options pour éviter les problèmes de référence circulaire
     commonjsOptions: {
@@ -419,8 +420,8 @@ export default defineConfig(({ mode }) => {
       // Forcer la transformation CommonJS vers ESM
       mainFields: ['module', 'jsnext:main', 'jsnext'],
     },
-    // Forcer la transformation CommonJS
-    force: true, // Forcer la re-optimisation des dépendances
+    // Forcer la transformation CommonJS seulement si nécessaire
+    force: false, // Ne pas forcer la re-optimisation à chaque build (accélère le build)
   },
 };
 });
