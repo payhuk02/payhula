@@ -47,7 +47,6 @@ export const OptimizedImage = ({
   ...props
 }: OptimizedImageProps) => {
   const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Démarrer à false pour afficher l'image immédiatement
   const [imageLoaded, setImageLoaded] = useState(false);
   
   // Détecter si on est sur mobile pour optimiser le chargement
@@ -159,31 +158,15 @@ export const OptimizedImage = ({
   }, [isMobile, src, webpSrc, originalSrc, error]);
 
   const handleLoad = () => {
-    setIsLoading(false);
     setImageLoaded(true);
   };
 
   const handleError = () => {
     logger.error('[OptimizedImage] Failed to load', { src, webpSrc, originalSrc });
     setError(true);
-    setIsLoading(false);
   };
   
-  // Timeout pour forcer l'affichage si l'image prend trop de temps à charger
-  useEffect(() => {
-    if (!src || error) return;
-    
-    const timeout = setTimeout(() => {
-      if (isLoading) {
-        // Si l'image n'a pas chargé après 3 secondes, forcer l'affichage du fallback
-        logger.warn('[OptimizedImage] Loading timeout, showing fallback', { src });
-        setError(true);
-        setIsLoading(false);
-      }
-    }, 3000); // 3 secondes timeout
-    
-    return () => clearTimeout(timeout);
-  }, [src, error, isLoading]);
+  // Pas de timeout - afficher l'image directement
 
   // Déterminer si on doit utiliser WebP
   const useWebP = !error && isSupabaseStorageUrl(src) && webpSrc !== originalSrc;

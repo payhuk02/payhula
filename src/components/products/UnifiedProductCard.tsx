@@ -79,20 +79,9 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
     >
       {/* Image Section - Ratio constant 16:9 avec styles professionnels */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-muted to-muted/80">
-        {imageAttrs ? (
-          <LazyImage
-            {...imageAttrs}
-            alt={product.name}
-            className="w-full h-full object-cover product-image"
-            placeholder="none"
-            quality={90}
-            rootMargin="100px" // Charger plus tôt sur mobile
-            threshold={0.01} // Seuil plus bas pour déclencher plus tôt
-          />
-        ) : product.image_url ? (
-          // Fallback avec OptimizedImage si LazyImage n'a pas d'attributs
+        {productImage ? (
           <OptimizedImage
-            src={product.image_url}
+            src={productImage}
             alt={product.name}
             width={1000}
             height={562}
@@ -105,6 +94,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
               desktop: 1000
             }}
             quality={90}
+            priority={false}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">
