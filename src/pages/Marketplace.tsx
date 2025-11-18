@@ -1124,9 +1124,12 @@ const Marketplace = () => {
               )}
 
               <ProductGrid>
-                {displayProducts.map((product) => {
+                {displayProducts.map((product, index) => {
                   // Transformer le produit vers le format unifié
                   const unifiedProduct = transformToUnifiedProduct(product);
+                  
+                  // Prioriser le chargement des 3 premières images sur mobile
+                  const isPriority = index < 3;
                   
                   return (
                     <UnifiedProductCard

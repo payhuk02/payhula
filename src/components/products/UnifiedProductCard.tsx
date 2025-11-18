@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, ShoppingCart, Eye, Heart, Percent, MessageSquare, Store, CheckCircle } from 'lucide-react';
 import { LazyImage } from '@/components/ui/LazyImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { UnifiedProduct, UnifiedProductCardProps, DigitalProduct } from '@/types/unified-product';
 import {
   getProductKeyInfo,
@@ -84,6 +85,25 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
             alt={product.name}
             className="w-full h-full object-cover product-image"
             placeholder="skeleton"
+            quality={90}
+            rootMargin="100px" // Charger plus tôt sur mobile
+            threshold={0.01} // Seuil plus bas pour déclencher plus tôt
+          />
+        ) : product.image_url ? (
+          // Fallback avec OptimizedImage si LazyImage n'a pas d'attributs
+          <OptimizedImage
+            src={product.image_url}
+            alt={product.name}
+            width={1000}
+            height={562}
+            className="w-full h-full object-cover product-image"
+            preset="productImage"
+            responsive={true}
+            sizes={{
+              mobile: 400,
+              tablet: 800,
+              desktop: 1000
+            }}
             quality={90}
           />
         ) : (

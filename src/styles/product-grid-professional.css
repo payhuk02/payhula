@@ -304,6 +304,54 @@
     backface-visibility: hidden;
     /* Légère amélioration de contraste pour mobile */
     filter: contrast(1.08) saturate(1.12);
+    /* Forcer l'affichage de l'image */
+    display: block;
+    /* Éviter les problèmes de chargement */
+    will-change: opacity;
+  }
+  
+  /* S'assurer que l'image se charge même si lazy loading échoue */
+  .product-image-container picture {
+    min-height: 200px; /* Hauteur minimum pour éviter le collapse */
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Forcer l'affichage de l'image sur mobile */
+  .product-image-container picture img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+  
+  /* Améliorer le placeholder sur mobile */
+  .product-image-container picture img[src=""],
+  .product-image-container picture img:not([src]) {
+    opacity: 0;
+  }
+  
+  /* Skeleton placeholder amélioré pour mobile */
+  .product-image-container picture .animate-pulse {
+    background: linear-gradient(
+      90deg,
+      #e5e7eb 25%,
+      #d1d5db 50%,
+      #e5e7eb 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  .dark .product-image-container picture .animate-pulse {
+    background: linear-gradient(
+      90deg,
+      #374151 25%,
+      #4b5563 50%,
+      #374151 75%
+    );
+    background-size: 200% 100%;
   }
   
   /* Badges plus compacts sur mobile */

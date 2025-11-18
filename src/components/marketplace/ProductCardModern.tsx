@@ -268,6 +268,12 @@ const ProductCardModernComponent = ({
             priority={false}
             preset="productImage"
             responsive={true}
+            sizes={{
+              mobile: 400,
+              tablet: 800,
+              desktop: 1000
+            }}
+            quality={90}
           />
         </Link>
         

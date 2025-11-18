@@ -230,8 +230,12 @@ export const getImageAttributesForPreset = (
   const srcSet = getResponsiveSrcSet(imageUrl, preset.sizes, preset.options);
 
   // Générer l'attribut sizes basé sur les breakpoints
+  // Optimisé pour mobile : utiliser 100vw sur mobile pour meilleure qualité
   const sizesArray: string[] = [];
-  if (preset.sizes.mobile) sizesArray.push(`(max-width: 640px) ${preset.sizes.mobile}px`);
+  if (preset.sizes.mobile) {
+    // Sur mobile, utiliser 100vw pour charger l'image pleine largeur
+    sizesArray.push(`(max-width: 640px) 100vw`);
+  }
   if (preset.sizes.tablet) sizesArray.push(`(max-width: 1024px) ${preset.sizes.tablet}px`);
   if (preset.sizes.large) sizesArray.push(`(min-width: 1536px) ${preset.sizes.large}px`);
   sizesArray.push(`${preset.sizes.desktop}px`); // Fallback

@@ -8,7 +8,7 @@
  * <OptimizedImage src="/image.jpg" alt="Description" responsive sizes={{ mobile: 400, tablet: 768, desktop: 1200 }} />
  */
 
-import { useState, ImgHTMLAttributes } from 'react';
+import { useState, useEffect, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { getOptimizedImageUrl, getResponsiveSrcSet, getImageAttributesForPreset, IMAGE_PRESETS, isSupabaseStorageUrl } from '@/lib/image-transform';
 import { logger } from '@/lib/logger';
@@ -48,6 +48,18 @@ export const OptimizedImage = ({
 }: OptimizedImageProps) => {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Détecter si on est sur mobile pour optimiser le chargement
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Utiliser un preset si spécifié
   const imageAttrs = preset 
@@ -124,6 +136,15 @@ export const OptimizedImage = ({
   };
 
   const { webpSrc, originalSrc, srcSet, sizesAttr } = getOptimizedUrls();
+  
+  // Forcer le chargement immédiat sur mobile si l'image est valide
+  useEffect(() => {
+    if (isMobile && src && !error && !isLoading) {
+      // Précharger l'image sur mobile pour améliorer l'affichage
+      const img = new Image();
+      img.src = webpSrc || originalSrc || src;
+    }
+  }, [isMobile, src, webpSrc, originalSrc, error, isLoading]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -137,15 +158,18 @@ export const OptimizedImage = ({
 
   // Déterminer si on doit utiliser WebP
   const useWebP = !error && isSupabaseStorageUrl(src) && webpSrc !== originalSrc;
+  
+  // Sur mobile, charger plus agressivement (eager pour les premières images)
+  const shouldLoadEager = priority || (isMobile && !error && src);
 
   return (
-    <picture className={cn('relative', className)}>
+    <picture className={cn('relative w-full h-full', className)}>
       {/* Source WebP avec srcSet si disponible */}
       {useWebP && (
         <source 
           srcSet={srcSet || webpSrc} 
           type="image/webp"
-          sizes={sizesAttr}
+          sizes={sizesAttr || (isMobile ? '100vw' : undefined)}
         />
       )}
       
@@ -154,43 +178,68 @@ export const OptimizedImage = ({
         <source 
           srcSet={srcSet} 
           type="image/jpeg"
-          sizes={sizesAttr}
+          sizes={sizesAttr || (isMobile ? '100vw' : undefined)}
         />
       )}
       
-      {/* Image fallback */}
+      {/* Image fallback - Optimisée pour mobile */}
       <img
-        src={error ? fallback : originalSrc}
+        src={error ? fallback : (webpSrc || originalSrc || src)}
         alt={alt}
         width={width}
         height={height}
         srcSet={srcSet && !useWebP ? srcSet : undefined}
-        sizes={sizesAttr}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding={priority ? 'sync' : 'async'}
+        sizes={sizesAttr || (isMobile ? '100vw' : undefined)}
+        loading={shouldLoadEager ? 'eager' : 'lazy'}
+        decoding={shouldLoadEager ? 'sync' : 'async'}
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          'transition-opacity duration-500 ease-out',
+          'transition-opacity duration-300 ease-out',
           'image-sharp', // Classe pour netteté professionnelle
           isLoading && 'opacity-0',
           !isLoading && 'opacity-100',
+          'w-full h-full object-cover',
+          'block', // Forcer display block pour éviter les problèmes de layout
           className
         )}
         style={{
           imageRendering: 'crisp-edges',
+          minHeight: isMobile ? '200px' : undefined, // Hauteur minimum sur mobile
           ...props.style
         }}
         {...props}
       />
       
-      {/* Skeleton loading */}
+      {/* Skeleton loading amélioré pour mobile */}
       {isLoading && (
         <div
-          className="absolute inset-0 animate-pulse bg-muted rounded"
-          style={{ width, height }}
+          className={cn(
+            'absolute inset-0 animate-pulse rounded',
+            isMobile 
+              ? 'bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800'
+              : 'bg-muted'
+          )}
+          style={{ width: '100%', height: '100%' }}
           aria-hidden="true"
-        />
+        >
+          {/* Icône placeholder subtile */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+            <svg
+              className="w-12 h-12 text-gray-400 dark:text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        </div>
       )}
     </picture>
   );
