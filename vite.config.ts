@@ -226,6 +226,12 @@ export default defineConfig(({ mode }) => {
             return 'monitoring';
           }
           
+          // Moneroo payment modules - Code splitting pour optimiser le bundle
+          // Les modules Moneroo ne sont chargés que lors du checkout
+          if (id.includes('src/lib/moneroo')) {
+            return 'moneroo';
+          }
+          
           // Autres dépendances node_modules
           if (id.includes('node_modules/')) {
             return 'vendor';

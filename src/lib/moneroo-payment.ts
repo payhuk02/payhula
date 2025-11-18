@@ -5,8 +5,12 @@ import {
   parseMonerooError,
   MonerooError,
   MonerooValidationError,
+  MonerooNetworkError,
+  MonerooAPIError,
 } from "./moneroo-errors";
 import { Currency, isSupportedCurrency } from "./currency-converter";
+import { MonerooCheckoutResponse } from "./moneroo-types";
+import { validateAmount } from "./moneroo-amount-validator";
 
 export interface PaymentOptions {
   storeId: string;
@@ -64,10 +68,8 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
     ? requestedCurrency 
     : "XOF";
 
-  // Valider le montant
-  if (amount <= 0) {
-    throw new MonerooValidationError("Amount must be greater than 0");
-  }
+  // Valider le montant selon les limites Moneroo
+  validateAmount(amount, currency);
 
   // Validation des paramètres obligatoires
   if (!storeId || typeof storeId !== 'string' || storeId.trim() === '') {
@@ -203,7 +205,13 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         isColumnMissingError,
       });
       
-      throw new Error(userFriendlyMessage);
+      // Utiliser MonerooValidationError au lieu de Error générique
+      throw new MonerooValidationError(userFriendlyMessage, {
+        transactionError,
+        storeId,
+        customerId: currentUserId,
+        productId,
+      });
     }
 
     logger.log("Transaction created:", transaction.id);
@@ -308,13 +316,28 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
     // L'Edge Function retourne : { success: true, data: { message: "...", data: { id: "...", checkout_url: "..." } } }
     // Dans moneroo-client.ts, on retourne response.data, donc monerooResponse est : { message: "...", data: { id: "...", checkout_url: "..." } }
     // Il faut donc accéder à monerooResponse.data.checkout_url et monerooResponse.data.id
-    const monerooData = (monerooResponse as any).data || monerooResponse;
-    const checkoutUrl = monerooData?.checkout_url || (monerooResponse as any).checkout_url;
-    const transactionId = monerooData?.id || (monerooResponse as any).id || (monerooResponse as any).transaction_id;
+    const typedResponse = monerooResponse as MonerooCheckoutResponse;
+    const monerooData = typedResponse.data;
+    
+    if (!monerooData) {
+      logger.error("Moneroo response missing data:", monerooResponse);
+      throw new MonerooAPIError(
+        "La réponse Moneroo ne contient pas de données. Vérifiez les logs Supabase pour plus de détails.",
+        500,
+        monerooResponse
+      );
+    }
+    
+    const checkoutUrl = monerooData.checkout_url;
+    const transactionId = monerooData.id || monerooData.transaction_id;
 
     if (!checkoutUrl) {
       logger.error("Moneroo response missing checkout_url:", monerooResponse);
-      throw new Error("La réponse Moneroo ne contient pas d'URL de checkout. Vérifiez les logs Supabase pour plus de détails.");
+      throw new MonerooAPIError(
+        "La réponse Moneroo ne contient pas d'URL de checkout. Vérifiez les logs Supabase pour plus de détails.",
+        500,
+        monerooResponse
+      );
     }
 
     // 5. Mettre à jour la transaction avec les infos Moneroo
@@ -370,7 +393,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
           `1. Les logs Supabase Edge Functions → Logs → moneroo\n` +
           `2. Que MONEROO_API_KEY est configuré dans Supabase Dashboard → Edge Functions → Secrets\n` +
           `3. Que l'Edge Function 'moneroo' est déployée`;
-        throw new Error(enhancedMessage);
+        throw new MonerooAPIError(enhancedMessage, monerooError.statusCode || 500, monerooError.details);
       }
       
       // Gérer l'erreur "Failed to fetch" spécifiquement
@@ -382,11 +405,12 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
           `💡 Vérifiez:\n` +
           `1. Votre connexion Internet\n` +
           `2. Que l'Edge Function 'moneroo' est déployée dans Supabase Dashboard\n` +
-          `3. Que l'Edge Function est accessible: https://hbdnzajbyjakdhuavrvb.supabase.co/functions/v1/moneroo\n` +
+          `3. Que l'Edge Function est accessible\n` +
           `4. Les logs Supabase Edge Functions → Logs → moneroo pour plus de détails`;
-        throw new Error(enhancedMessage);
+        throw new MonerooNetworkError(enhancedMessage, monerooError.details);
       }
       
+      // Relancer l'erreur Moneroo (déjà typée)
       throw monerooError;
     }
 };

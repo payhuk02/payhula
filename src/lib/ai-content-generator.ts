@@ -5,6 +5,8 @@
  * Impact: -80% temps de création, +40% qualité SEO
  */
 
+import { logger } from './logger';
+
 export type AIProvider = 'openai' | 'claude' | 'local' | 'fallback';
 
 export interface AIGenerationOptions {
@@ -50,7 +52,7 @@ export const generateProductContent = async (
       // Tentative avec l'API IA réelle
       return await generateWithAI(productInfo, provider, options);
     } catch (error) {
-      console.warn('AI generation failed, falling back to templates:', error);
+      logger.warn('AI generation failed, falling back to templates', { error });
       // Fallback vers templates en cas d'erreur
       return generateWithTemplates(productInfo, language);
     }

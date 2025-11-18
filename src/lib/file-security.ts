@@ -10,6 +10,8 @@
  * @version 1.0.0
  */
 
+import { logger } from './logger';
+
 /**
  * Signatures magiques (magic bytes) pour validation de type réel
  * Les 4-8 premiers bytes identifient de manière fiable le type de fichier
@@ -278,7 +280,7 @@ export async function validateFileSecurity(
     };
     
   } catch (error) {
-    console.error('[File Security] Validation error:', error);
+    logger.error('[File Security] Validation error', { error });
     return {
       isValid: false,
       error: 'Erreur lors de la validation du fichier',

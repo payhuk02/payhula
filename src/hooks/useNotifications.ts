@@ -258,13 +258,16 @@ export const useRealtimeNotifications = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let isMounted = true;
+
     const setupSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
-      if (!user) return;
+      if (!user || !isMounted) return;
 
       // S'abonner aux nouvelles notifications
-      const channel = supabase
+      channel = supabase
         .channel('notifications')
         .on(
           'postgres_changes',
@@ -275,6 +278,8 @@ export const useRealtimeNotifications = () => {
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
+            if (!isMounted) return;
+            
             logger.info('New notification received', { notificationId: payload.new?.id, type: payload.new?.type });
             // Invalider le cache pour rafraîchir
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
@@ -291,16 +296,21 @@ export const useRealtimeNotifications = () => {
         )
         .subscribe();
 
-      setIsSubscribed(true);
-
-      // Cleanup
-      return () => {
-        channel.unsubscribe();
-        setIsSubscribed(false);
-      };
+      if (isMounted) {
+        setIsSubscribed(true);
+      }
     };
 
     setupSubscription();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+      setIsSubscribed(false);
+    };
   }, [queryClient]);
 
   return { isSubscribed };

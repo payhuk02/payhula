@@ -1,5 +1,6 @@
 import { onCLS, onINP, onLCP, onFCP, onTTFB, Metric } from 'web-vitals';
 import * as Sentry from '@sentry/react';
+import { logger } from './logger';
 
 /**
  * Configuration Web Vitals pour surveiller les performances
@@ -44,12 +45,12 @@ function sendToAnalytics(metric: Metric) {
 }
 
 /**
- * Logger en console (dev uniquement)
+ * Logger les métriques (dev uniquement)
  */
 function logMetric(metric: Metric) {
   if (import.meta.env.DEV) {
     const emoji = metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌';
-    console.log(`${emoji} ${metric.name}:`, {
+    logger.log(`${emoji} ${metric.name}:`, {
       value: metric.value,
       rating: metric.rating,
       delta: metric.delta,
@@ -90,7 +91,7 @@ export const initWebVitals = () => {
   // Bon: < 800ms, Needs improvement: 800-1800ms, Poor: > 1800ms
   onTTFB(handleMetric);
   
-  console.log('✅ Web Vitals tracking initialisé');
+  logger.info('✅ Web Vitals tracking initialisé');
 };
 
 /**

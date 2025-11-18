@@ -22,11 +22,12 @@ import {
   Shield,
   CheckCircle2
 } from "lucide-react";
-import { initiateMonerooPayment } from "@/lib/moneroo-payment";
+import { loadMonerooPayment, prefetchMoneroo } from "@/lib/moneroo-lazy";
 import { useToast } from "@/hooks/use-toast";
 import { safeRedirect } from "@/lib/url-validator";
 import { logger } from "@/lib/logger";
 import { formatPrice, getDisplayPrice } from "@/lib/product-helpers";
+import { SEOMeta } from "@/components/seo/SEOMeta";
 
 interface CheckoutFormData {
   firstName: string;
@@ -318,6 +319,9 @@ const Checkout = () => {
         }
       }
 
+      // Charger le module Moneroo de manière asynchrone
+      const { initiateMonerooPayment } = await loadMonerooPayment();
+      
       const result = await initiateMonerooPayment({
         storeId: store.id,
         productId: product.id,
@@ -373,11 +377,31 @@ const Checkout = () => {
       }
     } catch (error: any) {
       logger.error("Payment initiation error:", error);
+      
+      // Extraire le message d'erreur de manière plus lisible
+      let errorMessage = error.message || "Impossible d'initialiser le paiement. Veuillez réessayer.";
+      
+      // Si le message contient des sauts de ligne, prendre seulement la première ligne pour le toast
+      const firstLine = errorMessage.split('\n')[0];
+      const hasMoreDetails = errorMessage.includes('💡') || errorMessage.includes('🔧') || errorMessage.split('\n').length > 1;
+      
       toast({
         title: "Erreur de paiement",
-        description: error.message || "Impossible d'initialiser le paiement. Veuillez réessayer.",
+        description: hasMoreDetails 
+          ? `${firstLine}\n\nConsultez la console pour plus de détails.`
+          : errorMessage,
         variant: "destructive",
+        duration: hasMoreDetails ? 10000 : 5000, // Afficher plus longtemps si détails
       });
+      
+      // Logger le message complet pour debugging
+      if (hasMoreDetails) {
+        logger.error("Payment error details:", {
+          fullMessage: errorMessage,
+          error: error,
+        });
+      }
+      
       setSubmitting(false);
     }
   }, [formData, product, store, user, selectedVariant, calculatePrice, toast]);
@@ -485,6 +509,8 @@ const Checkout = () => {
                       </Label>
                       <Input
                         id="lastName"
+                        name="lastName"
+                        data-testid="checkout-lastname"
                         value={formData.lastName}
                         onChange={(e) => handleFieldChange("lastName", e.target.value)}
                         placeholder="Votre nom"
@@ -504,7 +530,9 @@ const Checkout = () => {
                     </Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
+                      data-testid="checkout-email"
                       value={formData.email}
                       onChange={(e) => handleFieldChange("email", e.target.value)}
                       placeholder="votre@email.com"
@@ -523,7 +551,9 @@ const Checkout = () => {
                     </Label>
                     <Input
                       id="phone"
+                      name="phone"
                       type="tel"
+                      data-testid="checkout-phone"
                       value={formData.phone}
                       onChange={(e) => handleFieldChange("phone", e.target.value)}
                       placeholder="+226 XX XX XX XX"

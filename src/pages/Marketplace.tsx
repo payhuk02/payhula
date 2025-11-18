@@ -304,7 +304,7 @@ const Marketplace = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.currentPage, pagination.itemsPerPage, toast, hasSearchQuery]);
+  }, [filters, pagination.currentPage, pagination.itemsPerPage, hasSearchQuery]); // ✅ Retiré toast (stable en pratique)
 
   // Abonnement temps réel
   useEffect(() => {
@@ -342,7 +342,8 @@ const Marketplace = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchProducts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, pagination.currentPage, pagination.itemsPerPage, hasSearchQuery]); // ✅ Dépendances stables au lieu de fetchProducts
 
   // Utiliser les résultats de recherche full-text si une recherche est active
   // Sinon, utiliser les produits chargés normalement

@@ -3,6 +3,8 @@
  * Fonctions avancées pour améliorer l'accessibilité WCAG 2.1 AA
  */
 
+import { logger } from './logger';
+
 /**
  * Convertit une couleur hex en RGB
  */
@@ -362,7 +364,7 @@ export function setupKeyboardShortcuts(): () => void {
   // Raccourci pour afficher le rapport d'accessibilité (Alt+A)
   shortcuts.set('Alt+a', () => {
     const report = validatePageAccessibility();
-    console.log('📊 Rapport d\'accessibilité:', report);
+    logger.info('📊 Rapport d\'accessibilité:', { report });
     
     // Annoncer le score
     const announcement = document.createElement('div');

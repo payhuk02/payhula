@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from './logger';
 
 export interface PayDunyaPaymentData {
   amount: number;
@@ -32,7 +33,7 @@ class PayDunyaClient {
     });
 
     if (error) {
-      console.error(`[PayDunyaClient] Supabase function error:`, error);
+      logger.error('[PayDunyaClient] Supabase function error', { error });
       const errorMessage = error.message || 'Erreur inconnue';
       
       // Vérifier si c'est une erreur Edge Function (non-2xx)
@@ -57,7 +58,7 @@ class PayDunyaClient {
     }
 
     if (!response?.success) {
-      console.error(`[PayDunyaClient] PayDunya API error:`, response);
+      logger.error('[PayDunyaClient] PayDunya API error', { response });
       const responseError = response as { error?: string; message?: string; details?: unknown };
       const errorMessage = responseError.message || responseError.error || "Erreur lors de la requête PayDunya.";
       throw new Error(errorMessage);

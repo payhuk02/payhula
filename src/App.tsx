@@ -123,7 +123,25 @@ const Dashboard = lazy(() =>
     };
   })
 );
-const Products = lazy(() => import("./pages/Products"));
+const Products = lazy(() => 
+  import("./pages/Products").catch((error) => {
+    logger.error('Erreur lors du chargement de Products:', error);
+    // Retourner un composant de fallback en cas d'erreur
+    return {
+      default: () => (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center space-y-4">
+            <h2 className="text-xl font-semibold">Erreur de chargement</h2>
+            <p className="text-muted-foreground">Impossible de charger la page Produits</p>
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-primary text-white rounded">
+              Recharger
+            </button>
+          </div>
+        </div>
+      )
+    };
+  })
+);
 const Store = lazy(() => import("./pages/Store"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Customers = lazy(() => import("./pages/Customers"));

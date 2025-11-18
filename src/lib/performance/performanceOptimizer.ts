@@ -6,6 +6,7 @@
  */
 
 import { useMemo, useCallback, memo } from 'react';
+import { logger } from '../logger';
 
 // =====================================================
 // DEBOUNCE & THROTTLE
@@ -132,7 +133,7 @@ export async function dynamicImport<T>(
     const module = await importFn();
     return module.default;
   } catch (error) {
-    console.error('Dynamic import failed:', error);
+    logger.error('Dynamic import failed', { error });
     throw error;
   }
 }
@@ -154,9 +155,9 @@ export function measurePerformance<T>(
   const duration = end - start;
 
   if (duration > 100) {
-    console.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
+    logger.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
   } else {
-    console.log(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
+    logger.log(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
   }
 
   return result;
@@ -175,9 +176,9 @@ export async function measureAsyncPerformance<T>(
   const duration = end - start;
 
   if (duration > 1000) {
-    console.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
+    logger.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
   } else {
-    console.log(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
+    logger.log(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
   }
 
   return result;

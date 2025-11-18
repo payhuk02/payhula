@@ -198,7 +198,7 @@ export const cancelMonerooPayment = async (
         error: monerooError.message,
         code: monerooError.code,
       },
-    }]).catch((err) => console.error("Error logging cancellation failure:", err));
+    }]).catch((err) => logger.error("Error logging cancellation failure", { error: err }));
 
     logger.error("Cancellation error:", {
       error: monerooError.message,

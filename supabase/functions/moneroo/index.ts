@@ -267,9 +267,62 @@ serve(async (req) => {
           finalMetadataStoreId: metadata.store_id,
         });
         
+        // Valider le montant avant d'envoyer à Moneroo
+        const amount = typeof data.amount === 'number' ? data.amount : parseFloat(String(data.amount));
+        const currency = data.currency || 'XOF';
+        
+        // Validation basique du montant
+        if (!amount || amount <= 0 || !isFinite(amount)) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Montant invalide',
+              message: 'Le montant doit être un nombre positif valide'
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        // Vérifier les limites de montant (selon devise)
+        const limits: Record<string, { min: number; max: number }> = {
+          XOF: { min: 100, max: 10000000 },
+          NGN: { min: 100, max: 10000000 },
+          GHS: { min: 1, max: 100000 },
+          KES: { min: 10, max: 1000000 },
+          ZAR: { min: 10, max: 1000000 },
+          UGX: { min: 1000, max: 50000000 },
+          TZS: { min: 1000, max: 50000000 },
+          RWF: { min: 100, max: 10000000 },
+          ETB: { min: 10, max: 1000000 },
+          USD: { min: 1, max: 10000 },
+          EUR: { min: 1, max: 10000 },
+          GBP: { min: 1, max: 10000 },
+        };
+        
+        const currencyLimits = limits[currency] || limits.XOF;
+        
+        if (amount < currencyLimits.min) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Montant trop faible',
+              message: `Le montant minimum est ${currencyLimits.min} ${currency}`
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        if (amount > currencyLimits.max) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Montant trop élevé',
+              message: `Le montant maximum est ${currencyLimits.max} ${currency}`
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
         body = {
-          amount: data.amount,
-          currency: data.currency || 'XOF',
+          amount: Math.round(amount), // S'assurer que c'est un entier
+          currency: currency,
           description: data.description,
           customer: {
             email: data.customer_email,
@@ -322,35 +375,152 @@ serve(async (req) => {
       body: body ? JSON.stringify(body) : null,
     });
 
-    const monerooResponse = await fetch(monerooApiUrl, {
-      method,
-      headers: {
-        'Authorization': `Bearer ${monerooApiKey}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json', // Requis selon la documentation Moneroo
-      },
-      body: body ? JSON.stringify(body) : null,
-    });
+    let monerooResponse: Response;
+    try {
+      monerooResponse = await fetch(monerooApiUrl, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${monerooApiKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json', // Requis selon la documentation Moneroo
+        },
+        body: body ? JSON.stringify(body) : null,
+      });
+    } catch (fetchError: any) {
+      console.error('[Moneroo Edge Function] Fetch error (network/connection):', {
+        error: fetchError.message,
+        errorName: fetchError.name,
+        url: monerooApiUrl,
+        method,
+      });
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Erreur de connexion Moneroo',
+          message: `Impossible de se connecter à l'API Moneroo: ${fetchError.message}`,
+          details: {
+            url: monerooApiUrl,
+            method,
+            error: fetchError.message,
+            errorName: fetchError.name,
+          },
+          troubleshooting: {
+            step1: 'Vérifiez votre connexion Internet',
+            step2: 'Vérifiez que l\'URL Moneroo est correcte',
+            step3: 'Vérifiez que MONEROO_API_KEY est valide',
+            step4: 'Vérifiez les logs Supabase Edge Functions pour plus de détails',
+          }
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
 
+    // Récupérer le Content-Type de la réponse
+    const contentType = monerooResponse.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+    
     console.log('[Moneroo Edge Function] Moneroo API response:', {
       status: monerooResponse.status,
       statusText: monerooResponse.statusText,
       ok: monerooResponse.ok,
+      contentType,
+      isJson,
     });
 
-    // Parser la réponse JSON
+    // Parser la réponse JSON avec gestion d'erreur améliorée
     let responseData;
+    let responseText = '';
+    
     try {
-      const responseText = await monerooResponse.text();
-      responseData = responseText ? JSON.parse(responseText) : {};
-    } catch (parseError) {
-      console.error('Error parsing Moneroo response:', parseError);
+      responseText = await monerooResponse.text();
+      
+      // Logger le contenu brut pour debugging (limité à 500 caractères)
+      const previewText = responseText.length > 500 
+        ? responseText.substring(0, 500) + '...' 
+        : responseText;
+      console.log('[Moneroo Edge Function] Response preview:', {
+        length: responseText.length,
+        preview: previewText,
+        startsWithJson: responseText.trim().startsWith('{') || responseText.trim().startsWith('['),
+      });
+      
+      // Si la réponse est vide, créer un objet vide
+      if (!responseText || responseText.trim() === '') {
+        console.warn('[Moneroo Edge Function] Empty response from Moneroo API');
+        responseData = {};
+      } 
+      // Si le Content-Type n'est pas JSON mais la réponse commence par { ou [, essayer de parser quand même
+      else if (!isJson && (responseText.trim().startsWith('{') || responseText.trim().startsWith('['))) {
+        console.warn('[Moneroo Edge Function] Content-Type is not JSON but response looks like JSON, attempting to parse');
+        try {
+          responseData = JSON.parse(responseText);
+        } catch (jsonError: any) {
+          console.error('[Moneroo Edge Function] Failed to parse JSON-like response:', {
+            error: jsonError.message,
+            preview: previewText,
+          });
+          throw jsonError;
+        }
+      }
+      // Si le Content-Type indique JSON, parser normalement
+      else if (isJson) {
+        responseData = JSON.parse(responseText);
+      }
+      // Si la réponse est HTML (erreur serveur), extraire le message
+      else if (contentType.includes('text/html')) {
+        console.error('[Moneroo Edge Function] Received HTML response instead of JSON (likely server error)');
+        // Essayer d'extraire un message d'erreur du HTML
+        const titleMatch = responseText.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const errorMessage = titleMatch ? titleMatch[1] : 'Erreur serveur Moneroo';
+        responseData = {
+          error: 'Server Error',
+          message: errorMessage,
+          htmlResponse: true,
+        };
+      }
+      // Autre type de contenu
+      else {
+        console.warn('[Moneroo Edge Function] Unexpected content type, treating as text');
+        responseData = {
+          error: 'Unexpected Response',
+          message: `Moneroo API returned ${contentType} instead of JSON`,
+          rawResponse: previewText,
+        };
+      }
+    } catch (parseError: any) {
+      console.error('[Moneroo Edge Function] Error parsing Moneroo response:', {
+        error: parseError.message,
+        errorName: parseError.name,
+        status: monerooResponse.status,
+        statusText: monerooResponse.statusText,
+        contentType,
+        responseLength: responseText.length,
+        responsePreview: responseText.substring(0, 200),
+        fullResponse: responseText.length < 1000 ? responseText : responseText.substring(0, 1000) + '...',
+      });
+      
+      // Retourner une erreur détaillée avec le contenu brut pour debugging
       return new Response(
         JSON.stringify({ 
           error: 'Erreur de réponse Moneroo',
           message: 'Impossible de parser la réponse de l\'API Moneroo',
-          status: monerooResponse.status,
-          statusText: monerooResponse.statusText
+          details: {
+            parseError: parseError.message,
+            status: monerooResponse.status,
+            statusText: monerooResponse.statusText,
+            contentType,
+            responseLength: responseText.length,
+            responsePreview: responseText.substring(0, 200),
+          },
+          troubleshooting: {
+            step1: 'Vérifiez les logs Supabase Edge Functions pour voir la réponse complète',
+            step2: 'Vérifiez que MONEROO_API_KEY est correctement configuré',
+            step3: 'Vérifiez que l\'endpoint Moneroo est accessible',
+            step4: 'Vérifiez que les données envoyées sont valides',
+          }
         }),
         { 
           status: monerooResponse.status || 500, 

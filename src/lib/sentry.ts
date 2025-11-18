@@ -35,14 +35,20 @@ export const initSentry = () => {
     return;
   }
 
-  // Vérifier le format du DSN Sentry
+  // Vérifier le format du DSN Sentry (validation plus permissive)
   // Format attendu: https://<key>@<host>/<project_id>
   // Exemple: https://abc123@o123456.ingest.sentry.io/1234567
-  const dsnPattern = /^https:\/\/[^@]+@[^\/]+\/[0-9]+$/;
-  if (!dsnPattern.test(SENTRY_DSN)) {
-    logger.warn('Sentry DSN format invalide. Format attendu: https://<key>@<host>/<project_id>', {
+  // Note: Le DSN peut aussi être au format https://<key>@<host>/<project_id> sans @ si c'est un format différent
+  // On laisse Sentry valider le format exact, on fait juste une vérification basique
+  const hasAtSymbol = SENTRY_DSN.includes('@');
+  const hasSlash = SENTRY_DSN.includes('/');
+  
+  if (!hasAtSymbol || !hasSlash) {
+    logger.warn('Sentry DSN format suspect. Format attendu: https://<key>@<host>/<project_id>', {
       environment: ENV,
       dsnPrefix: SENTRY_DSN.substring(0, 50) + '...',
+      hasAtSymbol,
+      hasSlash,
     });
     // Ne pas bloquer l'initialisation, Sentry validera de toute façon
   }

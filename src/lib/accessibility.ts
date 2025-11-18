@@ -3,6 +3,8 @@
  * Fonctions pour améliorer l'accessibilité WCAG 2.1 AA
  */
 
+import { logger } from './logger';
+
 /**
  * Gère le focus trap pour les modales
  */
@@ -259,7 +261,7 @@ export function initAccessibility(): void {
     // Ignorer si le module n'est pas disponible
   }
   
-  console.log('✅ Accessibilité initialisée');
+  logger.info('✅ Accessibilité initialisée');
 }
 
 

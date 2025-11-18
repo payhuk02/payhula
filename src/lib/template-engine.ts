@@ -15,6 +15,7 @@ import {
   ValidationError,
   ValidationWarning,
 } from '@/types/templates-v2';
+import { logger } from './logger';
 
 // ============================================================================
 // TEMPLATE CONTEXT
@@ -141,7 +142,7 @@ export class TemplateEngine {
         
         return String(value);
       } catch (error) {
-        console.warn(`Failed to interpolate ${match}:`, error);
+        logger.warn(`Failed to interpolate ${match}`, { match, error });
         return match; // Return original if interpolation fails
       }
     });
@@ -166,7 +167,7 @@ export class TemplateEngine {
       
       return func(...Object.values(safeContext));
     } catch (error) {
-      console.warn(`Failed to evaluate expression "${expression}":`, error);
+      logger.warn(`Failed to evaluate expression "${expression}"`, { expression, error });
       return undefined;
     }
   }
@@ -179,7 +180,7 @@ export class TemplateEngine {
       const result = this.evaluateExpression(condition);
       return Boolean(result);
     } catch (error) {
-      console.warn(`Failed to evaluate condition "${condition}":`, error);
+      logger.warn(`Failed to evaluate condition "${condition}"`, { condition, error });
       return false;
     }
   }

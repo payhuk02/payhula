@@ -6,6 +6,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from './logger';
 import { Currency } from './currency-converter';
+import { monerooStatsCache, generateStatsCacheKey } from './moneroo-cache';
 
 export interface PaymentStats {
   total: number;
@@ -65,11 +66,14 @@ export async function getPaymentStats(
   endDate?: Date,
   storeId?: string
 ): Promise<PaymentStats> {
-  try {
-    let query = supabase
-      .from('transactions')
-      .select('status')
-      .eq('payment_provider', 'moneroo');
+  const cacheKey = generateStatsCacheKey('payments', startDate, endDate, storeId);
+  
+  return monerooStatsCache.getOrSet(cacheKey, async () => {
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('status')
+        .eq('payment_provider', 'moneroo');
 
     if (storeId) {
       query = query.eq('store_id', storeId);
@@ -119,11 +123,12 @@ export async function getPaymentStats(
       stats.failureRate = (stats.failed / finalized) * 100;
     }
 
-    return stats;
-  } catch (error) {
-    logger.error('Error getting payment stats:', error);
-    throw error;
-  }
+      return stats;
+    } catch (error) {
+      logger.error('Error getting payment stats:', error);
+      throw error;
+    }
+  });
 }
 
 /**
@@ -134,12 +139,15 @@ export async function getRevenueStats(
   endDate?: Date,
   storeId?: string
 ): Promise<RevenueStats> {
-  try {
-    let query = supabase
-      .from('transactions')
-      .select('amount, currency, status')
-      .eq('payment_provider', 'moneroo')
-      .in('status', ['completed', 'refunded']);
+  const cacheKey = generateStatsCacheKey('revenue', startDate, endDate, storeId);
+  
+  return monerooStatsCache.getOrSet(cacheKey, async () => {
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('amount, currency, status')
+        .eq('payment_provider', 'moneroo')
+        .in('status', ['completed', 'refunded']);
 
     if (storeId) {
       query = query.eq('store_id', storeId);
@@ -190,18 +198,19 @@ export async function getRevenueStats(
       byCurrency[currency] = (byCurrency[currency] || 0) + amount;
     }
 
-    return {
-      total,
-      successful,
-      refunded,
-      net: successful - refunded,
-      currency: 'XOF', // Devise de base
-      byCurrency: byCurrency as Record<Currency, number>,
-    };
-  } catch (error) {
-    logger.error('Error getting revenue stats:', error);
-    throw error;
-  }
+      return {
+        total,
+        successful,
+        refunded,
+        net: successful - refunded,
+        currency: 'XOF', // Devise de base
+        byCurrency: byCurrency as Record<Currency, number>,
+      };
+    } catch (error) {
+      logger.error('Error getting revenue stats:', error);
+      throw error;
+    }
+  });
 }
 
 /**
@@ -212,13 +221,16 @@ export async function getTimeStats(
   endDate?: Date,
   storeId?: string
 ): Promise<TimeStats> {
-  try {
-    let query = supabase
-      .from('transactions')
-      .select('created_at, completed_at, failed_at')
-      .eq('payment_provider', 'moneroo')
-      .in('status', ['completed', 'failed'])
-      .not('completed_at', 'is', null);
+  const cacheKey = generateStatsCacheKey('time', startDate, endDate, storeId);
+  
+  return monerooStatsCache.getOrSet(cacheKey, async () => {
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('created_at, completed_at, failed_at')
+        .eq('payment_provider', 'moneroo')
+        .in('status', ['completed', 'failed'])
+        .not('completed_at', 'is', null);
 
     if (storeId) {
       query = query.eq('store_id', storeId);
@@ -279,16 +291,17 @@ export async function getTimeStats(
     const slowest = processingTimes[processingTimes.length - 1];
     const median = processingTimes[Math.floor(processingTimes.length / 2)];
 
-    return {
-      averageProcessingTime: Math.round(average * 100) / 100,
-      fastestPayment: Math.round(fastest * 100) / 100,
-      slowestPayment: Math.round(slowest * 100) / 100,
-      medianProcessingTime: Math.round(median * 100) / 100,
-    };
-  } catch (error) {
-    logger.error('Error getting time stats:', error);
-    throw error;
-  }
+      return {
+        averageProcessingTime: Math.round(average * 100) / 100,
+        fastestPayment: Math.round(fastest * 100) / 100,
+        slowestPayment: Math.round(slowest * 100) / 100,
+        medianProcessingTime: Math.round(median * 100) / 100,
+      };
+    } catch (error) {
+      logger.error('Error getting time stats:', error);
+      throw error;
+    }
+  });
 }
 
 /**
@@ -299,12 +312,15 @@ export async function getPaymentMethodStats(
   endDate?: Date,
   storeId?: string
 ): Promise<PaymentMethodStats[]> {
-  try {
-    let query = supabase
-      .from('transactions')
-      .select('moneroo_payment_method, status, amount')
-      .eq('payment_provider', 'moneroo')
-      .not('moneroo_payment_method', 'is', null);
+  const cacheKey = generateStatsCacheKey('methods', startDate, endDate, storeId);
+  
+  return monerooStatsCache.getOrSet(cacheKey, async () => {
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('moneroo_payment_method, status, amount')
+        .eq('payment_provider', 'moneroo')
+        .not('moneroo_payment_method', 'is', null);
 
     if (storeId) {
       query = query.eq('store_id', storeId);
@@ -354,16 +370,17 @@ export async function getPaymentMethodStats(
       }
     }
 
-    return Object.entries(methodStats).map(([method, stats]) => ({
-      method,
-      count: stats.count,
-      totalAmount: stats.totalAmount,
-      successRate: stats.count > 0 ? (stats.successful / stats.count) * 100 : 0,
-    }));
-  } catch (error) {
-    logger.error('Error getting payment method stats:', error);
-    throw error;
-  }
+      return Object.entries(methodStats).map(([method, stats]) => ({
+        method,
+        count: stats.count,
+        totalAmount: stats.totalAmount,
+        successRate: stats.count > 0 ? (stats.successful / stats.count) * 100 : 0,
+      }));
+    } catch (error) {
+      logger.error('Error getting payment method stats:', error);
+      throw error;
+    }
+  });
 }
 
 /**
@@ -374,12 +391,15 @@ export async function getStatsByDate(
   endDate?: Date,
   storeId?: string
 ): Promise<Array<{ date: string; count: number; amount: number }>> {
-  try {
-    let query = supabase
-      .from('transactions')
-      .select('created_at, amount, status')
-      .eq('payment_provider', 'moneroo')
-      .eq('status', 'completed');
+  const cacheKey = generateStatsCacheKey('byDate', startDate, endDate, storeId);
+  
+  return monerooStatsCache.getOrSet(cacheKey, async () => {
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('created_at, amount, status')
+        .eq('payment_provider', 'moneroo')
+        .eq('status', 'completed');
 
     if (storeId) {
       query = query.eq('store_id', storeId);
@@ -423,11 +443,12 @@ export async function getStatsByDate(
         count: stats.count,
         amount: stats.amount,
       }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-  } catch (error) {
-    logger.error('Error getting stats by date:', error);
-    throw error;
-  }
+        .sort((a, b) => a.date.localeCompare(b.date));
+    } catch (error) {
+      logger.error('Error getting stats by date:', error);
+      throw error;
+    }
+  });
 }
 
 /**
@@ -438,30 +459,34 @@ export async function getAllMonerooStats(
   endDate?: Date,
   storeId?: string
 ): Promise<MonerooStats> {
-  try {
-    const [payments, revenue, time, byMethod, byDate] = await Promise.all([
-      getPaymentStats(startDate, endDate, storeId),
-      getRevenueStats(startDate, endDate, storeId),
-      getTimeStats(startDate, endDate, storeId),
-      getPaymentMethodStats(startDate, endDate, storeId),
-      getStatsByDate(startDate, endDate, storeId),
-    ]);
+  const cacheKey = generateStatsCacheKey('all', startDate, endDate, storeId);
+  
+  return monerooStatsCache.getOrSet(cacheKey, async () => {
+    try {
+      const [payments, revenue, time, byMethod, byDate] = await Promise.all([
+        getPaymentStats(startDate, endDate, storeId),
+        getRevenueStats(startDate, endDate, storeId),
+        getTimeStats(startDate, endDate, storeId),
+        getPaymentMethodStats(startDate, endDate, storeId),
+        getStatsByDate(startDate, endDate, storeId),
+      ]);
 
-    return {
-      payments,
-      revenue,
-      time,
-      byMethod,
-      byDate,
-      period: {
-        startDate: startDate?.toISOString() || new Date(0).toISOString(),
-        endDate: endDate?.toISOString() || new Date().toISOString(),
-      },
-    };
-  } catch (error) {
-    logger.error('Error getting all Moneroo stats:', error);
-    throw error;
-  }
+      return {
+        payments,
+        revenue,
+        time,
+        byMethod,
+        byDate,
+        period: {
+          startDate: startDate?.toISOString() || new Date(0).toISOString(),
+          endDate: endDate?.toISOString() || new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      logger.error('Error getting all Moneroo stats:', error);
+      throw error;
+    }
+  });
 }
 
 

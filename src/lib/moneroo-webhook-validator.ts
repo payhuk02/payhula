@@ -3,6 +3,7 @@
  * Utilise HMAC-SHA256 pour vérifier l'authenticité des webhooks
  */
 
+import { logger } from './logger';
 import { MonerooWebhookSignatureError } from './moneroo-errors';
 
 /**
@@ -32,7 +33,7 @@ export async function verifyMonerooWebhookSignature(
     // Comparer les signatures de manière sécurisée (constant-time comparison)
     return constantTimeEquals(calculatedSignature, signature);
   } catch (error) {
-    console.error('Error verifying webhook signature:', error);
+    logger.error('Error verifying webhook signature', { error });
     throw new MonerooWebhookSignatureError(
       'Failed to verify webhook signature',
       { error: error instanceof Error ? error.message : 'Unknown error' }

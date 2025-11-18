@@ -2,6 +2,8 @@
  * Utilitaires pour la gestion des domaines personnalisés
  */
 
+import { logger } from './logger';
+
 /**
  * Valide un nom de domaine
  * @param domain - Le nom de domaine à valider
@@ -161,7 +163,7 @@ export const checkDNSPropagation = async (
       lastCheck: new Date()
     };
   } catch (error) {
-    console.error('Error checking DNS propagation:', error);
+    logger.error('Error checking DNS propagation', { error });
     return {
       isPropagated: false,
       details: {
