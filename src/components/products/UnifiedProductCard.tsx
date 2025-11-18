@@ -84,7 +84,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
             {...imageAttrs}
             alt={product.name}
             className="w-full h-full object-cover product-image"
-            placeholder="skeleton"
+            placeholder="none"
             quality={90}
             rootMargin="100px" // Charger plus tôt sur mobile
             threshold={0.01} // Seuil plus bas pour déclencher plus tôt

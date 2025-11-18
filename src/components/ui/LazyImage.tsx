@@ -133,7 +133,7 @@ export function LazyImage({
   ...props
 }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(priority);
+  const [isInView, setIsInView] = useState(priority || true); // Toujours charger pour rendu professionnel
   const [hasError, setHasError] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -301,9 +301,9 @@ export function LazyImage({
           width={width}
           height={height}
                 className={cn(
-                  'transition-opacity duration-500 ease-out',
+                  'transition-opacity duration-200 ease-in',
                   'image-sharp', // Netteté professionnelle
-                  isLoaded ? 'opacity-100' : 'opacity-0',
+                  'opacity-100', // Toujours visible pour rendu professionnel
                   'w-full h-full object-cover'
                 )}
                 style={{

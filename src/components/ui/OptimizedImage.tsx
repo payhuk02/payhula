@@ -47,7 +47,8 @@ export const OptimizedImage = ({
   ...props
 }: OptimizedImageProps) => {
   const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Démarrer à false pour afficher l'image immédiatement
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   // Détecter si on est sur mobile pour optimiser le chargement
   const [isMobile, setIsMobile] = useState(false);
@@ -159,6 +160,7 @@ export const OptimizedImage = ({
 
   const handleLoad = () => {
     setIsLoading(false);
+    setImageLoaded(true);
   };
 
   const handleError = () => {
@@ -222,10 +224,9 @@ export const OptimizedImage = ({
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          'transition-opacity duration-300 ease-out',
+          'transition-opacity duration-200 ease-in',
           'image-sharp', // Classe pour netteté professionnelle
-          isLoading && 'opacity-0',
-          !isLoading && 'opacity-100',
+          imageLoaded ? 'opacity-100' : 'opacity-100', // Toujours visible pour rendu professionnel
           'w-full h-full object-cover',
           'block', // Forcer display block pour éviter les problèmes de layout
           className
@@ -238,36 +239,7 @@ export const OptimizedImage = ({
         {...props}
       />
       
-      {/* Skeleton loading amélioré pour mobile */}
-      {isLoading && (
-        <div
-          className={cn(
-            'absolute inset-0 animate-pulse rounded',
-            isMobile 
-              ? 'bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800'
-              : 'bg-muted'
-          )}
-          style={{ width: '100%', height: '100%' }}
-          aria-hidden="true"
-        >
-          {/* Icône placeholder subtile */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-20">
-            <svg
-              className="w-12 h-12 text-gray-400 dark:text-gray-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-        </div>
-      )}
+      {/* Pas de skeleton - afficher l'image directement pour un rendu professionnel */}
     </picture>
   );
 };
