@@ -226,13 +226,15 @@ export const OptimizedImage = ({
           'image-sharp', // Classe pour netteté professionnelle
           isLoading && 'opacity-0',
           !isLoading && 'opacity-100',
-          'w-full h-full object-cover',
+          'w-full h-full object-cover object-center',
           'block', // Forcer display block pour éviter les problèmes de layout
           className
         )}
         style={{
           imageRendering: 'crisp-edges',
           minHeight: isMobile ? '200px' : undefined, // Hauteur minimum sur mobile
+          objectFit: 'cover',
+          objectPosition: 'center',
           ...props.style
         }}
         {...props}
