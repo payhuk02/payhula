@@ -290,8 +290,7 @@ export function LazyImage({
       className={cn('relative overflow-hidden', className)}
       style={containerStyle}
     >
-      {/* Placeholder */}
-      {renderPlaceholder()}
+      {/* Pas de placeholder - afficher l'image directement pour rendu professionnel */}
 
       {/* Image réelle */}
       {isInView && imageSrc && (
