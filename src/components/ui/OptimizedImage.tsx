@@ -147,7 +147,7 @@ export const OptimizedImage = ({
       
       // Gérer le chargement réussi
       img.onload = () => {
-        setIsLoading(false);
+        setImageLoaded(true);
       };
       
       // Gérer les erreurs de préchargement
@@ -196,7 +196,7 @@ export const OptimizedImage = ({
       
       {/* Image fallback - Optimisée pour mobile */}
       <img
-        src={error ? fallback : (webpSrc || originalSrc || src)}
+        src={error ? fallback : (webpSrc || originalSrc || src || fallback)}
         alt={alt}
         width={width}
         height={height}
