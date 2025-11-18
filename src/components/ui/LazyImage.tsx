@@ -256,7 +256,8 @@ export function LazyImage({
 
       case 'skeleton':
       default:
-        return renderPlaceholderSkeleton();
+        // Pas de placeholder - afficher l'image directement pour rendu professionnel
+        return null;
     }
   };
 
