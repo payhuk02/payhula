@@ -110,6 +110,16 @@
   filter: contrast(1.05) saturate(1.1);
 }
 
+/* Netteté optimisée pour mobile (écrans Retina) */
+@media (max-width: 639px) {
+  .image-sharp {
+    filter: contrast(1.08) saturate(1.12) brightness(1.01);
+    /* Optimisation pour écrans haute densité */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
 /* Effet zoom subtil au hover sur l'image */
 .product-card-professional:hover .product-image {
   transform: scale(1.05);
@@ -254,14 +264,80 @@
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* ============================================================
+   OPTIMISATIONS MOBILE PROFESSIONNELLES
+   ============================================================ */
+
+/* Mobile (< 640px) - Optimisations spécifiques */
+@media (max-width: 639px) {
   .product-card-professional {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem; /* 12px - plus arrondi sur mobile */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 
+                0 1px 3px rgba(0, 0, 0, 0.12);
   }
   
+  /* Désactiver hover sur mobile (pas de souris) */
   .product-card-professional:hover {
-    /* Animations supprimées */
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 
+                0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Désactiver zoom image sur mobile */
+  .product-card-professional:hover .product-image {
+    transform: none;
+    filter: none;
+  }
+  
+  /* Container image optimisé mobile */
+  .product-image-container {
+    border-radius: 0.75rem 0.75rem 0 0; /* Arrondi seulement en haut */
+  }
+  
+  /* Image optimisée pour netteté mobile */
+  .product-image {
+    /* Netteté optimale pour écrans Retina mobile */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Légère amélioration de contraste pour mobile */
+    filter: contrast(1.08) saturate(1.12);
+  }
+  
+  /* Badges plus compacts sur mobile */
+  .product-badge {
+    font-size: 0.625rem; /* 10px */
+    padding: 0.25rem 0.5rem;
+  }
+  
+  /* Boutons avec touch targets optimisés */
+  .product-action-button {
+    min-height: 44px; /* Touch target minimum Apple/Google */
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Amélioration de la lisibilité du texte sur mobile */
+  .product-card-professional h3 {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Prix plus visible sur mobile */
+  .product-card-professional .product-price {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 700;
+  }
+}
+
+/* Tablet (640px - 1024px) */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .product-card-professional {
+    margin-bottom: 1.25rem;
   }
 }
 

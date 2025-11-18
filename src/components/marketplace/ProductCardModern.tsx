@@ -274,18 +274,18 @@ const ProductCardModernComponent = ({
         {/* Overlay gradient au hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100" />
         
-        {/* Badges en haut à gauche */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
+        {/* Badges en haut à gauche - Optimisés mobile */}
+        <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 flex flex-col gap-1 sm:gap-1.5 z-10">
           {isNew() && (
-            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 text-xs px-2 py-0.5">
-              <Sparkles className="h-3 w-3 mr-1" />
+            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 shadow-sm">
+              <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
               Nouveau
             </Badge>
           )}
           
           {product.is_featured && (
-            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 text-xs px-2 py-0.5">
-              <Star className="h-3 w-3 mr-1 fill-white" />
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 shadow-sm">
+              <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1 fill-white" />
               Vedette
             </Badge>
           )}
@@ -293,25 +293,25 @@ const ProductCardModernComponent = ({
           {getLicensingBadge()}
         </div>
 
-        {/* Badge promotion en haut à droite */}
+        {/* Badge promotion en haut à droite - Optimisé mobile */}
         {hasPromo && (
-          <div className="absolute top-2 right-2 z-10">
-            <Badge className="bg-red-500 text-white border-0 text-xs font-bold px-2.5 py-1">
-              <Percent className="h-3 w-3 mr-1" />
+          <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 z-10">
+            <Badge className="bg-red-500 text-white border-0 text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 shadow-sm">
+              <Percent className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
               -{discountPercent}%
             </Badge>
           </div>
         )}
 
-        {/* Bouton favori en bas à droite */}
+        {/* Bouton favori en bas à droite - Touch target optimisé mobile */}
         <button
           onClick={handleFavorite}
-          className="absolute bottom-2 right-2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 z-10"
+          className="absolute bottom-2 right-2 p-2.5 sm:p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 z-10 touch-manipulation active:scale-90 transition-transform min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
           aria-label={isFavorite ? `Retirer ${product.name} des favoris` : `Ajouter ${product.name} aux favoris`}
           aria-pressed={isFavorite}
         >
           <Heart 
-            className={`h-4 w-4 ${
+            className={`h-5 w-5 sm:h-4 sm:w-4 ${
               isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-300'
             }`} 
             aria-hidden="true"
@@ -319,8 +319,8 @@ const ProductCardModernComponent = ({
         </button>
       </div>
 
-      {/* Contenu de la carte - 40% de la hauteur */}
-      <div className="flex-1 flex flex-col p-4">
+      {/* Contenu de la carte - 40% de la hauteur - Optimisé mobile */}
+      <div className="flex-1 flex flex-col p-3 sm:p-4">
         {/* Logo et nom de la boutique */}
         {product.stores && (
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
@@ -449,13 +449,13 @@ const ProductCardModernComponent = ({
           />
         </div>
 
-        {/* Boutons d'action */}
-        <div className="flex flex-col gap-1.5 sm:gap-2 mt-auto">
-          <div className="flex gap-1.5 sm:gap-2">
+        {/* Boutons d'action - Touch targets optimisés mobile (44px minimum) */}
+        <div className="flex flex-col gap-2 sm:gap-2 mt-auto">
+          <div className="flex gap-2 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-2 sm:px-3"
+              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
               asChild
             >
               <Link 
@@ -472,7 +472,7 @@ const ProductCardModernComponent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-2 sm:px-3"
+                className="flex-1 h-11 sm:h-8 text-xs sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
                 asChild
               >
                 <Link 
@@ -491,7 +491,7 @@ const ProductCardModernComponent = ({
               onClick={handleBuyNow}
               disabled={loading}
               size="sm"
-              className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50 px-2 sm:px-3"
+              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
               aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
             >
               {loading ? (

@@ -127,8 +127,8 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
 
       </div>
 
-      {/* Content Section - Spacing professionnel responsive */}
-      <div className="flex-1 flex flex-col p-4 sm:p-5 lg:p-6">
+      {/* Content Section - Spacing professionnel responsive - Optimisé mobile */}
+      <div className="flex-1 flex flex-col p-3 sm:p-4 lg:p-6">
         {/* Logo et nom de la boutique */}
         {product.store && (
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
@@ -231,14 +231,14 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
             />
           </div>
 
-          {/* Actions - Boutons premium */}
+          {/* Actions - Boutons premium - Touch targets optimisés mobile */}
           {showActions && (
-            <div className="flex gap-1.5 sm:gap-2 md:gap-3">
+            <div className="flex gap-2 sm:gap-2 md:gap-3">
               <Link to={productUrl} className="flex-1">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full h-7 sm:h-8 md:h-9 text-[10px] sm:text-xs transition-all duration-200 hover:bg-accent/50 px-2 sm:px-3"
+                  className="w-full h-11 sm:h-8 md:h-9 text-xs sm:text-xs transition-all duration-200 hover:bg-accent/50 px-3 sm:px-3 touch-manipulation active:scale-95"
                   onClick={() => handleAction('view')}
                 >
                   <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0" />
@@ -250,7 +250,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full h-7 sm:h-8 md:h-9 text-[10px] sm:text-xs transition-all duration-200 hover:bg-accent/50 px-2 sm:px-3"
+                    className="w-full h-11 sm:h-8 md:h-9 text-xs sm:text-xs transition-all duration-200 hover:bg-accent/50 px-3 sm:px-3 touch-manipulation active:scale-95"
                   >
                     <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0" />
                     <span className="hidden sm:inline whitespace-nowrap">Contacter</span>
@@ -260,7 +260,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
               )}
               <Button
                 size="sm"
-                className="flex-1 h-7 sm:h-8 md:h-9 text-[10px] sm:text-xs transition-all duration-200 hover:scale-[1.02] px-2 sm:px-3"
+                className="flex-1 h-11 sm:h-8 md:h-9 text-xs sm:text-xs transition-all duration-200 hover:scale-[1.02] px-3 sm:px-3 touch-manipulation active:scale-95"
                 onClick={(e) => handleAction('buy', e)}
               >
                 <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0" />
