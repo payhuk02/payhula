@@ -173,42 +173,54 @@ export default defineConfig(({ mode }) => {
             return 'radix-ui';
           }
           
-          // Composants lourds - Charts - Séparer en chunk dédié
-          if (id.includes('node_modules/recharts')) {
-            return 'charts';
-          }
+          // Composants lourds - Charts - Garder dans le chunk principal (utilise React.createContext)
+          // Note: recharts sera géré dans la liste des dépendances React plus bas
           
-          // Composants lourds - Calendrier - Séparer en chunk dédié
-          if (id.includes('node_modules/react-big-calendar')) {
-            return 'calendar';
-          }
+          // Composants lourds - Calendrier - Garder dans le chunk principal (utilise React)
+          // Note: react-big-calendar sera géré dans la liste des dépendances React plus bas
           
           // Éditeurs de texte riches - Séparer en chunk dédié
           if (id.includes('node_modules/@tiptap')) {
             return 'editor';
           }
           
-          // Framer Motion - Séparer en chunk dédié (utilisé seulement pour animations)
-          if (id.includes('node_modules/framer-motion')) {
-            return 'animations';
-          }
+          // Framer Motion - Garder dans le chunk principal (utilise React.createContext)
+          // Note: Déjà géré plus bas, mais gardé ici pour clarté
           
           // react-hook-form - Garder dans le chunk principal (utilisé partout)
           if (id.includes('node_modules/react-hook-form') || id.includes('node_modules/@hookform')) {
             return undefined;
           }
           
-          // Supabase client - Séparer en chunk dédié
+          // CRITIQUE: Toutes les dépendances qui utilisent React doivent rester dans le chunk principal
+          // pour éviter l'erreur "Cannot read properties of undefined (reading 'createContext')"
+          
+          // next-themes utilise React Context - Garder dans le chunk principal
+          if (id.includes('node_modules/next-themes')) {
+            return undefined;
+          }
+          
+          // framer-motion utilise React - Garder dans le chunk principal
+          if (id.includes('node_modules/framer-motion')) {
+            return undefined;
+          }
+          
+          // Supabase client - Séparer en chunk dédié (ne dépend pas de React)
           if (id.includes('node_modules/@supabase')) {
             return 'supabase';
           }
           
-          // Date utilities - Séparer en chunk dédié
+          // Date utilities - Séparer en chunk dédié (ne dépend pas de React)
           if (id.includes('node_modules/date-fns')) {
             return 'date-utils';
           }
           
-          // Sentry (monitoring) - Séparer en chunk dédié
+          // Sentry (monitoring) - Garder dans le chunk principal (utilise React)
+          if (id.includes('node_modules/@sentry/react')) {
+            return undefined;
+          }
+          
+          // Sentry autres packages - Séparer
           if (id.includes('node_modules/@sentry')) {
             return 'monitoring';
           }
@@ -251,10 +263,34 @@ export default defineConfig(({ mode }) => {
             if (id.includes('node_modules/lucide-react')) {
               return undefined; // Garder dans le chunk principal avec React
             }
+            
+            // CRITIQUE: Toutes les dépendances qui utilisent React doivent rester dans le chunk principal
+            // Vérifier les dépendances React communes
+            const reactDependencies = [
+              'react-helmet',
+              'react-i18next',
+              'react-day-picker',
+              'react-resizable-panels',
+              'react-big-calendar',
+              'recharts', // Utilise React Context
+              'embla-carousel-react', // Utilise React
+              'cmdk', // Utilise React
+              'vaul', // Utilise React
+              'sonner', // Utilise React
+            ];
+            
+            for (const dep of reactDependencies) {
+              if (id.includes(`node_modules/${dep}`)) {
+                return undefined; // Garder dans le chunk principal
+              }
+            }
+            
+            // Zod - Séparer (ne dépend pas de React)
             if (id.includes('node_modules/zod')) {
               return 'validation';
             }
-            // Autres vendors
+            
+            // Autres vendors - Séparer seulement si elles ne dépendent pas de React
             return 'vendor';
           }
         },
