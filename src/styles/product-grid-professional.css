@@ -293,10 +293,6 @@
   /* Container image optimisé mobile */
   .product-image-container {
     border-radius: 0.75rem 0.75rem 0 0; /* Arrondi seulement en haut */
-    /* Ratio 4:5 uniforme pour toutes les cartes */
-    aspect-ratio: 4/5;
-    overflow: hidden;
-    position: relative;
   }
   
   /* Image optimisée pour netteté mobile */
@@ -312,12 +308,6 @@
     display: block;
     /* Éviter les problèmes de chargement */
     will-change: opacity;
-    /* Object-fit et position optimisés pour éviter rognage abusif */
-    object-fit: cover;
-    object-position: center;
-    /* Assurer que l'image remplit correctement l'espace */
-    width: 100%;
-    height: 100%;
   }
   
   /* S'assurer que l'image se charge même si lazy loading échoue */

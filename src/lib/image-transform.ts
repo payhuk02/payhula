@@ -166,7 +166,7 @@ export const IMAGE_PRESETS = {
    * Optimisé pour mobile : 400px pour petits écrans, 600px pour mobiles standards
    */
   productImage: {
-    sizes: { mobile: 400, tablet: 600, desktop: 800, large: 1000 },
+    sizes: { mobile: 400, tablet: 800, desktop: 1000, large: 1400 },
     options: { quality: 90, format: 'webp' as const, resize: 'cover' as const }
   },
 

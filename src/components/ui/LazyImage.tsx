@@ -304,12 +304,10 @@ export function LazyImage({
                   'transition-opacity duration-500 ease-out',
                   'image-sharp', // Netteté professionnelle
                   isLoaded ? 'opacity-100' : 'opacity-0',
-                  'w-full h-full object-cover object-center'
+                  'w-full h-full object-cover'
                 )}
                 style={{
                   imageRendering: 'crisp-edges',
-                  objectFit: 'cover',
-                  objectPosition: 'center',
                   ...props.style
                 }}
           onLoad={handleLoad}

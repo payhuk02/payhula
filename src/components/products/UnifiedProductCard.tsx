@@ -77,34 +77,32 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
-      {/* Image Section - Ratio 4:5 uniforme pour e-commerce mobile (portrait) */}
-      <div className="relative w-full aspect-[4/5] overflow-hidden bg-gradient-to-br from-muted to-muted/80">
+      {/* Image Section - Ratio constant 16:9 avec styles professionnels */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-muted to-muted/80">
         {imageAttrs ? (
           <LazyImage
             {...imageAttrs}
             alt={product.name}
-            className="w-full h-full object-cover object-center product-image"
+            className="w-full h-full object-cover product-image"
             placeholder="skeleton"
             quality={90}
             rootMargin="100px" // Charger plus tôt sur mobile
             threshold={0.01} // Seuil plus bas pour déclencher plus tôt
-            width={800}
-            height={1000}
           />
         ) : product.image_url ? (
           // Fallback avec OptimizedImage si LazyImage n'a pas d'attributs
           <OptimizedImage
             src={product.image_url}
             alt={product.name}
-            width={800}
-            height={1000}
-            className="w-full h-full object-cover object-center product-image"
+            width={1000}
+            height={562}
+            className="w-full h-full object-cover product-image"
             preset="productImage"
             responsive={true}
             sizes={{
               mobile: 400,
-              tablet: 600,
-              desktop: 800
+              tablet: 800,
+              desktop: 1000
             }}
             quality={90}
           />
