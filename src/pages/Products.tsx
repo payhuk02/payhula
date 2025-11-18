@@ -343,22 +343,6 @@ const Products = () => {
     handleToggleStatus(productId);
   }, [handleToggleStatus]);
 
-  const handleProductDuplicate = useCallback((productId: string) => {
-    handleDuplicateProduct(productId);
-  }, [handleDuplicateProduct]);
-
-  const handleProductQuickView = useCallback((product: any) => {
-    setQuickViewProduct(product);
-  }, []);
-
-  const handleProductSelect = useCallback((productId: string, selected: boolean) => {
-    if (selected) {
-      setSelectedProducts(prev => [...prev, productId]);
-    } else {
-      setSelectedProducts(prev => prev.filter(id => id !== productId));
-    }
-  }, []);
-
   const handleDuplicateProduct = useCallback(async (productId: string) => {
     try {
       logger.info('Duplication du produit', { productId });
@@ -395,6 +379,22 @@ const Products = () => {
       });
     }
   }, [products, toast, refetch]);
+
+  const handleProductDuplicate = useCallback((productId: string) => {
+    handleDuplicateProduct(productId);
+  }, [handleDuplicateProduct]);
+
+  const handleProductQuickView = useCallback((product: any) => {
+    setQuickViewProduct(product);
+  }, []);
+
+  const handleProductSelect = useCallback((productId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedProducts(prev => [...prev, productId]);
+    } else {
+      setSelectedProducts(prev => prev.filter(id => id !== productId));
+    }
+  }, []);
 
   // Import CSV avec validation
   const handleImportConfirmed = useCallback(async (validatedProducts: any[]) => {
