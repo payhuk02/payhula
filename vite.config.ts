@@ -167,10 +167,11 @@ export default defineConfig(({ mode }) => {
             return undefined;
           }
           
-          // Radix UI - Séparer en chunk dédié pour réduire bundle initial
-          // Note: Radix UI est chargé à la demande via lazy loading des composants
+          // Radix UI - Garder dans le chunk principal (utilise React.forwardRef)
+          // CRITIQUE: Radix UI utilise React.forwardRef et doit être chargé avec React
+          // pour éviter l'erreur "Cannot read properties of undefined (reading 'forwardRef')"
           if (id.includes('node_modules/@radix-ui')) {
-            return 'radix-ui';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Composants lourds - Charts - Garder dans le chunk principal (utilise React.createContext)
