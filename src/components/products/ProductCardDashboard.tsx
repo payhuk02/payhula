@@ -124,7 +124,7 @@ const ProductCardDashboardComponent = ({
             <LazyImage
               {...imageAttrs}
               alt={product.name}
-              placeholder="skeleton"
+              placeholder="none"
               className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300 sm:duration-500 ease-out"
               style={{ willChange: 'transform' }}
               onError={() => setImageError(true)}
