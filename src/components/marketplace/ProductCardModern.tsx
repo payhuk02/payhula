@@ -252,7 +252,7 @@ const ProductCardModernComponent = ({
 
   return (
     <article 
-      className="group relative flex flex-col rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden"
+      className="group relative flex flex-col rounded-lg bg-white border border-gray-200 overflow-hidden"
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
@@ -343,7 +343,7 @@ const ProductCardModernComponent = ({
                 <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
               </div>
             )}
-            <span className="text-xs sm:text-sm font-semibold text-white truncate">
+            <span className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
               {product.stores.name}
             </span>
             <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
@@ -352,7 +352,7 @@ const ProductCardModernComponent = ({
         
         {/* Titre du produit */}
         <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`}>
-          <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 leading-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors" id={`product-title-${product.id}`}>
+          <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-2 leading-tight hover:text-blue-600 transition-colors" id={`product-title-${product.id}`}>
             {product.name}
           </h3>
         </Link>
@@ -362,10 +362,10 @@ const ProductCardModernComponent = ({
           {product.rating !== null && product.rating !== undefined && product.rating > 0 ? (
             <>
               {renderStars(product.rating)}
-              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-xs font-medium text-gray-700">
                 {product.rating.toFixed(1)}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-gray-500">
                 ({product.reviews_count || 0})
               </span>
             </>
@@ -381,7 +381,7 @@ const ProductCardModernComponent = ({
         <div className="flex flex-wrap items-center gap-2 mb-3">
           {/* Nombre d'achats */}
           {product.purchases_count !== undefined && product.purchases_count > 0 && (
-            <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-1 text-xs text-gray-600">
               <TrendingUp className="h-3 w-3" aria-hidden="true" />
               <span>{product.purchases_count} vente{product.purchases_count > 1 ? 's' : ''}</span>
             </div>
@@ -434,11 +434,11 @@ const ProductCardModernComponent = ({
         <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
           <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
             {hasPromo && (
-              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-through flex-shrink-0 whitespace-nowrap" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>
+              <span className="text-[10px] sm:text-xs text-gray-500 line-through flex-shrink-0 whitespace-nowrap" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>
                 {formatPrice(product.price)} {product.currency || 'XOF'}
               </span>
             )}
-            <span className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap" aria-label={`Prix actuel: ${formatPrice(price)} ${product.currency || 'XOF'}`}>
+            <span className="text-sm sm:text-base md:text-lg font-bold text-blue-600 whitespace-nowrap" aria-label={`Prix actuel: ${formatPrice(price)} ${product.currency || 'XOF'}`}>
               {formatPrice(price)} {product.currency || 'XOF'}
             </span>
           </div>
@@ -461,7 +461,7 @@ const ProductCardModernComponent = ({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white border-gray-300 hover:bg-gray-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
               asChild
             >
               <Link 
@@ -469,8 +469,8 @@ const ProductCardModernComponent = ({
                 aria-label={`Voir les détails de ${product.name}`}
                 className="flex items-center justify-center gap-1 sm:gap-1.5"
               >
-                <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" aria-hidden="true" />
-                <span className="whitespace-nowrap">Voir</span>
+                <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 text-white" aria-hidden="true" />
+                <span className="whitespace-nowrap text-white">Voir</span>
               </Link>
             </Button>
             
@@ -478,7 +478,7 @@ const ProductCardModernComponent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 h-11 sm:h-8 text-xs sm:text-xs border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+                className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white border-gray-300 hover:bg-gray-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
                 asChild
               >
                 <Link 
@@ -486,9 +486,9 @@ const ProductCardModernComponent = ({
                   aria-label={`Contacter le vendeur pour ${product.name}`}
                   className="flex items-center justify-center gap-1 sm:gap-1.5"
                 >
-                  <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" aria-hidden="true" />
-                  <span className="hidden sm:inline whitespace-nowrap">Contacter</span>
-                  <span className="sm:hidden">Msg</span>
+                  <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="hidden sm:inline whitespace-nowrap text-white">Contacter</span>
+                  <span className="sm:hidden text-white">Msg</span>
                 </Link>
               </Button>
             )}

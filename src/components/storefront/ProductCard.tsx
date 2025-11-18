@@ -188,7 +188,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   );
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
+    <Card className="product-card-professional group relative overflow-hidden bg-white rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
       {/* Image avec overlay et badges - Ratio 16:9 uniforme professionnel */}
       <div className="product-image-container relative overflow-hidden">
         <OptimizedImage
@@ -283,7 +283,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               <span className="text-sm font-medium text-gray-700">
                 {product.rating.toFixed(1)}
               </span>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-600">
                 ({product.reviews_count || 0})
               </span>
             </>
@@ -386,7 +386,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
                   {formatPrice(product.price)} {product.currency || 'XOF'}
                 </span>
               )}
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-lg font-bold text-blue-600">
                 {formatPrice(price)} {product.currency || 'XOF'}
               </span>
               <PriceStockAlertButton
@@ -402,7 +402,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               />
             </div>
             {(product as any).purchases_count !== undefined && (
-              <div className="flex items-center gap-1 text-sm text-gray-500">
+              <div className="flex items-center gap-1 text-sm text-gray-600">
                 <TrendingUp className="h-4 w-4" />
                 <span>{(product as any).purchases_count || 0}</span>
               </div>
@@ -415,15 +415,15 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           <Button
             variant="outline"
             size="sm"
-            className="product-action-button flex-1 h-10 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+            className="product-action-button flex-1 h-10 text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
             asChild
           >
             <Link 
               to={`/stores/${storeSlug}/products/${product.slug}`}
               className="flex items-center justify-center gap-1.5"
             >
-              <Eye className="h-4 w-4" />
-              <span className="font-medium">Voir</span>
+              <Eye className="h-4 w-4 text-white" />
+              <span className="font-medium text-white">Voir</span>
             </Link>
           </Button>
           
@@ -431,15 +431,15 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             <Button
               variant="outline"
               size="sm"
-              className="product-action-button flex-1 h-10 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+              className="product-action-button flex-1 h-10 text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
               asChild
             >
               <Link 
                 to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}
                 className="flex items-center justify-center gap-1.5"
               >
-                <MessageSquare className="h-4 w-4" />
-                <span className="font-medium hidden sm:inline">Contacter</span>
+                <MessageSquare className="h-4 w-4 text-white" />
+                <span className="font-medium hidden sm:inline text-white">Contacter</span>
               </Link>
             </Button>
           )}

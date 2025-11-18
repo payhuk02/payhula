@@ -465,7 +465,7 @@ const ProductCardProfessionalComponent = ({
             <Button
               variant="outline"
               size="sm"
-              className="product-action-button flex-1 h-10 px-3 text-sm border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="product-action-button flex-1 h-10 px-3 text-sm text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               asChild
             >
               <Link 
@@ -473,9 +473,9 @@ const ProductCardProfessionalComponent = ({
                 aria-label={`Voir les détails de ${product.name}`}
                 className="flex items-center justify-center gap-1.5 truncate"
               >
-                <Eye className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                <span className="hidden lg:inline truncate">Voir</span>
-                <span className="lg:hidden truncate">Voir</span>
+                <Eye className="h-4 w-4 flex-shrink-0 text-white" aria-hidden="true" />
+                <span className="hidden lg:inline truncate text-white">Voir</span>
+                <span className="lg:hidden truncate text-white">Voir</span>
               </Link>
             </Button>
             
