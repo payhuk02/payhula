@@ -139,22 +139,49 @@ export const OptimizedImage = ({
   
   // Forcer le chargement immédiat sur mobile si l'image est valide
   useEffect(() => {
-    if (isMobile && src && !error && !isLoading) {
+    if (isMobile && src && !error) {
       // Précharger l'image sur mobile pour améliorer l'affichage
       const img = new Image();
-      img.src = webpSrc || originalSrc || src;
+      const imageUrl = webpSrc || originalSrc || src;
+      img.src = imageUrl;
+      
+      // Gérer le chargement réussi
+      img.onload = () => {
+        setIsLoading(false);
+      };
+      
+      // Gérer les erreurs de préchargement
+      img.onerror = () => {
+        logger.warn('[OptimizedImage] Preload failed on mobile', { imageUrl });
+      };
     }
-  }, [isMobile, src, webpSrc, originalSrc, error, isLoading]);
+  }, [isMobile, src, webpSrc, originalSrc, error]);
 
   const handleLoad = () => {
     setIsLoading(false);
   };
 
   const handleError = () => {
-    logger.error('[OptimizedImage] Failed to load', { src });
+    logger.error('[OptimizedImage] Failed to load', { src, webpSrc, originalSrc });
     setError(true);
     setIsLoading(false);
   };
+  
+  // Timeout pour forcer l'affichage si l'image prend trop de temps à charger
+  useEffect(() => {
+    if (!src || error) return;
+    
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        // Si l'image n'a pas chargé après 3 secondes, forcer l'affichage du fallback
+        logger.warn('[OptimizedImage] Loading timeout, showing fallback', { src });
+        setError(true);
+        setIsLoading(false);
+      }
+    }, 3000); // 3 secondes timeout
+    
+    return () => clearTimeout(timeout);
+  }, [src, error, isLoading]);
 
   // Déterminer si on doit utiliser WebP
   const useWebP = !error && isSupabaseStorageUrl(src) && webpSrc !== originalSrc;
