@@ -245,9 +245,11 @@ export default defineConfig(({ mode }) => {
           
           // Autres dépendances node_modules - Grouper par taille
           if (id.includes('node_modules/')) {
-            // Séparer les gros vendors
+            // CRITIQUE: lucide-react doit rester dans le chunk principal avec React
+            // pour éviter l'erreur "Cannot read properties of undefined (reading 'forwardRef')"
+            // lucide-react utilise forwardRef de React et doit être chargé après React
             if (id.includes('node_modules/lucide-react')) {
-              return 'icons';
+              return undefined; // Garder dans le chunk principal avec React
             }
             if (id.includes('node_modules/zod')) {
               return 'validation';
@@ -312,7 +314,7 @@ export default defineConfig(({ mode }) => {
       'react-router-dom',
       '@tanstack/react-query',
       '@supabase/supabase-js',
-      'lucide-react',
+      'lucide-react', // CRITIQUE: Inclure lucide-react pour éviter l'erreur forwardRef
       'date-fns',
       'zod',
       'react-hook-form',
