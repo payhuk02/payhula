@@ -1,6 +1,7 @@
 /// <reference path="../deno.d.ts" />
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { validateCreateCheckout, validateRefundPayment, validatePaymentId } from "./validation.ts";
 
 // Fonction pour déterminer l'origine autorisée pour CORS
 function getCorsOrigin(req: Request): string {
@@ -112,6 +113,15 @@ serve(async (req) => {
       );
     }
 
+    // Valider que l'action est supportée
+    const supportedActions = ['create_payment', 'get_payment', 'create_checkout', 'verify_payment', 'refund_payment', 'cancel_payment'];
+    if (!supportedActions.includes(action)) {
+      return new Response(
+        JSON.stringify({ error: 'Action non supportée', message: `L'action "${action}" n'est pas supportée` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     console.log('[Moneroo Edge Function] Processing request:', { 
       action, 
       hasData: !!data,
@@ -129,13 +139,39 @@ serve(async (req) => {
         method = 'POST';
         break;
       
-      case 'get_payment':
-        endpoint = `/payments/${data.paymentId}`;
+      case 'get_payment': {
+        const validation = validatePaymentId(data);
+        if (!validation.valid) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Validation échouée',
+              message: validation.error || 'paymentId invalide'
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        endpoint = `/payments/${validation.paymentId}`;
         method = 'GET';
         body = null;
         break;
+      }
       
       case 'create_checkout': {
+        // Validation serveur stricte
+        const validation = validateCreateCheckout(data);
+        if (!validation.valid) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Validation échouée',
+              message: validation.error || 'Données invalides'
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Utiliser les données validées
+        const validatedData = validation.validated!;
+
         // Endpoint correct selon la documentation Moneroo : /payments/initialize
         // Documentation : https://docs.moneroo.io/
         endpoint = '/payments/initialize';
@@ -143,13 +179,13 @@ serve(async (req) => {
         // Formater les données selon le format attendu par Moneroo
         // Documentation Moneroo : customer doit avoir first_name et last_name séparés
         // IMPORTANT: last_name ne peut pas être vide, donc on doit gérer les cas où customer_name est vide ou ne contient qu'un mot
-        let customerName = (data.customer_name || '').trim();
+        let customerName = (validatedData.customer_name || '').trim();
         let firstName = '';
         let lastName = '';
         
         // Si customer_name est vide, utiliser l'email comme base
-        if (!customerName && data.customer_email) {
-          customerName = data.customer_email.split('@')[0] || 'Client';
+        if (!customerName && validatedData.customer_email) {
+          customerName = validatedData.customer_email.split('@')[0] || 'Client';
         }
         
         // Si customer_name est toujours vide, utiliser une valeur par défaut
@@ -192,7 +228,7 @@ serve(async (req) => {
         // L'API Moneroo exige metadata.product_id
         // IMPORTANT: L'API Moneroo n'accepte que string, boolean ou integer dans metadata
         // Il faut filtrer les valeurs null, undefined, et objets vides
-        const rawMetadata = data.metadata || {};
+        const rawMetadata = validatedData.metadata || {};
         const metadata: Record<string, string | number | boolean> = {};
         
         // Nettoyer les métadonnées : ne garder que les valeurs valides (string, number, boolean)
@@ -213,151 +249,91 @@ serve(async (req) => {
           }
         });
         
-        // Log AVANT l'ajout pour diagnostic
-        console.log('[Moneroo Edge Function] Before metadata construction:', {
-          dataKeys: Object.keys(data),
-          dataProductId: data.productId,
-          dataStoreId: data.storeId,
-          existingMetadata: { ...metadata },
-          existingMetadataKeys: Object.keys(metadata),
-        });
-        
-        // Ajouter productId à metadata si présent dans data
-        // IMPORTANT: Vérifier aussi product_id (snake_case) au cas où il serait déjà dans metadata
-        if (data.productId) {
-          metadata.product_id = String(data.productId); // S'assurer que c'est une string
-          console.log('[Moneroo Edge Function] Added product_id to metadata:', metadata.product_id);
-        } else if (data.product_id) {
-          metadata.product_id = String(data.product_id);
-          console.log('[Moneroo Edge Function] Using product_id from data:', metadata.product_id);
+        // Ajouter productId à metadata si présent dans validatedData
+        if (validatedData.productId) {
+          metadata.product_id = String(validatedData.productId);
         }
         
-        // Ajouter storeId à metadata si présent dans data
-        if (data.storeId) {
-          metadata.store_id = String(data.storeId);
-          console.log('[Moneroo Edge Function] Added store_id to metadata:', metadata.store_id);
-        } else if (data.store_id) {
-          metadata.store_id = String(data.store_id);
-          console.log('[Moneroo Edge Function] Using store_id from data:', metadata.store_id);
+        // Ajouter storeId à metadata si présent dans validatedData
+        if (validatedData.storeId) {
+          metadata.store_id = String(validatedData.storeId);
         }
         
-        // Vérification finale - S'assurer que product_id est présent
-        if (!metadata.product_id) {
-          console.error('[Moneroo Edge Function] WARNING: product_id is missing from metadata!', {
-            dataProductId: data.productId,
-            dataProduct_id: data.product_id,
-            metadataKeys: Object.keys(metadata),
-            fullData: JSON.stringify(data, null, 2),
-          });
-        }
-        
-        // Log pour diagnostic - DÉTAILLÉ pour voir exactement ce qui se passe
-        console.log('[Moneroo Edge Function] Metadata construction:', {
-          originalMetadata: data.metadata,
-          productId: data.productId,
-          storeId: data.storeId,
-          hasProductId: !!data.productId,
-          hasStoreId: !!data.storeId,
-          productIdType: typeof data.productId,
-          storeIdType: typeof data.storeId,
-          metadataBefore: { ...metadata },
-          finalMetadata: metadata,
-          finalMetadataKeys: Object.keys(metadata),
-          finalMetadataProductId: metadata.product_id,
-          finalMetadataStoreId: metadata.store_id,
-        });
-        
-        // Valider le montant avant d'envoyer à Moneroo
-        const amount = typeof data.amount === 'number' ? data.amount : parseFloat(String(data.amount));
-        const currency = data.currency || 'XOF';
-        
-        // Validation basique du montant
-        if (!amount || amount <= 0 || !isFinite(amount)) {
-          return new Response(
-            JSON.stringify({ 
-              error: 'Montant invalide',
-              message: 'Le montant doit être un nombre positif valide'
-            }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
-        // Vérifier les limites de montant (selon devise)
-        const limits: Record<string, { min: number; max: number }> = {
-          XOF: { min: 100, max: 10000000 },
-          NGN: { min: 100, max: 10000000 },
-          GHS: { min: 1, max: 100000 },
-          KES: { min: 10, max: 1000000 },
-          ZAR: { min: 10, max: 1000000 },
-          UGX: { min: 1000, max: 50000000 },
-          TZS: { min: 1000, max: 50000000 },
-          RWF: { min: 100, max: 10000000 },
-          ETB: { min: 10, max: 1000000 },
-          USD: { min: 1, max: 10000 },
-          EUR: { min: 1, max: 10000 },
-          GBP: { min: 1, max: 10000 },
-        };
-        
-        const currencyLimits = limits[currency] || limits.XOF;
-        
-        if (amount < currencyLimits.min) {
-          return new Response(
-            JSON.stringify({ 
-              error: 'Montant trop faible',
-              message: `Le montant minimum est ${currencyLimits.min} ${currency}`
-            }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
-        if (amount > currencyLimits.max) {
-          return new Response(
-            JSON.stringify({ 
-              error: 'Montant trop élevé',
-              message: `Le montant maximum est ${currencyLimits.max} ${currency}`
-            }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
+        // Utiliser les données validées (montant et devise déjà validés)
+        const amount = validatedData.amount;
+        const currency = validatedData.currency;
         
         body = {
-          amount: Math.round(amount), // S'assurer que c'est un entier
+          amount: amount, // Déjà validé et arrondi
           currency: currency,
-          description: data.description,
+          description: validatedData.description,
           customer: {
-            email: data.customer_email,
+            email: validatedData.customer_email,
             first_name: firstName,
             last_name: lastName,
           },
-          return_url: data.return_url,
+          return_url: validatedData.return_url,
           metadata: metadata,
-          // methods est optionnel, peut être ajouté si spécifié dans data
-          ...(data.methods && { methods: data.methods }),
+          // methods est optionnel
+          ...(validatedData.methods && { methods: validatedData.methods }),
         };
         break;
       }
       
-      case 'verify_payment':
-        endpoint = `/payments/${data.paymentId}/verify`;
+      case 'verify_payment': {
+        const validation = validatePaymentId(data);
+        if (!validation.valid) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Validation échouée',
+              message: validation.error || 'paymentId invalide'
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        endpoint = `/payments/${validation.paymentId}/verify`;
         method = 'GET';
         body = null;
         break;
+      }
       
-      case 'refund_payment':
-        endpoint = `/payments/${data.paymentId}/refund`;
+      case 'refund_payment': {
+        const validation = validateRefundPayment(data);
+        if (!validation.valid) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Validation échouée',
+              message: validation.error || 'Données invalides'
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        endpoint = `/payments/${validation.validated!.paymentId}/refund`;
         method = 'POST';
         // Si amount n'est pas spécifié, c'est un remboursement total
         body = {
-          ...(data.amount && { amount: data.amount }),
-          reason: data.reason || 'Customer request',
+          ...(validation.validated!.amount && { amount: validation.validated!.amount }),
+          reason: validation.validated!.reason || 'Customer request',
         };
         break;
+      }
       
-      case 'cancel_payment':
-        endpoint = `/payments/${data.paymentId}/cancel`;
+      case 'cancel_payment': {
+        const validation = validatePaymentId(data);
+        if (!validation.valid) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Validation échouée',
+              message: validation.error || 'paymentId invalide'
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        endpoint = `/payments/${validation.paymentId}/cancel`;
         method = 'POST';
         body = null;
         break;
+      }
       
       default:
         return new Response(

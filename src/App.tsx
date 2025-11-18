@@ -158,7 +158,6 @@ const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/checkout/Checkout"));
-const MultiStoreSummary = lazy(() => import("./pages/checkout/MultiStoreSummary"));
 const ShippingServices = lazy(() => import("./pages/shipping/ShippingServices"));
 const ContactShippingService = lazy(() => import("./pages/shipping/ContactShippingService"));
 const ShippingServiceMessages = lazy(() => import("./pages/shipping/ShippingServiceMessages"));
@@ -366,7 +365,6 @@ const AppContent = () => {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/multi-store-summary" element={<ProtectedRoute><MultiStoreSummary /></ProtectedRoute>} />
           
           {/* --- Routes Customer Portal --- */}
           <Route path="/account" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />

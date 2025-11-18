@@ -43,7 +43,7 @@ export const OptimizedImage = ({
   responsive = false,
   sizes,
   preset,
-  quality = 85,
+  quality = 90, // Qualité élevée pour netteté professionnelle
   ...props
 }: OptimizedImageProps) => {
   const [error, setError] = useState(false);
@@ -171,11 +171,16 @@ export const OptimizedImage = ({
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          'transition-opacity duration-300',
+          'transition-opacity duration-500 ease-out',
+          'image-sharp', // Classe pour netteté professionnelle
           isLoading && 'opacity-0',
           !isLoading && 'opacity-100',
           className
         )}
+        style={{
+          imageRendering: 'crisp-edges',
+          ...props.style
+        }}
         {...props}
       />
       

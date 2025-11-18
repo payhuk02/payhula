@@ -193,7 +193,7 @@ const Checkout = () => {
           country: currentUser.user_metadata?.country || "Burkina Faso",
           postalCode: currentUser.user_metadata?.postal_code || "",
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error("Error loading checkout data:", err);
         setError("Erreur lors du chargement des données");
       } finally {
@@ -375,11 +375,12 @@ const Checkout = () => {
       } else {
         throw new Error("URL de paiement non reçue");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Payment initiation error:", error);
       
       // Extraire le message d'erreur de manière plus lisible
-      let errorMessage = error.message || "Impossible d'initialiser le paiement. Veuillez réessayer.";
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      let errorMessage = errorObj.message || "Impossible d'initialiser le paiement. Veuillez réessayer.";
       
       // Si le message contient des sauts de ligne, prendre seulement la première ligne pour le toast
       const firstLine = errorMessage.split('\n')[0];

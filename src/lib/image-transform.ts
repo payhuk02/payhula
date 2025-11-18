@@ -162,11 +162,11 @@ export const IMAGE_PRESETS = {
   },
 
   /**
-   * Image produit (carré/vertical, qualité élevée)
+   * Image produit (ratio 16:9, qualité élevée pour netteté professionnelle)
    */
   productImage: {
-    sizes: { mobile: 400, tablet: 600, desktop: 800, large: 1200 },
-    options: { quality: 85, format: 'webp' as const, resize: 'cover' as const }
+    sizes: { mobile: 600, tablet: 800, desktop: 1000, large: 1400 },
+    options: { quality: 90, format: 'webp' as const, resize: 'cover' as const }
   },
 
   /**

@@ -149,7 +149,6 @@ export default defineConfig(({ mode }) => {
         manualChunks: (id) => {
           // CRITIQUE: React, React DOM et Scheduler dans le chunk principal (undefined)
           // Ne pas séparer React pour garantir qu'il est chargé avant tous les composants
-          // Cela évite les erreurs "forwardRef" et "unstable_scheduleCallback"
           if (
             id.includes('node_modules/react/') || 
             id.includes('node_modules/react-dom/') ||
@@ -158,82 +157,102 @@ export default defineConfig(({ mode }) => {
             return undefined; // Garder dans le chunk principal
           }
           
-          // React Router - CRITIQUE: Garder dans le chunk principal avec React
-          // React Router doit avoir accès aux internes React (_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED)
-          // qui ne sont disponibles que si React est dans le même chunk
+          // React Router - Garder dans le chunk principal avec React
           if (id.includes('node_modules/react-router')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return undefined;
           }
           
-          // TanStack Query (React Query) - CRITIQUE: Garder dans le chunk principal avec React
-          // React Query doit avoir accès aux internes React (_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED)
-          // qui ne sont disponibles que si React est dans le même chunk
+          // TanStack Query - Garder dans le chunk principal avec React
           if (id.includes('node_modules/@tanstack/react-query')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return undefined;
           }
           
-          // Supabase client
-          if (id.includes('node_modules/@supabase')) {
-            return 'supabase';
-          }
-          
-          // Radix UI components (groupe tous les composants UI)
-          // CRITIQUE: Garder dans le chunk principal avec React pour éviter les erreurs d'initialisation
-          // Radix UI doit avoir accès aux internes React (_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED)
-          // qui ne sont disponibles que si React est dans le même chunk
+          // Radix UI - Séparer en chunk dédié pour réduire bundle initial
+          // Note: Radix UI est chargé à la demande via lazy loading des composants
           if (id.includes('node_modules/@radix-ui')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return 'radix-ui';
           }
           
-          // Composants lourds - Charts - CRITIQUE: Garder dans le chunk principal avec React
-          // Recharts doit avoir accès aux internes React et peut avoir des problèmes d'initialisation
-          // si chargé avant React
+          // Composants lourds - Charts - Séparer en chunk dédié
           if (id.includes('node_modules/recharts')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return 'charts';
           }
           
-          // Composants lourds - Calendrier - CRITIQUE: Garder dans le chunk principal avec React
-          // react-big-calendar doit avoir accès aux internes React et peut avoir des problèmes d'initialisation
-          // si chargé avant React
+          // Composants lourds - Calendrier - Séparer en chunk dédié
           if (id.includes('node_modules/react-big-calendar')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return 'calendar';
           }
           
-          // Éditeurs de texte riches
+          // Éditeurs de texte riches - Séparer en chunk dédié
           if (id.includes('node_modules/@tiptap')) {
             return 'editor';
           }
           
-          // Framer Motion (animations) - CRITIQUE: Garder dans le chunk principal avec React
-          // Framer Motion doit avoir accès aux internes React pour les animations
+          // Framer Motion - Séparer en chunk dédié (utilisé seulement pour animations)
           if (id.includes('node_modules/framer-motion')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return 'animations';
           }
           
-          // react-hook-form - CRITIQUE: Garder dans le chunk principal avec React
-          // react-hook-form doit avoir accès aux internes React
+          // react-hook-form - Garder dans le chunk principal (utilisé partout)
           if (id.includes('node_modules/react-hook-form') || id.includes('node_modules/@hookform')) {
-            return undefined; // Garder dans le chunk principal avec React
+            return undefined;
           }
           
-          // Date utilities
+          // Supabase client - Séparer en chunk dédié
+          if (id.includes('node_modules/@supabase')) {
+            return 'supabase';
+          }
+          
+          // Date utilities - Séparer en chunk dédié
           if (id.includes('node_modules/date-fns')) {
             return 'date-utils';
           }
           
-          // Sentry (monitoring)
+          // Sentry (monitoring) - Séparer en chunk dédié
           if (id.includes('node_modules/@sentry')) {
             return 'monitoring';
           }
           
           // Moneroo payment modules - Code splitting pour optimiser le bundle
-          // Les modules Moneroo ne sont chargés que lors du checkout
           if (id.includes('src/lib/moneroo')) {
             return 'moneroo';
           }
           
-          // Autres dépendances node_modules
+          // Pages Admin - Séparer en chunk dédié (chargées rarement)
+          if (id.includes('src/pages/admin')) {
+            return 'admin-pages';
+          }
+          
+          // Composants Courses - Séparer en chunk dédié
+          if (id.includes('src/components/courses') || id.includes('src/pages/courses')) {
+            return 'courses';
+          }
+          
+          // Composants Digital - Séparer en chunk dédié
+          if (id.includes('src/components/digital') || id.includes('src/pages/digital')) {
+            return 'digital';
+          }
+          
+          // Composants Physical - Séparer en chunk dédié
+          if (id.includes('src/components/physical') || id.includes('src/pages/physical')) {
+            return 'physical';
+          }
+          
+          // Composants Service - Séparer en chunk dédié
+          if (id.includes('src/components/service') || id.includes('src/pages/service')) {
+            return 'service';
+          }
+          
+          // Autres dépendances node_modules - Grouper par taille
           if (id.includes('node_modules/')) {
+            // Séparer les gros vendors
+            if (id.includes('node_modules/lucide-react')) {
+              return 'icons';
+            }
+            if (id.includes('node_modules/zod')) {
+              return 'validation';
+            }
+            // Autres vendors
             return 'vendor';
           }
         },

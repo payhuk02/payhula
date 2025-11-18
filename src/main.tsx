@@ -12,6 +12,7 @@ import { installConsoleGuard } from "./lib/console-guard";
 import { initAPMMonitoring } from "./lib/apm-monitoring";
 import { initCDNConnections } from "./lib/cdn-config";
 import { initAccessibility } from "./lib/accessibility";
+import { logger } from "./lib/logger";
 import "./i18n/config"; // Initialiser i18n
 
 // Install console guard first to neutralize console.* in production
@@ -36,7 +37,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       scope: '/',
       updateViaCache: 'none' // Toujours récupérer la dernière version du SW
     }).catch((error) => {
-      console.warn('Service Worker registration failed:', error);
+      logger.warn('Service Worker registration failed', { error });
     });
   });
 }

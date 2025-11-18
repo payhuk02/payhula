@@ -43,7 +43,6 @@ export const useCustomerPurchasedProducts = () => {
       if (!user) throw new Error('Non authentifié');
 
       // Récupérer le customer_id depuis l'email
-      // Note: La table customers peut avoir plusieurs enregistrements pour le même email (multi-stores)
       // On récupère le premier enregistrement trouvé
       const { data: customers, error: customerError } = await supabase
         .from('customers')

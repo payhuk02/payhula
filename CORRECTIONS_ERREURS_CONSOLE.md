@@ -175,3 +175,4 @@ Largest Contentful Paint dépasse le seuil critical (36832ms >= 5000ms)
 **Correction principale appliquée** : ✅ Gestion d'erreur pour lazy loading de Products.tsx
 
 
+

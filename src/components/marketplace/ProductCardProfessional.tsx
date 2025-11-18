@@ -239,15 +239,17 @@ const ProductCardProfessionalComponent = ({
 
   return (
     <Card className="product-card-professional group relative overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300 hover:-translate-y-2 rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px] shadow-sm hover:shadow-lg" style={{ willChange: 'transform' }} role="article" aria-label={`Produit: ${product.name}`}>
-      {/* Image avec overlay et badges - 60% de la hauteur de la carte */}
-      <div className="product-image-container relative overflow-hidden flex-[0.6] min-h-[300px] md:min-h-[360px] lg:min-h-[420px]">
+      {/* Image avec overlay et badges - Ratio 16:9 uniforme professionnel */}
+      <div className="product-image-container relative overflow-hidden">
         <OptimizedImage
           src={product.image_url || '/placeholder-image.png'}
           alt={product.name}
-          width={1280}
-          height={720}
-          className="product-image w-full h-full object-cover rounded-t-lg"
+          width={1400}
+          height={787}
+          className="product-image w-full h-full object-cover"
           priority={false}
+          preset="productImage"
+          responsive={true}
         />
         <div className="product-image-overlay" aria-hidden="true"></div>
         

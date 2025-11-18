@@ -76,14 +76,15 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
-      {/* Image Section - Ratio constant 16:9 */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+      {/* Image Section - Ratio constant 16:9 avec styles professionnels */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-muted to-muted/80">
         {imageAttrs ? (
           <LazyImage
             {...imageAttrs}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover product-image"
             placeholder="skeleton"
+            quality={90}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">

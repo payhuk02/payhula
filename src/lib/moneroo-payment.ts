@@ -224,7 +224,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         status: "pending",
         request_data: JSON.parse(JSON.stringify(options)),
       }]);
-    } catch (logError: any) {
+    } catch (logError: unknown) {
       // Ne pas bloquer le processus si le log échoue
       logger.warn("Failed to insert transaction log (non-critical):", logError);
     }
@@ -298,12 +298,13 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         responseKeys: monerooResponse ? Object.keys(monerooResponse) : [],
         fullResponse: monerooResponse,
       });
-    } catch (checkoutError: any) {
+    } catch (checkoutError: unknown) {
+      const error = checkoutError instanceof Error ? checkoutError : new Error(String(checkoutError));
       logger.error("Error in monerooClient.createCheckout:", {
         error: checkoutError,
-        errorMessage: checkoutError?.message,
-        errorName: checkoutError?.name,
-        errorStack: checkoutError?.stack,
+        errorMessage: error.message,
+        errorName: error.name,
+        errorStack: error.stack,
         checkoutData,
       });
       // Relancer l'erreur pour qu'elle soit gérée par le catch principal
@@ -363,7 +364,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         status: "processing",
         response_data: monerooResponse,
       }]);
-    } catch (logError: any) {
+    } catch (logError: unknown) {
       // Ne pas bloquer le processus si le log échoue
       logger.warn("Failed to insert payment initiated log (non-critical):", logError);
     }

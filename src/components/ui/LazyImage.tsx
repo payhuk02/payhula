@@ -126,7 +126,7 @@ export function LazyImage({
   className,
   rootMargin = '50px',
   threshold = 0.1,
-  quality = 85,
+  quality = 90, // Qualité élevée pour netteté professionnelle
   format = 'auto',
   onLoadComplete,
   onError,
@@ -262,12 +262,12 @@ export function LazyImage({
 
   const renderPlaceholderSkeleton = () => (
     <div
-      className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse"
+      className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 animate-pulse"
       aria-hidden="true"
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <svg
-          className="w-12 h-12 text-slate-400 dark:text-slate-600"
+          className="w-12 h-12 text-slate-400 dark:text-slate-600 opacity-50"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -301,10 +301,15 @@ export function LazyImage({
           width={width}
           height={height}
           className={cn(
-            'transition-opacity duration-500',
+            'transition-opacity duration-500 ease-out',
+            'image-sharp', // Netteté professionnelle
             isLoaded ? 'opacity-100' : 'opacity-0',
             'w-full h-full object-cover'
           )}
+          style={{
+            imageRendering: 'crisp-edges',
+            ...props.style
+          }}
           onLoad={handleLoad}
           onError={handleError}
           loading={priority ? 'eager' : 'lazy'}

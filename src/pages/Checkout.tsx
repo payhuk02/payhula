@@ -33,7 +33,6 @@ import { logger } from '@/lib/logger';
 import GiftCardInput from '@/components/checkout/GiftCardInput';
 import CouponInput from '@/components/checkout/CouponInput';
 import { PaymentProviderSelector } from '@/components/checkout/PaymentProviderSelector';
-import { processMultiStoreCheckout, groupItemsByStore, type StoreGroup } from '@/lib/multi-store-checkout';
 import {
   ShoppingBag,
   MapPin,
@@ -85,10 +84,6 @@ export default function Checkout() {
   // State pour le provider de paiement sélectionné
   const [selectedPaymentProvider, setSelectedPaymentProvider] = useState<'moneroo' | 'paydunya'>('moneroo');
   
-  // State pour la gestion multi-stores
-  const [isMultiStore, setIsMultiStore] = useState(false);
-  const [storeGroups, setStoreGroups] = useState<Map<string, StoreGroup>>(new Map());
-  const [isCheckingStores, setIsCheckingStores] = useState(false);
   
   // Récupérer l'utilisateur pour pré-remplir le formulaire
   const { data: user } = useQuery({

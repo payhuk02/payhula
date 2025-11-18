@@ -145,8 +145,48 @@ export default function BookingsManagement() {
         return [];
       }
 
-      // Utiliser any pour les tables non typées dans Supabase
-      const { data, error } = await (supabase as any)
+      // Type pour la réponse Supabase avec relations
+      interface ServiceBookingWithRelations {
+        id: string;
+        product_id: string;
+        customer_id: string;
+        booking_date: string;
+        start_time: string;
+        end_time?: string;
+        status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
+        total_price: number;
+        staff_member_id?: string;
+        participants_count: number;
+        deposit_paid: number;
+        cancellation_reason?: string;
+        meeting_url?: string;
+        customer_notes?: string;
+        internal_notes?: string;
+        reminder_sent_at?: string;
+        created_at: string;
+        updated_at: string;
+        service_product?: Array<{
+          id: string;
+          product_id: string;
+          store_id: string;
+          service_type: string;
+          duration_minutes: number;
+          product?: {
+            id: string;
+            name: string;
+            price: number;
+            currency: string;
+          };
+        }>;
+        customer?: {
+          full_name: string;
+          email: string;
+          phone: string;
+        };
+      }
+
+      // Requête optimisée avec relations (évite N+1)
+      const { data, error } = await supabase
         .from('service_bookings')
         .select(`
           *,
@@ -157,17 +197,18 @@ export default function BookingsManagement() {
           customer:customers(full_name, email, phone)
         `)
         .order('booking_date', { ascending: false })
-        .order('start_time', { ascending: true });
+        .order('start_time', { ascending: true })
+        .returns<ServiceBookingWithRelations[]>();
 
       if (error) {
         logger.error('Error fetching bookings', { error: error.message });
         throw error;
       }
 
-      // Filtrer par store_id via service_products
-      const filtered = data?.filter((booking: any) => {
-        return booking.service_product?.some((sp: any) => sp.store_id === storeId);
-      }) || [];
+      // Filtrer par store_id via service_products (côté client car relation complexe)
+      const filtered = (data || []).filter((booking) => {
+        return booking.service_product?.some((sp) => sp.store_id === storeId);
+      });
 
       return filtered;
     },

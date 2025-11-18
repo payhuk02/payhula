@@ -44,9 +44,10 @@ const CheckoutSuccess = () => {
             .single();
           if (prod) setProduct(prod);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error("Verification error", { error: err });
-        setError(err.message || "Erreur lors de la vérification du paiement");
+        const errorObj = err instanceof Error ? err : new Error(String(err));
+        setError(errorObj.message || "Erreur lors de la vérification du paiement");
       } finally {
         setLoading(false);
       }

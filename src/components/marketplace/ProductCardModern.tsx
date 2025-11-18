@@ -256,15 +256,15 @@ const ProductCardModernComponent = ({
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
-      {/* Image Container - 60% de la hauteur */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-900">
-        <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`}>
+      {/* Image Container - Ratio 16:9 uniforme pour professionnalisme */}
+      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+        <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`} className="block w-full h-full">
           <OptimizedImage
             src={product.image_url || '/placeholder-image.png'}
             alt={product.name}
-            width={400}
-            height={300}
-            className="w-full h-full object-cover"
+            width={1000}
+            height={562}
+            className="w-full h-full object-cover product-image"
             priority={false}
             preset="productImage"
             responsive={true}
