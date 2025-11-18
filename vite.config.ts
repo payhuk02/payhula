@@ -234,29 +234,37 @@ export default defineConfig(({ mode }) => {
             return 'moneroo';
           }
           
-          // Pages Admin - Séparer en chunk dédié (chargées rarement)
+          // Pages Admin - Garder dans le chunk principal (utilisent React.createContext)
+          // CRITIQUE: Les pages admin utilisent React et doivent être chargées avec React
+          // pour éviter l'erreur "Cannot read properties of undefined (reading 'createContext')"
+          // Note: Ces pages sont lazy-loaded dans App.tsx, donc elles ne sont chargées qu'à la demande
+          // mais elles doivent avoir accès à React quand elles sont chargées
           if (id.includes('src/pages/admin')) {
-            return 'admin-pages';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
-          // Composants Courses - Séparer en chunk dédié
+          // Composants Courses - Garder dans le chunk principal (utilisent React)
+          // CRITIQUE: Les composants courses utilisent React et doivent être chargés avec React
           if (id.includes('src/components/courses') || id.includes('src/pages/courses')) {
-            return 'courses';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
-          // Composants Digital - Séparer en chunk dédié
+          // Composants Digital - Garder dans le chunk principal (utilisent React)
+          // CRITIQUE: Les composants digital utilisent React et doivent être chargés avec React
           if (id.includes('src/components/digital') || id.includes('src/pages/digital')) {
-            return 'digital';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
-          // Composants Physical - Séparer en chunk dédié
+          // Composants Physical - Garder dans le chunk principal (utilisent React)
+          // CRITIQUE: Les composants physical utilisent React et doivent être chargés avec React
           if (id.includes('src/components/physical') || id.includes('src/pages/physical')) {
-            return 'physical';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
-          // Composants Service - Séparer en chunk dédié
+          // Composants Service - Garder dans le chunk principal (utilisent React)
+          // CRITIQUE: Les composants service utilisent React et doivent être chargés avec React
           if (id.includes('src/components/service') || id.includes('src/pages/service')) {
-            return 'service';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Autres dépendances node_modules - Grouper par taille
