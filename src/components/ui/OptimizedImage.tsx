@@ -47,7 +47,7 @@ export const OptimizedImage = ({
   ...props
 }: OptimizedImageProps) => {
   const [error, setError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(true); // Initialiser à true pour éviter tout flash gris
   
   // Détecter si on est sur mobile pour optimiser le chargement
   const [isMobile, setIsMobile] = useState(false);
@@ -145,9 +145,9 @@ export const OptimizedImage = ({
       const imageUrl = webpSrc || originalSrc || src;
       img.src = imageUrl;
       
-      // Gérer le chargement réussi
+      // Gérer le chargement réussi - ne pas changer imageLoaded car déjà à true
       img.onload = () => {
-        setImageLoaded(true);
+        // Image préchargée avec succès
       };
       
       // Gérer les erreurs de préchargement
@@ -175,7 +175,7 @@ export const OptimizedImage = ({
   const shouldLoadEager = priority || (isMobile && !error && src);
 
   return (
-    <picture className={cn('relative w-full h-full', className)}>
+    <picture className={cn('relative w-full h-full bg-transparent', className)}>
       {/* Source WebP avec srcSet si disponible */}
       {useWebP && (
         <source 
@@ -207,9 +207,8 @@ export const OptimizedImage = ({
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          'transition-opacity duration-200 ease-in',
           'image-sharp', // Classe pour netteté professionnelle
-          imageLoaded ? 'opacity-100' : 'opacity-100', // Toujours visible pour rendu professionnel
+          'opacity-100', // Toujours visible - pas de transition pour éviter flash gris
           'w-full h-full object-cover',
           'block', // Forcer display block pour éviter les problèmes de layout
           className

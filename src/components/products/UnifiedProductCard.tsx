@@ -73,7 +73,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
       aria-labelledby={`product-title-${product.id}`}
     >
       {/* Image Section - Ratio constant 16:9 avec styles professionnels */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-muted to-muted/80">
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-transparent">
         {productImage ? (
           <OptimizedImage
             src={productImage}
@@ -92,8 +92,8 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
             priority={false}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
-            <ShoppingCart className="h-16 w-16 text-muted-foreground opacity-20" />
+          <div className="w-full h-full flex items-center justify-center bg-transparent">
+            <ShoppingCart className="h-16 w-16 text-gray-400 opacity-20" />
           </div>
         )}
 
