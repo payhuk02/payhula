@@ -318,15 +318,7 @@ export function LazyImage({
         />
       )}
 
-      {/* Overlay de chargement (optionnel) */}
-      {isInView && !isLoaded && !hasError && placeholder !== 'none' && (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-black/5 dark:bg-white/5"
-          aria-hidden="true"
-        >
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600 dark:border-slate-600 dark:border-t-slate-300" />
-        </div>
-      )}
+      {/* Pas d'overlay de chargement - afficher l'image directement */}
     </div>
   );
 }
