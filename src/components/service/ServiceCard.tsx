@@ -108,7 +108,7 @@ const ServiceCardComponent = ({
           <LazyImage
             {...imageAttrs}
             alt={service.product.name}
-            placeholder="skeleton"
+            placeholder="none"
             className="w-full h-full object-cover"
             format="webp"
             quality={85}

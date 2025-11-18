@@ -89,7 +89,7 @@ const PhysicalProductCardComponent = ({
           <LazyImage
             {...imageAttrs}
             alt={product.product.name}
-            placeholder="skeleton"
+            placeholder="none"
             className="w-full h-full object-cover"
             format="webp"
             quality={85}
