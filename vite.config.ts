@@ -179,9 +179,10 @@ export default defineConfig(({ mode }) => {
           // Composants lourds - Calendrier - Garder dans le chunk principal (utilise React)
           // Note: react-big-calendar sera géré dans la liste des dépendances React plus bas
           
-          // Éditeurs de texte riches - Séparer en chunk dédié
+          // Éditeurs de texte riches - Garder dans le chunk principal (utilise React.useLayoutEffect)
+          // TipTap utilise React hooks et doit être chargé avec React
           if (id.includes('node_modules/@tiptap')) {
-            return 'editor';
+            return undefined; // Garder dans le chunk principal avec React
           }
           
           // Framer Motion - Garder dans le chunk principal (utilise React.createContext)
@@ -265,7 +266,7 @@ export default defineConfig(({ mode }) => {
             }
             
             // CRITIQUE: Toutes les dépendances qui utilisent React doivent rester dans le chunk principal
-            // Vérifier les dépendances React communes
+            // Vérifier les dépendances React communes (utilisent useLayoutEffect, createContext, etc.)
             const reactDependencies = [
               'react-helmet',
               'react-i18next',
@@ -277,6 +278,9 @@ export default defineConfig(({ mode }) => {
               'cmdk', // Utilise React
               'vaul', // Utilise React
               'sonner', // Utilise React
+              '@tiptap/react', // Utilise React.useLayoutEffect
+              '@tiptap/starter-kit', // Dépend de @tiptap/react
+              '@tiptap/extension', // Extensions TipTap
             ];
             
             for (const dep of reactDependencies) {
