@@ -210,7 +210,9 @@ export function useCreateReturn() {
             refund_amount: data.refund_amount || 0,
             created_at: data.created_at,
           }
-        ).catch(console.error);
+        ).catch((error) => {
+          logger.error('Error in useReturns mutation', { error });
+        });
       });
 
       return data as ProductReturn;

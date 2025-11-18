@@ -37,6 +37,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 export default function VendorMessaging() {
   const { storeId, productId } = useParams<{ storeId?: string; productId?: string }>();
@@ -196,7 +197,7 @@ export default function VendorMessaging() {
         fileInputRef.current.value = '';
       }
     } catch (error: any) {
-      console.error('Send message error:', error);
+      logger.error('Send vendor message error', { error, storeId, productId });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible d\'envoyer le message',

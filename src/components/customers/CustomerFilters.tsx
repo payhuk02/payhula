@@ -10,6 +10,8 @@ interface CustomerFiltersProps {
   onSearchChange: (value: string) => void;
   sortBy: string;
   onSortChange: (value: string) => void;
+  sortOrder?: 'asc' | 'desc';
+  onSortOrderChange?: (value: 'asc' | 'desc') => void;
 }
 
 const CustomerFiltersComponent = ({
@@ -17,6 +19,8 @@ const CustomerFiltersComponent = ({
   onSearchChange,
   sortBy,
   onSortChange,
+  sortOrder = 'asc',
+  onSortOrderChange,
 }: CustomerFiltersProps) => {
   const filtersRef = useScrollAnimation<HTMLDivElement>();
 
@@ -54,11 +58,24 @@ const CustomerFiltersComponent = ({
           <SelectValue placeholder="Trier par" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="name">Nom (A-Z)</SelectItem>
-          <SelectItem value="orders">Nombre de commandes</SelectItem>
-          <SelectItem value="spent">Total dépensé</SelectItem>
+          <SelectItem value="name">Nom</SelectItem>
+          <SelectItem value="created_at">Date de création</SelectItem>
+          <SelectItem value="total_orders">Nombre de commandes</SelectItem>
+          <SelectItem value="total_spent">Total dépensé</SelectItem>
         </SelectContent>
       </Select>
+      
+      {onSortOrderChange && (
+        <Select value={sortOrder} onValueChange={onSortOrderChange}>
+          <SelectTrigger className="w-full sm:w-[150px] h-9 sm:h-10 text-xs sm:text-sm">
+            <SelectValue placeholder="Ordre" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="asc">Croissant</SelectItem>
+            <SelectItem value="desc">Décroissant</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 };
@@ -70,8 +87,10 @@ export const CustomerFilters = React.memo(CustomerFiltersComponent, (prevProps, 
   return (
     prevProps.searchQuery === nextProps.searchQuery &&
     prevProps.sortBy === nextProps.sortBy &&
+    prevProps.sortOrder === nextProps.sortOrder &&
     prevProps.onSearchChange === nextProps.onSearchChange &&
-    prevProps.onSortChange === nextProps.onSortChange
+    prevProps.onSortChange === nextProps.onSortChange &&
+    prevProps.onSortOrderChange === nextProps.onSortOrderChange
   );
 });
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface Pixel {
   id: string;
@@ -54,7 +55,7 @@ export const usePixels = () => {
       if (error) throw error;
       setPixels((data || []) as Pixel[]);
     } catch (error: any) {
-      console.error('Error fetching pixels:', error);
+      logger.error('Error fetching pixels', { error, userId: user.id });
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les Pixels',
@@ -92,7 +93,7 @@ export const usePixels = () => {
       await fetchPixels();
       return true;
     } catch (error: any) {
-      console.error('Error creating pixel:', error);
+      logger.error('Error creating pixel', { error, pixelData });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de créer le Pixel',
@@ -122,7 +123,7 @@ export const usePixels = () => {
       await fetchPixels();
       return true;
     } catch (error: any) {
-      console.error('Error updating pixel:', error);
+      logger.error('Error updating pixel', { error, pixelId, updates });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de mettre à jour le Pixel',
@@ -152,7 +153,7 @@ export const usePixels = () => {
       await fetchPixels();
       return true;
     } catch (error: any) {
-      console.error('Error deleting pixel:', error);
+      logger.error('Error deleting pixel', { error, pixelId });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de supprimer le Pixel',
@@ -194,7 +195,7 @@ export const usePixels = () => {
       if (error) throw error;
       return true;
     } catch (error: any) {
-      console.error('Error tracking event:', error);
+      logger.error('Error tracking pixel event', { error, pixelId, eventType });
       return false;
     }
   };

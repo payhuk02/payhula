@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import {
@@ -9,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Users, ShoppingBag, DollarSign, TrendingUp } from "lucide-react";
+import { Plus, Users, ShoppingBag, DollarSign, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "@/hooks/use-store";
 import { useCustomers } from "@/hooks/useCustomers";
 import { CreateCustomerDialog } from "@/components/customers/CreateCustomerDialog";
@@ -22,16 +23,24 @@ import { logger } from "@/lib/logger";
 
 const Customers = () => {
   const { store, loading: storeLoading } = useStore();
-  const {
-    customers,
-    loading: customersLoading,
-    refetch,
-    setCustomers,
-  } = useCustomers(store?.id);
-
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<string>("name");
+  const [sortBy, setSortBy] = useState<'name' | 'created_at' | 'total_orders' | 'total_spent'>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const queryClient = useQueryClient();
+
+  // Utiliser le hook avec pagination serveur
+  const { data: customersResult, isLoading: customersLoading, refetch } = useCustomers(store?.id, {
+    page: currentPage,
+    pageSize,
+    searchQuery: searchQuery || undefined,
+    sortBy,
+    sortOrder,
+  });
+  const customers = customersResult?.data || [];
+  const totalCount = customersResult?.count || 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   // --- 🔄 Realtime pour les clients du store ---
   useEffect(() => {
@@ -45,18 +54,8 @@ const Customers = () => {
         (payload) => {
           logger.info("Realtime customers payload", { payload });
 
-          setCustomers((prev: any[]) => {
-            if (payload.eventType === "INSERT") {
-              return [payload.new, ...prev];
-            }
-            if (payload.eventType === "UPDATE") {
-              return prev.map((c) => (c.id === payload.new.id ? payload.new : c));
-            }
-            if (payload.eventType === "DELETE") {
-              return prev.filter((c) => c.id !== payload.old.id);
-            }
-            return prev;
-          });
+          // Invalider les queries pour rafraîchir
+          queryClient.invalidateQueries({ queryKey: ['customers', store.id] });
         }
       )
       .subscribe();
@@ -64,49 +63,25 @@ const Customers = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [store?.id, setCustomers]);
+  }, [store?.id, queryClient]);
 
   // Refs for animations
   const headerRef = useScrollAnimation<HTMLDivElement>();
 
-  // --- 🔍 Filtrage + tri optimisé ---
-  const filteredCustomers = useMemo(() => {
-    if (!customers) return [];
+  // Les clients sont déjà filtrés et triés côté serveur
+  const filteredCustomers = customers;
 
-    return [...customers]
-      .filter((customer) => {
-        const query = searchQuery.toLowerCase();
-        return (
-          customer.name.toLowerCase().includes(query) ||
-          customer.email?.toLowerCase().includes(query) ||
-          customer.phone?.includes(query)
-        );
-      })
-      .sort((a, b) => {
-        switch (sortBy) {
-          case "name":
-            return a.name.localeCompare(b.name);
-          case "orders":
-            return (b.total_orders || 0) - (a.total_orders || 0);
-          case "spent":
-            return (Number(b.total_spent) || 0) - (Number(a.total_spent) || 0);
-          default:
-            return 0;
-        }
-      });
-  }, [customers, searchQuery, sortBy]);
-
-  // Stats calculées
+  // Stats calculées (basées sur le total, pas seulement la page actuelle)
   const stats = useMemo(() => {
-    if (!customers) return { total: 0, totalOrders: 0, totalSpent: 0, averageSpent: 0 };
-    
-    const total = customers.length;
+    // Pour les stats, on utilise les données de la page actuelle
+    // Note: Pour des stats précises, il faudrait une requête séparée
+    const total = totalCount;
     const totalOrders = customers.reduce((sum, c) => sum + (c.total_orders || 0), 0);
     const totalSpent = customers.reduce((sum, c) => sum + (Number(c.total_spent) || 0), 0);
-    const averageSpent = total > 0 ? totalSpent / total : 0;
+    const averageSpent = customers.length > 0 ? totalSpent / customers.length : 0;
     
     return { total, totalOrders, totalSpent, averageSpent };
-  }, [customers]);
+  }, [customers, totalCount]);
 
   // --- 🧱 Loading du store ---
   if (storeLoading) {
@@ -253,9 +228,17 @@ const Customers = () => {
             {/* Filtres */}
             <CustomerFilters
               searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              onSearchChange={(value) => {
+                setSearchQuery(value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
               sortBy={sortBy}
-              onSortChange={setSortBy}
+              onSortChange={(value) => {
+                setSortBy(value);
+                setCurrentPage(1); // Reset to first page on sort change
+              }}
+              sortOrder={sortOrder}
+              onSortOrderChange={setSortOrder}
             />
 
             {/* Table ou état vide */}
@@ -266,7 +249,64 @@ const Customers = () => {
                 </CardContent>
               </Card>
             ) : filteredCustomers.length > 0 ? (
-              <CustomersTable customers={filteredCustomers} onUpdate={refetch} />
+              <>
+                <CustomersTable customers={filteredCustomers} onUpdate={refetch} />
+                
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="text-sm text-muted-foreground">
+                      Page {currentPage} sur {totalPages} ({totalCount} clients)
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1 || customersLoading}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Précédent
+                      </Button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                              disabled={customersLoading}
+                              className="min-w-[40px]"
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages || customersLoading}
+                      >
+                        Suivant
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                 <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16 text-center">

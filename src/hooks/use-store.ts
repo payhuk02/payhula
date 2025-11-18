@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 export interface Store {
   id: string;
@@ -39,7 +40,7 @@ export const useStore = () => {
         .limit(1);
 
       if (error) {
-        console.error('Error fetching store:', error);
+        logger.error('Error fetching store', { error, userId: user.id });
         setStore(null);
         return;
       }

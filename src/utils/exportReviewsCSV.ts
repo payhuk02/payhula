@@ -4,6 +4,7 @@
  */
 
 import type { Review } from '@/types/review';
+import { logger } from '@/lib/logger';
 
 export interface ExportReviewsOptions {
   filename?: string;
@@ -172,9 +173,9 @@ export async function exportReviewsToCSV(
     // Download
     downloadCSV(csvContent, filename);
     
-    console.log(`✅ Exported ${reviews.length} reviews to ${filename}`);
+    logger.info('Reviews exported to CSV', { count: reviews.length, filename });
   } catch (error) {
-    console.error('❌ Error exporting reviews:', error);
+    logger.error('Error exporting reviews to CSV', { error, filename });
     throw error;
   }
 }

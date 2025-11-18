@@ -48,6 +48,7 @@ import { useAdvancedPayments } from '@/hooks/useAdvancedPayments';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 import { fr } from 'date-fns/locale';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { useQueryClient } from '@tanstack/react-query';
@@ -99,7 +100,7 @@ export default function PaymentManagement() {
       setShowReleaseDialog(false);
       setSelectedPayment(null);
     } catch (error: any) {
-      console.error('Release payment error:', error);
+      logger.error('Release payment error', { error, paymentId: payment.id });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de relâcher le paiement',
@@ -130,7 +131,7 @@ export default function PaymentManagement() {
       setShowConfirmDialog(false);
       setSelectedPayment(null);
     } catch (error: any) {
-      console.error('Confirm delivery error:', error);
+      logger.error('Confirm delivery error', { error, paymentId: payment.id });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de confirmer la livraison',

@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { logger } from "@/lib/logger";
 
 const AdvancedDashboard = () => {
   const { store, loading: storeLoading } = useStore();
@@ -98,12 +99,12 @@ const AdvancedDashboard = () => {
 
   const handleExport = () => {
     // Logique d'export des données
-    console.log('Exporting dashboard data...');
+    logger.info('Exporting dashboard data');
   };
 
   const handleFilter = () => {
     // Logique de filtrage
-    console.log('Opening filter options...');
+    logger.debug('Opening filter options');
   };
 
   const handleSettings = () => {
@@ -131,15 +132,15 @@ const AdvancedDashboard = () => {
   };
 
   const handleMarkNotificationAsRead = (id: string) => {
-    console.log('Marking notification as read:', id);
+    logger.debug('Marking notification as read', { notificationId: id });
   };
 
   const handleViewAllNotifications = () => {
-    console.log('Viewing all notifications');
+    logger.debug('Viewing all notifications');
   };
 
   const handleViewAllActivity = () => {
-    console.log('Viewing all activity');
+    logger.debug('Viewing all activity');
   };
 
   if (storeLoading || loading) {

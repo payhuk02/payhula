@@ -10,6 +10,7 @@ import {
   TemplateV2,
   TemplateExportV2,
 } from '@/types/templates-v2';
+import { logger } from './logger';
 
 // ============================================================================
 // EXPORT OPTIONS
@@ -375,7 +376,7 @@ export function downloadTemplate(template: TemplateV2, options?: TemplateExportO
   const result = exporter.exportAsFile(template);
   
   if (!result.success || !(result.data instanceof Blob)) {
-    console.error('Export failed:', result.error);
+    logger.error('Template export failed', { error: result.error });
     return;
   }
   
@@ -405,7 +406,7 @@ export async function copyTemplateToClipboard(
   const result = exporter.exportToJSON(template);
   
   if (!result.success || typeof result.data !== 'string') {
-    console.error('Export failed:', result.error);
+    logger.error('Template export failed', { error: result.error });
     return false;
   }
   
@@ -413,7 +414,7 @@ export async function copyTemplateToClipboard(
     await navigator.clipboard.writeText(result.data);
     return true;
   } catch (error) {
-    console.error('Clipboard copy failed:', error);
+    logger.error('Template clipboard copy failed', { error });
     return false;
   }
 }
@@ -426,7 +427,7 @@ export async function shareTemplate(
   options?: TemplateExportOptions
 ): Promise<boolean> {
   if (!navigator.share) {
-    console.warn('Web Share API not supported');
+    logger.warn('Web Share API not supported');
     return false;
   }
   
@@ -434,7 +435,7 @@ export async function shareTemplate(
   const result = exporter.exportAsFile(template);
   
   if (!result.success || !(result.data instanceof Blob)) {
-    console.error('Export failed:', result.error);
+    logger.error('Template export failed', { error: result.error });
     return false;
   }
   
@@ -451,7 +452,7 @@ export async function shareTemplate(
     
     return true;
   } catch (error) {
-    console.error('Share failed:', error);
+    logger.error('Template share failed', { error });
     return false;
   }
 }

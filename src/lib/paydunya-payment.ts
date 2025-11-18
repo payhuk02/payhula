@@ -131,7 +131,7 @@ export const initiatePayDunyaPayment = async (options: PaymentOptions) => {
         userFriendlyMessage += `\n\n📋 Détails: ${errorDetails}`;
       }
       
-      console.error("❌ Transaction error details:", {
+      logger.error("Transaction error details", {
         error: transactionError,
         code: transactionError.code,
         message: transactionError.message,
@@ -281,7 +281,7 @@ export const verifyPayDunyaTransactionStatus = async (transactionId: string) => 
 
         return { ...transaction, ...updates };
       } catch (verifyError) {
-        console.error("Error verifying with PayDunya:", verifyError);
+        logger.error("Error verifying with PayDunya", { error: verifyError, transactionId });
         // Retourner la transaction actuelle si la vérification échoue
         return transaction;
       }
@@ -290,7 +290,7 @@ export const verifyPayDunyaTransactionStatus = async (transactionId: string) => 
     return transaction;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-    console.error("Transaction verification error:", errorMessage);
+    logger.error("Transaction verification error", { error: errorMessage, transactionId });
     throw new Error(errorMessage);
   }
 };

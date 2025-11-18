@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import type { Course } from "@/types/courses";
 import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
 import { supabase } from "@/integrations/supabase/client";
+import { LazyImage } from "@/components/ui/LazyImage";
+import { getImageAttributesForPreset } from "@/lib/image-transform";
 
 interface CourseCardProps {
   course: Course;
@@ -53,14 +55,30 @@ const CourseCardComponent = ({ course }: CourseCardProps) => {
       {/* Image du cours */}
       <div className="relative aspect-video overflow-hidden bg-muted">
         {product?.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            width={1280}
-            height={720}
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-            style={{ willChange: 'transform' }}
-          />
+          (() => {
+            const imageAttrs = getImageAttributesForPreset(product.image_url, 'productImage');
+            return imageAttrs ? (
+              <LazyImage
+                {...imageAttrs}
+                alt={product.name}
+                placeholder="skeleton"
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                style={{ willChange: 'transform' }}
+                format="webp"
+                quality={85}
+              />
+            ) : (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                width={1280}
+                height={720}
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                style={{ willChange: 'transform' }}
+                loading="lazy"
+              />
+            );
+          })()
         ) : (
           <div className="flex items-center justify-center h-full bg-gradient-to-br from-orange-400/20 to-orange-600/20">
             <GraduationCap className="w-16 h-16 text-orange-400" />

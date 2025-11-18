@@ -67,6 +67,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDistanceToNow, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 export default function OrderMessaging() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -237,7 +238,7 @@ export default function OrderMessaging() {
         fileInputRef.current.value = '';
       }
     } catch (error: any) {
-      console.error('Send message error:', error);
+      logger.error('Send order message error', { error, orderId, conversationId });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible d\'envoyer le message',

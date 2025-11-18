@@ -57,6 +57,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useDisputes } from '@/hooks/useDisputes';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -194,7 +195,7 @@ export default function DisputeDetail() {
         fileInputRef.current.value = '';
       }
     } catch (error: any) {
-      console.error('Send message error:', error);
+      logger.error('Send dispute message error', { error, disputeId });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible d\'envoyer le message',
@@ -232,7 +233,7 @@ export default function DisputeDetail() {
       setResolution('');
       setAdminNotes('');
     } catch (error: any) {
-      console.error('Resolve dispute error:', error);
+      logger.error('Resolve dispute error', { error, disputeId });
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de résoudre le litige',

@@ -4,6 +4,8 @@
  * Date : 27 octobre 2025
  */
 
+import { logger } from '../logger';
+
 // Déclarer les types pour window
 declare global {
   interface Window {
@@ -22,7 +24,7 @@ export const initGoogleAnalytics = (measurementId: string) => {
 
   // Vérifier si déjà initialisé
   if (document.getElementById(`ga-${measurementId}`)) {
-    console.log('Google Analytics already initialized');
+    logger.debug('Google Analytics already initialized', { measurementId });
     return;
   }
 
@@ -45,7 +47,7 @@ export const initGoogleAnalytics = (measurementId: string) => {
     page_path: window.location.pathname,
   });
 
-  console.log(`✅ Google Analytics initialized: ${measurementId}`);
+  logger.info('Google Analytics initialized', { measurementId });
 };
 
 /**
@@ -56,7 +58,7 @@ export const initFacebookPixel = (pixelId: string) => {
 
   // Vérifier si déjà initialisé
   if (window.fbq) {
-    console.log('Facebook Pixel already initialized');
+    logger.debug('Facebook Pixel already initialized', { pixelId });
     return;
   }
 
@@ -88,7 +90,7 @@ export const initFacebookPixel = (pixelId: string) => {
   window.fbq!('init', pixelId);
   window.fbq!('track', 'PageView');
 
-  console.log(`✅ Facebook Pixel initialized: ${pixelId}`);
+  logger.info('Facebook Pixel initialized', { pixelId });
 };
 
 /**
@@ -99,7 +101,7 @@ export const initGoogleTagManager = (containerId: string) => {
 
   // Vérifier si déjà initialisé
   if (document.getElementById(`gtm-${containerId}`)) {
-    console.log('Google Tag Manager already initialized');
+    logger.debug('Google Tag Manager already initialized', { containerId });
     return;
   }
 
@@ -116,7 +118,7 @@ export const initGoogleTagManager = (containerId: string) => {
     f.parentNode.insertBefore(j, f);
   })(window, document, 'script', 'dataLayer', containerId);
 
-  console.log(`✅ Google Tag Manager initialized: ${containerId}`);
+  logger.info('Google Tag Manager initialized', { containerId });
 };
 
 /**
@@ -127,7 +129,7 @@ export const initTikTokPixel = (pixelId: string) => {
 
   // Vérifier si déjà initialisé
   if (window.ttq) {
-    console.log('TikTok Pixel already initialized');
+    logger.debug('TikTok Pixel already initialized', { pixelId });
     return;
   }
 
@@ -183,7 +185,7 @@ export const initTikTokPixel = (pixelId: string) => {
     ttq.page();
   })(window, document, 'ttq');
 
-  console.log(`✅ TikTok Pixel initialized: ${pixelId}`);
+  logger.info('TikTok Pixel initialized', { pixelId });
 };
 
 /**
@@ -198,19 +200,19 @@ export const trackEvent = (
   // Google Analytics
   if (window.gtag) {
     window.gtag('event', eventName, eventData);
-    console.log(`📊 GA Event: ${eventName}`, eventData);
+    logger.debug('Google Analytics event', { eventName, eventData });
   }
 
   // Facebook Pixel
   if (window.fbq) {
     window.fbq('track', eventName, eventData);
-    console.log(`📘 FB Event: ${eventName}`, eventData);
+    logger.debug('Facebook Pixel event', { eventName, eventData });
   }
 
   // TikTok Pixel
   if (window.ttq) {
     window.ttq.track(eventName, eventData);
-    console.log(`🎵 TikTok Event: ${eventName}`, eventData);
+    logger.debug('TikTok Pixel event', { eventName, eventData });
   }
 };
 

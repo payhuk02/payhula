@@ -192,7 +192,7 @@ export const initiateMonerooPayment = async (options: PaymentOptions) => {
         userFriendlyMessage += `\n\n📋 Détails: ${errorDetails}`;
       }
       
-      console.error("❌ Transaction error details:", {
+      logger.error("Transaction error details", {
         error: transactionError,
         code: transactionError.code,
         message: transactionError.message,

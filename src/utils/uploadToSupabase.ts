@@ -13,6 +13,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { validateFileSecurity, SAFE_MIME_TYPES } from '@/lib/file-security';
+import { logger } from '@/lib/logger';
 
 /**
  * Options de configuration pour l'upload
@@ -144,7 +145,7 @@ export async function uploadToSupabaseStorage(
     
     // Avertissements de sécurité (logs mais n'arrête pas l'upload)
     if (securityValidation.warnings && securityValidation.warnings.length > 0) {
-      console.warn('[File Security] Warnings:', securityValidation.warnings);
+      logger.warn('File security warnings', { warnings: securityValidation.warnings, fileName: file.name });
     }
 
     // 2. Validation de la taille
@@ -199,7 +200,7 @@ export async function uploadToSupabaseStorage(
     };
 
   } catch (error) {
-    console.error('Upload error:', error);
+    logger.error('File upload error', { error, bucket, path: options.path, fileName: file.name });
     
     return {
       url: null,
@@ -265,7 +266,7 @@ export async function deleteFromSupabaseStorage(
     return { error: null, success: true };
     
   } catch (error) {
-    console.error('Delete error:', error);
+    logger.error('File delete error', { error, bucket, filePath });
     return {
       error: error instanceof Error ? error : new Error('Erreur lors de la suppression'),
       success: false,

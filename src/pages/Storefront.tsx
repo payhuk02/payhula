@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useProducts } from "@/hooks/useProducts";
+import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { useProductReviews } from "@/hooks/useReviews";
 import StoreHeader from "@/components/storefront/StoreHeader";
 import StoreTabs from "@/components/storefront/StoreTabs";
@@ -36,7 +36,11 @@ const Storefront = () => {
 
   // Utiliser un ID stable pour éviter les violations des règles des hooks
   const storeId = store?.id || null;
-  const { products, loading: productsLoading } = useProducts(storeId);
+  // Utiliser useProductsOptimized avec pagination pour meilleures performances
+  const { products, isLoading: productsLoading } = useProductsOptimized(storeId, {
+    page: 1,
+    itemsPerPage: 100, // Limite raisonnable pour storefront public
+  });
   // Store-wide reviews not implemented yet; keep placeholders to avoid runtime errors
   const reviews: any[] = [];
   const reviewsLoading = false;

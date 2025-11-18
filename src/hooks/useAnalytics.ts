@@ -5,6 +5,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type AnalyticsEventType =
   | 'page_view'
@@ -149,11 +150,11 @@ export const useAnalytics = (storeId?: string) => {
         .insert(eventPayload);
       
       if (error) {
-        console.error('Error tracking event:', error);
+        logger.error('Error tracking analytics event', { error, storeId, eventType, eventData });
       }
     } catch (error) {
       // Ne pas bloquer l'application si le tracking échoue
-      console.error('Error in trackEvent:', error);
+      logger.error('Error in trackEvent', { error, storeId, eventType });
     }
   }, []);
 

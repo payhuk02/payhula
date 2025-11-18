@@ -20,7 +20,7 @@ import { ShoppingCart, Star, ArrowLeft, CheckCircle2, Package, HelpCircle, Clipb
 import ProductCard from "@/components/marketplace/ProductCard";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import StoreFooter from "@/components/storefront/StoreFooter";
-import { useProducts } from "@/hooks/useProducts";
+import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { sanitizeProductDescription } from "@/lib/html-sanitizer";
 import { ProductImageGallery } from "@/components/ui/ProductImageGallery";
 import { CountdownTimer } from "@/components/ui/countdown-timer";
@@ -49,7 +49,12 @@ const ProductDetails = () => {
 
   // ID stable pour éviter les violations des règles des hooks
   const storeId = store?.id || null;
-  const { products: similarProducts } = useProducts(storeId);
+  // Utiliser useProductsOptimized avec limite pour produits similaires
+  const { products: similarProductsData } = useProductsOptimized(storeId, {
+    page: 1,
+    itemsPerPage: 20, // Limite raisonnable pour produits similaires
+  });
+  const similarProducts = similarProductsData || [];
 
   const fetchData = useCallback(async () => {
     if (!slug || !productSlug) {

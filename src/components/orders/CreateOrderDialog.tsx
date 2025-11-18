@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCustomers } from "@/hooks/useCustomers";
-import { useProducts } from "@/hooks/useProducts";
+import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
@@ -29,8 +29,10 @@ interface OrderItem {
 
 const CreateOrderDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: CreateOrderDialogProps) => {
   const { toast } = useToast();
-  const { customers } = useCustomers(storeId);
-  const { products } = useProducts(storeId);
+  // Utiliser avec limite pour sélection dans dialog
+  const { data: customersResult } = useCustomers(storeId, { page: 1, pageSize: 100 });
+  const customers = customersResult?.data || [];
+  const { products } = useProductsOptimized(storeId, { page: 1, itemsPerPage: 100 });
   const [loading, setLoading] = useState(false);
   const [customerId, setCustomerId] = useState<string>("");
   const [items, setItems] = useState<OrderItem[]>([]);

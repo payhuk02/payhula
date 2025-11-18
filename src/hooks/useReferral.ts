@@ -263,42 +263,66 @@ export const useReferral = () => {
       }
 
       // Récupérer les statistiques des commandes pour chaque filleul
-      // Utiliser customers table pour trouver les commandes
+      // OPTIMISATION: Utiliser une seule requête au lieu de N requêtes (N+1)
       const ordersStatsMap = new Map<string, { orders: number; spent: number }>();
 
       if (referredIds.length > 0) {
         try {
-          // Récupérer les customers correspondants via user_id si possible
-          // Note: customers.user_id peut exister ou on peut utiliser email
-          for (const userId of referredIds) {
-            const email = emailsMap.get(userId);
-            if (email) {
-              const { data: customerData } = await supabase
-                .from('customers')
-                .select('id')
-                .eq('email', email)
-                .limit(1)
-                .single()
-                .catch(() => ({ data: null }));
+          // Récupérer tous les customers correspondants en une seule requête
+          const emails = Array.from(emailsMap.values());
+          if (emails.length > 0) {
+            const { data: customersData } = await supabase
+              .from('customers')
+              .select('id, email')
+              .in('email', emails)
+              .catch(() => ({ data: [] }));
 
-              if (customerData?.id) {
-                const { data: ordersData } = await supabase
+            if (customersData && customersData.length > 0) {
+              // Créer un map email -> customer_id
+              const emailToCustomerMap = new Map<string, string>();
+              customersData.forEach((c: { id: string; email: string }) => {
+                emailToCustomerMap.set(c.email, c.id);
+              });
+
+              // Récupérer toutes les commandes en une seule requête
+              const customerIds = Array.from(emailToCustomerMap.values());
+              if (customerIds.length > 0) {
+                const { data: allOrdersData } = await supabase
                   .from('orders')
-                  .select('id, total_amount, status')
-                  .eq('customer_id', customerData.id)
+                  .select('id, customer_id, total_amount, status')
+                  .in('customer_id', customerIds)
                   .catch(() => ({ data: [] }));
 
-                if (ordersData && ordersData.length > 0) {
-                  const completedOrders = ordersData.filter((o: { status: string }) => 
-                    o.status === 'completed' || o.status === 'delivered'
-                  );
-                  const totalSpent = completedOrders.reduce(
-                    (sum: number, o: { total_amount?: number | null }) => sum + Number(o.total_amount || 0), 
-                    0
-                  );
-                  ordersStatsMap.set(userId, {
-                    orders: completedOrders.length,
-                    spent: totalSpent,
+                if (allOrdersData && allOrdersData.length > 0) {
+                  // Grouper les commandes par customer_id
+                  const ordersByCustomer = new Map<string, typeof allOrdersData>();
+                  allOrdersData.forEach((order: { customer_id: string; total_amount?: number | null; status: string }) => {
+                    if (!ordersByCustomer.has(order.customer_id)) {
+                      ordersByCustomer.set(order.customer_id, []);
+                    }
+                    ordersByCustomer.get(order.customer_id)!.push(order);
+                  });
+
+                  // Calculer les stats pour chaque userId
+                  referredIds.forEach((userId: string) => {
+                    const email = emailsMap.get(userId);
+                    if (email) {
+                      const customerId = emailToCustomerMap.get(email);
+                      if (customerId) {
+                        const customerOrders = ordersByCustomer.get(customerId) || [];
+                        const completedOrders = customerOrders.filter((o: { status: string }) => 
+                          o.status === 'completed' || o.status === 'delivered'
+                        );
+                        const totalSpent = completedOrders.reduce(
+                          (sum: number, o: { total_amount?: number | null }) => sum + Number(o.total_amount || 0), 
+                          0
+                        );
+                        ordersStatsMap.set(userId, {
+                          orders: completedOrders.length,
+                          spent: totalSpent,
+                        });
+                      }
+                    }
                   });
                 }
               }

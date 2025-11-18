@@ -182,6 +182,8 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
                   src={storeInfo.logo_url} 
                   alt={`Logo de ${storeInfo.name}`}
                   className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">

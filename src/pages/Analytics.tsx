@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useStore } from "@/hooks/use-store";
 import { useOrders } from "@/hooks/useOrders";
 import { useCustomers } from "@/hooks/useCustomers";
-import { useProducts } from "@/hooks/useProducts";
+import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, DollarSign, ShoppingCart, Users, Package, BarChart3 } from "lucide-react";
 import { SalesChart } from "@/components/analytics/SalesChart";
@@ -17,8 +17,10 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 const Analytics = () => {
   const { store, loading: storeLoading } = useStore();
   const { orders, loading: ordersLoading } = useOrders(store?.id);
-  const { customers, loading: customersLoading } = useCustomers(store?.id);
-  const { products, loading: productsLoading } = useProducts(store?.id);
+  // Utiliser avec limite pour stats (pas besoin de tous les clients/produits)
+  const { data: customersResult, isLoading: customersLoading } = useCustomers(store?.id, { page: 1, pageSize: 1000 });
+  const customers = customersResult?.data || [];
+  const { products, isLoading: productsLoading } = useProductsOptimized(store?.id, { page: 1, itemsPerPage: 1000 });
 
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();

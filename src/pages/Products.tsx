@@ -432,19 +432,24 @@ const Products = () => {
         'created_at', 'updated_at'
       ];
 
-      const csvContent = [
-        headers.join(','),
-        ...filteredProducts.map(product => 
-          headers.map(header => {
-            const value = product[header as keyof Product];
-            // Échapper les virgules et guillemets
-            if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-              return `"${value.replace(/"/g, '""')}"`;
-            }
-            return value;
-          }).join(',')
-        )
-      ].join('\n');
+      // OPTIMISATION: Éviter .map().map() en utilisant une seule boucle
+      const csvRows: string[] = [headers.join(',')];
+      
+      for (const product of filteredProducts) {
+        const row: string[] = [];
+        for (const header of headers) {
+          const value = product[header as keyof Product];
+          // Échapper les virgules et guillemets
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            row.push(`"${value.replace(/"/g, '""')}"`);
+          } else {
+            row.push(String(value ?? ''));
+          }
+        }
+        csvRows.push(row.join(','));
+      }
+      
+      const csvContent = csvRows.join('\n');
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');

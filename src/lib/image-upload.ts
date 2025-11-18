@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from './logger';
 
 export type ImageType = 'store-logo' | 'store-banner' | 'product-image' | 'product-gallery' | 'avatar';
 
@@ -123,7 +124,7 @@ export const uploadImage = async ({
       });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError);
+      logger.error('Image upload error', { error: uploadError, fileName, type, userId });
       return {
         success: false,
         error: `Erreur lors de l'upload : ${uploadError.message}`
@@ -140,7 +141,7 @@ export const uploadImage = async ({
       url: urlData.publicUrl
     };
   } catch (error: any) {
-    console.error('Unexpected upload error:', error);
+    logger.error('Unexpected image upload error', { error, fileName, type, userId });
     return {
       success: false,
       error: error.message || 'Une erreur inattendue est survenue'
@@ -158,7 +159,7 @@ export const deleteImage = async (imageUrl: string): Promise<boolean> => {
     const pathParts = url.pathname.split(`/${BUCKET_NAME}/`);
     
     if (pathParts.length < 2) {
-      console.error('Invalid image URL format');
+      logger.error('Invalid image URL format', { imageUrl });
       return false;
     }
 
@@ -169,13 +170,13 @@ export const deleteImage = async (imageUrl: string): Promise<boolean> => {
       .remove([filePath]);
 
     if (error) {
-      console.error('Delete error:', error);
+      logger.error('Image delete error', { error, filePath });
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Unexpected delete error:', error);
+    logger.error('Unexpected image delete error', { error, imageUrl });
     return false;
   }
 };
