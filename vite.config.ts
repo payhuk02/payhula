@@ -207,11 +207,13 @@ export default defineConfig(({ mode }) => {
           }
           
           // Supabase client - Séparer en chunk dédié (ne dépend pas de React)
-          if (id.includes('node_modules/@supabase')) {
+          // Note: @supabase/supabase-js est pure JS, pas de React
+          if (id.includes('node_modules/@supabase/supabase-js')) {
             return 'supabase';
           }
           
           // Date utilities - Séparer en chunk dédié (ne dépend pas de React)
+          // Note: date-fns est pure JS, pas de React
           if (id.includes('node_modules/date-fns')) {
             return 'date-utils';
           }
@@ -294,8 +296,11 @@ export default defineConfig(({ mode }) => {
               return 'validation';
             }
             
-            // Autres vendors - Séparer seulement si elles ne dépendent pas de React
-            return 'vendor';
+            // CRITIQUE: Par défaut, garder TOUTES les dépendances node_modules dans le chunk principal
+            // pour éviter les erreurs React (forwardRef, createContext, useLayoutEffect, etc.)
+            // Seules les dépendances explicitement identifiées comme non-React peuvent être séparées
+            // Cette approche conservative garantit que React est toujours disponible
+            return undefined; // Garder dans le chunk principal par défaut
           }
         },
         // Optimisation des noms de chunks
