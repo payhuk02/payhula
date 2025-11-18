@@ -381,7 +381,9 @@ export const useCreatePhysicalOrder = () => {
           currency: order.currency,
           payment_status: order.payment_status,
           created_at: order.created_at,
-        }).catch(console.error);
+        }).catch((err) => {
+          logger.error('Error in analytics tracking', { error: err, orderId: order.id });
+        });
       });
 
       // 11. Créer l'order_item avec les références spécialisées
@@ -540,7 +542,7 @@ export const useCreatePhysicalOrder = () => {
     },
 
     onError: (error: Error) => {
-      console.error('Physical order creation error:', error);
+      logger.error('Physical order creation error', { error });
       toast({
         title: '❌ Erreur',
         description: error.message || 'Impossible de créer la commande',

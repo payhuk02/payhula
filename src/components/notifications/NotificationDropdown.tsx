@@ -24,7 +24,8 @@ interface NotificationDropdownProps {
 
 export const NotificationDropdown = ({ onClose }: NotificationDropdownProps) => {
   const navigate = useNavigate();
-  const { data: notifications = [], isLoading } = useNotifications(10);
+  const { data: notificationsResult, isLoading } = useNotifications({ page: 1, pageSize: 10 });
+  const notifications = notificationsResult?.data || [];
   const { data: unreadCount = 0 } = useUnreadCount();
   const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();

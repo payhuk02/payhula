@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 interface Section {
   id: string;
@@ -105,7 +106,7 @@ export const useCreateFullCourse = () => {
         }
 
         // ÉTAPE 1 : Créer le produit
-        console.log('📦 Création du produit...');
+        logger.info('Creating product for course', { storeId: data.storeId, name: data.name });
         const { data: product, error: productError } = await supabase
           .from('products')
           .insert({
@@ -136,14 +137,14 @@ export const useCreateFullCourse = () => {
           .single();
 
         if (productError) {
-          console.error('❌ Erreur création produit:', productError);
+          logger.error('Error creating product for course', { error: productError, storeId: data.storeId });
           throw new Error(`Erreur lors de la création du produit: ${productError.message}`);
         }
 
-        console.log('✅ Produit créé:', product.id);
+        logger.info('Product created successfully', { productId: product.id });
 
         // ÉTAPE 2 : Créer le cours
-        console.log('🎓 Création du cours...');
+        logger.info('Creating course', { productId: product.id });
         
         // Calculer les statistiques
         const totalLessons = data.sections.reduce((total, section) => total + section.lessons.length, 0);
@@ -169,16 +170,16 @@ export const useCreateFullCourse = () => {
           .single();
 
         if (courseError) {
-          console.error('❌ Erreur création cours:', courseError);
+          logger.error('Error creating course', { error: courseError, productId: product.id });
           // Rollback : supprimer le produit
           await supabase.from('products').delete().eq('id', product.id);
           throw new Error(`Erreur lors de la création du cours: ${courseError.message}`);
         }
 
-        console.log('✅ Cours créé:', course.id);
+        logger.info('Course created successfully', { courseId: course.id, productId: product.id });
 
         // ÉTAPE 3 : Créer les sections
-        console.log('📚 Création des sections...');
+        logger.info('Creating course sections', { courseId: course.id, sectionsCount: data.sections.length });
         const createdSections: any[] = [];
 
         for (const section of data.sections) {
@@ -194,7 +195,7 @@ export const useCreateFullCourse = () => {
             .single();
 
           if (sectionError) {
-            console.error('❌ Erreur création section:', sectionError);
+            logger.error('Error creating course section', { error: sectionError, courseId: course.id, sectionTitle: section.title });
             // Rollback : supprimer le cours et le produit
             await supabase.from('courses').delete().eq('id', course.id);
             await supabase.from('products').delete().eq('id', product.id);
@@ -202,11 +203,11 @@ export const useCreateFullCourse = () => {
           }
 
           createdSections.push({ ...createdSection, originalSection: section });
-          console.log(`✅ Section créée: ${createdSection.id} - ${section.title}`);
+          logger.debug('Section created', { sectionId: createdSection.id, sectionTitle: section.title });
         }
 
         // ÉTAPE 4 : Créer les leçons
-        console.log('📹 Création des leçons...');
+        logger.info('Creating course lessons', { courseId: course.id });
         let totalCreatedLessons = 0;
 
         for (const sectionData of createdSections) {
@@ -229,7 +230,7 @@ export const useCreateFullCourse = () => {
               });
 
             if (lessonError) {
-              console.error('❌ Erreur création leçon:', lessonError);
+              logger.error('Error creating course lesson', { error: lessonError, courseId: course.id, lessonTitle: lesson.title });
               // Rollback : supprimer tout
               await supabase.from('courses').delete().eq('id', course.id);
               await supabase.from('products').delete().eq('id', product.id);
@@ -237,13 +238,13 @@ export const useCreateFullCourse = () => {
             }
 
             totalCreatedLessons++;
-            console.log(`✅ Leçon créée: ${lesson.title}`);
+            logger.debug('Lesson created', { lessonTitle: lesson.title, totalLessons: totalCreatedLessons });
           }
         }
 
         // ÉTAPE 5 : Créer les settings d'affiliation (si activé)
         if (data.affiliate_enabled) {
-          console.log('💰 Création des settings d\'affiliation...');
+          logger.info('Creating affiliate settings for course', { productId: product.id });
           const { error: affiliateError } = await supabase
             .from('product_affiliate_settings')
             .insert({
@@ -262,17 +263,17 @@ export const useCreateFullCourse = () => {
             });
 
           if (affiliateError) {
-            console.error('❌ Erreur création settings affiliation:', affiliateError);
+            logger.error('Error creating affiliate settings', { error: affiliateError, productId: product.id });
             // Ne pas faire de rollback complet car le cours est déjà créé
             // Juste logger l'erreur et continuer
-            console.warn('⚠️ Le cours a été créé mais sans configuration d\'affiliation');
+            logger.warn('Course created but affiliate settings failed', { productId: product.id });
           } else {
-            console.log('✅ Settings d\'affiliation créés');
+            logger.info('Affiliate settings created successfully', { productId: product.id });
           }
         }
 
         // ÉTAPE 6 : Configurer le tracking et les pixels
-        console.log('📊 Configuration du tracking...');
+        logger.info('Configuring analytics tracking for course', { productId: product.id });
         const { error: analyticsError } = await supabase
           .from('product_analytics')
           .upsert({
@@ -286,19 +287,23 @@ export const useCreateFullCourse = () => {
           });
 
         if (analyticsError) {
-          console.error('❌ Erreur configuration analytics:', analyticsError);
-          console.warn('⚠️ Le cours a été créé mais sans configuration analytics');
+          logger.error('Error configuring analytics', { error: analyticsError, productId: product.id });
+          logger.warn('Course created but analytics configuration failed', { productId: product.id });
         } else {
-          console.log('✅ Tracking configuré avec succès');
+          logger.info('Analytics tracking configured successfully', { productId: product.id });
         }
 
-        console.log('🎉 COURS CRÉÉ AVEC SUCCÈS !');
-        console.log(`📊 Résumé: ${data.sections.length} sections, ${totalCreatedLessons} leçons`);
+        logger.info('Course created successfully', { 
+          productId: product.id, 
+          courseId: course.id,
+          sectionsCount: data.sections.length, 
+          lessonsCount: totalCreatedLessons 
+        });
 
         // ÉTAPE 7 : Créer le cours preview gratuit si demandé
         if (data.create_free_preview && data.pricing_model !== 'free') {
           try {
-            console.log('🎁 Création du cours preview gratuit...');
+            logger.info('Creating free preview course', { paidProductId: product.id });
             
             const { data: previewCourseId, error: previewError } = await supabase
               .rpc('create_free_preview_course', {
@@ -307,13 +312,13 @@ export const useCreateFullCourse = () => {
               });
 
             if (previewError) {
-              console.error('❌ Erreur création cours preview:', previewError);
-              console.warn('⚠️ Le cours payant a été créé mais le preview gratuit a échoué');
+              logger.error('Error creating free preview course', { error: previewError, paidProductId: product.id });
+              logger.warn('Paid course created but free preview failed', { paidProductId: product.id });
             } else {
-              console.log('✅ Cours preview gratuit créé:', previewCourseId);
+              logger.info('Free preview course created successfully', { previewCourseId, paidProductId: product.id });
             }
           } catch (error: any) {
-            console.error('💥 Exception création cours preview:', error);
+            logger.error('Exception creating free preview course', { error, paidProductId: product.id });
             // Ne pas faire échouer la création du cours principal
           }
         }
@@ -325,7 +330,7 @@ export const useCreateFullCourse = () => {
           lessonsCount: totalCreatedLessons,
         };
       } catch (error: any) {
-        console.error('💥 Erreur globale:', error);
+        logger.error('Global error creating course', { error, storeId: data.storeId });
         throw error;
       }
     },
@@ -342,7 +347,7 @@ export const useCreateFullCourse = () => {
       }, 1500);
     },
     onError: (error: any) => {
-      console.error('❌ Erreur finale:', error);
+      logger.error('Final error creating course', { error });
       toast({
         title: '❌ Erreur lors de la création du cours',
         description: error.message || 'Une erreur est survenue. Veuillez réessayer.',

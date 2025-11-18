@@ -172,21 +172,49 @@ export const useDisputesOptimized = (options: UseDisputesOptions = {}) => {
 
 /**
  * Calculer les statistiques des disputes
+ * OPTIMISÉ: Utilise une fonction SQL pour calculer les stats directement en base
+ * Évite de charger tous les disputes en mémoire
  */
 async function calculateStats(disputes: Dispute[]): Promise<DisputeStats> {
-  // Si on a déjà tous les disputes, calculer directement
-  // Sinon, faire une requête séparée pour les stats
-  const { data: allDisputes, error } = await supabase
-    .from('disputes')
-    .select('status, assigned_admin_id, created_at, resolved_at');
+  try {
+    // OPTIMISATION: Utiliser la fonction SQL get_dispute_stats() si disponible
+    // Sinon, fallback sur requête simple
+    const { data: statsData, error: rpcError } = await supabase
+      .rpc('get_dispute_stats');
 
-  if (error) {
-    logger.warn('Erreur lors du calcul des stats', { error: error.message });
-    // Calculer avec les disputes disponibles
+    if (!rpcError && statsData) {
+      // Convertir le JSONB en DisputeStats
+      return {
+        total: statsData.total || 0,
+        open: statsData.open || 0,
+        investigating: statsData.investigating || 0,
+        waiting_customer: statsData.waiting_customer || 0,
+        waiting_seller: statsData.waiting_seller || 0,
+        resolved: statsData.resolved || 0,
+        closed: statsData.closed || 0,
+        unassigned: statsData.unassigned || 0,
+        avgResolutionTime: statsData.avgResolutionTime || undefined,
+      };
+    }
+
+    // Fallback: Utiliser une seule requête avec select pour obtenir seulement les champs nécessaires
+    const { data: allDisputes, error } = await supabase
+      .from('disputes')
+      .select('status, assigned_admin_id, created_at, resolved_at');
+
+    if (error) {
+      logger.warn('Erreur lors du calcul des stats', { error: error.message });
+      // Fallback: Calculer avec les disputes de la page actuelle (moins précis mais fonctionnel)
+      return calculateStatsFromDisputes(disputes);
+    }
+
+    // Calculer les stats depuis tous les disputes (une seule requête)
+    return calculateStatsFromDisputes(allDisputes || []);
+  } catch (error) {
+    logger.error('Erreur dans calculateStats', { error });
+    // Fallback: Calculer avec les disputes de la page actuelle
     return calculateStatsFromDisputes(disputes);
   }
-
-  return calculateStatsFromDisputes(allDisputes || []);
 }
 
 /**

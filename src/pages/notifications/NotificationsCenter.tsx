@@ -43,7 +43,11 @@ const NotificationsCenter = () => {
   const { toast } = useToast();
   const [filter, setFilter] = useState<'all' | NotificationType | 'unread'>('all');
   
-  const { data: notifications = [], isLoading } = useNotifications(100);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
+  const { data: notificationsResult, isLoading } = useNotifications({ page: currentPage, pageSize });
+  const notifications = notificationsResult?.data || [];
+  const totalCount = notificationsResult?.count || 0;
   const { data: unreadCount = 0 } = useUnreadCount();
   const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();

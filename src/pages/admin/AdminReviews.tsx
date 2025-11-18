@@ -22,6 +22,8 @@ import {
 
 export const AdminReviews = () => {
   const [activeTab, setActiveTab] = useState<'pending' | 'flagged' | 'approved' | 'all'>('pending');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
 
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -30,13 +32,24 @@ export const AdminReviews = () => {
 
   // Data hooks
   const { data: stats } = useAdminReviewStats();
-  const { data: reviews, isLoading } = useAdminReviews({ status: activeTab });
+  const { data: reviewsResult, isLoading } = useAdminReviews({ 
+    status: activeTab,
+    page: currentPage,
+    pageSize 
+  });
+  const reviews = reviewsResult?.data || [];
+  const totalCount = reviewsResult?.count || 0;
 
   useEffect(() => {
     if (!isLoading && reviews) {
-      logger.info(`Admin Reviews: ${reviews.length} avis chargés (tab: ${activeTab})`);
+      logger.info(`Admin Reviews: ${reviews.length} avis chargés (tab: ${activeTab}, page: ${currentPage})`);
     }
-  }, [isLoading, reviews, activeTab]);
+  }, [isLoading, reviews, activeTab, currentPage]);
+
+  // Reset page when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
 
   // Action hooks
   const approveReviews = useApproveReviews();

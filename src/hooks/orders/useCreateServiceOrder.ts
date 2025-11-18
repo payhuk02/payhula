@@ -245,7 +245,9 @@ export const useCreateServiceOrder = () => {
             created_at: booking.created_at || new Date().toISOString(),
           },
           storeId
-        ).catch(console.error);
+        ).catch((err) => {
+          logger.error('Error in analytics tracking for booking', { error: err, bookingId: booking.id });
+        });
       });
 
       // 7. Calculer le prix (peut dépendre du nombre de participants ou de la durée)
@@ -367,7 +369,9 @@ export const useCreateServiceOrder = () => {
           currency: order.currency,
           payment_status: order.payment_status,
           created_at: order.created_at,
-        }).catch(console.error);
+        }).catch((err) => {
+          logger.error('Error in analytics tracking for order', { error: err, orderId: order.id });
+        });
       });
 
       // 11. Créer l'order_item avec les références spécialisées
@@ -491,7 +495,7 @@ export const useCreateServiceOrder = () => {
     },
 
     onError: (error: Error) => {
-      console.error('Service order creation error:', error);
+      logger.error('Service order creation error', { error });
       toast({
         title: '❌ Erreur',
         description: error.message || 'Impossible de créer la réservation',

@@ -176,7 +176,7 @@ export const useUserGamification = (userId?: string) => {
 
               if (rpcError) {
                 // Si la fonction RPC échoue, logger l'erreur et relancer l'erreur d'insert
-                console.error('Error initializing gamification via RPC:', rpcError);
+                logger.error('Error initializing gamification via RPC', { error: rpcError, userId: targetUserId });
                 throw insertError; // Relancer l'erreur d'insert original
               }
               
@@ -228,7 +228,7 @@ export const useUserBadges = (userId?: string) => {
         if (error.code === 'PGRST116' || error.code === 'PGRST301') {
           return [] as UserBadge[];
         }
-        console.warn('Error fetching user badges:', error);
+        logger.warn('Error fetching user badges', { error, userId: targetUserId });
         return [] as UserBadge[];
       }
       return (data || []) as UserBadge[];
@@ -263,7 +263,7 @@ export const useUserAchievements = (userId?: string) => {
         if (error.code === 'PGRST116' || error.code === 'PGRST301') {
           return [] as UserAchievement[];
         }
-        console.warn('Error fetching user achievements:', error);
+        logger.warn('Error fetching user achievements', { error, userId: targetUserId });
         return [] as UserAchievement[];
       }
       return (data || []) as UserAchievement[];
@@ -303,7 +303,7 @@ export const useGlobalLeaderboard = (limit: number = 10, period: 'all' | 'monthl
         }
       } catch (viewErr) {
         // Si la vue n'existe pas ou échoue, continuer avec la méthode normale
-        console.debug('Leaderboard view not available, using direct query');
+        logger.debug('Leaderboard view not available, using direct query');
       }
 
       // Méthode de fallback : récupérer les données de gamification (sans jointure)
@@ -324,7 +324,8 @@ export const useGlobalLeaderboard = (limit: number = 10, period: 'all' | 'monthl
         // Erreur 400 peut être due à une syntaxe incorrecte ou RLS
         // Erreur 403 peut être due à RLS qui bloque
         // Erreur 406 peut être due à un header Accept incorrect
-        console.warn('Leaderboard: Error fetching data:', {
+        logger.warn('Leaderboard: Error fetching data', {
+          error: gamificationError,
           code: gamificationError.code,
           message: gamificationError.message,
           details: gamificationError.details,
@@ -406,7 +407,7 @@ export const usePointsHistory = (userId?: string, limit: number = 20) => {
         if (error.code === 'PGRST116' || error.code === 'PGRST301') {
           return [] as PointsHistory[];
         }
-        console.warn('Error fetching points history:', error);
+        logger.warn('Error fetching points history', { error, userId: targetUserId });
         return [] as PointsHistory[];
       }
       return (data || []) as PointsHistory[];

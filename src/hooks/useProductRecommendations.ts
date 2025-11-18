@@ -140,7 +140,7 @@ export function useUserProductRecommendations(
           // Erreur 400 Bad Request (généralement problème de format ou de validation)
           if (errorCode === 'PGRST116' || errorMessage.includes('Bad Request') || errorMessage.includes('400')) {
             logger.warn('Bad Request error for get_user_product_recommendations. This may indicate the function needs to be recreated or tables are missing.');
-            console.warn('Error details:', {
+            logger.warn('Error details for get_user_product_recommendations', {
               code: errorCode,
               message: errorMessage,
               details: error.details,

@@ -19,7 +19,7 @@ interface CustomersTableProps {
 }
 
 // CustomerCard component for mobile view
-const CustomerCard = ({ 
+const CustomerCardComponent = ({ 
   customer, 
   onDelete 
 }: { 
@@ -103,6 +103,22 @@ const CustomerCard = ({
     </Card>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+const CustomerCard = React.memo(CustomerCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.customer.id === nextProps.customer.id &&
+    prevProps.customer.name === nextProps.customer.name &&
+    prevProps.customer.email === nextProps.customer.email &&
+    prevProps.customer.phone === nextProps.customer.phone &&
+    prevProps.customer.total_orders === nextProps.customer.total_orders &&
+    prevProps.customer.total_spent === nextProps.customer.total_spent &&
+    prevProps.customer.created_at === nextProps.customer.created_at &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+CustomerCard.displayName = 'CustomerCard';
 
 const CustomersTableComponent = ({ customers, onUpdate }: CustomersTableProps) => {
   const { toast } = useToast();

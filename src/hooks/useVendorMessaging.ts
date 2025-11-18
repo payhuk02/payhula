@@ -70,20 +70,28 @@ export interface VendorMessageFormData {
   }>;
 }
 
+export interface UseVendorMessagingOptions {
+  page?: number;
+  pageSize?: number;
+}
+
 export const useVendorMessaging = (
   storeId?: string,
-  productId?: string
+  productId?: string,
+  options: UseVendorMessagingOptions = {}
 ) => {
+  const { page = 1, pageSize = 20 } = options;
   const [conversations, setConversations] = useState<VendorConversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<VendorConversation | null>(null);
   const [messages, setMessages] = useState<VendorMessage[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const { toast } = useToast();
   const channelRef = useRef<any>(null);
 
-  // Récupérer les conversations
+  // Récupérer les conversations avec pagination
   const fetchConversations = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -92,13 +100,17 @@ export const useVendorMessaging = (
         return;
       }
 
+      // Calculer l'offset pour la pagination
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
       let query = supabase
         .from("vendor_conversations")
         .select(`
           *,
           store:stores (name, slug, logo_url),
           product:products (name, slug, image_url)
-        `)
+        `, { count: 'exact' })
         .order("last_message_at", { ascending: false });
 
       // Filtrer par store_id si fourni
@@ -136,9 +148,14 @@ export const useVendorMessaging = (
         }
       }
 
-      const { data, error } = await query;
+      // Appliquer la pagination
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
+
+      setTotalCount(count || 0);
 
       // Récupérer le dernier message pour chaque conversation
       const conversationIds = (data || []).map((c: any) => c.id);
@@ -173,21 +190,26 @@ export const useVendorMessaging = (
     } finally {
       setLoading(false);
     }
-  }, [storeId, toast]);
+  }, [storeId, page, pageSize, toast]);
 
-  // Récupérer les messages d'une conversation
-  const fetchMessages = useCallback(async (conversationId: string) => {
+  // Récupérer les messages d'une conversation avec pagination
+  const fetchMessages = useCallback(async (conversationId: string, messagePage: number = 1, messagePageSize: number = 50) => {
     setMessagesLoading(true);
     try {
+      // Calculer l'offset pour la pagination des messages
+      const from = (messagePage - 1) * messagePageSize;
+      const to = from + messagePageSize - 1;
+
       // Récupérer les messages avec les informations de l'expéditeur
       const { data: messagesData, error: messagesError } = await supabase
         .from("vendor_messages")
         .select(`
           *,
           attachments:vendor_message_attachments (*)
-        `)
+        `, { count: 'exact' })
         .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: true })
+        .range(from, to);
 
       if (messagesError) throw messagesError;
 
@@ -541,6 +563,10 @@ export const useVendorMessaging = (
     conversations,
     currentConversation,
     messages,
+    totalCount,
+    page,
+    pageSize,
+    totalPages: Math.ceil(totalCount / pageSize),
     loading,
     messagesLoading,
     sendingMessage,

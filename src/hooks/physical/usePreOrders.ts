@@ -295,7 +295,7 @@ export function useConvertPreOrderToOrders() {
           .eq('id', customer.id);
 
         if (notifyError) {
-          console.error('Error notifying customer:', notifyError);
+          logger.error('Error notifying customer', { error: notifyError, customerId: customer.id });
         }
       }
 

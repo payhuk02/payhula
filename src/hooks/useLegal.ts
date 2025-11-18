@@ -117,7 +117,7 @@ export const useCookiePreferences = (userId: string | undefined) => {
             return null;
           }
           // Pour les autres erreurs, log mais ne pas throw
-          console.warn('Erreur lors de la récupération des préférences cookies:', error);
+          logger.warn('Erreur lors de la récupération des préférences cookies', { error, userId });
           return null;
         }
         
@@ -127,7 +127,7 @@ export const useCookiePreferences = (userId: string | undefined) => {
         if (err?.code === '42P01' || err?.message?.includes('does not exist') || err?.message?.includes('404')) {
           return null; // Table n'existe pas, retourner null silencieusement
         }
-        console.warn('Erreur inattendue lors de la récupération des préférences cookies:', err);
+        logger.warn('Erreur inattendue lors de la récupération des préférences cookies', { error: err, userId });
         return null;
       }
     },
@@ -168,14 +168,14 @@ export const useUpdateCookiePreferences = () => {
 
         // Si la table n'existe pas, sauvegarder en localStorage comme fallback
         if (error && (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('404'))) {
-          console.warn('Table cookie_preferences n\'existe pas, sauvegarde en localStorage');
+          logger.warn('Table cookie_preferences n\'existe pas, sauvegarde en localStorage', { userId });
           localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
           return preferences as any;
         }
 
         if (error) {
           // Pour les autres erreurs, fallback localStorage
-          console.warn('Erreur lors de la sauvegarde des préférences cookies:', error);
+          logger.warn('Erreur lors de la sauvegarde des préférences cookies', { error, userId });
           localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
           return preferences as any;
         }
@@ -188,7 +188,7 @@ export const useUpdateCookiePreferences = () => {
           localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
           return preferences as any;
         }
-        console.warn('Erreur lors de la sauvegarde des préférences cookies, fallback localStorage:', err);
+        logger.warn('Erreur lors de la sauvegarde des préférences cookies, fallback localStorage', { error: err, userId });
         localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
         return preferences as any;
       }

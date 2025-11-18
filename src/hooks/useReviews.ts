@@ -80,16 +80,10 @@ export const useProductReviews = (
           query = query.order('created_at', { ascending: false });
       }
 
-      // Pagination
-      if (filters?.limit) {
-        query = query.limit(filters.limit);
-      }
-      if (filters?.offset) {
-        query = query.range(
-          filters.offset,
-          filters.offset + (filters.limit || 10) - 1
-        );
-      }
+      // Pagination (par défaut: 20 reviews, max 100)
+      const limit = filters?.limit || 20;
+      const offset = filters?.offset || 0;
+      query = query.range(offset, offset + Math.min(limit, 100) - 1);
 
       const { data, error } = await query;
 
@@ -191,7 +185,7 @@ export const useReview = (reviewId?: string) => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching review:', error);
+        logger.error('Error fetching review', { error, reviewId });
         throw error;
       }
 
@@ -296,7 +290,7 @@ export const useCreateReview = () => {
         .single();
 
       if (error) {
-        console.error('Error creating review:', error);
+        logger.error('Error creating review', { error, productId, payload });
         throw error;
       }
 
@@ -369,7 +363,7 @@ export const useUpdateReview = () => {
         .single();
 
       if (error) {
-        console.error('Error updating review:', error);
+        logger.error('Error updating review', { error, reviewId, payload });
         throw error;
       }
 
@@ -420,7 +414,7 @@ export const useDeleteReview = () => {
         .eq('user_id', user.id); // Sécurité
 
       if (error) {
-        console.error('Error deleting review:', error);
+        logger.error('Error deleting review', { error, reviewId });
         throw error;
       }
 
@@ -474,7 +468,7 @@ export const useVoteReview = () => {
         .single();
 
       if (error) {
-        console.error('Error voting review:', error);
+        logger.error('Error voting review', { error, reviewId, voteType });
         throw error;
       }
 
@@ -520,7 +514,7 @@ export const useReplyToReview = () => {
         .single();
 
       if (error) {
-        console.error('Error replying to review:', error);
+        logger.error('Error replying to review', { error, reviewId, reply });
         throw error;
       }
 
@@ -568,7 +562,7 @@ export const useUserReviews = (userId?: string, limit: number = 50) => {
         .limit(limit);
 
       if (error) {
-        console.error('Error fetching user reviews:', error);
+        logger.error('Error fetching user reviews', { error, userId });
         throw error;
       }
 

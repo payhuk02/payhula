@@ -264,7 +264,9 @@ export const useCreateOrder = () => {
                 currency: order.currency,
                 payment_status: order.payment_status,
                 created_at: order.created_at,
-              }).catch(console.error);
+              }).catch((err) => {
+                logger.error('Error in analytics tracking', { error: err, orderId: order.id });
+              });
             });
           }
 

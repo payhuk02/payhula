@@ -7,28 +7,34 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 import type { Notification, CreateNotificationData, NotificationPreferences } from '@/types/notifications';
 
 /**
- * Hook pour récupérer les notifications de l'utilisateur
+ * Hook pour récupérer les notifications de l'utilisateur avec pagination
  */
-export const useNotifications = (limit = 50) => {
+export const useNotifications = (options?: { page?: number; pageSize?: number }) => {
+  const page = options?.page || 1;
+  const pageSize = options?.pageSize || 20;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   return useQuery({
-    queryKey: ['notifications', limit],
-    queryFn: async (): Promise<Notification[]> => {
-      const { data, error } = await supabase
+    queryKey: ['notifications', page, pageSize],
+    queryFn: async (): Promise<{ data: Notification[]; count: number }> => {
+      const { data, error, count } = await supabase
         .from('notifications')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('is_archived', false)
         .order('created_at', { ascending: false })
-        .limit(limit);
+        .range(from, to);
 
       if (error) {
-        console.error('Error fetching notifications:', error);
+        logger.error('Error fetching notifications', { error, page, pageSize });
         throw new Error(error.message);
       }
 
-      return data || [];
+      return { data: data || [], count: count || 0 };
     },
   });
 };
@@ -43,7 +49,7 @@ export const useUnreadCount = () => {
       const { data, error } = await supabase.rpc('get_unread_count');
 
       if (error) {
-        console.error('Error fetching unread count:', error);
+        logger.error('Error fetching unread count', { error });
         return 0;
       }
 
@@ -190,7 +196,7 @@ export const useNotificationPreferences = () => {
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching notification preferences:', error);
+        logger.error('Error fetching notification preferences', { error });
         throw new Error(error.message);
       }
 
@@ -203,7 +209,7 @@ export const useNotificationPreferences = () => {
           .single();
 
         if (insertError) {
-          console.error('Error creating notification preferences:', insertError);
+          logger.error('Error creating notification preferences', { error: insertError });
           return null;
         }
 
@@ -269,7 +275,7 @@ export const useRealtimeNotifications = () => {
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
-            console.log('📬 New notification received:', payload);
+            logger.info('New notification received', { notificationId: payload.new?.id, type: payload.new?.type });
             // Invalider le cache pour rafraîchir
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
             
@@ -310,7 +316,7 @@ export const useRequestNotificationPermission = () => {
 
   const requestPermission = async () => {
     if (!('Notification' in window)) {
-      console.log('Browser does not support notifications');
+      logger.warn('Browser does not support notifications');
       return;
     }
 
