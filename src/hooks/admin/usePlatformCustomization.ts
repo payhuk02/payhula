@@ -82,18 +82,28 @@ export const usePlatformCustomization = () => {
         .eq('key', 'customization')
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        // Si la table n'existe pas encore, on continue avec des données vides
+        if (error.code === 'PGRST116' || error.message.includes('does not exist')) {
+          console.log('Customization settings table not found, using defaults');
+          return;
+        }
+        throw error;
+      }
       
       if (data?.settings) {
         setCustomizationData(data.settings as PlatformCustomizationData);
       }
     } catch (error: any) {
       console.error('Error loading customization:', error);
-      toast({
-        title: 'Erreur de chargement',
-        description: error.message,
-        variant: 'destructive',
-      });
+      // Ne pas afficher de toast si c'est juste que la table n'existe pas
+      if (error.code !== 'PGRST116' && !error.message.includes('does not exist')) {
+        toast({
+          title: 'Erreur de chargement',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
     }
   }, [toast]);
 

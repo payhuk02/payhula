@@ -17,16 +17,27 @@ const PlatformCustomizationContext = createContext<PlatformCustomizationContextT
 export const PlatformCustomizationProvider = ({ children }: { children: ReactNode }) => {
   const { customizationData, load } = usePlatformCustomization();
   const [previewMode, setPreviewMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    const initialize = async () => {
+      try {
+        await load();
+      } catch (error) {
+        console.error('Error loading customization:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initialize();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    if (customizationData?.design) {
+    if (!isLoading && customizationData?.design) {
       applyDesignCustomization(customizationData.design);
     }
-  }, [customizationData]);
+  }, [customizationData, isLoading]);
 
   const applyDesignCustomization = (design: any) => {
     if (!design) return;

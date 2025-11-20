@@ -14,7 +14,6 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { FileText, Mail, Bell, Globe, Search, Save, RefreshCw } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
-import { useTranslation } from 'react-i18next';
 
 interface ContentManagementSectionProps {
   onChange?: () => void;
@@ -36,7 +35,6 @@ const KEY_TEXTS = [
 
 export const ContentManagementSection = ({ onChange }: ContentManagementSectionProps) => {
   const { customizationData, save } = usePlatformCustomization();
-  const { t, i18n } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [customTexts, setCustomTexts] = useState<Record<string, string>>({});
@@ -143,7 +141,7 @@ export const ContentManagementSection = ({ onChange }: ContentManagementSectionP
               {/* Liste des textes */}
               <div className="space-y-4 max-h-[600px] overflow-y-auto">
                 {filteredTexts.map((text) => {
-                  const currentValue = customTexts[text.key] || t(text.key);
+                  const currentValue = customTexts[text.key] || text.key;
                   const isCustom = !!customTexts[text.key];
 
                   return (
@@ -183,7 +181,7 @@ export const ContentManagementSection = ({ onChange }: ContentManagementSectionP
                             />
                             {!isCustom && (
                               <p className="text-xs text-muted-foreground">
-                                Valeur par défaut: {t(text.key)}
+                                Valeur par défaut: {text.key}
                               </p>
                             )}
                           </div>
