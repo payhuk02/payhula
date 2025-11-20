@@ -20,8 +20,10 @@ import {
   CreditCard,
   AlertCircle,
   Shield,
-  CheckCircle2
+  CheckCircle2,
+  Tag
 } from "lucide-react";
+import CouponInput from '@/components/checkout/CouponInput';
 import { loadMonerooPayment, prefetchMoneroo } from "@/lib/moneroo-lazy";
 import { useToast } from "@/hooks/use-toast";
 import { safeRedirect } from "@/lib/url-validator";
@@ -59,6 +61,13 @@ const Checkout = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   
+  // State pour le code promo
+  const [appliedCouponCode, setAppliedCouponCode] = useState<{
+    id: string;
+    discountAmount: number;
+    code: string;
+  } | null>(null);
+  
   // Formulaire
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
@@ -72,6 +81,26 @@ const Checkout = () => {
   });
   
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
+
+  // Restaurer le code promo depuis localStorage au chargement
+  useEffect(() => {
+    try {
+      const savedCoupon = localStorage.getItem('applied_coupon');
+      if (savedCoupon) {
+        const coupon = JSON.parse(savedCoupon);
+        if (coupon.id && coupon.discountAmount && coupon.code) {
+          setAppliedCouponCode({
+            id: coupon.id,
+            discountAmount: coupon.discountAmount,
+            code: coupon.code,
+          });
+        }
+      }
+    } catch (error) {
+      logger.warn('Error loading coupon from localStorage:', error);
+      localStorage.removeItem('applied_coupon');
+    }
+  }, []);
 
   // Charger les données
   useEffect(() => {
@@ -250,8 +279,12 @@ const Checkout = () => {
     }
     
     // Sinon, utiliser le prix normal
-    return basePrice;
-  }, [product, selectedVariant]);
+    const finalBasePrice = basePrice;
+    
+    // Appliquer la réduction du code promo
+    const couponDiscount = appliedCouponCode?.discountAmount || 0;
+    return Math.max(0, finalBasePrice - couponDiscount);
+  }, [product, selectedVariant, appliedCouponCode]);
 
   // Gérer le changement de champ
   const handleFieldChange = (field: keyof CheckoutFormData, value: string) => {
@@ -679,14 +712,90 @@ const Checkout = () => {
 
                 <Separator />
 
+                {/* Code promo - Visible et proéminent */}
+                <div className="space-y-3 py-3 border-t border-b border-border/50 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-md bg-primary/10">
+                      <Tag className="h-4 w-4 text-primary" />
+                    </div>
+                    <Label htmlFor="coupon-code" className="text-sm font-semibold text-foreground">
+                      Avez-vous un code promo ?
+                    </Label>
+                  </div>
+                  <CouponInput
+                    storeId={storeId || undefined}
+                    productId={productId || undefined}
+                    productType={product?.product_type}
+                    customerId={user?.id || undefined}
+                    orderAmount={(() => {
+                      // Calculer le prix de base sans coupon pour la validation
+                      if (!product) return 0;
+                      if (selectedVariant?.price) return Number(selectedVariant.price);
+                      const promoPrice = product.promotional_price || product.promo_price;
+                      const normalPrice = Number(product.price) || 0;
+                      if (promoPrice && Number(promoPrice) < normalPrice && Number(promoPrice) > 0) {
+                        return Number(promoPrice);
+                      }
+                      return normalPrice;
+                    })()}
+                    onApply={(couponId, discountAmount, code) => {
+                      setAppliedCouponCode({
+                        id: couponId,
+                        discountAmount,
+                        code: code || '',
+                      });
+                      localStorage.setItem('applied_coupon', JSON.stringify({
+                        id: couponId,
+                        discountAmount,
+                        code: code || '',
+                      }));
+                      toast({
+                        title: '✅ Code promo appliqué',
+                        description: `Réduction de ${discountAmount.toLocaleString('fr-FR')} XOF appliquée`,
+                      });
+                    }}
+                    onRemove={() => {
+                      setAppliedCouponCode(null);
+                      localStorage.removeItem('applied_coupon');
+                      toast({
+                        title: 'Code promo retiré',
+                        description: 'Le code promo a été retiré de votre commande',
+                      });
+                    }}
+                    appliedCouponId={appliedCouponCode?.id || null}
+                    appliedCouponCode={appliedCouponCode?.code || null}
+                    appliedDiscountAmount={appliedCouponCode?.discountAmount || null}
+                  />
+                </div>
+
+                <Separator />
+
                 {/* Prix */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Sous-total</span>
                     <span className="font-semibold">
-                      {formatPrice(Number(displayPrice) || 0, currency)}
+                      {formatPrice((() => {
+                        // Prix de base sans coupon
+                        if (!product) return 0;
+                        if (selectedVariant?.price) return Number(selectedVariant.price);
+                        const promoPrice = product.promotional_price || product.promo_price;
+                        const normalPrice = Number(product.price) || 0;
+                        if (promoPrice && Number(promoPrice) < normalPrice && Number(promoPrice) > 0) {
+                          return Number(promoPrice);
+                        }
+                        return normalPrice;
+                      })(), currency)}
                     </span>
                   </div>
+                  {appliedCouponCode && appliedCouponCode.discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                      <span>Code promo ({appliedCouponCode.code})</span>
+                      <span className="font-semibold">
+                        -{formatPrice(appliedCouponCode.discountAmount, currency)}
+                      </span>
+                    </div>
+                  )}
                   {(() => {
                     // Vérifier si une promotion existe (promotional_price ou promo_price)
                     const promoPrice = product.promotional_price || product.promo_price;
