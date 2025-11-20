@@ -797,6 +797,11 @@ const adminMenuSections = [
         url: "/admin/commission-payments",
         icon: DollarSign,
       },
+      {
+        title: "Personnalisation",
+        url: "/admin/platform-customization",
+        icon: Sparkles,
+      },
     ]
   },
 ];
