@@ -124,13 +124,6 @@ const menuSections = [
     ]
   },
   {
-    label: 'Templates',
-    items: [
-      { icon: Layout, label: 'Templates', path: '/admin/templates' },
-      { icon: Sparkles, label: 'Templates Premium', path: '/admin/templates-premium' },
-    ]
-  },
-  {
     label: 'Configuration',
     items: [
       { icon: Settings, label: 'Paramètres', path: '/admin/settings' },

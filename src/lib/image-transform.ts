@@ -292,9 +292,9 @@ export const preloadImage = (imageUrl: string, as: 'image' | 'fetch' = 'image'):
 };
 
 /**
- * Détecte le support WebP du navigateur
+ * Détecte le support WebP du navigateur (synchrone)
  */
-export const supportsWebP = async (): Promise<boolean> => {
+export const supportsWebP = (): boolean => {
   if (typeof window === 'undefined') return false;
 
   // Check via canvas
@@ -305,8 +305,23 @@ export const supportsWebP = async (): Promise<boolean> => {
   const ctx = canvas.getContext('2d');
   if (!ctx) return false;
 
-  const dataURI = canvas.toDataURL('image/webp');
-  return dataURI.startsWith('data:image/webp');
+  try {
+    const dataURI = canvas.toDataURL('image/webp');
+    return dataURI.startsWith('data:image/webp');
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Détecte le support WebP du navigateur (asynchrone avec cache)
+ */
+let webpSupportCache: boolean | null = null;
+export const supportsWebPAsync = async (): Promise<boolean> => {
+  if (webpSupportCache !== null) return webpSupportCache;
+  
+  webpSupportCache = supportsWebP();
+  return webpSupportCache;
 };
 
 /**

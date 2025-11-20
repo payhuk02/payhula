@@ -304,15 +304,6 @@ const PhysicalProductDetail = lazy(() => import("./pages/physical/PhysicalProduc
 const ServiceDetail = lazy(() => import("./pages/service/ServiceDetail"));
 const BookingsManagement = lazy(() => import("./pages/service/BookingsManagement"));
 
-// Pages Demo - Templates UI V2
-const TemplatesUIDemo = lazy(() => import("./pages/demo/TemplatesUIDemo"));
-
-// Pages Templates - User
-const MyTemplates = lazy(() => import("./pages/MyTemplates"));
-
-// Pages Templates - Admin
-const AdminTemplates = lazy(() => import("./pages/admin/AdminTemplates"));
-const AdminTemplatesPremium = lazy(() => import("./pages/admin/AdminTemplatesPremium"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminErrorMonitoring = lazy(() => import("./pages/admin/AdminErrorMonitoring"));
 const AdminMonitoring = lazy(() => import("./pages/admin/AdminMonitoring"));
@@ -483,8 +474,6 @@ const AppContent = () => {
           <Route path="/dashboard/services/resource-conflicts" element={<ProtectedRoute><ResourceConflictManagement /></ProtectedRoute>} />
           <Route path="/dashboard/services/recurring-bookings" element={<ProtectedRoute><RecurringBookingsManagement /></ProtectedRoute>} />
 
-          {/* --- Routes Templates --- */}
-          <Route path="/dashboard/my-templates" element={<ProtectedRoute><MyTemplates /></ProtectedRoute>} />
 
           {/* --- Routes Advanced Systems (Messaging, Payments, Disputes) --- */}
           <Route path="/orders/:orderId/messaging" element={<ProtectedRoute><OrderMessaging /></ProtectedRoute>} />
@@ -518,7 +507,6 @@ const AppContent = () => {
           <Route path="/bookings/manage" element={<ProtectedRoute><BookingsManagement /></ProtectedRoute>} />
 
           {/* --- Routes Demo --- */}
-          <Route path="/demo/templates-ui" element={<ProtectedRoute><TemplatesUIDemo /></ProtectedRoute>} />
 
           {/* --- Routes administrateur --- */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
@@ -565,8 +553,6 @@ const AppContent = () => {
           <Route path="/admin/cost-optimization" element={<ProtectedRoute><AdminCostOptimization /></ProtectedRoute>} />
           <Route path="/admin/batch-shipping" element={<ProtectedRoute><AdminBatchShipping /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
-          <Route path="/admin/templates" element={<ProtectedRoute><AdminTemplates /></ProtectedRoute>} />
-          <Route path="/admin/templates-premium" element={<ProtectedRoute><AdminTemplatesPremium /></ProtectedRoute>} />
           <Route path="/admin/error-monitoring" element={<ProtectedRoute><AdminErrorMonitoring /></ProtectedRoute>} />
           <Route path="/admin/monitoring" element={<ProtectedRoute><AdminMonitoring /></ProtectedRoute>} />
           <Route path="/admin/accessibility" element={<ProtectedRoute><AdminAccessibilityReport /></ProtectedRoute>} />

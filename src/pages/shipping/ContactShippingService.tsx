@@ -23,7 +23,6 @@ import {
   Star,
   Loader2,
   Info,
-  CheckCircle2,
   Settings,
   ArrowLeft,
   MessageSquare,
@@ -73,6 +72,8 @@ export default function ContactShippingService() {
   const { data: services, isLoading, error } = useQuery({
     queryKey: ['global-shipping-services-contact'],
     queryFn: async () => {
+      // Utiliser un type assertion car la table peut ne pas être dans les types générés
+      // @ts-expect-error - Table global_shipping_services may not be in generated types
       const { data, error } = await supabase
         .from('global_shipping_services')
         .select('*')
@@ -85,11 +86,12 @@ export default function ContactShippingService() {
         // Si la table n'existe pas encore, retourner un tableau vide
         if (error.code === '42P01' || error.code === 'PGRST116') {
           logger.warn('Table global_shipping_services does not exist yet');
-          return [];
+          return [] as GlobalShippingService[];
         }
         throw error;
       }
-      return (data || []) as GlobalShippingService[];
+      // Conversion via unknown pour éviter les erreurs de type
+      return (data || []) as unknown as GlobalShippingService[];
     },
   });
 

@@ -111,16 +111,23 @@ export const OptimizedImage = ({
         };
       }
 
-      // URL WebP simple
+      // URL WebP simple avec fallback JPG/PNG
       const webpSrc = getOptimizedImageUrl(src, {
         width,
         quality,
         format: 'webp',
       }) || src;
 
+      // Fallback vers format original si WebP non supporté
+      const fallbackSrc = getOptimizedImageUrl(src, {
+        width,
+        quality,
+        format: 'origin', // Format original comme fallback
+      }) || src;
+
       return {
         webpSrc,
-        originalSrc: src,
+        originalSrc: fallbackSrc,
         srcSet: undefined,
         sizesAttr: undefined,
       };
@@ -136,6 +143,34 @@ export const OptimizedImage = ({
   };
 
   const { webpSrc, originalSrc, srcSet, sizesAttr } = getOptimizedUrls();
+  
+  // Détecter le support WebP du navigateur
+  const [webpSupported, setWebpSupported] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    // Vérifier le support WebP
+    const checkWebPSupport = async () => {
+      if (typeof window === 'undefined') return;
+      
+      // Méthode rapide : vérifier si le navigateur supporte WebP
+      const canvas = document.createElement('canvas');
+      canvas.width = 1;
+      canvas.height = 1;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        try {
+          const dataURI = canvas.toDataURL('image/webp');
+          setWebpSupported(dataURI.startsWith('data:image/webp'));
+        } catch {
+          setWebpSupported(false);
+        }
+      } else {
+        setWebpSupported(false);
+      }
+    };
+    
+    checkWebPSupport();
+  }, []);
   
   // Forcer le chargement immédiat sur mobile si l'image est valide
   useEffect(() => {

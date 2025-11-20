@@ -73,3 +73,6 @@ grep -r "multi-store\|multistore\|MultiStore\|isMultiStore\|storeGroups" src/
 
 **⚠️ NOTE**: Les migrations SQL dans `supabase/migrations` peuvent rester (elles ne causent pas de problème si le code client ne les utilise pas).
 
+
+
+

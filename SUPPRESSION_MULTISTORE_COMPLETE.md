@@ -68,3 +68,6 @@
 
 **⚠️ ATTENTION**: Le fichier `Checkout.tsx` contient encore du code multistore qui doit être supprimé manuellement car il est trop complexe pour une suppression automatique.
 
+
+
+
