@@ -107,7 +107,14 @@ export const PlatformCustomization = () => {
   const [activeSection, setActiveSection] = useState<CustomizationSection>('design');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const { toast } = useToast();
-  const { saveAll, isSaving, previewMode, togglePreview } = usePlatformCustomization();
+  const { saveAll, isSaving, previewMode, togglePreview, load } = usePlatformCustomization();
+  
+  // Charger les données au montage
+  useEffect(() => {
+    load().catch((error) => {
+      console.warn('Error loading customization data:', error);
+    });
+  }, [load]);
 
   const handleSave = async () => {
     try {
