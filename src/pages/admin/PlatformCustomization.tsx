@@ -4,7 +4,7 @@
  * Date: 2025-01-30
  */
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,6 @@ import { SecuritySection } from '@/components/admin/customization/SecuritySectio
 import { FeaturesSection } from '@/components/admin/customization/FeaturesSection';
 import { NotificationsSection } from '@/components/admin/customization/NotificationsSection';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
-import { PlatformCustomizationProvider } from '@/contexts/PlatformCustomizationContext';
 
 type CustomizationSection = 
   | 'design'
@@ -151,8 +150,7 @@ export const PlatformCustomization = () => {
   const activeSectionConfig = sections.find(s => s.id === activeSection);
 
   return (
-    <PlatformCustomizationProvider>
-      <AdminLayout>
+    <AdminLayout>
       <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 border-r bg-card/50 backdrop-blur-sm flex flex-col">
@@ -270,7 +268,6 @@ export const PlatformCustomization = () => {
         </main>
       </div>
     </AdminLayout>
-    </PlatformCustomizationProvider>
   );
 };
 
