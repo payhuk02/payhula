@@ -195,7 +195,7 @@ const AdminReferrals = lazy(() => import("./pages/admin/AdminReferrals"));
 const AdminActivity = lazy(() => import("./pages/admin/AdminActivity"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminCommissionSettings = lazy(() => import("./pages/admin/AdminCommissionSettings"));
-const PlatformCustomization = lazy(() => import("./pages/admin/PlatformCustomization"));
+const PlatformCustomization = lazy(() => import("./pages/admin/PlatformCustomization").then(m => ({ default: m.PlatformCustomization })));
 const AdminCommissionPayments = lazy(() => import("./pages/admin/AdminCommissionPayments"));
 const MonerooAnalytics = lazy(() => import("./pages/admin/MonerooAnalytics"));
 const MonerooReconciliation = lazy(() => import("./pages/admin/MonerooReconciliation"));
