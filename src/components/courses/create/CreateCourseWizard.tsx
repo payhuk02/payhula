@@ -40,10 +40,6 @@ import { logger } from "@/lib/logger";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 
-// Template system
-import { TemplateSelector } from "@/components/templates/TemplateSelector";
-import { useTemplateApplier } from "@/hooks/useTemplateApplier";
-import type { ProductTemplate } from "@/types/templates";
 
 interface Section {
   id: string;
@@ -104,8 +100,6 @@ interface CreateCourseWizardProps {
   onSuccess?: () => void;
   onBack?: () => void;
   hideHeader?: boolean; // Prop pour cacher le header si il est déjà affiché dans la page parente
-  templateSelectorOpen?: boolean; // Prop pour contrôler l'ouverture du template selector depuis la page parente
-  onTemplateSelectorOpenChange?: (open: boolean) => void; // Callback pour notifier les changements d'état
 }
 
 export const CreateCourseWizard = ({ 
@@ -113,8 +107,6 @@ export const CreateCourseWizard = ({
   onSuccess,
   onBack,
   hideHeader = false,
-  templateSelectorOpen,
-  onTemplateSelectorOpenChange,
 }: CreateCourseWizardProps = {}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -124,18 +116,6 @@ export const CreateCourseWizard = ({
   const createFullCourse = useCreateFullCourse();
   
   const [currentStep, setCurrentStep] = useState(1);
-  
-  // Template system - Utiliser la prop si fournie, sinon état interne
-  const [internalTemplateSelector, setInternalTemplateSelector] = useState(false);
-  const showTemplateSelector = templateSelectorOpen !== undefined ? templateSelectorOpen : internalTemplateSelector;
-  const setShowTemplateSelector = (open: boolean) => {
-    if (onTemplateSelectorOpenChange) {
-      onTemplateSelectorOpenChange(open);
-    } else {
-      setInternalTemplateSelector(open);
-    }
-  };
-  const { applyTemplate } = useTemplateApplier();
 
   // Auto-save
   const [isAutoSaving, setIsAutoSaving] = useState(false);
@@ -288,38 +268,6 @@ export const CreateCourseWizard = ({
     }
   }, []);
 
-  /**
-   * Handle template selection
-   */
-  const handleTemplateSelect = useCallback((template: ProductTemplate) => {
-    try {
-      const updatedData = applyTemplate(template, formData, {
-        mergeMode: 'smart', // Ne remplace que les champs vides
-      });
-      
-      setFormData(updatedData);
-      setShowTemplateSelector(false);
-      
-      logger.info('Template appliqué au cours', { templateName: template.name });
-      
-      toast({
-        title: '✨ Template appliqué !',
-        description: `Le template "${template.name}" a été appliqué avec succès. Personnalisez maintenant votre cours.`,
-      });
-      
-      // Optionnel : passer à l'étape 1 si on n'y est pas déjà
-      if (currentStep !== 1) {
-        setCurrentStep(1);
-      }
-    } catch (error: any) {
-      logger.error('Erreur lors de l\'application du template', error);
-      toast({
-        title: '❌ Erreur',
-        description: error.message || 'Impossible d\'appliquer le template',
-        variant: 'destructive',
-      });
-    }
-  }, [formData, currentStep, applyTemplate, toast]);
 
   /**
    * Validate current step
@@ -809,23 +757,6 @@ export const CreateCourseWizard = ({
               </p>
             </div>
             
-            {/* Template Button - Style Inventaire */}
-            {currentStep === 1 && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowTemplateSelector(true);
-                  logger.info('Ouverture sélecteur de template pour cours');
-                }}
-                className="h-9 sm:h-10 transition-all hover:scale-105 border-2 border-purple-500/20 hover:border-purple-500 hover:bg-purple-500/5"
-                size="sm"
-                aria-label={t('courses.useTemplate', 'Utiliser un template')}
-              >
-                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-purple-500" />
-                <span className="hidden sm:inline text-xs sm:text-sm">{t('courses.useTemplate', 'Utiliser un template')}</span>
-                <span className="sm:hidden text-xs">{t('courses.template', 'Template')}</span>
-              </Button>
-            )}
           </div>
         </div>
       )}
@@ -1026,16 +957,6 @@ export const CreateCourseWizard = ({
         </div>
       </div>
       
-      {/* Template Selector Dialog */}
-      <TemplateSelector
-        productType="course"
-        open={showTemplateSelector}
-        onClose={() => {
-          setShowTemplateSelector(false);
-          logger.info('Fermeture sélecteur de template pour cours');
-        }}
-        onSelectTemplate={handleTemplateSelect}
-      />
     </div>
   );
 };

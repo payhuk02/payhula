@@ -54,10 +54,6 @@ import { DigitalPreview } from './DigitalPreview';
 import { ProductSEOForm } from '../shared/ProductSEOForm';
 import { ProductFAQForm } from '../shared/ProductFAQForm';
 
-// Template system
-import { TemplateSelector } from '@/components/templates/TemplateSelector';
-import { useTemplateApplier } from '@/hooks/useTemplateApplier';
-import type { ProductTemplate } from '@/types/templates';
 
 const STEPS = [
   {
@@ -118,9 +114,6 @@ export const CreateDigitalProductWizard = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Template system
-  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
-  const { applyTemplate } = useTemplateApplier();
 
   // Auto-save
   const [isAutoSaving, setIsAutoSaving] = useState(false);
@@ -283,38 +276,6 @@ export const CreateDigitalProductWizard = ({
     }
   }, []);
 
-  /**
-   * Handle template selection
-   */
-  const handleTemplateSelect = useCallback((template: ProductTemplate) => {
-    try {
-      const updatedData = applyTemplate(template, formData, {
-        mergeMode: 'smart', // Ne remplace que les champs vides
-      });
-      
-      setFormData(updatedData);
-      setShowTemplateSelector(false);
-      
-      logger.info('Template appliqué', { templateName: template.name });
-      
-      toast({
-        title: '✨ Template appliqué !',
-        description: `Le template "${template.name}" a été appliqué avec succès. Personnalisez maintenant votre produit.`,
-      });
-      
-      // Optionnel : passer à l'étape 1 si on n'y est pas déjà
-      if (currentStep !== 1) {
-        setCurrentStep(1);
-      }
-    } catch (error: any) {
-      logger.error('Erreur lors de l\'application du template', error);
-      toast({
-        title: '❌ Erreur',
-        description: error.message || 'Impossible d\'appliquer le template',
-        variant: 'destructive',
-      });
-    }
-  }, [formData, currentStep, applyTemplate, toast]);
 
   /**
    * Validate current step avec validation améliorée (client + serveur)
@@ -899,23 +860,6 @@ export const CreateDigitalProductWizard = ({
               </div>
             </div>
             
-            {/* Template Button - Badge "Nouveau" supprimé */}
-            {currentStep === 1 && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowTemplateSelector(true);
-                  logger.info('Ouverture sélecteur de template');
-                }}
-                className="gap-2 border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
-                size="sm"
-                aria-label={t('wizard.useTemplate', 'Utiliser un template')}
-              >
-                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                <span className="hidden sm:inline">{t('wizard.useTemplate', 'Utiliser un template')}</span>
-                <span className="sm:hidden">{t('wizard.template', 'Template')}</span>
-              </Button>
-            )}
           </div>
 
           {/* Progress Bar */}
@@ -1120,16 +1064,6 @@ export const CreateDigitalProductWizard = ({
         </div>
       </div>
       
-      {/* Template Selector Dialog */}
-      <TemplateSelector
-        productType="digital"
-        open={showTemplateSelector}
-        onClose={() => {
-          setShowTemplateSelector(false);
-          logger.info('Fermeture sélecteur de template');
-        }}
-        onSelectTemplate={handleTemplateSelect}
-      />
     </div>
   );
 };
