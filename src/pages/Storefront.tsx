@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Storefront = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { getValue } = usePageCustomization('storefront');
   const navigate = useNavigate();
   const [store, setStore] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -347,8 +348,8 @@ const Storefront = () => {
                         </div>
                         <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">
                           {searchQuery || category !== "all" || productType !== "all" || licensingType !== "all"
-                            ? "Aucun produit ne correspond à vos filtres"
-                            : "Aucun produit disponible"}
+                            ? getValue('storefront.noProducts') || "Aucun produit ne correspond à vos filtres"
+                            : getValue('storefront.noProducts') || "Aucun produit disponible"}
                         </h3>
                         <p className="text-sm sm:text-base text-muted-foreground mb-4">
                           {searchQuery || category !== "all" || productType !== "all" || licensingType !== "all"

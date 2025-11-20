@@ -20,8 +20,10 @@ import { CartSummary } from '@/components/cart/CartSummary';
 import { CartEmpty } from '@/components/cart/CartEmpty';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { usePageCustomization } from '@/hooks/usePageCustomization';
 
 export default function Cart() {
+  const { getValue } = usePageCustomization('cart');
   const {
     items,
     summary,
@@ -107,10 +109,10 @@ export default function Cart() {
               <div>
                 <h1 className="text-3xl font-bold flex items-center gap-2">
                   <ShoppingBag className="h-8 w-8" />
-                  Mon Panier
+                  {getValue('cart.title')}
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                  {summary.item_count} {summary.item_count > 1 ? 'articles' : 'article'}
+                  {summary.item_count} {getValue('cart.itemCount') || (summary.item_count > 1 ? 'articles' : 'article')}
                 </p>
               </div>
               {items.length > 0 && (
@@ -120,7 +122,7 @@ export default function Cart() {
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Vider le panier
+                  {getValue('cart.clearCart')}
                 </Button>
               )}
             </div>

@@ -3,9 +3,10 @@
  * Centralise toutes les opérations de sauvegarde et chargement
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export interface PlatformCustomizationData {
   design?: {
@@ -27,6 +28,11 @@ export interface PlatformCustomizationData {
       fontSize?: Record<string, string>;
     };
     theme?: 'light' | 'dark' | 'auto';
+    tokens?: {
+      borderRadius?: string;
+      shadow?: string;
+      spacing?: string;
+    };
   };
   settings?: {
     commissions?: {
@@ -66,13 +72,20 @@ export interface PlatformCustomizationData {
     push?: boolean;
     channels?: Record<string, any>;
   };
+  pages?: Record<string, Record<string, any>>;
 }
 
 export const usePlatformCustomization = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [customizationData, setCustomizationData] = useState<PlatformCustomizationData>({});
+  const customizationDataRef = useRef<PlatformCustomizationData>({});
   const { toast } = useToast();
+  
+  // Synchroniser le ref avec le state
+  useEffect(() => {
+    customizationDataRef.current = customizationData;
+  }, [customizationData]);
 
   const load = useCallback(async () => {
     try {
@@ -106,26 +119,44 @@ export const usePlatformCustomization = () => {
     try {
       setIsSaving(true);
       
+      // Utiliser le ref pour avoir les données les plus récentes
+      const currentData = customizationDataRef.current;
+      
+      // Fusionner les données existantes avec les nouvelles
+      const updatedData = {
+        ...currentData,
+        [section]: {
+          ...currentData?.[section as keyof PlatformCustomizationData],
+          ...data,
+        },
+      };
+      
+      // Mettre à jour l'état local immédiatement
+      setCustomizationData(updatedData);
+      
+      // Si on est en mode preview, on ne sauvegarde pas en base mais on met à jour l'état local
+      if (previewMode) {
+        setIsSaving(false);
+        return true;
+      }
+      
+      // Sauvegarder dans Supabase
       const { error } = await supabase
         .from('platform_settings')
         .upsert({
           key: 'customization',
-          settings: {
-            ...customizationData,
-            [section]: data,
-          },
+          settings: updatedData,
           updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'key',
         });
 
       if (error) throw error;
 
-      setCustomizationData(prev => ({
-        ...prev,
-        [section]: data,
+      // Déclencher l'événement pour synchroniser avec la plateforme
+      window.dispatchEvent(new CustomEvent('platform-customization-updated', {
+        detail: { customizationData: updatedData }
       }));
 
+      setIsSaving(false);
       return true;
     } catch (error: any) {
       console.error('Error saving customization:', error);
@@ -134,27 +165,40 @@ export const usePlatformCustomization = () => {
         description: error.message,
         variant: 'destructive',
       });
-      return false;
-    } finally {
       setIsSaving(false);
+      return false;
     }
-  }, [customizationData, toast]);
+  }, [toast, previewMode]);
 
   const saveAll = useCallback(async () => {
     try {
       setIsSaving(true);
       
+      // Si on est en mode preview, on ne sauvegarde pas en base
+      if (previewMode) {
+        console.log('Preview mode: changes not saved to database');
+        setIsSaving(false);
+        return true;
+      }
+      
+      // Utiliser le ref pour avoir les données les plus récentes
+      const currentData = customizationDataRef.current;
+      
+      // Supabase upsert avec gestion du conflit sur la clé primaire
       const { error } = await supabase
         .from('platform_settings')
         .upsert({
           key: 'customization',
-          settings: customizationData,
+          settings: currentData,
           updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'key',
         });
 
       if (error) throw error;
+
+      // Déclencher l'événement pour synchroniser avec la plateforme
+      window.dispatchEvent(new CustomEvent('platform-customization-updated', {
+        detail: { customizationData: currentData }
+      }));
 
       return true;
     } catch (error: any) {
@@ -163,7 +207,7 @@ export const usePlatformCustomization = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [customizationData]);
+  }, [previewMode]);
 
   const togglePreview = useCallback(() => {
     setPreviewMode(prev => !prev);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
@@ -44,7 +44,6 @@ import MarketplaceFooter from "@/components/marketplace/MarketplaceFooter";
 import AdvancedFilters from "@/components/marketplace/AdvancedFilters";
 import ProductComparison from "@/components/marketplace/ProductComparison";
 import FavoritesManager from "@/components/marketplace/FavoritesManager";
-import ProductCardModern from "@/components/marketplace/ProductCardModern";
 import UnifiedProductCard from "@/components/products/UnifiedProductCard";
 import { transformToUnifiedProduct } from "@/lib/product-transform";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
@@ -53,6 +52,7 @@ import { BundlesSection } from "@/components/marketplace/BundlesSection";
 import { PersonalizedRecommendations } from "@/components/marketplace/ProductRecommendations";
 import { useActiveBundles } from "@/hooks/digital/useDigitalBundles";
 import { logger } from '@/lib/logger';
+import { usePageCustomization } from "@/hooks/usePageCustomization";
 import { Product, FilterState, PaginationState } from '@/types/marketplace';
 import { useMarketplaceFavorites } from '@/hooks/useMarketplaceFavorites';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -66,6 +66,7 @@ const Marketplace = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { getValue } = usePageCustomization('marketplace');
   
   // Récupérer les bundles actifs pour affichage
   const { data: activeBundles } = useActiveBundles(6);
@@ -567,7 +568,6 @@ const Marketplace = () => {
     if (!activeBundles || activeBundles.length === 0) return [];
     return activeBundles.map(bundle => ({
       ...bundle,
-      stores: bundle.stores || null,
       savings_percentage: bundle.discount_percentage || null,
     }));
   }, [activeBundles]);
@@ -651,14 +651,14 @@ const Marketplace = () => {
                 id="hero-title" 
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
               >
-                {t('marketplace.hero.title')}
+                {getValue('marketplace.hero.title')}
               </h1>
               <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-yellow-400 animate-pulse" aria-hidden="true" />
             </div>
             <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-slate-300 mb-4 sm:mb-6 lg:mb-8 max-w-4xl mx-auto leading-relaxed px-2">
-              {t('marketplace.hero.subtitle')}
+              {getValue('marketplace.hero.subtitle')}
               <br />
-              <span className="text-blue-400 font-semibold">{t('marketplace.hero.tagline')}</span>
+              <span className="text-blue-400 font-semibold">{getValue('marketplace.hero.tagline')}</span>
             </p>
           </div>
 
@@ -679,7 +679,7 @@ const Marketplace = () => {
                 // Réinitialiser la pagination lors d'une nouvelle recherche
                 setPagination(prev => ({ ...prev, currentPage: 1 }));
               }}
-              placeholder={t('marketplace.searchPlaceholder') || 'Rechercher des produits...'}
+              placeholder={getValue('marketplace.searchPlaceholder') || 'Rechercher des produits...'}
               className="w-full"
               showSuggestions={true}
             />
@@ -688,70 +688,70 @@ const Marketplace = () => {
             {/* Filtres actifs (tags) */}
             {(filters.category !== "all" || filters.productType !== "all" || filters.priceRange !== "all" || filters.tags.length > 0 || filters.verifiedOnly || filters.featuredOnly) && (
               <div className="flex flex-wrap gap-2 items-center justify-center mb-3 sm:mb-4 px-2">
-                <span className="text-xs sm:text-sm text-slate-300 font-medium">{t('marketplace.filtersActive')}</span>
+                <span className="text-xs sm:text-sm text-slate-300 font-medium">{getValue('marketplace.filtersActive')}</span>
                 
                 {filters.category !== "all" && (
                   <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
-                    {t('marketplace.filterLabels.category')} {filters.category}
+                    {getValue('marketplace.filterLabels.category')} {filters.category}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
                       onClick={() => updateFilter({ category: "all" })}
-                      aria-label={`${t('marketplace.filterLabels.clear')} ${filters.category}`}
+                      aria-label={`${getValue('marketplace.filterLabels.clear')} ${filters.category}`}
                     />
                   </Badge>
                 )}
                 
                 {filters.productType !== "all" && (
                   <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
-                    {t('marketplace.filterLabels.type')} {filters.productType}
+                    {getValue('marketplace.filterLabels.type')} {filters.productType}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
                       onClick={() => updateFilter({ productType: "all" })}
-                      aria-label={`${t('marketplace.filterLabels.clear')} ${filters.productType}`}
+                      aria-label={`${getValue('marketplace.filterLabels.clear')} ${filters.productType}`}
                     />
                   </Badge>
                 )}
                 
                 {filters.priceRange !== "all" && (
                   <Badge variant="secondary" className="bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
-                    {t('marketplace.filterLabels.priceRange')} {PRICE_RANGES.find(r => r.value === filters.priceRange)?.label}
+                    {getValue('marketplace.filterLabels.priceRange')} {PRICE_RANGES.find(r => r.value === filters.priceRange)?.label}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
                       onClick={() => updateFilter({ priceRange: "all" })}
-                      aria-label={`${t('marketplace.filterLabels.clear')} ${t('marketplace.filterLabels.priceRange')}`}
+                      aria-label={`${getValue('marketplace.filterLabels.clear')} ${getValue('marketplace.filterLabels.priceRange')}`}
                     />
                   </Badge>
                 )}
                 
                 {filters.verifiedOnly && (
                   <Badge variant="secondary" className="bg-green-700 text-white hover:bg-green-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
-                    ✓ {t('marketplace.filterLabels.verified')}
+                    ✓ {getValue('marketplace.filterLabels.verified')}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
                       onClick={() => updateFilter({ verifiedOnly: false })}
-                      aria-label={`${t('marketplace.filterLabels.clear')} ${t('marketplace.filterLabels.verified')}`}
+                      aria-label={`${getValue('marketplace.filterLabels.clear')} ${getValue('marketplace.filterLabels.verified')}`}
                     />
                   </Badge>
                 )}
                 
                 {filters.featuredOnly && (
                   <Badge variant="secondary" className="bg-yellow-700 text-white hover:bg-yellow-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
-                    ⭐ {t('marketplace.filterLabels.featured')}
+                    ⭐ {getValue('marketplace.filterLabels.featured')}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
                       onClick={() => updateFilter({ featuredOnly: false })}
-                      aria-label={`${t('marketplace.filterLabels.clear')} ${t('marketplace.filterLabels.featured')}`}
+                      aria-label={`${getValue('marketplace.filterLabels.clear')} ${getValue('marketplace.filterLabels.featured')}`}
                     />
                   </Badge>
                 )}
                 
                 {filters.tags.map((tag, index) => (
                   <Badge key={index} variant="secondary" className="bg-purple-700 text-white hover:bg-purple-600 transition-colors flex items-center gap-1 text-xs sm:text-sm">
-                    {t('marketplace.filterLabels.tag')} {tag}
+                    {getValue('marketplace.filterLabels.tag')} {tag}
                     <X 
                       className="h-3 w-3 cursor-pointer hover:text-red-400" 
                       onClick={() => updateFilter({ tags: filters.tags.filter(t => t !== tag) })}
-                      aria-label={`${t('marketplace.filterLabels.clear')} ${tag}`}
+                      aria-label={`${getValue('marketplace.filterLabels.clear')} ${tag}`}
                     />
                   </Badge>
                 ))}
@@ -761,9 +761,9 @@ const Marketplace = () => {
                   size="sm"
                   onClick={clearFilters}
                   className="text-xs sm:text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 sm:h-8"
-                  aria-label={`${t('marketplace.filterLabels.clear')} ${t('marketplace.filterLabels.all')}`}
+                  aria-label={`${getValue('marketplace.filterLabels.clear')} ${getValue('marketplace.filterLabels.all')}`}
                 >
-                  {t('marketplace.filterLabels.clear')} {t('marketplace.filterLabels.all')}
+                  {getValue('marketplace.filterLabels.clear')} {getValue('marketplace.filterLabels.all')}
                 </Button>
               </div>
             )}
@@ -1124,12 +1124,9 @@ const Marketplace = () => {
               )}
 
               <ProductGrid>
-                {displayProducts.map((product, index) => {
+                {displayProducts.map((product) => {
                   // Transformer le produit vers le format unifié
                   const unifiedProduct = transformToUnifiedProduct(product);
-                  
-                  // Prioriser le chargement des 3 premières images sur mobile
-                  const isPriority = index < 3;
                   
                   return (
                     <UnifiedProductCard
@@ -1169,16 +1166,17 @@ const Marketplace = () => {
                   </Button>
 
                   {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                    let page;
-                    if (totalPages <= 7) {
-                      page = i + 1;
-                    } else if (pagination.currentPage <= 4) {
-                      page = i + 1;
-                    } else if (pagination.currentPage >= totalPages - 3) {
-                      page = totalPages - 6 + i;
-                    } else {
-                      page = pagination.currentPage - 3 + i;
-                    }
+                    const page: number = (() => {
+                      if (totalPages <= 7) {
+                        return i + 1;
+                      } else if (pagination.currentPage <= 4) {
+                        return i + 1;
+                      } else if (pagination.currentPage >= totalPages - 3) {
+                        return totalPages - 6 + i;
+                      } else {
+                        return pagination.currentPage - 3 + i;
+                      }
+                    })();
                     
                     const isActive = page === pagination.currentPage;
                     
@@ -1242,23 +1240,23 @@ const Marketplace = () => {
           <div className="flex items-center justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
             <Rocket className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-bounce" />
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              {t('marketplace.cta.title')}
+              {getValue('marketplace.cta.title')}
             </h2>
             <Rocket className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-bounce" />
           </div>
           <p className="text-base sm:text-lg lg:text-xl text-blue-100 mb-4 sm:mb-6 lg:mb-8 px-2">
-            {t('marketplace.cta.subtitle')}
+            {getValue('marketplace.cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2">
             <Link to="/auth" className="w-full sm:w-auto">
               <Button size="lg" className="bg-white text-blue-600 font-semibold h-11 sm:h-14 px-6 sm:px-8 hover:bg-blue-50 transition-all duration-300 hover:scale-105 w-full sm:w-auto text-sm sm:text-base">
-                {t('marketplace.cta.startFree')}
+                {getValue('marketplace.cta.startFree')}
                 <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 h-11 sm:h-14 px-6 sm:px-8 transition-all duration-300 hover:scale-105 w-full sm:w-auto text-sm sm:text-base">
               <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              {t('marketplace.cta.joinCommunity')}
+              {getValue('marketplace.cta.joinCommunity')}
             </Button>
           </div>
         </div>

@@ -3,7 +3,7 @@
  * Activer/désactiver toutes les fonctionnalités de la plateforme
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Zap, Search, Users, Gift, Star, ShoppingCart, GraduationCap, CreditCard, Globe, Shield, Bell, TrendingUp } from 'lucide-react';
+import { Zap, Search, Users, Gift, Star, ShoppingCart, GraduationCap, CreditCard, Globe, Shield, Bell, TrendingUp, FileText, MessageSquare } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 
 interface FeaturesSectionProps {
@@ -188,6 +188,216 @@ const ALL_FEATURES: Feature[] = [
     icon: Bell,
     enabled: true,
   },
+  
+  // Commerce avancé
+  {
+    id: 'wishlist',
+    name: 'Liste de souhaits',
+    description: 'Les utilisateurs peuvent sauvegarder leurs produits favoris',
+    category: 'Commerce',
+    icon: Star,
+    enabled: true,
+    route: '/dashboard/wishlist',
+  },
+  {
+    id: 'coupons',
+    name: 'Codes promo et coupons',
+    description: 'Système de codes promotionnels et réductions',
+    category: 'Commerce',
+    icon: Gift,
+    enabled: true,
+    route: '/admin/coupons',
+  },
+  {
+    id: 'reviews',
+    name: 'Avis et évaluations',
+    description: 'Système d\'avis clients avec photos/vidéos',
+    category: 'Commerce',
+    icon: Star,
+    enabled: true,
+    route: '/dashboard/reviews',
+  },
+  {
+    id: 'subscriptions',
+    name: 'Abonnements',
+    description: 'Gestion d\'abonnements récurrents',
+    category: 'Commerce',
+    icon: CreditCard,
+    enabled: true,
+    route: '/dashboard/subscriptions',
+  },
+  {
+    id: 'invoicing',
+    name: 'Facturation',
+    description: 'Génération automatique de factures',
+    category: 'Commerce',
+    icon: FileText,
+    enabled: true,
+    route: '/dashboard/invoices',
+  },
+  
+  // Produits avancés
+  {
+    id: 'product_variants',
+    name: 'Variantes de produits',
+    description: 'Gestion des variantes (taille, couleur, etc.)',
+    category: 'Produits',
+    icon: ShoppingCart,
+    enabled: true,
+  },
+  {
+    id: 'product_bundles',
+    name: 'Packs de produits',
+    description: 'Création de packs et bundles de produits',
+    category: 'Produits',
+    icon: ShoppingCart,
+    enabled: true,
+  },
+  {
+    id: 'inventory_management',
+    name: 'Gestion d\'inventaire',
+    description: 'Suivi avancé des stocks et alertes',
+    category: 'Produits',
+    icon: ShoppingCart,
+    enabled: true,
+  },
+  {
+    id: 'product_analytics',
+    name: 'Analytics produits',
+    description: 'Statistiques détaillées par produit',
+    category: 'Produits',
+    icon: TrendingUp,
+    enabled: true,
+  },
+  
+  // Marketplace
+  {
+    id: 'multi_vendor',
+    name: 'Multi-vendeurs',
+    description: 'Marketplace avec plusieurs vendeurs',
+    category: 'Marketplace',
+    icon: Users,
+    enabled: true,
+  },
+  {
+    id: 'vendor_verification',
+    name: 'Vérification vendeurs',
+    description: 'Processus de vérification des vendeurs',
+    category: 'Marketplace',
+    icon: Shield,
+    enabled: true,
+    route: '/admin/vendors',
+  },
+  {
+    id: 'disputes',
+    name: 'Gestion des litiges',
+    description: 'Système de résolution de litiges',
+    category: 'Marketplace',
+    icon: Shield,
+    enabled: true,
+    route: '/admin/disputes',
+  },
+  
+  // Communication
+  {
+    id: 'messaging',
+    name: 'Messagerie',
+    description: 'Système de messagerie entre utilisateurs',
+    category: 'Communication',
+    icon: MessageSquare,
+    enabled: true,
+    route: '/dashboard/messages',
+  },
+  {
+    id: 'live_chat',
+    name: 'Chat en direct',
+    description: 'Support client en temps réel',
+    category: 'Communication',
+    icon: MessageSquare,
+    enabled: true,
+  },
+  {
+    id: 'announcements',
+    name: 'Annonces',
+    description: 'Système d\'annonces et notifications globales',
+    category: 'Communication',
+    icon: Bell,
+    enabled: true,
+    route: '/admin/announcements',
+  },
+  
+  // Analytics & Reporting
+  {
+    id: 'advanced_analytics',
+    name: 'Analytics avancés',
+    description: 'Tableaux de bord et rapports détaillés',
+    category: 'Analytics',
+    icon: TrendingUp,
+    enabled: true,
+    route: '/admin/analytics',
+  },
+  {
+    id: 'export_reports',
+    name: 'Export de rapports',
+    description: 'Export CSV/PDF des données',
+    category: 'Analytics',
+    icon: FileText,
+    enabled: true,
+  },
+  
+  // Intégrations avancées
+  {
+    id: 'api_keys',
+    name: 'Clés API',
+    description: 'Gestion des clés API pour intégrations',
+    category: 'Intégrations',
+    icon: Globe,
+    enabled: true,
+    route: '/admin/api-keys',
+  },
+  {
+    id: 'zapier',
+    name: 'Intégration Zapier',
+    description: 'Connexion avec Zapier pour automatisations',
+    category: 'Intégrations',
+    icon: Globe,
+    enabled: false,
+  },
+  {
+    id: 'stripe',
+    name: 'Stripe',
+    description: 'Intégration Stripe pour paiements internationaux',
+    category: 'Paiements',
+    icon: CreditCard,
+    enabled: false,
+  },
+  
+  // Sécurité avancée
+  {
+    id: 'rate_limiting',
+    name: 'Limitation de débit',
+    description: 'Protection contre les abus et attaques',
+    category: 'Sécurité',
+    icon: Shield,
+    enabled: true,
+  },
+  {
+    id: 'ip_whitelist',
+    name: 'Liste blanche IP',
+    description: 'Restriction d\'accès par adresse IP',
+    category: 'Sécurité',
+    icon: Shield,
+    enabled: false,
+  },
+  {
+    id: 'audit_logs',
+    name: 'Journaux d\'audit',
+    description: 'Traçabilité complète des actions administrateur',
+    category: 'Sécurité',
+    icon: Shield,
+    enabled: true,
+    route: '/admin/audit',
+  },
 ];
 
 export const FeaturesSection = ({ onChange }: FeaturesSectionProps) => {
@@ -207,35 +417,45 @@ export const FeaturesSection = ({ onChange }: FeaturesSectionProps) => {
     }
   }, [customizationData]);
 
-  const categories = Array.from(new Set(ALL_FEATURES.map(f => f.category)));
+  const categories = useMemo(() => 
+    Array.from(new Set(ALL_FEATURES.map(f => f.category))), 
+    []
+  );
 
-  const filteredFeatures = features.filter(feature => {
-    const matchesSearch = feature.name.toLowerCase().includes(searchText.toLowerCase()) ||
-                         feature.description.toLowerCase().includes(searchText.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || feature.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredFeatures = useMemo(() => 
+    features.filter(feature => {
+      const matchesSearch = feature.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                           feature.description.toLowerCase().includes(searchText.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || feature.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    }),
+    [features, searchText, selectedCategory]
+  );
 
-  const handleToggleFeature = (featureId: string, enabled: boolean) => {
-    setFeatures(prev => prev.map(f => 
-      f.id === featureId ? { ...f, enabled } : f
-    ));
+  const handleToggleFeature = useCallback((featureId: string, enabled: boolean) => {
+    setFeatures(prev => {
+      const updated = prev.map(f => 
+        f.id === featureId ? { ...f, enabled } : f
+      );
+      
+      const enabledFeatures = updated
+        .filter(f => f.enabled)
+        .map(f => f.id);
+      
+      const disabledFeatures = updated
+        .filter(f => !f.enabled)
+        .map(f => f.id);
 
-    const enabledFeatures = features
-      .filter(f => f.id === featureId ? enabled : f.enabled)
-      .map(f => f.id);
-    
-    const disabledFeatures = features
-      .filter(f => f.id === featureId ? !enabled : !f.enabled)
-      .map(f => f.id);
+      save('features', {
+        enabled: enabledFeatures,
+        disabled: disabledFeatures,
+      }).catch(console.error);
 
-    save('features', {
-      enabled: enabledFeatures,
-      disabled: disabledFeatures,
+      return updated;
     });
 
     if (onChange) onChange();
-  };
+  }, [save, onChange]);
 
   const enabledCount = features.filter(f => f.enabled).length;
   const disabledCount = features.filter(f => !f.enabled).length;
@@ -265,22 +485,23 @@ export const FeaturesSection = ({ onChange }: FeaturesSectionProps) => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Recherche et filtres */}
-          <div className="flex gap-4">
+          {/* Recherche et filtres - Responsive */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher une fonctionnalité..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant={selectedCategory === 'all' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory('all')}
+                className="text-xs sm:text-sm"
               >
                 Toutes
               </Button>
@@ -290,6 +511,7 @@ export const FeaturesSection = ({ onChange }: FeaturesSectionProps) => {
                   variant={selectedCategory === cat ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedCategory(cat)}
+                  className="text-xs sm:text-sm"
                 >
                   {cat}
                 </Button>

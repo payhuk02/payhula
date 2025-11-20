@@ -18,9 +18,11 @@ import { SEOMeta } from "@/components/seo/SEOMeta";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { logger } from "@/lib/logger";
 import { getStoredReferralCode, clearStoredReferralCode } from "@/components/referral/ReferralTracker";
+import { usePageCustomization } from "@/hooks/usePageCustomization";
 
 const Auth = () => {
   const { t } = useTranslation();
+  const { getValue } = usePageCustomization('auth');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [showPassword, setShowPassword] = useState({ login: false, signup: false });
@@ -298,9 +300,9 @@ const Auth = () => {
 
         <Card className="shadow-large" role="main" aria-labelledby="auth-title">
           <CardHeader>
-            <CardTitle id="auth-title">{t('auth.welcome')}</CardTitle>
+            <CardTitle id="auth-title">{getValue('auth.welcome') || t('auth.welcome')}</CardTitle>
             <CardDescription>
-              {t('auth.welcomeSubtitle')}
+              {getValue('auth.welcomeSubtitle') || t('auth.welcomeSubtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -313,8 +315,8 @@ const Auth = () => {
 
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">{t('nav.login')}</TabsTrigger>
-                <TabsTrigger value="signup">{t('nav.signup')}</TabsTrigger>
+                <TabsTrigger value="login">{getValue('auth.login.title') || t('nav.login')}</TabsTrigger>
+                <TabsTrigger value="signup">{getValue('auth.signup.title') || t('nav.signup')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
@@ -386,7 +388,7 @@ const Auth = () => {
                     disabled={isLoading}
                     aria-busy={isLoading}
                   >
-                    {isLoading ? t('auth.login.buttonLoading') : t('auth.login.button')}
+                    {isLoading ? t('auth.login.buttonLoading') : (getValue('auth.login.button') || t('auth.login.button'))}
                   </Button>
                 </form>
               </TabsContent>
@@ -491,7 +493,7 @@ const Auth = () => {
                     disabled={isLoading}
                     aria-busy={isLoading}
                   >
-                    {isLoading ? t('auth.signup.buttonLoading') : t('auth.signup.button')}
+                    {isLoading ? t('auth.signup.buttonLoading') : (getValue('auth.signup.button') || t('auth.signup.button'))}
                   </Button>
                 </form>
               </TabsContent>

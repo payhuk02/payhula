@@ -3,16 +3,18 @@
  * Permet de personnaliser les couleurs, logos, typographie
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { Palette, Image as ImageIcon, Type, Upload, Eye, RefreshCw } from 'lucide-react';
+import { Palette, Image as ImageIcon, Type, Upload, Eye, RefreshCw, Loader2, X, Settings, Box, Save } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 import { designTokens } from '@/lib/design-system';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface DesignBrandingSectionProps {
   onChange?: () => void;
@@ -20,6 +22,7 @@ interface DesignBrandingSectionProps {
 
 export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) => {
   const { customizationData, setCustomizationData, save } = usePlatformCustomization();
+  const { toast } = useToast();
   const [localColors, setLocalColors] = useState({
     primary: customizationData?.design?.colors?.primary || 'hsl(210, 100%, 60%)',
     secondary: customizationData?.design?.colors?.secondary || 'hsl(220, 20%, 50%)',
@@ -33,12 +36,64 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
     customizationData?.design?.theme || 'auto'
   );
 
+  const [localTypography, setLocalTypography] = useState({
+    fontFamily: customizationData?.design?.typography?.fontFamily || designTokens.typography.fontFamily.sans.join(', '),
+    fontSize: customizationData?.design?.typography?.fontSize || designTokens.typography.fontSize,
+  });
+
+  const [localDesignTokens, setLocalDesignTokens] = useState({
+    borderRadius: customizationData?.design?.tokens?.borderRadius || designTokens.borderRadius.md,
+    shadow: customizationData?.design?.tokens?.shadow || 'md',
+    spacing: customizationData?.design?.tokens?.spacing || '4',
+  });
+
+  const [uploadingLogo, setUploadingLogo] = useState<{ [key: string]: boolean }>({});
+  const logoInputRefs = {
+    light: useRef<HTMLInputElement>(null),
+    dark: useRef<HTMLInputElement>(null),
+    favicon: useRef<HTMLInputElement>(null),
+  };
+
+  // Synchroniser avec les données chargées
   useEffect(() => {
-    if (onChange) onChange();
-  }, [localColors, localTheme, onChange]);
+    if (customizationData?.design) {
+      if (customizationData.design.colors) {
+        setLocalColors(prev => ({
+          ...prev,
+          ...customizationData.design?.colors,
+        }));
+      }
+      if (customizationData.design.theme) {
+        setLocalTheme(customizationData.design.theme);
+      }
+      if (customizationData.design.typography) {
+        setLocalTypography({
+          fontFamily: customizationData.design.typography.fontFamily || designTokens.typography.fontFamily.sans.join(', '),
+          fontSize: customizationData.design.typography.fontSize || designTokens.typography.fontSize,
+        });
+      }
+      if (customizationData.design.tokens) {
+        setLocalDesignTokens({
+          borderRadius: customizationData.design.tokens.borderRadius || designTokens.borderRadius.md,
+          shadow: customizationData.design.tokens.shadow || 'md',
+          spacing: customizationData.design.tokens.spacing || '4',
+        });
+      }
+    }
+  }, [customizationData]);
+
+  // Debounce pour éviter trop de notifications
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onChange) onChange();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localColors, localTheme, localTypography, localDesignTokens, onChange]);
 
   const handleColorChange = (colorKey: keyof typeof localColors, value: string) => {
     setLocalColors(prev => ({ ...prev, [colorKey]: value }));
+    
+    // Mettre à jour l'état local pour l'application en temps réel
     setCustomizationData(prev => ({
       ...prev,
       design: {
@@ -52,11 +107,25 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
     
     // Application en temps réel
     applyColorInRealTime(colorKey, value);
+    
+    // Sauvegarder dans Supabase
+    save('design', {
+      ...customizationData?.design,
+      colors: {
+        ...localColors,
+        [colorKey]: value,
+      },
+    }).catch(console.error);
   };
 
   const applyColorInRealTime = (colorKey: string, value: string) => {
     const root = document.documentElement;
-    const hslValue = value.replace('hsl(', '').replace(')', '');
+    let hslValue = value;
+    
+    // Convertir HSL si nécessaire
+    if (value.startsWith('hsl(')) {
+      hslValue = value.replace('hsl(', '').replace(')', '');
+    }
     
     // Mapper les clés aux variables CSS
     const cssVarMap: Record<string, string> = {
@@ -71,14 +140,159 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
     const cssVar = cssVarMap[colorKey];
     if (cssVar) {
       root.style.setProperty(cssVar, hslValue);
+      
+      // Appliquer aussi les variantes
+      if (colorKey === 'primary') {
+        root.style.setProperty('--primary-foreground', '0 0% 100%');
+        root.style.setProperty('--ring', hslValue);
+      } else if (colorKey === 'secondary') {
+        root.style.setProperty('--secondary-foreground', '0 0% 98%');
+      } else if (colorKey === 'accent') {
+        root.style.setProperty('--accent-foreground', '220 30% 12%');
+      }
     }
+  };
+
+  const handleTypographyChange = (key: string, value: string) => {
+    if (key === 'fontFamily') {
+      setLocalTypography(prev => ({ ...prev, fontFamily: value }));
+    } else {
+      setLocalTypography(prev => ({
+        ...prev,
+        fontSize: { ...prev.fontSize, [key]: value },
+      }));
+    }
+    
+    // Mettre à jour l'état local
+    setCustomizationData(prev => ({
+      ...prev,
+      design: {
+        ...prev?.design,
+        typography: {
+          ...prev?.design?.typography,
+          [key === 'fontFamily' ? 'fontFamily' : 'fontSize']: key === 'fontFamily' ? value : {
+            ...prev?.design?.typography?.fontSize,
+            [key]: value,
+          },
+        },
+      },
+    }));
+    
+    // Sauvegarder dans Supabase
+    const updatedTypography = key === 'fontFamily' 
+      ? { ...localTypography, fontFamily: value }
+      : { ...localTypography, fontSize: { ...localTypography.fontSize, [key]: value } };
+    
+    save('design', {
+      ...customizationData?.design,
+      typography: updatedTypography,
+    }).catch(console.error);
+  };
+
+  const handleLogoUpload = async (type: 'light' | 'dark' | 'favicon', file: File) => {
+    // Validation
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp', 'image/x-icon'];
+    const maxSize = type === 'favicon' ? 1024 * 100 : 1024 * 1024 * 2; // 100KB pour favicon, 2MB pour logos
+
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: 'Format non supporté',
+        description: 'Veuillez utiliser PNG, JPG, SVG, WebP ou ICO',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (file.size > maxSize) {
+      toast({
+        title: 'Fichier trop volumineux',
+        description: `Taille maximale : ${type === 'favicon' ? '100KB' : '2MB'}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploadingLogo(prev => ({ ...prev, [type]: true }));
+
+    try {
+      // Générer un nom de fichier unique
+      const fileExt = file.name.split('.').pop();
+      const fileName = `platform-assets/logos/${type}-${Date.now()}.${fileExt}`;
+
+      // Upload vers Supabase Storage
+      const { data, error: uploadError } = await supabase.storage
+        .from('platform-assets')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true, // Remplacer si existe déjà
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Récupérer l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('platform-assets')
+        .getPublicUrl(fileName);
+
+      // Sauvegarder l'URL dans la configuration
+      await save('design', {
+        ...customizationData?.design,
+        logo: {
+          ...customizationData?.design?.logo,
+          [type]: publicUrl,
+        },
+      });
+
+      toast({
+        title: '✅ Logo téléchargé',
+        description: `Le logo ${type} a été téléchargé avec succès`,
+      });
+
+      if (onChange) onChange();
+    } catch (error: any) {
+      console.error('Error uploading logo:', error);
+      toast({
+        title: '❌ Erreur',
+        description: error.message || 'Impossible de télécharger le logo',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingLogo(prev => ({ ...prev, [type]: false }));
+    }
+  };
+
+  const handleLogoFileSelect = (type: 'light' | 'dark' | 'favicon', event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleLogoUpload(type, file);
+    }
+    // Reset input
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
+
+  const handleRemoveLogo = async (type: 'light' | 'dark' | 'favicon') => {
+    await save('design', {
+      ...customizationData?.design,
+      logo: {
+        ...customizationData?.design?.logo,
+        [type]: undefined,
+      },
+    });
+    toast({
+      title: 'Logo supprimé',
+      description: `Le logo ${type} a été supprimé`,
+    });
+    if (onChange) onChange();
   };
 
   const handleSave = async () => {
     await save('design', {
       colors: localColors,
       theme: localTheme,
-      ...customizationData?.design,
+      typography: localTypography,
+      logo: customizationData?.design?.logo,
     });
   };
 
@@ -94,20 +308,28 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Tabs defaultValue="colors" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="colors">
-            <Palette className="h-4 w-4 mr-2" />
-            Couleurs
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
+          <TabsTrigger value="colors" className="text-xs sm:text-sm">
+            <Palette className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Couleurs</span>
+            <span className="sm:hidden">Couleurs</span>
           </TabsTrigger>
-          <TabsTrigger value="logos">
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Logos
+          <TabsTrigger value="logos" className="text-xs sm:text-sm">
+            <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Logos</span>
+            <span className="sm:hidden">Logos</span>
           </TabsTrigger>
-          <TabsTrigger value="typography">
-            <Type className="h-4 w-4 mr-2" />
-            Typographie
+          <TabsTrigger value="typography" className="text-xs sm:text-sm">
+            <Type className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Typographie</span>
+            <span className="sm:hidden">Typo</span>
+          </TabsTrigger>
+          <TabsTrigger value="tokens" className="text-xs sm:text-sm">
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Tokens</span>
+            <span className="sm:hidden">Tokens</span>
           </TabsTrigger>
         </TabsList>
 
@@ -164,13 +386,21 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 {(['light', 'dark', 'auto'] as const).map((theme) => (
                   <button
                     key={theme}
-                    onClick={() => setLocalTheme(theme)}
+                    onClick={() => {
+                      setLocalTheme(theme);
+                      // Sauvegarder le thème dans Supabase
+                      save('design', {
+                        ...customizationData?.design,
+                        theme: theme,
+                      }).catch(console.error);
+                      if (onChange) onChange();
+                    }}
                     className={`
-                      flex-1 p-4 rounded-lg border-2 transition-all
+                      flex-1 p-3 sm:p-4 rounded-lg border-2 transition-all text-left
                       ${localTheme === theme
                         ? 'border-primary bg-primary/10'
                         : 'border-border hover:border-primary/50'
@@ -178,7 +408,7 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                     `}
                   >
                     <div className="text-sm font-medium capitalize mb-1">{theme}</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground line-clamp-2">
                       {theme === 'auto' ? 'Suivre les préférences système' : `Thème ${theme}`}
                     </div>
                   </button>
@@ -202,64 +432,163 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                 <div className="space-y-2">
                   <Label>Logo (Thème clair)</Label>
                   <div className="flex items-center gap-4">
-                    <div className="w-32 h-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50">
+                    <div className="w-32 h-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50 relative">
                       {customizationData?.design?.logo?.light ? (
-                        <img
-                          src={customizationData.design.logo.light}
-                          alt="Logo clair"
-                          className="max-w-full max-h-full"
-                        />
+                        <>
+                          <img
+                            src={customizationData.design.logo.light}
+                            alt="Logo clair"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                          <button
+                            onClick={() => handleRemoveLogo('light')}
+                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                            type="button"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </>
                       ) : (
                         <ImageIcon className="h-8 w-8 text-muted-foreground" />
                       )}
                     </div>
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Télécharger
+                    <input
+                      ref={logoInputRefs.light}
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                      onChange={(e) => handleLogoFileSelect('light', e)}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRefs.light.current?.click()}
+                      disabled={uploadingLogo.light}
+                    >
+                      {uploadingLogo.light ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Téléchargement...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </>
+                      )}
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Formats acceptés : PNG, JPG, SVG, WebP (max 2MB)
+                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Logo (Thème sombre)</Label>
                   <div className="flex items-center gap-4">
-                    <div className="w-32 h-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50">
+                    <div className="w-32 h-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50 relative">
                       {customizationData?.design?.logo?.dark ? (
-                        <img
-                          src={customizationData.design.logo.dark}
-                          alt="Logo sombre"
-                          className="max-w-full max-h-full"
-                        />
+                        <>
+                          <img
+                            src={customizationData.design.logo.dark}
+                            alt="Logo sombre"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                          <button
+                            onClick={() => handleRemoveLogo('dark')}
+                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                            type="button"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </>
                       ) : (
                         <ImageIcon className="h-8 w-8 text-muted-foreground" />
                       )}
                     </div>
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Télécharger
+                    <input
+                      ref={logoInputRefs.dark}
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                      onChange={(e) => handleLogoFileSelect('dark', e)}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRefs.dark.current?.click()}
+                      disabled={uploadingLogo.dark}
+                    >
+                      {uploadingLogo.dark ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Téléchargement...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </>
+                      )}
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Formats acceptés : PNG, JPG, SVG, WebP (max 2MB)
+                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Favicon</Label>
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50">
+                    <div className="w-16 h-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50 relative">
                       {customizationData?.design?.logo?.favicon ? (
-                        <img
-                          src={customizationData.design.logo.favicon}
-                          alt="Favicon"
-                          className="max-w-full max-h-full"
-                        />
+                        <>
+                          <img
+                            src={customizationData.design.logo.favicon}
+                            alt="Favicon"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                          <button
+                            onClick={() => handleRemoveLogo('favicon')}
+                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                            type="button"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </>
                       ) : (
                         <ImageIcon className="h-6 w-6 text-muted-foreground" />
                       )}
                     </div>
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Télécharger
+                    <input
+                      ref={logoInputRefs.favicon}
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/x-icon,image/svg+xml"
+                      onChange={(e) => handleLogoFileSelect('favicon', e)}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRefs.favicon.current?.click()}
+                      disabled={uploadingLogo.favicon}
+                    >
+                      {uploadingLogo.favicon ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Téléchargement...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </>
+                      )}
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Formats acceptés : PNG, JPG, ICO, SVG (max 100KB)
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -279,19 +608,25 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
               <div className="space-y-2">
                 <Label>Famille de police principale</Label>
                 <Input
-                  defaultValue={designTokens.typography.fontFamily.sans[0]}
+                  value={localTypography.fontFamily}
+                  onChange={(e) => handleTypographyChange('fontFamily', e.target.value)}
                   placeholder="Poppins, system-ui, sans-serif"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Séparez les polices par des virgules (ex: Poppins, Inter, sans-serif)
+                </p>
               </div>
               <Separator />
               <div className="space-y-4">
                 <Label>Tailles de police</Label>
-                {Object.entries(designTokens.typography.fontSize).map(([key, value]) => (
+                {Object.entries(localTypography.fontSize).map(([key, value]) => (
                   <div key={key} className="flex items-center justify-between">
-                    <Label className="text-sm">{key}</Label>
+                    <Label className="text-sm capitalize">{key}</Label>
                     <Input
-                      defaultValue={value}
+                      value={value}
+                      onChange={(e) => handleTypographyChange(key, e.target.value)}
                       className="w-32"
+                      placeholder="1rem"
                     />
                   </div>
                 ))}
@@ -299,13 +634,204 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Design Tokens */}
+        <TabsContent value="tokens" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Box className="h-5 w-5" />
+                Design Tokens
+              </CardTitle>
+              <CardDescription>
+                Personnalisez les ombres, bordures et espacements de la plateforme
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Border Radius */}
+              <div className="space-y-4">
+                <Label>Rayon de bordure (Border Radius)</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+                  {Object.entries(designTokens.borderRadius).map(([key, value]) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setLocalDesignTokens(prev => ({ ...prev, borderRadius: value }));
+                        const updated = {
+                          ...customizationData,
+                          design: {
+                            ...customizationData?.design,
+                            tokens: {
+                              ...customizationData?.design?.tokens,
+                              borderRadius: value,
+                            },
+                          },
+                        };
+                        setCustomizationData(updated);
+                        // Application en temps réel
+                        document.documentElement.style.setProperty('--radius', value);
+                        // Sauvegarder automatiquement
+                        save('design', updated.design).catch(console.error);
+                        if (onChange) onChange();
+                      }}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        localDesignTokens.borderRadius === value
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <div
+                        className="w-full h-16 bg-primary/20 rounded"
+                        style={{ borderRadius: value }}
+                      />
+                      <div className="mt-2 text-sm font-medium capitalize">{key}</div>
+                      <div className="text-xs text-muted-foreground">{value}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Shadows */}
+              <div className="space-y-4">
+                <Label>Ombres (Shadows)</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {Object.entries(designTokens.shadows).map(([key, value]) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setLocalDesignTokens(prev => ({ ...prev, shadow: key }));
+                        const shadows = {
+                          sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                          base: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                          md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                          lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                          xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                          soft: '0 4px 16px -2px hsl(220 100% 10% / 0.3)',
+                          medium: '0 8px 32px -4px hsl(220 100% 10% / 0.4)',
+                          large: '0 16px 64px -8px hsl(220 100% 10% / 0.5)',
+                          glow: '0 0 40px hsl(210 100% 60% / 0.3)',
+                        };
+                        const shadowValue = shadows[key as keyof typeof shadows] || shadows.md;
+                        const updated = {
+                          ...customizationData,
+                          design: {
+                            ...customizationData?.design,
+                            tokens: {
+                              ...customizationData?.design?.tokens,
+                              shadow: key,
+                            },
+                          },
+                        };
+                        setCustomizationData(updated);
+                        // Application en temps réel
+                        document.documentElement.style.setProperty('--shadow-default', shadowValue);
+                        // Sauvegarder automatiquement
+                        save('design', updated.design).catch(console.error);
+                        if (onChange) onChange();
+                      }}
+                      className={`p-4 rounded-lg border-2 transition-all text-left ${
+                        localDesignTokens.shadow === key
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-16 h-16 bg-card rounded-lg"
+                          style={{ boxShadow: value }}
+                        />
+                        <div className="flex-1">
+                          <div className="text-sm font-medium capitalize">{key}</div>
+                          <div className="text-xs text-muted-foreground font-mono mt-1">
+                            {value.substring(0, 50)}...
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Spacing */}
+              <div className="space-y-4">
+                <Label>Espacement de base (Base Spacing)</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                  {Object.entries(designTokens.spacing).slice(0, 8).map(([key, value]) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setLocalDesignTokens(prev => ({ ...prev, spacing: key }));
+                        const spacingMap: Record<string, string> = {
+                          '0': '0',
+                          '1': '0.25rem',
+                          '2': '0.5rem',
+                          '3': '0.75rem',
+                          '4': '1rem',
+                          '5': '1.25rem',
+                          '6': '1.5rem',
+                          '8': '2rem',
+                        };
+                        const spacingValue = spacingMap[key] || '1rem';
+                        const updated = {
+                          ...customizationData,
+                          design: {
+                            ...customizationData?.design,
+                            tokens: {
+                              ...customizationData?.design?.tokens,
+                              spacing: key,
+                            },
+                          },
+                        };
+                        setCustomizationData(updated);
+                        // Application en temps réel
+                        document.documentElement.style.setProperty('--spacing-base', spacingValue);
+                        // Sauvegarder automatiquement
+                        save('design', updated.design).catch(console.error);
+                        if (onChange) onChange();
+                      }}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        localDesignTokens.spacing === key
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="bg-primary rounded"
+                          style={{ width: value, height: '20px' }}
+                        />
+                        <div>
+                          <div className="text-sm font-medium">{key}</div>
+                          <div className="text-xs text-muted-foreground">{value}</div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={resetToDefault}>
+      <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t">
+        <Button 
+          variant="outline" 
+          onClick={resetToDefault}
+          className="w-full sm:w-auto"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
           Réinitialiser
         </Button>
-        <Button onClick={handleSave}>
+        <Button 
+          onClick={handleSave}
+          className="w-full sm:w-auto"
+        >
+          <Save className="h-4 w-4 mr-2" />
           Sauvegarder les modifications
         </Button>
       </div>

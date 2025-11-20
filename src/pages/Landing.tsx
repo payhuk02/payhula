@@ -39,9 +39,11 @@ import { SEOMeta } from "@/components/seo/SEOMeta";
 import { WebsiteSchema } from "@/components/seo/WebsiteSchema";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { usePageCustomization } from "@/hooks/usePageCustomization";
 
 const Landing = () => {
   const { t } = useTranslation();
+  const { getValue, getColor, getImage } = usePageCustomization('landing');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showCountries, setShowCountries] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({
@@ -119,7 +121,7 @@ const Landing = () => {
           <nav className="hidden lg:flex items-center gap-2 xl:gap-3" aria-label="Navigation principale">
             <Link to="/marketplace">
               <Button variant="ghost" className="text-foreground hover:text-primary transition-smooth text-sm xl:text-base">
-                {t('landing.nav.marketplace')}
+                {getValue('landing.nav.marketplace')}
               </Button>
             </Link>
             <Button 
@@ -127,14 +129,14 @@ const Landing = () => {
               className="text-foreground hover:text-primary transition-smooth text-sm xl:text-base"
               onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              {t('landing.nav.howItWorks')}
+              {getValue('landing.nav.howItWorks')}
             </Button>
             <Button 
               variant="ghost" 
               className="text-foreground hover:text-primary transition-smooth text-sm xl:text-base"
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              {t('landing.nav.pricing')}
+              {getValue('landing.nav.pricing')}
             </Button>
             <Button 
               variant="ghost" 
@@ -146,12 +148,12 @@ const Landing = () => {
             <LanguageSwitcher variant="ghost" showLabel={false} />
             <Link to="/auth">
               <Button variant="ghost" className="text-foreground hover:text-primary transition-smooth text-sm xl:text-base">
-                {t('landing.nav.login')}
+                {getValue('landing.nav.login')}
               </Button>
             </Link>
             <Link to="/auth">
               <Button className="gradient-accent text-accent-foreground font-semibold shadow-glow hover:opacity-90 hover:scale-105 transition-smooth text-sm xl:text-base px-4 xl:px-6">
-                {t('landing.nav.getStarted')}
+                {getValue('landing.nav.getStarted')}
               </Button>
             </Link>
           </nav>
@@ -172,7 +174,7 @@ const Landing = () => {
             <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
               <Link to="/marketplace" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full text-foreground hover:text-primary transition-smooth">
-                  {t('landing.nav.marketplace')}
+                  {getValue('landing.nav.marketplace')}
                 </Button>
               </Link>
               <Button 
@@ -183,7 +185,7 @@ const Landing = () => {
                   document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                {t('landing.nav.howItWorks')}
+                {getValue('landing.nav.howItWorks')}
               </Button>
               <Button 
                 variant="ghost" 
@@ -193,7 +195,7 @@ const Landing = () => {
                   document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                {t('landing.nav.pricing')}
+                {getValue('landing.nav.pricing')}
               </Button>
               <Button 
                 variant="ghost" 
@@ -210,12 +212,12 @@ const Landing = () => {
               </div>
               <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full text-foreground hover:text-primary transition-smooth">
-                  {t('landing.nav.login')}
+                  {getValue('landing.nav.login')}
                 </Button>
               </Link>
               <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="w-full gradient-accent text-accent-foreground font-semibold shadow-glow hover:opacity-90 transition-smooth">
-                  {t('landing.nav.getStarted')}
+                  {getValue('landing.nav.getStarted')}
                 </Button>
               </Link>
             </div>
@@ -230,26 +232,26 @@ const Landing = () => {
           <div className="max-w-4xl mx-auto text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 bg-secondary/50 backdrop-blur-sm px-3 md:px-4 py-2 rounded-full mb-6 border border-border">
               <Star className="h-4 w-4 text-accent" fill="currentColor" />
-              <span className="text-xs md:text-sm text-foreground">{t('landing.hero.badge')}</span>
+              <span className="text-xs md:text-sm text-foreground">{getValue('landing.hero.badge')}</span>
             </div>
             
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-foreground px-2 sm:px-4 break-words">
-              {t('landing.hero.title')}
+              {getValue('landing.hero.title')}
             </h1>
             
             <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-2 sm:px-4 break-words">
-              {t('landing.hero.subtitle')}
+              {getValue('landing.hero.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 px-4">
               <Link to="/auth" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto gradient-accent text-accent-foreground font-semibold text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-glow hover:opacity-90 hover:scale-105 transition-smooth">
-                  {t('landing.hero.ctaPrimary')}
+                  {getValue('landing.hero.ctaPrimary')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Button size="lg" variant="outline" className="w-full sm:w-auto bg-card/50 backdrop-blur-sm text-base md:text-lg px-6 md:px-8 py-5 md:py-6 border-border hover:bg-card hover:scale-105 transition-smooth">
-                {t('landing.hero.ctaSecondary')}
+                {getValue('landing.hero.ctaSecondary')}
               </Button>
             </div>
 
@@ -259,19 +261,19 @@ const Landing = () => {
                 <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-0.5 sm:mb-1 break-words">
                   {animatedStats.users.toLocaleString()}+
                 </div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{t('landing.stats.users')}</div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{getValue('landing.stats.users')}</div>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 border border-border">
                 <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent mb-0.5 sm:mb-1 break-words">
                   {animatedStats.sales.toLocaleString()}+
                 </div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{t('landing.stats.sales')}</div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{getValue('landing.stats.sales')}</div>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 border border-border">
                 <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-0.5 sm:mb-1 break-words">
                   {animatedStats.stores}+
                 </div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{t('landing.stats.stores')}</div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{getValue('landing.stats.stores')}</div>
               </div>
             </div>
 
@@ -293,10 +295,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground px-4">
-              {t('landing.testimonials.title')}
+              {getValue('landing.testimonials.title')}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              {t('landing.testimonials.subtitle')}
+              {getValue('landing.testimonials.subtitle')}
             </p>
           </div>
 
@@ -370,17 +372,17 @@ const Landing = () => {
             <div className="order-1 md:order-2 text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-accent/20 px-3 md:px-4 py-2 rounded-full mb-4">
                 <Zap className="h-4 w-4 text-accent" />
-                <span className="text-xs md:text-sm font-medium text-accent">{t('landing.featureSections.feature1.badge')}</span>
+                <span className="text-xs md:text-sm font-medium text-accent">{getValue('landing.featureSections.feature1.badge')}</span>
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground">
-                {t('landing.featureSections.feature1.title')}
+                {getValue('landing.featureSections.feature1.title')}
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                {t('landing.featureSections.feature1.description')}
+                {getValue('landing.featureSections.feature1.description')}
               </p>
               <Link to="/auth">
                 <Button className="gradient-primary text-primary-foreground font-semibold hover:scale-105 transition-smooth">
-                  {t('landing.featureSections.feature1.cta')}
+                  {getValue('landing.featureSections.feature1.cta')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -392,17 +394,17 @@ const Landing = () => {
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-primary/20 px-3 md:px-4 py-2 rounded-full mb-4">
                 <Globe className="h-4 w-4 text-primary" />
-                <span className="text-xs md:text-sm font-medium text-primary">{t('landing.featureSections.feature2.badge')}</span>
+                <span className="text-xs md:text-sm font-medium text-primary">{getValue('landing.featureSections.feature2.badge')}</span>
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground">
-                {t('landing.featureSections.feature2.title')}
+                {getValue('landing.featureSections.feature2.title')}
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                {t('landing.featureSections.feature2.description')}
+                {getValue('landing.featureSections.feature2.description')}
               </p>
               <Link to="/auth">
                 <Button className="gradient-primary text-primary-foreground font-semibold hover:scale-105 transition-smooth">
-                  {t('landing.featureSections.feature2.cta')}
+                  {getValue('landing.featureSections.feature2.cta')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -428,17 +430,17 @@ const Landing = () => {
             <div className="order-1 md:order-2 text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-accent/20 px-3 md:px-4 py-2 rounded-full mb-4">
                 <Shield className="h-4 w-4 text-accent" />
-                <span className="text-xs md:text-sm font-medium text-accent">{t('landing.featureSections.feature3.badge')}</span>
+                <span className="text-xs md:text-sm font-medium text-accent">{getValue('landing.featureSections.feature3.badge')}</span>
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground">
-                {t('landing.featureSections.feature3.title')}
+                {getValue('landing.featureSections.feature3.title')}
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                {t('landing.featureSections.feature3.description')}
+                {getValue('landing.featureSections.feature3.description')}
               </p>
               <Link to="/auth">
                 <Button className="gradient-primary text-primary-foreground font-semibold hover:scale-105 transition-smooth">
-                  {t('landing.featureSections.feature3.cta')}
+                  {getValue('landing.featureSections.feature3.cta')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -450,17 +452,17 @@ const Landing = () => {
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-primary/20 px-3 md:px-4 py-2 rounded-full mb-4">
                 <BarChart3 className="h-4 w-4 text-primary" />
-                <span className="text-xs md:text-sm font-medium text-primary">{t('landing.featureSections.feature4.badge')}</span>
+                <span className="text-xs md:text-sm font-medium text-primary">{getValue('landing.featureSections.feature4.badge')}</span>
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground">
-                {t('landing.featureSections.feature4.title')}
+                {getValue('landing.featureSections.feature4.title')}
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                {t('landing.featureSections.feature4.description')}
+                {getValue('landing.featureSections.feature4.description')}
               </p>
               <Link to="/auth">
                 <Button className="gradient-primary text-primary-foreground font-semibold hover:scale-105 transition-smooth">
-                  {t('landing.featureSections.feature4.cta')}
+                  {getValue('landing.featureSections.feature4.cta')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -486,17 +488,17 @@ const Landing = () => {
             <div className="order-1 md:order-2 text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-accent/20 px-3 md:px-4 py-2 rounded-full mb-4">
                 <Users className="h-4 w-4 text-accent" />
-                <span className="text-xs md:text-sm font-medium text-accent">{t('landing.featureSections.feature5.badge')}</span>
+                <span className="text-xs md:text-sm font-medium text-accent">{getValue('landing.featureSections.feature5.badge')}</span>
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground">
-                {t('landing.featureSections.feature5.title')}
+                {getValue('landing.featureSections.feature5.title')}
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
-                {t('landing.featureSections.feature5.description')}
+                {getValue('landing.featureSections.feature5.description')}
               </p>
               <Link to="/auth">
                 <Button className="gradient-primary text-primary-foreground font-semibold hover:scale-105 transition-smooth">
-                  {t('landing.featureSections.feature5.cta')}
+                  {getValue('landing.featureSections.feature5.cta')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -510,10 +512,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground px-4">
-              {t('landing.keyFeatures.title')}
+              {getValue('landing.keyFeatures.title')}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              {t('landing.keyFeatures.subtitle')}
+              {getValue('landing.keyFeatures.subtitle')}
             </p>
           </div>
 
@@ -571,31 +573,31 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground px-4">
-              {t('landing.howItWorksDetailed.title')}
+              {getValue('landing.howItWorksDetailed.title')}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              {t('landing.howItWorksDetailed.subtitle')}
+              {getValue('landing.howItWorksDetailed.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 md:gap-12 max-w-6xl mx-auto">
             {[
               {
-                step: t('landing.howItWorksDetailed.steps.step1.number'),
-                title: t('landing.howItWorksDetailed.steps.step1.title'),
-                description: t('landing.howItWorksDetailed.steps.step1.description'),
+                step: getValue('landing.howItWorksDetailed.steps.step1.number'),
+                title: getValue('landing.howItWorksDetailed.steps.step1.title'),
+                description: getValue('landing.howItWorksDetailed.steps.step1.description'),
                 icon: <Users className="h-8 w-8" />
               },
               {
-                step: t('landing.howItWorksDetailed.steps.step2.number'),
-                title: t('landing.howItWorksDetailed.steps.step2.title'),
-                description: t('landing.howItWorksDetailed.steps.step2.description'),
+                step: getValue('landing.howItWorksDetailed.steps.step2.number'),
+                title: getValue('landing.howItWorksDetailed.steps.step2.title'),
+                description: getValue('landing.howItWorksDetailed.steps.step2.description'),
                 icon: <Package className="h-8 w-8" />
               },
               {
-                step: t('landing.howItWorksDetailed.steps.step3.number'),
-                title: t('landing.howItWorksDetailed.steps.step3.title'),
-                description: t('landing.howItWorksDetailed.steps.step3.description'),
+                step: getValue('landing.howItWorksDetailed.steps.step3.number'),
+                title: getValue('landing.howItWorksDetailed.steps.step3.title'),
+                description: getValue('landing.howItWorksDetailed.steps.step3.description'),
                 icon: <TrendingUp className="h-8 w-8" />
               }
             ].map((item, index) => (
@@ -617,7 +619,7 @@ const Landing = () => {
           <div className="text-center mt-12 px-4">
             <Link to="/auth">
               <Button size="lg" className="w-full sm:w-auto gradient-accent text-accent-foreground font-semibold text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-glow hover:opacity-90 hover:scale-105 transition-smooth">
-                {t('landing.howItWorksDetailed.cta')}
+                {getValue('landing.howItWorksDetailed.cta')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -630,10 +632,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground px-4">
-              {t('landing.pricingDetailed.title')}
+              {getValue('landing.pricingDetailed.title')}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              {t('landing.pricingDetailed.subtitle')}
+              {getValue('landing.pricingDetailed.subtitle')}
             </p>
           </div>
 
@@ -642,38 +644,38 @@ const Landing = () => {
               <CardContent className="p-8 md:p-12 text-center">
                 <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
                   <Star className="h-4 w-4 text-primary" fill="currentColor" />
-                  <span className="text-sm font-medium text-primary">{t('landing.pricingDetailed.free.badge')}</span>
+                  <span className="text-sm font-medium text-primary">{getValue('landing.pricingDetailed.free.badge')}</span>
                 </div>
                 
                 <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                  {t('landing.pricingDetailed.free.title')}
+                  {getValue('landing.pricingDetailed.free.title')}
                 </h3>
                 
                 <div className="mb-8">
                   <div className="text-5xl md:text-6xl font-bold text-primary mb-2">
-                    {t('landing.pricingDetailed.free.price')}
+                    {getValue('landing.pricingDetailed.free.price')}
                   </div>
                   <p className="text-lg text-muted-foreground">
-                    {t('landing.pricingDetailed.free.subtitle')}
+                    {getValue('landing.pricingDetailed.free.subtitle')}
                   </p>
                 </div>
 
                 <div className="bg-accent/10 border border-accent/20 rounded-xl p-6 mb-8">
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <DollarSign className="h-6 w-6 text-accent" />
-                    <span className="text-2xl md:text-3xl font-bold text-accent">{t('landing.pricingDetailed.free.commission.percentage')}</span>
+                    <span className="text-2xl md:text-3xl font-bold text-accent">{getValue('landing.pricingDetailed.free.commission.percentage')}</span>
                   </div>
                   <p className="text-base md:text-lg text-foreground">
-                    {t('landing.pricingDetailed.free.commission.title')}
+                    {getValue('landing.pricingDetailed.free.commission.title')}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {t('landing.pricingDetailed.free.commission.subtitle')}
+                    {getValue('landing.pricingDetailed.free.commission.subtitle')}
                   </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
                   <div>
-                    <h4 className="font-semibold text-lg mb-4 text-foreground">{t('landing.pricingDetailed.free.featuresTitle')}</h4>
+                    <h4 className="font-semibold text-lg mb-4 text-foreground">{getValue('landing.pricingDetailed.free.featuresTitle')}</h4>
                     <ul className="space-y-3">
                       {(t('landing.pricingDetailed.free.features', { returnObjects: true }) as string[]).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
@@ -684,7 +686,7 @@ const Landing = () => {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-4 text-foreground text-center">{t('landing.pricingDetailed.free.advantagesTitle')}</h4>
+                    <h4 className="font-semibold text-lg mb-4 text-foreground text-center">{getValue('landing.pricingDetailed.free.advantagesTitle')}</h4>
                     <ul className="space-y-3">
                       {(t('landing.pricingDetailed.free.advantages', { returnObjects: true }) as string[]).map((advantage, index) => (
                         <li key={index} className="flex items-start gap-2">
@@ -701,7 +703,7 @@ const Landing = () => {
                     size="lg"
                     className="w-full md:w-auto gradient-accent text-accent-foreground font-semibold text-lg px-10 py-6 shadow-glow hover:opacity-90 hover:scale-105 transition-smooth inline-flex items-center justify-center gap-2"
                   >
-                    {t('landing.pricingDetailed.free.cta')}
+                    {getValue('landing.pricingDetailed.free.cta')}
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
@@ -709,7 +711,7 @@ const Landing = () => {
             </Card>
 
             <p className="text-center text-sm text-muted-foreground mt-6 px-4">
-              {t('landing.pricingDetailed.free.note')}
+              {getValue('landing.pricingDetailed.free.note')}
             </p>
           </div>
         </div>
@@ -720,10 +722,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground px-4">
-              {t('landing.coverage.title')}
+              {getValue('landing.coverage.title')}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              {t('landing.coverage.subtitle')}
+              {getValue('landing.coverage.subtitle')}
             </p>
           </div>
 
@@ -742,9 +744,9 @@ const Landing = () => {
                   <Globe className="h-5 w-5 text-accent-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-foreground">{t('landing.coverage.regions.westAfrica.title')}</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-foreground">{getValue('landing.coverage.regions.westAfrica.title')}</h3>
                   <p className="text-sm md:text-base text-muted-foreground">
-                    {t('landing.coverage.regions.westAfrica.description')}
+                    {getValue('landing.coverage.regions.westAfrica.description')}
                   </p>
                 </div>
               </div>
@@ -754,9 +756,9 @@ const Landing = () => {
                   <CreditCard className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-foreground">{t('landing.coverage.regions.international.title')}</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-foreground">{getValue('landing.coverage.regions.international.title')}</h3>
                   <p className="text-sm md:text-base text-muted-foreground">
-                    {t('landing.coverage.regions.international.description')}
+                    {getValue('landing.coverage.regions.international.description')}
                   </p>
                 </div>
               </div>
@@ -766,9 +768,9 @@ const Landing = () => {
                   <Shield className="h-5 w-5 text-accent-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-foreground">{t('landing.coverage.regions.compliance.title')}</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-foreground">{getValue('landing.coverage.regions.compliance.title')}</h3>
                   <p className="text-sm md:text-base text-muted-foreground">
-                    {t('landing.coverage.regions.compliance.description')}
+                    {getValue('landing.coverage.regions.compliance.description')}
                   </p>
                 </div>
               </div>
@@ -778,7 +780,7 @@ const Landing = () => {
                   onClick={() => setShowCountries(!showCountries)}
                   className="gradient-primary text-primary-foreground font-semibold hover:scale-105 transition-smooth"
                 >
-                  {showCountries ? t('landing.coverage.cta.hide') : t('landing.coverage.cta.show')}
+                  {showCountries ? getValue('landing.coverage.cta.hide') : getValue('landing.coverage.cta.show')}
                   <ArrowRight className={`ml-2 h-4 w-4 transition-transform ${showCountries ? 'rotate-90' : ''}`} />
                 </Button>
               </div>
@@ -786,7 +788,7 @@ const Landing = () => {
               {/* Liste complète des pays */}
               {showCountries && (
                 <div className="mt-6 p-6 bg-card rounded-lg border border-border shadow-medium animate-fade-in-up">
-                  <h4 className="font-semibold text-lg mb-4 text-foreground">{t('landing.coverage.detailedCoverage.title')}</h4>
+                  <h4 className="font-semibold text-lg mb-4 text-foreground">{getValue('landing.coverage.detailedCoverage.title')}</h4>
                   
                   <div className="space-y-6">
                     {(() => {
@@ -809,7 +811,7 @@ const Landing = () => {
                   </div>
 
                   <p className="text-sm text-muted-foreground mt-4 italic">
-                    {t('landing.coverage.detailedCoverage.note')}
+                    {getValue('landing.coverage.detailedCoverage.note')}
                   </p>
                 </div>
               )}
@@ -824,15 +826,15 @@ const Landing = () => {
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-foreground px-4">
-              {t('landing.finalCta.title')}
+              {getValue('landing.finalCta.title')}
             </h2>
             <p className="text-base md:text-xl text-muted-foreground mb-8 px-4">
-              {t('landing.finalCta.subtitle')}
+              {getValue('landing.finalCta.subtitle')}
             </p>
             <div className="px-4">
               <Link to="/auth">
                 <Button size="lg" className="w-full sm:w-auto gradient-accent text-accent-foreground font-semibold text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-glow hover:opacity-90 hover:scale-105 transition-smooth">
-                  {t('landing.finalCta.button')}
+                  {getValue('landing.finalCta.button')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -851,40 +853,40 @@ const Landing = () => {
                 <span className="text-lg md:text-xl font-bold text-foreground">Payhuk</span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                {t('landing.footer.description')}
+                {getValue('landing.footer.description')}
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{t('landing.footer.product')}</h4>
+              <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.product')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.features')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.pricing')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.demo')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.features')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.pricing')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.demo')}</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{t('landing.footer.support')}</h4>
+              <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.support')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.documentation')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.guides')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.contact')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.documentation')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.guides')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.contact')}</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{t('landing.footer.company')}</h4>
+              <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.company')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.about')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.blog')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{t('landing.footer.links.careers')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.about')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.blog')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.careers')}</Link></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t pt-8 text-center">
-            <p className="text-muted-foreground text-xs md:text-sm">{t('landing.footer.copyright')}</p>
+            <p className="text-muted-foreground text-xs md:text-sm">{getValue('landing.footer.copyright')}</p>
           </div>
         </div>
       </footer>

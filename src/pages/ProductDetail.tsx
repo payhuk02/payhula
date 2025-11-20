@@ -34,9 +34,11 @@ import { ProductRecommendations, FrequentlyBoughtTogether } from "@/components/m
 import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertButton";
 import { formatPrice, getDisplayPrice, hasPromotion, calculateDiscount } from '@/lib/product-helpers';
 import { useToast } from '@/hooks/use-toast';
+import { usePageCustomization } from '@/hooks/usePageCustomization';
 
 const ProductDetails = () => {
   const { slug, productSlug } = useParams<{ slug: string; productSlug: string }>();
+  const { getValue } = usePageCustomization('productDetail');
   const navigate = useNavigate();
   const [product, setProduct] = useState<any>(null);
   const [store, setStore] = useState<any>(null);
@@ -681,8 +683,8 @@ const ProductDetails = () => {
                     ) : (
                       <>
                         <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
-                        <span className="hidden sm:inline">Acheter maintenant</span>
-                        <span className="sm:hidden">Acheter</span>
+                        <span className="hidden sm:inline">{getValue('productDetail.cta.buyNow') || 'Acheter maintenant'}</span>
+                        <span className="sm:hidden">{getValue('productDetail.cta.buyNow') || 'Acheter'}</span>
                         {selectedVariantPrice && selectedVariantPrice !== (displayPriceInfo?.price ?? product.price) && (
                           <span className="ml-2 hidden sm:inline">
                             ({formatPrice(selectedVariantPrice, product.currency || 'FCFA')})

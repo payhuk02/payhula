@@ -13,10 +13,12 @@ import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { usePageCustomization } from "@/hooks/usePageCustomization";
 import "@/styles/dashboard-responsive.css";
 
 const Dashboard = () => {
   const { t } = useTranslation();
+  const { getValue } = usePageCustomization('dashboard');
   const { store, loading: storeLoading } = useStore();
   const { stats, loading, error: hookError, refetch } = useDashboardStats();
   const navigate = useNavigate();
@@ -131,7 +133,7 @@ const Dashboard = () => {
                 <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 text-center">
                   <LayoutDashboard className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-4 animate-in zoom-in-95 duration-500" />
                   <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                    {t('dashboard.welcome')}
+                    {getValue('dashboard.welcome')}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-6">
                     {t('dashboard.createStorePrompt')}
@@ -140,7 +142,7 @@ const Dashboard = () => {
                     onClick={() => navigate("/dashboard/store")} 
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                   >
-                    {t('dashboard.createStoreButton')}
+                    {getValue('dashboard.createStoreButton')}
                   </Button>
                 </CardContent>
               </Card>
@@ -171,7 +173,7 @@ const Dashboard = () => {
                         <LayoutDashboard className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                       </div>
                       <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
-                        {t('dashboard.titleWithStore', { storeName: store.name })}
+                        {getValue('dashboard.titleWithStore') || t('dashboard.titleWithStore', { storeName: store.name })}
                       </span>
                     </div>
                   </h1>
@@ -181,17 +183,17 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
-                <Badge variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 hidden sm:flex items-center gap-1.5" aria-label={t('dashboard.status.online', 'En ligne')}>
+                  <Badge variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 hidden sm:flex items-center gap-1.5" aria-label={getValue('dashboard.online') || 'En ligne'}>
                   <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
-                  {t('dashboard.online')}
+                  {getValue('dashboard.online')}
                 </Badge>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={handleRefresh}
                   className="h-9 sm:h-10 w-9 sm:w-10 p-0"
-                  aria-label={t('dashboard.refresh')}
-                  title={t('dashboard.refresh')}
+                  aria-label={getValue('dashboard.refresh')}
+                  title={getValue('dashboard.refresh')}
                 >
                   <Activity className="h-4 w-4" aria-hidden="true" />
                 </Button>

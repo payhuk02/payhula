@@ -157,3 +157,4 @@ COMMENT ON COLUMN public.user_templates.is_premium IS 'Si true, le template est 
 
 
 
+
