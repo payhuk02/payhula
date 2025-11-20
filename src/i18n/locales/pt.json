@@ -329,7 +329,6 @@
   },
   "dashboard": {
     "title": "Painel",
-    "titleWithStore": "Painel - {{storeName}}",
     "loading": "Carregando seu painel...",
     "welcome": "Bem-vindo ao seu painel",
     "createStore": "Você ainda não tem uma loja. Crie uma para começar a vender!",

@@ -42,6 +42,7 @@ import {
   ArrowRight,
   AlertCircle,
   Loader2,
+  Tag,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -165,6 +166,26 @@ export default function Checkout() {
 
     checkMultiStore();
   }, [items]);
+
+  // Restaurer le code promo depuis localStorage au chargement
+  useEffect(() => {
+    try {
+      const savedCoupon = localStorage.getItem('applied_coupon');
+      if (savedCoupon) {
+        const coupon = JSON.parse(savedCoupon);
+        if (coupon.id && coupon.discountAmount && coupon.code) {
+          setAppliedCouponCode({
+            id: coupon.id,
+            discountAmount: coupon.discountAmount,
+            code: coupon.code,
+          });
+        }
+      }
+    } catch (error) {
+      logger.warn('Error loading coupon from localStorage:', error);
+      localStorage.removeItem('applied_coupon');
+    }
+  }, []);
 
   // Charger le customer_id si utilisateur connecté
   useEffect(() => {
@@ -887,37 +908,6 @@ export default function Checkout() {
                       </div>
                     </div>
 
-                    {/* Code promo */}
-                    {storeId && items.length > 0 && (
-                      <div className="space-y-2 mt-4">
-                        <CouponInput
-                          storeId={storeId}
-                          productId={items[0].product_id}
-                          productType={items[0].product_type}
-                          customerId={customerId || undefined}
-                          orderAmount={summary.subtotal}
-                          onApply={(couponId, discountAmount, code) => {
-                            setAppliedCouponCode({
-                              id: couponId,
-                              discountAmount,
-                              code: code || '',
-                            });
-                            localStorage.setItem('applied_coupon', JSON.stringify({
-                              id: couponId,
-                              discountAmount,
-                              code: code || '',
-                            }));
-                          }}
-                          onRemove={() => {
-                            setAppliedCouponCode(null);
-                            localStorage.removeItem('applied_coupon');
-                          }}
-                          appliedCouponId={appliedCouponCode?.id || null}
-                          appliedCouponCode={appliedCouponCode?.code || null}
-                          appliedDiscountAmount={appliedCouponCode?.discountAmount || null}
-                        />
-                      </div>
-                    )}
 
                     {/* Carte cadeau */}
                     {storeId && (
@@ -1034,8 +1024,14 @@ export default function Checkout() {
                               )}
                               {group.discount_amount > 0 && (
                                 <div className="flex justify-between text-green-600">
-                                  <span>Réduction:</span>
+                                  <span>Réduction panier:</span>
                                   <span>-{group.discount_amount.toLocaleString('fr-FR')} XOF</span>
+                                </div>
+                              )}
+                              {appliedCouponCode && couponDiscountAmount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                  <span>Code promo ({appliedCouponCode.code}):</span>
+                                  <span>-{couponDiscountAmount.toLocaleString('fr-FR')} XOF</span>
                                 </div>
                               )}
                               <div className="flex justify-between font-semibold pt-1 border-t">
@@ -1052,13 +1048,21 @@ export default function Checkout() {
                           </AlertDescription>
                         </Alert>
                         <Separator />
-                        <div className="flex justify-between items-center text-lg font-bold pt-2">
-                          <span>Total Général:</span>
-                          <span className="text-2xl text-primary">
-                            {Array.from(storeGroups.values())
-                              .reduce((sum, group) => sum + group.total, 0)
-                              .toLocaleString('fr-FR')} XOF
-                          </span>
+                        <div className="space-y-2 text-sm pt-2">
+                          {appliedCouponCode && couponDiscountAmount > 0 && (
+                            <div className="flex justify-between text-green-600">
+                              <span>Code promo ({appliedCouponCode.code}):</span>
+                              <span>-{couponDiscountAmount.toLocaleString('fr-FR')} XOF</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center text-lg font-bold pt-2 border-t">
+                            <span>Total Général:</span>
+                            <span className="text-2xl text-primary">
+                              {Math.max(0, Array.from(storeGroups.values())
+                                .reduce((sum, group) => sum + group.total, 0) - (appliedCouponCode ? couponDiscountAmount : 0))
+                                .toLocaleString('fr-FR')} XOF
+                            </span>
+                          </div>
                         </div>
                         <p className="text-xs text-muted-foreground text-center">
                           Réparti sur {storeGroups.size} commande{storeGroups.size > 1 ? 's' : ''}
@@ -1126,6 +1130,54 @@ export default function Checkout() {
                               </p>
                             </div>
                           ))}
+                        </div>
+
+                        <Separator />
+
+                        {/* Code promo - Visible et proéminent dans le récapitulatif */}
+                        <div className="space-y-3 py-3 border-t border-b border-border/50 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 rounded-lg p-4">
+                          <div className="flex items-center gap-2">
+                            <div className="p-1.5 rounded-md bg-primary/10">
+                              <Tag className="h-4 w-4 text-primary" />
+                            </div>
+                            <Label htmlFor="coupon-code" className="text-sm font-semibold text-foreground">
+                              Avez-vous un code promo ?
+                            </Label>
+                          </div>
+                          <CouponInput
+                            storeId={storeId || undefined}
+                            productId={items[0]?.product_id}
+                            productType={items[0]?.product_type}
+                            customerId={customerId || undefined}
+                            orderAmount={summary.subtotal}
+                            onApply={(couponId, discountAmount, code) => {
+                              setAppliedCouponCode({
+                                id: couponId,
+                                discountAmount,
+                                code: code || '',
+                              });
+                              localStorage.setItem('applied_coupon', JSON.stringify({
+                                id: couponId,
+                                discountAmount,
+                                code: code || '',
+                              }));
+                              toast({
+                                title: '✅ Code promo appliqué',
+                                description: `Réduction de ${discountAmount.toLocaleString('fr-FR')} XOF appliquée`,
+                              });
+                            }}
+                            onRemove={() => {
+                              setAppliedCouponCode(null);
+                              localStorage.removeItem('applied_coupon');
+                              toast({
+                                title: 'Code promo retiré',
+                                description: 'Le code promo a été retiré de votre commande',
+                              });
+                            }}
+                            appliedCouponId={appliedCouponCode?.id || null}
+                            appliedCouponCode={appliedCouponCode?.code || null}
+                            appliedDiscountAmount={appliedCouponCode?.discountAmount || null}
+                          />
                         </div>
 
                         <Separator />

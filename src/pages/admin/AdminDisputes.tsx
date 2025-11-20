@@ -25,7 +25,6 @@ import { Link } from "react-router-dom";
 import { ProtectedAction } from "@/components/admin/ProtectedAction";
 import { Admin2FABanner } from "@/components/admin/Admin2FABanner";
 import { useAdminMFA } from "@/hooks/useAdminMFA";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { RequireAAL2 } from "@/components/admin/RequireAAL2";
 
 const AdminDisputes = () => {

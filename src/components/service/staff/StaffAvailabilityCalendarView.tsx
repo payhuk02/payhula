@@ -254,7 +254,7 @@ export function StaffAvailabilityCalendarView({
 
   if (isLoadingStaff) {
     return (
-      <Card>
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
           <Skeleton className="h-6 w-48" />
         </CardHeader>
@@ -266,25 +266,25 @@ export function StaffAvailabilityCalendarView({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Staff Selector */}
-      <Card>
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Users className="h-5 w-5 sm:h-6 sm:w-6" />
             Sélectionner un membre du staff
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm sm:text-base">
             Choisissez un membre du staff pour voir ses disponibilités
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <Select
               value={selectedStaffId || 'all'}
               onValueChange={(value) => onStaffSelect?.(value === 'all' ? undefined : value)}
             >
-              <SelectTrigger className="w-[300px]">
+              <SelectTrigger className="w-full sm:w-[300px] h-9 sm:h-10 text-xs sm:text-sm">
                 <SelectValue placeholder="Tous les membres" />
               </SelectTrigger>
               <SelectContent>
@@ -300,6 +300,7 @@ export function StaffAvailabilityCalendarView({
               <Button
                 variant="outline"
                 onClick={() => onStaffSelect?.(undefined)}
+                className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm"
               >
                 Effacer la sélection
               </Button>
@@ -309,26 +310,28 @@ export function StaffAvailabilityCalendarView({
       </Card>
 
       {/* Calendar */}
-      <Card>
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <CardTitle>Calendrier des Disponibilités</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-lg sm:text-xl">Calendrier des Disponibilités</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 {format(currentMonth, 'MMMM yyyy', { locale: fr })}
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => navigateMonth('prev')}
+                className="h-9 w-9 sm:h-10 sm:w-10"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setCurrentMonth(new Date())}
+                className="flex-1 sm:flex-none h-9 sm:h-10 text-xs sm:text-sm"
               >
                 Aujourd'hui
               </Button>
@@ -336,6 +339,7 @@ export function StaffAvailabilityCalendarView({
                 variant="outline"
                 size="icon"
                 onClick={() => navigateMonth('next')}
+                className="h-9 w-9 sm:h-10 sm:w-10"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -344,16 +348,17 @@ export function StaffAvailabilityCalendarView({
         </CardHeader>
         <CardContent>
           {/* Day Names */}
-          <div className="grid grid-cols-7 gap-2 mb-4">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3 sm:mb-4">
             {dayNames.map((day) => (
-              <div key={day} className="text-center font-semibold text-sm text-muted-foreground py-2">
-                {day}
+              <div key={day} className="text-center font-semibold text-xs sm:text-sm text-muted-foreground py-1 sm:py-2">
+                <span className="hidden sm:inline">{day}</span>
+                <span className="sm:hidden">{day.charAt(0)}</span>
               </div>
             ))}
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {/* Empty cells for days before month start */}
             {Array.from({ length: getDay(monthDays[0]) }).map((_, i) => (
               <div key={`empty-${i}`} className="aspect-square" />
@@ -370,7 +375,7 @@ export function StaffAvailabilityCalendarView({
                   key={date.toISOString()}
                   onClick={() => setSelectedDate(date)}
                   className={cn(
-                    'aspect-square p-2 rounded-lg border transition-all hover:shadow-md',
+                    'aspect-square p-1 sm:p-2 rounded-lg border transition-all hover:shadow-md touch-manipulation',
                     isToday && 'ring-2 ring-primary',
                     isSelected && 'bg-primary/10 border-primary',
                     availability.status === 'available' && 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
@@ -380,20 +385,20 @@ export function StaffAvailabilityCalendarView({
                 >
                   <div className="flex flex-col h-full">
                     <div className={cn(
-                      'text-sm font-semibold',
+                      'text-xs sm:text-sm font-semibold',
                       isToday && 'text-primary'
                     )}>
                       {format(date, 'd')}
                     </div>
-                    <div className="flex-1 flex items-center justify-center mt-1">
+                    <div className="flex-1 flex items-center justify-center mt-0.5 sm:mt-1">
                       {availability.status === 'available' && (
-                        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 dark:text-green-400" />
                       )}
                       {availability.status === 'unavailable' && (
-                        <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-600 dark:text-red-400" />
                       )}
                       {availability.status === 'no-schedule' && (
-                        <AlertCircle className="h-4 w-4 text-gray-400" />
+                        <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                       )}
                     </div>
                   </div>
@@ -403,18 +408,18 @@ export function StaffAvailabilityCalendarView({
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-6 mt-6 pt-6 border-t">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800" />
-              <span className="text-sm">Disponible</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800" />
+              <span className="text-xs sm:text-sm">Disponible</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800" />
-              <span className="text-sm">Indisponible</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800" />
+              <span className="text-xs sm:text-sm">Indisponible</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-gray-100 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800" />
-              <span className="text-sm">Aucun horaire</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-gray-100 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800" />
+              <span className="text-xs sm:text-sm">Aucun horaire</span>
             </div>
           </div>
         </CardContent>
@@ -422,15 +427,17 @@ export function StaffAvailabilityCalendarView({
 
       {/* Selected Date Details */}
       {selectedDate && (
-        <Card>
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Détails - {format(selectedDate, 'dd MMMM yyyy', { locale: fr })}</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">
+              Détails - {format(selectedDate, 'dd MMMM yyyy', { locale: fr })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {(() => {
               const availability = getDayAvailability(selectedDate);
               return (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center gap-2">
                     <Badge
                       variant={
@@ -440,6 +447,7 @@ export function StaffAvailabilityCalendarView({
                           ? 'destructive'
                           : 'secondary'
                       }
+                      className="text-xs sm:text-sm"
                     >
                       {availability.reason}
                     </Badge>
@@ -447,15 +455,15 @@ export function StaffAvailabilityCalendarView({
 
                   {availability.status === 'available' && availability.slots && (
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">Horaires disponibles :</p>
-                      <div className="grid grid-cols-2 gap-2">
+                      <p className="text-xs sm:text-sm font-medium">Horaires disponibles :</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {availability.slots.map((slot, i) => (
                           <div
                             key={i}
                             className="flex items-center gap-2 p-2 bg-muted rounded-lg"
                           >
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">
+                            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                            <span className="text-xs sm:text-sm">
                               {slot.start} - {slot.end}
                             </span>
                           </div>
@@ -466,15 +474,15 @@ export function StaffAvailabilityCalendarView({
 
                   {availability.status === 'available' && availability.startTime && (
                     <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">
+                      <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
                         {availability.startTime} - {availability.endTime}
                       </span>
                     </div>
                   )}
 
                   {availability.type && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       Type : {availability.type}
                     </div>
                   )}

@@ -683,7 +683,6 @@
   },
   "dashboard": {
     "title": "Panel",
-    "titleWithStore": "Panel - {{storeName}}",
     "loading": "Cargando panel...",
     "welcome": "¡Bienvenido! 🎉",
     "createStorePrompt": "Comienza creando tu tienda para acceder al panel avanzado",

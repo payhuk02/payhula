@@ -28,6 +28,7 @@ const Customers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<'name' | 'created_at' | 'total_orders' | 'total_spent'>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Utiliser le hook avec pagination serveur

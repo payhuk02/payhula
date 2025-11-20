@@ -54,6 +54,16 @@ export default function StoreAffiliateManagement() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [commissionStatusFilter, setCommissionStatusFilter] = useState<string>('all');
 
+  // ⚠️ IMPORTANT: Tous les hooks doivent être appelés AVANT les retours conditionnels
+  // pour respecter les règles des Hooks React
+  const {
+    links,
+    commissions,
+    approveCommission,
+    rejectCommission,
+    isLoading,
+  } = useStoreAffiliates(store?.id || '');
+
   if (storeLoading) {
     return (
       <SidebarProvider>
@@ -83,14 +93,6 @@ export default function StoreAffiliateManagement() {
       </SidebarProvider>
     );
   }
-
-  const {
-    links,
-    commissions,
-    approveCommission,
-    rejectCommission,
-    isLoading,
-  } = useStoreAffiliates(store.id);
 
   // Filtrer les commissions
   const filteredCommissions = commissions.filter((commission) => {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { ProtectedAction } from '@/components/admin/ProtectedAction';
 import { Admin2FABanner } from '@/components/admin/Admin2FABanner';
 import { RequireAAL2 } from '@/components/admin/RequireAAL2';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { logger } from '@/lib/logger';
 
 type AdminActionRow = {
   id: string;
@@ -124,43 +126,96 @@ export default function AdminAudit() {
         </Card>
       }>
         <RequireAAL2>
-        <div className="space-y-6">
+        <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
           <Admin2FABanner />
-          <div>
-            <h1 className="text-3xl font-bold">Journal d'audit (administration)</h1>
-            <p className="text-muted-foreground">Suivi des actions critiques réalisées par les administrateurs</p>
+          
+          {/* Header avec animation - Style Inventory */}
+          <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                  <Shield className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                </div>
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Journal d'audit
+                </span>
+              </h1>
+              <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+                Suivi des actions critiques réalisées par les administrateurs
+              </p>
+            </div>
           </div>
 
-          <Card>
+          <Card ref={tableRef} className="border-border/50 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
             <CardHeader>
-              <CardTitle>Logs</CardTitle>
-              <CardDescription>Dernières 200 actions</CardDescription>
+              <CardTitle className="text-lg sm:text-xl">Logs</CardTitle>
+              <CardDescription className="text-sm sm:text-base">Dernières 200 actions</CardDescription>
               <div className="flex flex-col gap-3 mt-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Rechercher (action, cible, id)" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
+                    <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Rechercher (action, cible, id)" 
+                      value={search} 
+                      onChange={e => { setSearch(e.target.value); setPage(1); }} 
+                      className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm" 
+                    />
                   </div>
-                  <Input placeholder="Filtrer action" value={actionFilter} onChange={e => { setActionFilter(e.target.value); setPage(1); }} />
-                  <Input placeholder="Filtrer acteur (UUID)" value={actorFilter} onChange={e => { setActorFilter(e.target.value); setPage(1); }} />
+                  <Input 
+                    placeholder="Filtrer action" 
+                    value={actionFilter} 
+                    onChange={e => { setActionFilter(e.target.value); setPage(1); }} 
+                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                  />
+                  <Input 
+                    placeholder="Filtrer acteur (UUID)" 
+                    value={actorFilter} 
+                    onChange={e => { setActorFilter(e.target.value); setPage(1); }} 
+                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                  />
                   <div className="flex items-center gap-2">
-                    <Input type="date" value={fromDate} onChange={e => { setFromDate(e.target.value); setPage(1); }} />
-                    <Input type="date" value={toDate} onChange={e => { setToDate(e.target.value); setPage(1); }} />
+                    <Input 
+                      type="date" 
+                      value={fromDate} 
+                      onChange={e => { setFromDate(e.target.value); setPage(1); }} 
+                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                    />
+                    <Input 
+                      type="date" 
+                      value={toDate} 
+                      onChange={e => { setToDate(e.target.value); setPage(1); }} 
+                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                    />
                   </div>
                 </div>
                 <div className="relative flex-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" onClick={exportCSV}>
-                        <Download className="h-4 w-4 mr-2"/>Exporter CSV
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button variant="outline" onClick={exportCSV} size="sm" className="h-9 sm:h-10 text-xs sm:text-sm">
+                        <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2"/>
+                        <span className="hidden sm:inline">Exporter CSV</span>
+                        <span className="sm:hidden">CSV</span>
                       </Button>
-                      <Button variant="outline" onClick={exportJSON}>Exporter JSON</Button>
+                      <Button variant="outline" onClick={exportJSON} size="sm" className="h-9 sm:h-10 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Exporter JSON</span>
+                        <span className="sm:hidden">JSON</span>
+                      </Button>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Page</span>
-                      <Input className="w-16" type="number" min={1} value={page} onChange={e => setPage(Math.max(1, Number(e.target.value)||1))} />
-                      <span className="text-sm text-muted-foreground">/ {Math.max(1, Math.ceil(filtered.length / pageSize))}</span>
-                      <select className="border rounded px-2 py-1 text-sm" value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}>
+                      <span className="text-xs sm:text-sm text-muted-foreground">Page</span>
+                      <Input 
+                        className="w-16 h-9 sm:h-10 text-xs sm:text-sm" 
+                        type="number" 
+                        min={1} 
+                        value={page} 
+                        onChange={e => setPage(Math.max(1, Number(e.target.value)||1))} 
+                      />
+                      <span className="text-xs sm:text-sm text-muted-foreground">/ {Math.max(1, Math.ceil(filtered.length / pageSize))}</span>
+                      <select 
+                        className="border rounded px-2 py-1 text-xs sm:text-sm h-9 sm:h-10" 
+                        value={pageSize} 
+                        onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
+                      >
                         <option value={10}>10</option>
                         <option value={25}>25</option>
                         <option value={50}>50</option>
@@ -181,24 +236,30 @@ export default function AdminAudit() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Action</TableHead>
-                        <TableHead>Cible</TableHead>
-                        <TableHead>Id cible</TableHead>
-                        <TableHead>Admin</TableHead>
-                        <TableHead>Détails</TableHead>
+                        <TableHead className="whitespace-nowrap text-xs sm:text-sm">Date</TableHead>
+                        <TableHead className="whitespace-nowrap text-xs sm:text-sm">Action</TableHead>
+                        <TableHead className="whitespace-nowrap text-xs sm:text-sm">Cible</TableHead>
+                        <TableHead className="whitespace-nowrap text-xs sm:text-sm">Id cible</TableHead>
+                        <TableHead className="whitespace-nowrap text-xs sm:text-sm">Admin</TableHead>
+                        <TableHead className="whitespace-nowrap text-xs sm:text-sm">Détails</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {paged.map(r => (
                         <TableRow key={r.id}>
-                          <TableCell className="text-muted-foreground">{new Date(r.created_at).toLocaleString()}</TableCell>
-                          <TableCell><Badge variant="secondary">{r.action}</Badge></TableCell>
-                          <TableCell>{r.target_type || '-'}</TableCell>
-                          <TableCell className="font-mono text-xs">{r.target_id || '-'}</TableCell>
-                          <TableCell className="font-mono text-xs">{r.actor_id}</TableCell>
+                          <TableCell className="text-muted-foreground text-xs sm:text-sm whitespace-nowrap">
+                            {new Date(r.created_at).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            <Badge variant="secondary" className="text-xs">{r.action}</Badge>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap">{r.target_type || '-'}</TableCell>
+                          <TableCell className="font-mono text-[10px] sm:text-xs whitespace-nowrap">{r.target_id || '-'}</TableCell>
+                          <TableCell className="font-mono text-[10px] sm:text-xs whitespace-nowrap">{r.actor_id}</TableCell>
                           <TableCell>
-                            <pre className="text-xs whitespace-pre-wrap max-w-[520px] overflow-auto">{JSON.stringify(r.metadata ?? {}, null, 2)}</pre>
+                            <pre className="text-[10px] sm:text-xs whitespace-pre-wrap max-w-[200px] sm:max-w-[520px] overflow-auto">
+                              {JSON.stringify(r.metadata ?? {}, null, 2)}
+                            </pre>
                           </TableCell>
                         </TableRow>
                       ))}

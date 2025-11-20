@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type EffectivePermissions = Record<string, boolean>;
 
+// Email de l'administrateur principal avec accès complet
+const PRINCIPAL_ADMIN_EMAIL = 'contact@edigit-agence.com';
+
 export const useCurrentAdminPermissions = () => {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string>('user');
@@ -16,6 +19,27 @@ export const useCurrentAdminPermissions = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
+
+      // Vérifier si c'est l'administrateur principal
+      if (user.email === PRINCIPAL_ADMIN_EMAIL) {
+        // Administrateur principal : accès complet
+        setRole('admin');
+        setIsSuperAdmin(true);
+        // Toutes les permissions activées
+        setPermissions({
+          'users.manage': true,
+          'users.roles': true,
+          'products.manage': true,
+          'orders.manage': true,
+          'payments.manage': true,
+          'disputes.manage': true,
+          'settings.manage': true,
+          'emails.manage': true,
+          'analytics.view': true,
+        });
+        setLoading(false);
+        return;
+      }
 
       const { data: profile, error: pErr } = await supabase
         .from('profiles')

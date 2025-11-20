@@ -183,7 +183,6 @@ const PAGES_CONFIG: PageConfig[] = [
         elements: [
           { id: 'welcomeMessage', label: 'Message de bienvenue', type: 'textarea', key: 'dashboard.welcome', defaultValue: 'Bienvenue sur votre tableau de bord' },
           { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'dashboard.subtitle', defaultValue: 'Gérez votre boutique en toute simplicité' },
-          { id: 'titleWithStore', label: 'Titre avec nom boutique', type: 'text', key: 'dashboard.titleWithStore', defaultValue: 'Tableau de bord' },
           { id: 'online', label: 'Label En ligne', type: 'text', key: 'dashboard.online', defaultValue: 'En ligne' },
           { id: 'refresh', label: 'Label Actualiser', type: 'text', key: 'dashboard.refresh', defaultValue: 'Actualiser' },
           { id: 'createStorePrompt', label: 'Message Créer boutique', type: 'textarea', key: 'dashboard.createStorePrompt', defaultValue: 'Créez votre première boutique pour commencer' },

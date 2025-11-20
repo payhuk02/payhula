@@ -173,7 +173,7 @@ const Dashboard = () => {
                         <LayoutDashboard className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                       </div>
                       <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
-                        {getValue('dashboard.titleWithStore') || t('dashboard.titleWithStore', { storeName: store.name })}
+                        {getValue('dashboard.title') || t('dashboard.title')}
                       </span>
                     </div>
                   </h1>

@@ -683,7 +683,6 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "titleWithStore": "Dashboard - {{storeName}}",
     "loading": "Dashboard wird geladen...",
     "welcome": "Willkommen! 🎉",
     "createStorePrompt": "Erstellen Sie zunächst Ihren Shop, um auf das erweiterte Dashboard zuzugreifen",

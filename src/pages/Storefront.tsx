@@ -21,6 +21,7 @@ import { SEOMeta, StoreSchema, BreadcrumbSchema, ItemListSchema } from "@/compon
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useToast } from '@/hooks/use-toast';
+import { usePageCustomization } from '@/hooks/usePageCustomization';
 
 const Storefront = () => {
   const { slug } = useParams<{ slug: string }>();

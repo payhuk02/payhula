@@ -108,17 +108,22 @@ const AdminStores = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+        {/* Header avec animation - Style Inventory */}
+        <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Gestion des boutiques
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold flex items-center gap-2 mb-1 sm:mb-2">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 animate-in zoom-in duration-500">
+                <Store className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+              </div>
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Gestion des boutiques
+              </span>
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
               {stores.length} boutique{stores.length > 1 ? 's' : ''} créée{stores.length > 1 ? 's' : ''}
             </p>
           </div>
-          <Store className="h-5 w-5 text-muted-foreground" />
         </div>
 
         <Card>

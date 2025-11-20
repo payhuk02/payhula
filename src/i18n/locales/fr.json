@@ -684,7 +684,6 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
-    "titleWithStore": "Tableau de bord - {{storeName}}",
     "loading": "Chargement du tableau de bord...",
     "welcome": "Bienvenue ! 🎉",
     "createStorePrompt": "Commencez par créer votre boutique pour accéder au tableau de bord avancé",
