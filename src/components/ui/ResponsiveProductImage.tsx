@@ -107,7 +107,7 @@ export const ResponsiveProductImage = ({
         </div>
       )}
 
-      {/* Image optimisée avec rendu professionnel */}
+      {/* Image optimisée avec rendu professionnel - Stable et optimisée */}
       {isInView && (
         <img
           src={src}
@@ -115,27 +115,36 @@ export const ResponsiveProductImage = ({
           width={1280}
           height={720}
           className={cn(
-            "w-full h-full object-cover transition-all duration-700 ease-out",
-            "transform-gpu will-change-transform",
-            isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            "w-full h-full object-cover",
+            "product-image",
+            isLoaded ? "opacity-100" : "opacity-100"
           )}
           onLoad={handleLoad}
           onError={handleError}
           loading={priority ? "eager" : "lazy"}
-          decoding="async"
+          decoding={priority ? "sync" : "async"}
           sizes={sizes}
           style={{
             // Prévenir le CLS (Cumulative Layout Shift)
             aspectRatio: '16/9',
-            // Optimisation GPU pour les performances
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
             // Qualité d'affichage optimisée - Images nettes et centrées
             imageRendering: 'high-quality',
             // Centrage parfait de l'image
             objectPosition: 'center',
             // Coins arrondis hérités du parent
-            borderRadius: 'inherit'
+            borderRadius: 'inherit',
+            // Stabilité garantie - pas de transformations
+            transform: 'none',
+            // Toujours visible
+            visibility: 'visible',
+            opacity: 1,
+            // Optimisation performance
+            willChange: 'auto',
+            backfaceVisibility: 'visible',
+            WebkitBackfaceVisibility: 'visible',
+            // Position relative pour garantir la visibilité
+            position: 'relative',
+            zIndex: 1
           }}
         />
       )}

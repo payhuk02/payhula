@@ -23,6 +23,7 @@ import StoreFooter from "@/components/storefront/StoreFooter";
 import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { sanitizeProductDescription } from "@/lib/html-sanitizer";
 import { ProductImageGallery } from "@/components/ui/ProductImageGallery";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { CountdownTimer } from "@/components/ui/countdown-timer";
 import { CustomFieldsDisplay } from "@/components/products/CustomFieldsDisplay";
 import { ProductVariantSelector } from "@/components/products/ProductVariantSelector";
@@ -35,6 +36,7 @@ import { PriceStockAlertButton } from "@/components/marketplace/PriceStockAlertB
 import { formatPrice, getDisplayPrice, hasPromotion, calculateDiscount } from '@/lib/product-helpers';
 import { useToast } from '@/hooks/use-toast';
 import { usePageCustomization } from '@/hooks/usePageCustomization';
+import { cn } from '@/lib/utils';
 
 const ProductDetails = () => {
   const { slug, productSlug } = useParams<{ slug: string; productSlug: string }>();
@@ -47,6 +49,7 @@ const ProductDetails = () => {
   const [selectedVariantPrice, setSelectedVariantPrice] = useState<number | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { toast } = useToast();
 
   // ID stable pour éviter les violations des règles des hooks
@@ -426,60 +429,98 @@ const ProductDetails = () => {
         <main className="flex-1" role="main">
           <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
-              {/* 🖼️ Bannière principale et bannières secondaires */}
-              <div ref={galleryRef} className="space-y-3 sm:space-y-4" role="group" aria-label="Bannières du produit">
-                {/* Bannière principale */}
-                {product.image_url && (
-                  <div className="rounded-lg overflow-hidden border border-border shadow-sm bg-card">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-auto object-contain max-h-[500px] sm:max-h-[600px] md:max-h-[700px]"
-                      loading="eager"
-                      decoding="async"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
-                    />
-                  </div>
-                )}
-
-                {/* Bannières secondaires (max 3) */}
+              {/* 🖼️ Galerie d'images inspirée du design professionnel - Image principale à gauche, miniatures à droite */}
+              <div ref={galleryRef} className="flex flex-col lg:flex-row gap-3 sm:gap-4" role="group" aria-label="Galerie du produit">
+                {/* Collection de toutes les images */}
                 {(() => {
-                  // Extraire les bannières secondaires (max 3)
-                  const secondaryBanners: string[] = [];
+                  const allImages: string[] = [];
                   
-                  // Récupérer depuis product.images (tableau JSONB)
+                  // Ajouter l'image principale
+                  if (product.image_url) {
+                    allImages.push(product.image_url);
+                  }
+                  
+                  // Ajouter les images secondaires
                   if (Array.isArray(product.images)) {
                     product.images.forEach((img: any) => {
                       if (typeof img === 'string' && img && img !== product.image_url) {
-                        secondaryBanners.push(img);
+                        allImages.push(img);
                       } else if (typeof img === 'object' && img?.url && img.url !== product.image_url) {
-                        secondaryBanners.push(img.url);
+                        allImages.push(img.url);
                       }
                     });
                   }
                   
-                  // Limiter à 3 bannières maximum
-                  const bannersToShow = secondaryBanners.slice(0, 3);
+                  const currentImage = allImages[selectedImageIndex] || product.image_url;
                   
-                  if (bannersToShow.length > 0) {
-                    return (
-                      <div className="space-y-3 sm:space-y-4">
-                        {bannersToShow.map((bannerUrl, index) => (
-                          <div key={index} className="rounded-lg overflow-hidden border border-border shadow-sm bg-card">
-                            <img
-                              src={bannerUrl}
-                              alt={`${product.name} - Bannière ${index + 2}`}
-                              className="w-full h-auto object-contain max-h-[400px] sm:max-h-[500px]"
-                              loading="lazy"
-                              decoding="async"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    );
+                  if (allImages.length === 0 && !product.image_url) {
+                    return null;
                   }
-                  return null;
+                  
+                  return (
+                    <>
+                      {/* Image principale - Grande taille à gauche (ou en haut sur mobile) */}
+                      <div className="flex-1 lg:w-[75%]">
+                        <div className="rounded-lg overflow-hidden border border-border shadow-sm bg-transparent product-image-container">
+                          {currentImage && (
+                            <OptimizedImage
+                              src={currentImage}
+                              alt={product.name}
+                              width={1200}
+                              height={675}
+                              className="w-full h-auto object-contain max-h-[500px] sm:max-h-[600px] md:max-h-[700px] lg:max-h-[800px] product-image cursor-pointer transition-opacity duration-300"
+                              priority={selectedImageIndex === 0}
+                              preset="productImage"
+                              responsive={true}
+                              sizes={{
+                                mobile: 400,
+                                tablet: 800,
+                                desktop: 1200
+                              }}
+                              quality={90}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Miniatures à droite (ou en bas sur mobile) - Colonne verticale */}
+                      {allImages.length > 1 && (
+                        <div className="flex lg:flex-col gap-2 sm:gap-3 lg:w-[25%] overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                          {allImages.map((imageUrl, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setSelectedImageIndex(index)}
+                              className={cn(
+                                "flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200 product-image-container",
+                                "w-20 h-20 sm:w-24 sm:h-24 lg:w-full lg:aspect-square",
+                                selectedImageIndex === index
+                                  ? "border-amber-500 ring-2 ring-amber-500/30 shadow-md scale-105"
+                                  : "border-gray-300 hover:border-amber-400 hover:shadow-sm opacity-75 hover:opacity-100"
+                              )}
+                              aria-label={`Voir l'image ${index + 1} de ${product.name}`}
+                            >
+                              <OptimizedImage
+                                src={imageUrl}
+                                alt={`${product.name} - Miniature ${index + 1}`}
+                                width={150}
+                                height={150}
+                                className="w-full h-full object-cover product-image"
+                                priority={index < 3}
+                                preset="productImage"
+                                responsive={true}
+                                sizes={{
+                                  mobile: 100,
+                                  tablet: 150,
+                                  desktop: 150
+                                }}
+                                quality={85}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
                 })()}
 
                 {/* 🎥 Vidéo produit */}

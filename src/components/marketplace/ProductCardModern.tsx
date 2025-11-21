@@ -461,7 +461,7 @@ const ProductCardModernComponent = ({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white border-gray-300 hover:bg-gray-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 border-amber-500 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
               asChild
             >
               <Link 
@@ -478,7 +478,7 @@ const ProductCardModernComponent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white border-gray-300 hover:bg-gray-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+                className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 border-purple-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
                 asChild
               >
                 <Link 

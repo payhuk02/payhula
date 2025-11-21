@@ -243,7 +243,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full h-11 sm:h-8 md:h-9 text-xs sm:text-xs text-white bg-gray-800 hover:bg-gray-700 border-gray-800 transition-all duration-200 px-3 sm:px-3 touch-manipulation active:scale-95"
+                  className="w-full h-11 sm:h-8 md:h-9 text-xs sm:text-xs text-white bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 border-amber-500 transition-all duration-200 px-3 sm:px-3 touch-manipulation active:scale-95"
                   onClick={() => handleAction('view')}
                 >
                   <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0 text-white" />
@@ -255,7 +255,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full h-11 sm:h-8 md:h-9 text-xs sm:text-xs text-white bg-gray-800 hover:bg-gray-700 border-gray-800 transition-all duration-200 px-3 sm:px-3 touch-manipulation active:scale-95"
+                    className="w-full h-11 sm:h-8 md:h-9 text-xs sm:text-xs text-white bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 border-purple-700 transition-all duration-200 px-3 sm:px-3 touch-manipulation active:scale-95"
                   >
                     <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2 flex-shrink-0 text-white" />
                     <span className="hidden sm:inline whitespace-nowrap text-white">Contacter</span>

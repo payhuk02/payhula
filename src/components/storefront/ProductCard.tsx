@@ -415,7 +415,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           <Button
             variant="outline"
             size="sm"
-            className="product-action-button flex-1 h-10 text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+            className="product-action-button flex-1 h-10 text-white bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 border-amber-500 transition-all duration-200"
             asChild
           >
             <Link 
@@ -431,7 +431,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             <Button
               variant="outline"
               size="sm"
-              className="product-action-button flex-1 h-10 text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+              className="product-action-button flex-1 h-10 text-white bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 border-purple-700 transition-all duration-200"
               asChild
             >
               <Link 
