@@ -206,8 +206,8 @@ export const OptimizedImage = ({
   // Déterminer si on doit utiliser WebP
   const useWebP = !error && isSupabaseStorageUrl(src) && webpSrc !== originalSrc;
   
-  // Sur mobile, charger plus agressivement (eager pour les premières images)
-  const shouldLoadEager = priority || (isMobile && !error && src);
+  // Sur mobile, toujours charger en eager pour éviter les disparitions lors du scroll
+  const shouldLoadEager = priority || isMobile;
 
   return (
     <picture className={cn('relative w-full h-full bg-transparent', className)}>
@@ -251,6 +251,8 @@ export const OptimizedImage = ({
         style={{
           imageRendering: 'crisp-edges',
           minHeight: isMobile ? '200px' : undefined, // Hauteur minimum sur mobile
+          position: 'relative', // S'assurer que l'image reste visible
+          zIndex: 1, // S'assurer que l'image est au-dessus
           ...props.style
         }}
         {...props}

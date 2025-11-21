@@ -287,19 +287,20 @@
     border-radius: 0.75rem 0.75rem 0 0; /* Arrondi seulement en haut */
   }
   
-  /* Image optimisée pour netteté mobile */
+  /* Image optimisée pour netteté mobile - Toujours visible lors du scroll */
   .product-image {
     /* Netteté optimale pour écrans Retina mobile */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    /* Légère amélioration de contraste pour mobile */
-    filter: contrast(1.08) saturate(1.12);
     /* Forcer l'affichage de l'image */
-    display: block;
-    /* Éviter les problèmes de chargement */
-    will-change: opacity;
+    display: block !important;
+    /* S'assurer que l'image reste visible lors du scroll */
+    position: relative;
+    z-index: 1;
+    /* Pas de will-change pour éviter les problèmes de rendu */
+    will-change: auto;
+    /* Pas de filtres coûteux sur mobile */
+    filter: none;
   }
   
   /* S'assurer que l'image se charge même si lazy loading échoue */
@@ -310,12 +311,18 @@
     height: 100%;
   }
   
-  /* Forcer l'affichage de l'image sur mobile */
-  .product-image-container picture img {
+  /* Forcer l'affichage de l'image sur mobile - Toujours visible lors du scroll */
+  .product-image-container picture img,
+  .product-image-container picture,
+  .product-image {
     display: block !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+    position: relative !important;
+    z-index: 1 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   /* Améliorer le placeholder sur mobile */

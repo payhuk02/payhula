@@ -89,7 +89,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
               desktop: 1000
             }}
             quality={90}
-            priority={false}
+            priority={true}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-transparent">

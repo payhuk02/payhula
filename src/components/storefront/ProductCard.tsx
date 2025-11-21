@@ -197,7 +197,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           width={1400}
           height={787}
           className="product-image w-full h-full object-cover"
-          priority={false}
+          priority={true}
           preset="productImage"
           responsive={true}
         />

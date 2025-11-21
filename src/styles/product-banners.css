@@ -60,6 +60,12 @@
   /* Pas d'ombres, affichage statique */
   box-shadow: none !important;
   filter: none;
+  /* S'assurer que l'image reste visible lors du scroll sur mobile */
+  position: relative;
+  z-index: 1;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
 }
 
 /* Overlay gradient pour les effets visuels */
