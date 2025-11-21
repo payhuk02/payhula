@@ -8,7 +8,6 @@ import StoreTabs from "@/components/storefront/StoreTabs";
 import ProductCardModern from "@/components/marketplace/ProductCardModern";
 import UnifiedProductCard from "@/components/products/UnifiedProductCard";
 import { transformToUnifiedProduct } from "@/lib/product-transform";
-import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import ProductFilters from "@/components/storefront/ProductFilters";
 import StoreFooter from "@/components/storefront/StoreFooter";
 import ContactForm from "@/components/storefront/ContactForm";
@@ -312,14 +311,16 @@ const Storefront = () => {
                     productTypes={productTypes}
                   />
 
-                  {productsLoading && hasLoadedOnce ? (
-                    // Afficher les skeletons seulement si on recharge (pas au premier chargement)
-                    <ProductGrid>
-                      <ProductCardSkeleton variant="store" count={6} />
-                    </ProductGrid>
-                  ) : filteredProducts.length > 0 ? (
+                  {filteredProducts.length > 0 ? (
                     <div ref={productsRef}>
-                      <ProductGrid>
+                      {/* Indicateur de chargement discret en haut si rechargement */}
+                      {productsLoading && hasLoadedOnce && (
+                        <div className="flex justify-center mb-4">
+                          <div className="h-1 w-32 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-full animate-pulse" />
+                        </div>
+                      )}
+
+                      <ProductGrid className={productsLoading && hasLoadedOnce ? 'opacity-75 transition-opacity duration-300' : ''}>
                         {filteredProducts.map((product, index) => {
                           // Transformer le produit vers le format unifié
                           const unifiedProduct = transformToUnifiedProduct({

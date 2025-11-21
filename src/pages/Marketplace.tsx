@@ -46,7 +46,6 @@ import ProductComparison from "@/components/marketplace/ProductComparison";
 import FavoritesManager from "@/components/marketplace/FavoritesManager";
 import UnifiedProductCard from "@/components/products/UnifiedProductCard";
 import { transformToUnifiedProduct } from "@/lib/product-transform";
-import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { CategoryNavigationBar } from "@/components/marketplace/CategoryNavigationBar";
 import { BundlesSection } from "@/components/marketplace/BundlesSection";
 import { PersonalizedRecommendations } from "@/components/marketplace/ProductRecommendations";
@@ -1090,12 +1089,7 @@ const Marketplace = () => {
         aria-label={t('marketplace.productList.ariaLabel')}
       >
         <div className="w-full mx-auto max-w-7xl px-0 sm:px-4">
-          {isLoadingProducts ? (
-            // Afficher les skeletons seulement si on recharge (pas au premier chargement)
-            <ProductGrid>
-              <ProductCardSkeleton variant="marketplace" count={pagination.itemsPerPage} />
-            </ProductGrid>
-          ) : error ? (
+          {error ? (
             <div className="text-center py-8 sm:py-12 lg:py-16 px-2" role="alert" aria-live="polite">
               <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
                 <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-red-500" aria-hidden="true" />
@@ -1130,7 +1124,14 @@ const Marketplace = () => {
                 </div>
               )}
 
-              <ProductGrid>
+              {/* Indicateur de chargement discret en haut si rechargement */}
+              {isLoadingProducts && hasLoadedOnce && (
+                <div className="flex justify-center mb-4">
+                  <div className="h-1 w-32 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-full animate-pulse" />
+                </div>
+              )}
+
+              <ProductGrid className={isLoadingProducts && hasLoadedOnce ? 'opacity-75 transition-opacity duration-300' : ''}>
                 {displayProducts.map((product) => {
                   // Transformer le produit vers le format unifié
                   const unifiedProduct = transformToUnifiedProduct(product);
