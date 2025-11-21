@@ -41,16 +41,14 @@
 .product-card-professional {
   @apply relative overflow-hidden bg-white border border-gray-200;
   border-radius: var(--comeup-radius-lg);
-  box-shadow: var(--comeup-shadow-sm);
-  transition: var(--comeup-transition);
-  transform: translateZ(0);
-  will-change: transform;
+  box-shadow: none;
+  /* Affichage statique - pas d'animations */
 }
 
 .product-card-professional:hover {
   border-color: var(--comeup-gray-300);
-  box-shadow: var(--comeup-shadow-xl);
-  transform: translateY(-4px) scale(1.02);
+  box-shadow: none;
+  transform: none;
 }
 
 /* Image container avec overlay */
@@ -61,12 +59,15 @@
 }
 
 .product-image-container img {
-  @apply w-full h-full object-cover transition-transform duration-500;
-  transform: translateZ(0);
+  @apply w-full h-full object-cover;
+  /* Affichage statique - pas d'ombres, pas d'animations */
+  box-shadow: none !important;
+  filter: none;
 }
 
 .product-card-professional:hover .product-image-container img {
-  transform: scale(1.05);
+  transform: none;
+  box-shadow: none;
 }
 
 /* Overlay avec gradient */

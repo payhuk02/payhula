@@ -13,9 +13,7 @@
   --border-radius-tablet: 1rem;
   --border-radius-desktop: 1.25rem;
   --transition-duration: 300ms;
-  --shadow-mobile: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-desktop: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  /* Ombres supprimées pour affichage statique et professionnel */
 }
 
 /* Container principal pour les cartes produits - Optimisé pour toutes les plateformes */
@@ -47,14 +45,9 @@
   will-change: transform;
 }
 
-/* Image optimisée avec lazy loading et rendu professionnel */
+/* Image optimisée avec rendu professionnel statique - Pas d'ombres, pas d'animations */
 .product-banner img {
-  @apply w-full h-full object-cover transition-all duration-700 ease-out;
-  will-change: transform, opacity;
-  /* Optimisation GPU */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  @apply w-full h-full object-cover;
   /* Qualité d'affichage optimisée - Images nettes */
   image-rendering: high-quality;
   -webkit-image-rendering: high-quality;
@@ -64,14 +57,9 @@
   contain: layout;
   /* Coins arrondis pour l'image */
   border-radius: inherit;
-}
-
-/* Effet hover professionnel inspiré des grandes plateformes */
-.product-card:hover .product-banner img {
-  @apply scale-105;
-  filter: brightness(1.05) contrast(1.02);
-  /* Optimisation GPU pour les animations */
-  transform: translateZ(0) scale(1.05);
+  /* Pas d'ombres, affichage statique */
+  box-shadow: none !important;
+  filter: none;
 }
 
 /* Overlay gradient pour les effets visuels */
@@ -141,7 +129,7 @@
     width: 96%;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: var(--shadow-mobile);
+    box-shadow: none;
     border-radius: var(--border-radius-mobile);
     /* Effet de profondeur */
     transform: translateZ(0);
@@ -191,7 +179,7 @@
   
   /* Cartes produits tablette */
   .product-card-tablet {
-    box-shadow: var(--shadow-desktop);
+    box-shadow: none;
     border-radius: var(--border-radius-tablet);
     /* Hauteur uniforme exacte */
     height: 520px;
@@ -203,10 +191,10 @@
     will-change: transform;
   }
   
-  /* Effet hover tablette avec shadow-xl et scale-105 */
+  /* Pas d'effet hover - Affichage statique */
   .product-card-tablet:hover {
-    transform: translateZ(0) translateY(-8px) scale(1.05);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: none;
+    box-shadow: none;
   }
 }
 
@@ -234,24 +222,20 @@
     will-change: transform;
   }
   
-  /* Effets hover avancés pour desktop - Style professionnel */
+  /* Affichage statique et professionnel pour desktop - Pas d'ombres */
   .product-card-desktop {
-    box-shadow: var(--shadow-desktop);
+    box-shadow: none;
     border-radius: var(--border-radius-desktop);
-    transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
     /* Hauteur uniforme exacte */
     height: 560px;
     min-height: 560px;
     max-height: 560px;
-    /* Optimisation GPU */
-    transform: translateZ(0);
-    will-change: transform;
   }
   
-  /* Effet hover desktop avec shadow-xl et scale-105 */
+  /* Pas d'effet hover - Affichage statique */
   .product-card-desktop:hover {
-    transform: translateZ(0) translateY(-12px) scale(1.05);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: none;
+    box-shadow: none;
   }
   
   /* Optimisation pour les écrans ultra-larges - Maintenir EXACTEMENT 3 colonnes */
@@ -332,11 +316,10 @@
   @apply absolute top-3 right-3 z-10;
 }
 
-/* Effet de survol global avec shadow-xl et scale-105 */
+/* Pas d'effet hover - Affichage statique et professionnel */
 .product-card:hover {
-  @apply shadow-xl;
-  transform: translateZ(0) translateY(-8px) scale(1.05);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: none;
+  box-shadow: none;
 }
 
 .product-card:hover .product-title {
