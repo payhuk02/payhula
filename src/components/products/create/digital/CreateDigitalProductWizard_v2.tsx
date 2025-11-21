@@ -247,6 +247,7 @@ export const CreateDigitalProductWizard = ({
       // Sauvegarder dans localStorage pour l'instant
       // TODO: Implémenter sauvegarde en base de données
       localStorage.setItem('digital-product-draft', JSON.stringify(dataToSave));
+      localStorage.setItem('digital-product-current-step', currentStep.toString());
       logger.info('Brouillon auto-sauvegardé', { step: currentStep });
     } catch (error) {
       logger.error('Auto-save error', {
@@ -263,11 +264,21 @@ export const CreateDigitalProductWizard = ({
    */
   useEffect(() => {
     const savedDraft = localStorage.getItem('digital-product-draft');
+    const savedStep = localStorage.getItem('digital-product-current-step');
     if (savedDraft) {
       try {
         const draft = JSON.parse(savedDraft);
         setFormData(draft);
         logger.info('Brouillon chargé depuis localStorage');
+        
+        // Restaurer l'étape si elle existe
+        if (savedStep) {
+          const step = parseInt(savedStep, 10);
+          if (step >= 1 && step <= STEPS.length) {
+            setCurrentStep(step);
+            logger.info('Étape restaurée depuis localStorage', { step });
+          }
+        }
       } catch (error) {
         logger.error('Error loading draft', {
           error: error instanceof Error ? error.message : String(error),
@@ -281,6 +292,13 @@ export const CreateDigitalProductWizard = ({
    * Validate current step avec validation améliorée (client + serveur)
    */
   const validateStep = useCallback(async (step: number): Promise<boolean> => {
+    // Log détaillé pour débogage
+    logger.info('validateStep appelé', { 
+      step, 
+      stepType: typeof step,
+      STEPSLength: STEPS.length
+    });
+    
     // Réinitialiser les erreurs serveur en premier
     clearServerErrors();
     
@@ -398,12 +416,20 @@ export const CreateDigitalProductWizard = ({
     }
 
     try {
-      logger.info('Début validation étape', { step: currentStep });
+      // Log détaillé pour débogage
+      logger.info('Début validation étape', { 
+        step: currentStep, 
+        stepType: typeof currentStep,
+        STEPSLength: STEPS.length,
+        isValidStep: currentStep >= 1 && currentStep <= STEPS.length
+      });
       const isValid = await validateStep(currentStep);
       
       if (isValid) {
         const nextStep = Math.min(currentStep + 1, STEPS.length);
         setCurrentStep(nextStep);
+        // Sauvegarder l'étape dans localStorage
+        localStorage.setItem('digital-product-current-step', nextStep.toString());
         logger.info('Navigation vers étape suivante', { from: currentStep, to: nextStep });
         
         // Scroll to top
@@ -425,6 +451,8 @@ export const CreateDigitalProductWizard = ({
   const handlePrevious = useCallback(() => {
     const prevStep = Math.max(currentStep - 1, 1);
     setCurrentStep(prevStep);
+    // Sauvegarder l'étape dans localStorage
+    localStorage.setItem('digital-product-current-step', prevStep.toString());
     logger.info('Navigation vers étape précédente', { from: currentStep, to: prevStep });
     
     // Scroll to top
