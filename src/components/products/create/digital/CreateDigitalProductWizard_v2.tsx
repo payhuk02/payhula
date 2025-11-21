@@ -314,13 +314,24 @@ export const CreateDigitalProductWizard = ({
       switch (step) {
       case 1: {
         // 1. Validation client avec Zod
-        const result = validateWithZod(digitalProductSchema, {
-          name: formData.name,
-          slug: formData.slug,
-          description: formData.description,
-          price: formData.price,
-          version: formData.version,
-        });
+        // Préparer les données en gérant les valeurs vides/undefined
+        const validationData: any = {
+          name: formData.name?.trim() || '',
+          price: formData.price || 0,
+        };
+        
+        // Ajouter les champs optionnels seulement s'ils ont une valeur
+        if (formData.slug && formData.slug.trim()) {
+          validationData.slug = formData.slug.trim();
+        }
+        if (formData.description && formData.description.trim()) {
+          validationData.description = formData.description.trim();
+        }
+        if (formData.version && formData.version.trim()) {
+          validationData.version = formData.version.trim();
+        }
+        
+        const result = validateWithZod(digitalProductSchema, validationData);
         
         if (!result.valid) {
           const nameError = getFieldError(result.errors, 'name');

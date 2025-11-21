@@ -55,7 +55,8 @@ export const digitalProductSchema = z.object({
   
   version: z.string()
     .regex(/^\d+\.\d+(\.\d+)?(-[a-zA-Z0-9]+)?$/, 'Format de version invalide (ex: 1.0.0 ou 1.0.0-beta)')
-    .optional(),
+    .optional()
+    .or(z.literal('')),
   
   main_file_url: z.string().url('URL de fichier invalide').optional().or(z.literal('')),
   
