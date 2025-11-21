@@ -30,19 +30,20 @@ const CartItemComponent = ({ item, onUpdateQuantity, onRemove, isLoading }: Cart
   const hasDiscount = (item.discount_amount || 0) > 0;
 
   return (
-    <div className="flex gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+    <article className="flex gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors" aria-labelledby={`cart-item-${item.id}-name`}>
       {/* Image */}
       <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border">
         <img
           src={item.product_image_url || '/placeholder-product.png'}
           alt={item.product_name}
           className="w-full h-full object-cover"
+          loading="lazy"
         />
       </div>
 
       {/* Infos produit */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-lg mb-1 truncate">{item.product_name}</h3>
+        <h3 id={`cart-item-${item.id}-name`} className="font-semibold text-lg mb-1 truncate">{item.product_name}</h3>
         
         {item.variant_name && (
           <p className="text-sm text-muted-foreground mb-2">
@@ -52,15 +53,16 @@ const CartItemComponent = ({ item, onUpdateQuantity, onRemove, isLoading }: Cart
 
         <div className="flex items-center gap-4 mt-2">
           {/* Quantité */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="group" aria-label={`Quantité pour ${item.product_name}`}>
             <Button
               variant="outline"
               size="icon"
               className="h-8 w-8"
               onClick={() => handleQuantityChange(item.quantity - 1)}
               disabled={isLoading}
+              aria-label={`Diminuer la quantité de ${item.product_name}`}
             >
-              <Minus className="h-4 w-4" />
+              <Minus className="h-4 w-4" aria-hidden="true" />
             </Button>
             <Input
               type="number"
@@ -72,6 +74,7 @@ const CartItemComponent = ({ item, onUpdateQuantity, onRemove, isLoading }: Cart
               }}
               className="w-16 text-center h-8"
               disabled={isLoading}
+              aria-label={`Quantité de ${item.product_name}`}
             />
             <Button
               variant="outline"
@@ -79,8 +82,9 @@ const CartItemComponent = ({ item, onUpdateQuantity, onRemove, isLoading }: Cart
               className="h-8 w-8"
               onClick={() => handleQuantityChange(item.quantity + 1)}
               disabled={isLoading}
+              aria-label={`Augmenter la quantité de ${item.product_name}`}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
 

@@ -1,9 +1,92 @@
 /**
- * Export centralisé des icônes personnalisées
- * Ces icônes utilisent des SVG inline pour éviter les problèmes de bundling en production
+ * Index centralisé pour les icônes lucide-react les plus utilisées
+ * Permet d'optimiser le bundle size en évitant les imports multiples
  */
 
-export { AlertCircleIcon } from './AlertCircleIcon';
+// Icônes de navigation et layout
+export {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  Settings,
+  Store,
+  User,
+  Heart,
+  Receipt,
+  RotateCcw,
+  Download,
+  Bell,
+} from 'lucide-react';
 
-// Ré-export des icônes lucide-react pour compatibilité
-export * from 'lucide-react';
+// Icônes de commerce
+export {
+  CreditCard,
+  DollarSign,
+  Tag,
+  Percent,
+  Gift,
+  ShoppingBag,
+} from 'lucide-react';
+
+// Icônes d'analytics
+export {
+  BarChart3,
+  TrendingUp,
+  Target,
+} from 'lucide-react';
+
+// Icônes de sécurité
+export {
+  Shield,
+  ShieldCheck,
+  Key,
+} from 'lucide-react';
+
+// Icônes de communication
+export {
+  MessageSquare,
+  Search,
+} from 'lucide-react';
+
+// Icônes de contenu
+export {
+  BookOpen,
+  GraduationCap,
+  FileText,
+} from 'lucide-react';
+
+// Icônes de logistique
+export {
+  Truck,
+  Warehouse,
+  Calendar,
+} from 'lucide-react';
+
+// Icônes utilitaires
+export {
+  LogOut,
+  UserPlus,
+  History,
+  Palette,
+  Layout,
+  Sparkles,
+  Webhook,
+  Star,
+  Repeat,
+  GanttChart,
+  Boxes,
+  PackageSearch,
+  Factory,
+  Hash,
+  Building2,
+  BarChart,
+  Layers,
+  FileBarChart,
+  Camera,
+  Globe,
+  Trophy,
+  AlertTriangle,
+  Phone,
+  Wallet,
+} from 'lucide-react';

@@ -727,27 +727,27 @@ export default function Checkout() {
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-6xl mx-auto space-y-6">
             {/* Header */}
-            <div>
+            <header>
               <h1 className="text-3xl font-bold flex items-center gap-2">
-                <ShoppingBag className="h-8 w-8" />
+                <ShoppingBag className="h-8 w-8" aria-hidden="true" />
                 Finaliser la commande
               </h1>
-              <p className="text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1" id="checkout-description">
                 Remplissez vos informations pour compléter votre achat
               </p>
-            </div>
+            </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Formulaire (2/3) */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Informations de livraison */}
-                <Card>
+                <Card role="region" aria-labelledby="shipping-title" aria-describedby="shipping-description">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
+                    <CardTitle id="shipping-title" className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" aria-hidden="true" />
                       Informations de livraison
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription id="shipping-description">
                       Où souhaitez-vous recevoir votre commande ?
                     </CardDescription>
                   </CardHeader>
@@ -774,7 +774,7 @@ export default function Checkout() {
                           Email <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                           <Input
                             id="email"
                             type="email"
@@ -782,10 +782,13 @@ export default function Checkout() {
                             onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                             placeholder="jean@example.com"
                             className={`pl-10 ${formErrors.email ? 'border-red-500' : ''}`}
+                            aria-invalid={!!formErrors.email}
+                            aria-describedby={formErrors.email ? "email-error" : undefined}
+                            autoComplete="email"
                           />
                         </div>
                         {formErrors.email && (
-                          <p className="text-sm text-red-500">{formErrors.email}</p>
+                          <p id="email-error" className="text-sm text-red-500" role="alert">{formErrors.email}</p>
                         )}
                       </div>
                     </div>
@@ -795,7 +798,7 @@ export default function Checkout() {
                         Téléphone <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                         <Input
                           id="phone"
                           type="tel"
@@ -803,10 +806,13 @@ export default function Checkout() {
                           onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                           placeholder="+225 07 12 34 56 78"
                           className={`pl-10 ${formErrors.phone ? 'border-red-500' : ''}`}
+                          aria-invalid={!!formErrors.phone}
+                          aria-describedby={formErrors.phone ? "phone-error" : undefined}
+                          autoComplete="tel"
                         />
                       </div>
                       {formErrors.phone && (
-                        <p className="text-sm text-red-500">{formErrors.phone}</p>
+                        <p id="phone-error" className="text-sm text-red-500" role="alert">{formErrors.phone}</p>
                       )}
                     </div>
 
@@ -882,6 +888,9 @@ export default function Checkout() {
                           value={formData.country}
                           onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
                           className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${formErrors.country ? 'border-red-500' : ''}`}
+                          aria-invalid={!!formErrors.country}
+                          aria-describedby={formErrors.country ? "country-error" : undefined}
+                          autoComplete="country"
                         >
                           <option value="BF">Burkina Faso</option>
                           <option value="CI">Côte d'Ivoire</option>
@@ -903,7 +912,7 @@ export default function Checkout() {
                           <option value="US">États-Unis</option>
                         </select>
                         {formErrors.country && (
-                          <p className="text-sm text-red-500">{formErrors.country}</p>
+                          <p id="country-error" className="text-sm text-red-500" role="alert">{formErrors.country}</p>
                         )}
                       </div>
                     </div>
@@ -949,10 +958,10 @@ export default function Checkout() {
               </div>
 
               {/* Récapitulatif (1/3) */}
-              <div className="lg:col-span-1">
-                <Card className="sticky top-4">
+              <aside className="lg:col-span-1" aria-label="Récapitulatif de la commande">
+                <Card className="sticky top-4" role="region" aria-labelledby="summary-title">
                   <CardHeader>
-                    <CardTitle>
+                    <CardTitle id="summary-title">
                       Récapitulatif
                       {isMultiStore && storeGroups.size > 1 && (
                         <span className="ml-2 text-sm text-orange-600 font-normal">
@@ -1074,26 +1083,27 @@ export default function Checkout() {
                           disabled={isProcessing || items.length === 0 || isCheckingStores}
                           className="w-full mt-4"
                           size="lg"
+                          aria-label={isProcessing ? "Traitement de la commande en cours" : `Finaliser les commandes pour ${Array.from(storeGroups.values()).reduce((sum, group) => sum + group.total, 0).toLocaleString('fr-FR')} XOF`}
                         >
                           {isProcessing ? (
                             <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                               Traitement...
                             </>
                           ) : isCheckingStores ? (
                             <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                               Vérification des boutiques...
                             </>
                           ) : (
                             <>
-                              <CreditCard className="mr-2 h-4 w-4" />
+                              <CreditCard className="mr-2 h-4 w-4" aria-hidden="true" />
                               Payer{' '}
                               {Array.from(storeGroups.values())
                                 .reduce((sum, group) => sum + group.total, 0)
                                 .toLocaleString('fr-FR')}{' '}
                               XOF
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                             </>
                           )}
                         </Button>
@@ -1237,22 +1247,23 @@ export default function Checkout() {
                           disabled={isProcessing || items.length === 0 || isCheckingStores}
                           className="w-full"
                           size="lg"
+                          aria-label={isProcessing ? "Traitement de la commande en cours" : `Finaliser la commande pour ${finalTotal.toLocaleString('fr-FR')} XOF`}
                         >
                           {isProcessing ? (
                             <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                               Traitement...
                             </>
                           ) : isCheckingStores ? (
                             <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                               Vérification des boutiques...
                             </>
                           ) : (
                             <>
-                              <CreditCard className="mr-2 h-4 w-4" />
+                              <CreditCard className="mr-2 h-4 w-4" aria-hidden="true" />
                               Payer {finalTotal.toLocaleString('fr-FR')} XOF
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                             </>
                           )}
                         </Button>

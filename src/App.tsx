@@ -10,6 +10,7 @@ import { LoadingBar } from "@/components/navigation/LoadingBar";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { PerformanceOptimizer } from "@/components/optimization/PerformanceOptimizer";
+import { useGlobalKeyboardShortcuts } from "@/hooks/useKeyboardNavigation";
 import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
 import { CrispChat } from "@/components/chat/CrispChat";
 import { Require2FABanner } from "@/components/auth/Require2FABanner";

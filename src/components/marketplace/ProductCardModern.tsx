@@ -255,6 +255,8 @@ const ProductCardModernComponent = ({
       className="group relative flex flex-col rounded-lg bg-transparent border border-gray-200 overflow-hidden"
       role="article"
       aria-labelledby={`product-title-${product.id}`}
+      aria-describedby={`product-price-${product.id}`}
+      tabIndex={0}
     >
       {/* Image Container - Ratio 16:9 uniforme pour professionnalisme */}
       <div className="relative aspect-[16/9] overflow-hidden bg-transparent">
@@ -431,7 +433,7 @@ const ProductCardModernComponent = ({
         </div>
 
         {/* Prix */}
-        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3" id={`product-price-${product.id}`}>
           <div className="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-1">
             {hasPromo && (
               <span className="text-[10px] sm:text-xs text-gray-500 line-through flex-shrink-0 whitespace-nowrap" aria-label={`Prix original: ${formatPrice(product.price)} ${product.currency || 'XOF'}`}>

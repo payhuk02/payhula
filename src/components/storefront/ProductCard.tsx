@@ -188,7 +188,13 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   );
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-transparent rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
+    <Card 
+      className="product-card-professional group relative overflow-hidden bg-transparent rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]"
+      role="article"
+      aria-labelledby={`product-title-${product.id}`}
+      aria-describedby={`product-price-${product.id}`}
+      tabIndex={0}
+    >
       {/* Image avec overlay et badges - Ratio 16:9 uniforme professionnel */}
       <div className="product-image-container relative overflow-hidden">
         <OptimizedImage
@@ -449,6 +455,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             disabled={loading}
             size="sm"
             className="product-action-button flex-1 h-10 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium"
+            aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
           >
             <div className="flex items-center justify-center gap-1.5">
               {loading ? (

@@ -373,7 +373,7 @@ export const CreateDigitalProductWizard = ({
       default:
         return true;
     }
-  }, [formData, toast, t]);
+  }, [formData, toast, t, storeId, validateSlug, validateDigitalProductServer, clearServerErrors]);
 
   /**
    * Navigation handlers
@@ -455,7 +455,34 @@ export const CreateDigitalProductWizard = ({
         throw new Error('Store ID manquant');
       }
 
-      const slug = formData.slug || generateSlug(formData.name);
+      // Générer un slug unique
+      let slug = formData.slug || generateSlug(formData.name);
+      
+      // Vérifier l'unicité du slug et générer un nouveau si nécessaire
+      let attempts = 0;
+      const maxAttempts = 10;
+      while (attempts < maxAttempts) {
+        const { data: existing } = await supabase
+          .from('products')
+          .select('id')
+          .eq('store_id', storeId)
+          .eq('slug', slug)
+          .limit(1);
+        
+        if (!existing || existing.length === 0) {
+          // Slug disponible
+          break;
+        }
+        
+        // Slug existe déjà, générer un nouveau avec suffixe
+        attempts++;
+        const baseSlug = formData.slug || generateSlug(formData.name);
+        slug = `${baseSlug}-${attempts}`;
+      }
+      
+      if (attempts >= maxAttempts) {
+        throw new Error('Impossible de générer un slug unique. Veuillez modifier le nom du produit.');
+      }
 
       // 1. Create base product
       const { data: product, error: productError } = await supabase
@@ -477,20 +504,29 @@ export const CreateDigitalProductWizard = ({
           license_terms: formData.license_terms || null,
           is_active: !isDraft,
           is_draft: isDraft,
-          // SEO fields
+          // SEO fields (only fields that exist in products table)
           meta_title: formData.seo?.meta_title || formData.name,
           meta_description: formData.seo?.meta_description || formData.short_description,
-          meta_keywords: formData.seo?.meta_keywords,
-          og_title: formData.seo?.og_title,
-          og_description: formData.seo?.og_description,
           og_image: formData.seo?.og_image,
+          // Note: meta_keywords, og_title, og_description are not saved to DB (columns don't exist)
           // FAQs
           faqs: formData.faqs || [],
         })
         .select()
         .single();
 
-      if (productError) throw productError;
+      if (productError) {
+        // Gestion améliorée des erreurs de contrainte unique
+        if (productError.code === '23505' || productError.message?.includes('duplicate key')) {
+          const constraintMatch = productError.message?.match(/constraint ['"]([^'"]+)['"]/);
+          const constraintName = constraintMatch ? constraintMatch[1] : 'unknown';
+          
+          if (constraintName.includes('slug')) {
+            throw new Error('Ce slug est déjà utilisé par un autre produit de votre boutique. Veuillez modifier le nom ou l\'URL du produit.');
+          }
+        }
+        throw productError;
+      }
 
       // 2. Calculate file info
       const totalSizeMB = formData.downloadable_files?.reduce((sum: number, file: any) => {
@@ -670,8 +706,11 @@ export const CreateDigitalProductWizard = ({
 
       if (onSuccess) {
         onSuccess();
+      } else if (storeSlug) {
+        navigate(`/${storeSlug}/products/${product.slug}`, { replace: true });
       } else {
-        navigate(`/${storeSlug}/products/${product.slug}`);
+        // Fallback vers la liste des produits digitaux si storeSlug n'est pas disponible
+        navigate('/dashboard/digital-products', { replace: true });
       }
     } catch (error: any) {
       logger.error('Erreur lors de la publication', error);
@@ -704,7 +743,8 @@ export const CreateDigitalProductWizard = ({
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate('/dashboard/digital-products');
+        // Rediriger vers la liste des produits digitaux
+        navigate('/dashboard/digital-products', { replace: true });
       }
     } catch (error: any) {
       logger.error('Erreur lors de la sauvegarde du brouillon', error);

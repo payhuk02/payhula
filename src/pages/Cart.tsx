@@ -105,13 +105,13 @@ export default function Cart() {
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <header className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold flex items-center gap-2">
-                  <ShoppingBag className="h-8 w-8" />
+                  <ShoppingBag className="h-8 w-8" aria-hidden="true" />
                   {getValue('cart.title')}
                 </h1>
-                <p className="text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1" id="cart-description">
                   {summary.item_count} {getValue('cart.itemCount') || (summary.item_count > 1 ? 'articles' : 'article')}
                 </p>
               </div>
@@ -120,17 +120,18 @@ export default function Cart() {
                   variant="outline"
                   onClick={handleClearCart}
                   className="text-destructive hover:text-destructive"
+                  aria-label="Vider le panier"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
                   {getValue('cart.clearCart')}
                 </Button>
               )}
-            </div>
+            </header>
 
             {/* Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Liste articles */}
-              <div className="lg:col-span-2 space-y-4">
+              <section className="lg:col-span-2 space-y-4" aria-label="Articles du panier">
                 {items.map((item) => (
                   <CartItem
                     key={item.id}
@@ -140,12 +141,12 @@ export default function Cart() {
                     isLoading={isLoading}
                   />
                 ))}
-              </div>
+              </section>
 
               {/* Récapitulatif */}
-              <div className="lg:col-span-1">
+              <aside className="lg:col-span-1" aria-label="Récapitulatif du panier">
                 <CartSummary summary={summary} />
-              </div>
+              </aside>
             </div>
           </div>
         </main>

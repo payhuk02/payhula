@@ -6,7 +6,7 @@ interface ProductGridProps {
   className?: string;
 }
 
-export const ProductGrid = ({ 
+const ProductGridComponent = ({ 
   children, 
   className
 }: ProductGridProps) => {
@@ -16,17 +16,23 @@ export const ProductGrid = ({
   return (
     <div 
       ref={gridRef}
-        className={cn(
-          "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
-          // Responsive exact: 1 mobile (<640px), 2 tablette (≥640px <1024px), 3 desktop (≥1024px)
-          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 w-full max-w-full",
-          className
-        )}
+      role="region"
+      aria-label="Grille de produits"
+      className={cn(
+        "products-grid-mobile md:products-grid-tablet lg:products-grid-desktop",
+        // Responsive exact: 1 mobile (<640px), 2 tablette (≥640px <1024px), 3 desktop (≥1024px)
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 w-full max-w-full",
+        className
+      )}
     >
       {children}
     </div>
   );
 };
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export const ProductGrid = React.memo(ProductGridComponent);
+ProductGrid.displayName = 'ProductGrid';
 
 // Composant pour les cartes produits - affichage statique et professionnel
 interface LazyProductCardProps {

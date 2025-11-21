@@ -1,3 +1,4 @@
+// Import optimisé depuis l'index centralisé
 import {
   LayoutDashboard,
   Package,
@@ -27,8 +28,6 @@ import {
   Warehouse,
   Calendar,
   FileText,
-  Scale,
-  Headphones,
   Palette,
   Layout,
   Sparkles,
@@ -43,7 +42,6 @@ import {
   Repeat,
   GanttChart,
   Boxes,
-  DollarSign as DollarSignIcon,
   PackageSearch,
   Factory,
   Hash,
@@ -58,7 +56,9 @@ import {
   AlertTriangle,
   Phone,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
+// Imports spécifiques non dans l'index
+import { Scale, Headphones, DollarSign as DollarSignIcon } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";

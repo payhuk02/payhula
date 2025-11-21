@@ -41,7 +41,15 @@ const CreateProduct = () => {
             storeId={store.id} 
             storeSlug={store.slug}
             initialProductType={productType}
-            onSuccess={() => navigate('/products')}
+            onSuccess={() => {
+              // Rediriger vers la page appropriée selon le type de produit
+              if (productType === 'digital') {
+                navigate('/dashboard/digital-products');
+              } else {
+                // Pour les produits physiques et services, rediriger vers la liste générale
+                navigate('/dashboard/products');
+              }
+            }}
           />
         </main>
       </div>

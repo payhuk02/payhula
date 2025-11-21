@@ -479,8 +479,11 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
     setBusy(true);
     
     try {
+      // Retirer les colonnes qui n'existent pas dans la table products
+      const { meta_keywords, og_title, og_description, ...formDataCleaned } = formData;
+      
       const productData = {
-        ...formData,
+        ...formDataCleaned,
         status: status,
         is_draft: status === 'draft',
         is_active: status === 'published',

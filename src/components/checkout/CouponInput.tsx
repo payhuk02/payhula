@@ -133,8 +133,10 @@ export const CouponInput = ({
             size="sm"
             onClick={handleRemove}
             className="text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100"
+            aria-label={`Retirer le code promo ${appliedCouponCode}`}
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
+            <span className="sr-only">Retirer le code promo</span>
           </Button>
         </div>
       </div>
@@ -142,11 +144,11 @@ export const CouponInput = ({
   }
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="coupon-code">Code promo</Label>
+    <div className="space-y-2" role="region" aria-labelledby="coupon-label">
+      <Label htmlFor="coupon-code" id="coupon-label">Code promo</Label>
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <Input
             id="coupon-code"
             placeholder="Entrez votre code promo"
@@ -162,24 +164,33 @@ export const CouponInput = ({
                 handleApply();
               }
             }}
+            aria-label="Code promo"
+            aria-describedby={validation ? (validation.valid ? "coupon-valid" : "coupon-invalid") : undefined}
+            aria-invalid={validation && !validation.valid && couponCode ? true : false}
+            autoComplete="off"
           />
           {isValidating && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" aria-label="Validation du code en cours" aria-live="polite" />
           )}
           {!isValidating && validation && validation.valid && (
-            <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-600" />
+            <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-600" aria-label="Code promo valide" aria-hidden="true" />
           )}
           {!isValidating && validation && !validation.valid && couponCode && (
-            <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-500" />
+            <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-500" aria-label="Code promo invalide" aria-hidden="true" />
           )}
         </div>
         <Button
           onClick={handleApply}
           disabled={!validation?.valid || isValidating || applyCoupon.isPending}
           variant="outline"
+          aria-label={applyCoupon.isPending ? "Application du code promo en cours" : "Appliquer le code promo"}
+          aria-describedby={validation?.valid ? "coupon-valid" : undefined}
         >
           {applyCoupon.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              <span className="sr-only">Application en cours</span>
+            </>
           ) : (
             'Appliquer'
           )}
@@ -188,15 +199,15 @@ export const CouponInput = ({
 
       {/* Messages de validation */}
       {validation && !validation.valid && couponCode && (
-        <Alert variant="destructive">
-          <XCircle className="h-4 w-4" />
+        <Alert variant="destructive" id="coupon-invalid" role="alert" aria-live="assertive">
+          <XCircle className="h-4 w-4" aria-hidden="true" />
           <AlertDescription>{validation.message || 'Code promo invalide'}</AlertDescription>
         </Alert>
       )}
 
       {validation && validation.valid && (
-        <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
+        <Alert className="border-green-200 bg-green-50 dark:bg-green-950" id="coupon-valid" role="alert" aria-live="polite">
+          <CheckCircle2 className="h-4 w-4 text-green-600" aria-hidden="true" />
           <AlertDescription className="text-green-900 dark:text-green-100">
             <div className="font-medium mb-1">Code promo valide !</div>
             <div className="text-sm">
