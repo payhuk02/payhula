@@ -253,6 +253,15 @@ export const OptimizedImage = ({
           minHeight: isMobile ? '200px' : undefined, // Hauteur minimum sur mobile
           position: 'relative', // S'assurer que l'image reste visible
           zIndex: 1, // S'assurer que l'image est au-dessus
+          // Stabilité garantie - pas de transformations
+          transform: 'none',
+          // Toujours visible
+          visibility: 'visible',
+          opacity: 1,
+          // Optimisation performance
+          willChange: 'auto',
+          backfaceVisibility: 'visible',
+          WebkitBackfaceVisibility: 'visible',
           ...props.style
         }}
         {...props}

@@ -148,7 +148,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                 <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
               </div>
             )}
-            <span className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
+            <span className="text-xs sm:text-sm font-semibold text-white truncate">
               {product.store.name}
             </span>
             <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
@@ -161,7 +161,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
           className={cn(
             'font-semibold leading-tight line-clamp-2 mb-2',
             'text-base sm:text-lg',
-            'text-gray-900 group-hover:text-blue-600 transition-colors duration-200',
+            'text-white',
             isCompact && 'text-sm'
           )}
         >

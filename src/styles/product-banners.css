@@ -45,7 +45,7 @@
   will-change: transform;
 }
 
-/* Image optimisée avec rendu professionnel statique - Pas d'ombres, pas d'animations */
+/* Image optimisée avec rendu professionnel statique - Pas d'ombres, pas d'animations - Stable et optimisée */
 .product-banner img {
   @apply w-full h-full object-cover;
   /* Qualité d'affichage optimisée - Images nettes */
@@ -61,11 +61,17 @@
   box-shadow: none !important;
   filter: none;
   /* S'assurer que l'image reste visible lors du scroll sur mobile */
-  position: relative;
-  z-index: 1;
+  position: relative !important;
+  z-index: 1 !important;
   visibility: visible !important;
   opacity: 1 !important;
   display: block !important;
+  /* Stabilité garantie - pas de transformations */
+  transform: none !important;
+  /* Optimisation performance */
+  will-change: auto;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
 }
 
 /* Overlay gradient pour les effets visuels */

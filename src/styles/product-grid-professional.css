@@ -287,7 +287,7 @@
     border-radius: 0.75rem 0.75rem 0 0; /* Arrondi seulement en haut */
   }
   
-  /* Image optimisée pour netteté mobile - Toujours visible lors du scroll */
+  /* Image optimisée pour netteté mobile - Toujours visible lors du scroll - Stable et optimisée */
   .product-image {
     /* Netteté optimale pour écrans Retina mobile */
     image-rendering: -webkit-optimize-contrast;
@@ -295,12 +295,20 @@
     /* Forcer l'affichage de l'image */
     display: block !important;
     /* S'assurer que l'image reste visible lors du scroll */
-    position: relative;
-    z-index: 1;
+    position: relative !important;
+    z-index: 1 !important;
     /* Pas de will-change pour éviter les problèmes de rendu */
     will-change: auto;
     /* Pas de filtres coûteux sur mobile */
     filter: none;
+    /* Stabilité garantie - pas de transformations */
+    transform: none !important;
+    /* Toujours visible */
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Optimisation performance */
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
   
   /* S'assurer que l'image se charge même si lazy loading échoue */

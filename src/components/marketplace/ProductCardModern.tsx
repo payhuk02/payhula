@@ -343,7 +343,7 @@ const ProductCardModernComponent = ({
                 <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400" />
               </div>
             )}
-            <span className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
+            <span className="text-xs sm:text-sm font-semibold text-white truncate">
               {product.stores.name}
             </span>
             <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 -ml-2" aria-label="Vendeur vérifié" />
@@ -352,7 +352,7 @@ const ProductCardModernComponent = ({
         
         {/* Titre du produit */}
         <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`}>
-          <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-2 leading-tight hover:text-blue-600 transition-colors" id={`product-title-${product.id}`}>
+          <h3 className="font-semibold text-sm text-white mb-2 line-clamp-2 leading-tight" id={`product-title-${product.id}`}>
             {product.name}
           </h3>
         </Link>

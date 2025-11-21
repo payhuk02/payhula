@@ -270,7 +270,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
       <CardContent className="p-5 flex-[0.4] flex flex-col">
         {/* Titre du produit */}
         <Link to={`/stores/${storeSlug}/products/${product.slug}`}>
-          <h3 className="font-semibold text-lg text-gray-900 mb-3 line-clamp-2 leading-tight hover:text-blue-600 transition-colors">
+          <h3 className="font-semibold text-lg text-white mb-3 line-clamp-2 leading-tight">
             {product.name}
           </h3>
         </Link>
