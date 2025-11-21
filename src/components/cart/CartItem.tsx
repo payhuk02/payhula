@@ -117,7 +117,7 @@ const CartItemComponent = ({ item, onUpdateQuantity, onRemove, isLoading }: Cart
           </Button>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
