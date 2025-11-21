@@ -281,13 +281,19 @@ export const CreateDigitalProductWizard = ({
    * Validate current step avec validation améliorée (client + serveur)
    */
   const validateStep = useCallback(async (step: number): Promise<boolean> => {
-    const { validateWithZod, formatValidators, getFieldError } = require('@/lib/wizard-validation');
-    const { digitalProductSchema } = require('@/lib/wizard-validation');
-    
-    // Réinitialiser les erreurs serveur
+    // Réinitialiser les erreurs serveur en premier
     clearServerErrors();
     
-    switch (step) {
+    // Pour les étapes 3-6, pas de validation stricte nécessaire
+    if (step >= 3) {
+      logger.info('Validation étape optionnelle', { step });
+      return true;
+    }
+    
+    try {
+      const { validateWithZod, formatValidators, getFieldError, digitalProductSchema } = await import('@/lib/wizard-validation');
+      
+      switch (step) {
       case 1: {
         // 1. Validation client avec Zod
         const result = validateWithZod(digitalProductSchema, {
@@ -354,7 +360,7 @@ export const CreateDigitalProductWizard = ({
         
         return true;
       }
-      case 2:
+      case 2: {
         if (!formData.main_file_url && (!formData.downloadable_files || formData.downloadable_files.length === 0)) {
           toast({
             title: t('wizard.errors.title', 'Erreur'),
@@ -365,13 +371,19 @@ export const CreateDigitalProductWizard = ({
           return false;
         }
         return true;
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-        return true;
+      }
       default:
+        // Les étapes 3-6 sont déjà gérées en haut de la fonction
         return true;
+      }
+    } catch (error: any) {
+      logger.error('Erreur lors du chargement des modules de validation', { error, step, errorMessage: error?.message });
+      toast({
+        title: '❌ Erreur',
+        description: 'Une erreur est survenue lors de la validation. Veuillez réessayer.',
+        variant: 'destructive',
+      });
+      return false;
     }
   }, [formData, toast, t, storeId, validateSlug, validateDigitalProductServer, clearServerErrors]);
 
