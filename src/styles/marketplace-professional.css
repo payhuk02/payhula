@@ -39,7 +39,7 @@
    ============================================================ */
 
 .product-card-professional {
-  @apply relative overflow-hidden bg-white border border-gray-200;
+  @apply relative overflow-hidden bg-transparent border border-gray-200;
   border-radius: var(--comeup-radius-lg);
   box-shadow: none;
   /* Affichage statique - pas d'animations */
@@ -55,7 +55,7 @@
 .product-image-container {
   @apply relative overflow-hidden;
   height: 12rem; /* 192px */
-  background: linear-gradient(135deg, var(--comeup-gray-100) 0%, var(--comeup-gray-200) 100%);
+  background: transparent;
 }
 
 .product-image-container img {

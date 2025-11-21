@@ -188,7 +188,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
   );
 
   return (
-    <Card className="product-card-professional group relative overflow-hidden bg-white rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
+    <Card className="product-card-professional group relative overflow-hidden bg-transparent rounded-lg flex flex-col min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
       {/* Image avec overlay et badges - Ratio 16:9 uniforme professionnel */}
       <div className="product-image-container relative overflow-hidden">
         <OptimizedImage

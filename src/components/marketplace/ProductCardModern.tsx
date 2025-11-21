@@ -252,12 +252,12 @@ const ProductCardModernComponent = ({
 
   return (
     <article 
-      className="group relative flex flex-col rounded-lg bg-white border border-gray-200 overflow-hidden"
+      className="group relative flex flex-col rounded-lg bg-transparent border border-gray-200 overflow-hidden"
       role="article"
       aria-labelledby={`product-title-${product.id}`}
     >
       {/* Image Container - Ratio 16:9 uniforme pour professionnalisme */}
-      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+      <div className="relative aspect-[16/9] overflow-hidden bg-transparent">
         <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`} className="block w-full h-full">
           <OptimizedImage
             src={product.image_url || '/placeholder-image.png'}

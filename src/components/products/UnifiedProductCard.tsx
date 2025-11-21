@@ -60,7 +60,7 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
       className={cn(
         // Base structure
         'group relative flex flex-col h-full',
-        'bg-white border border-gray-200',
+        'bg-transparent border border-gray-200',
         'rounded-xl overflow-hidden',
         
         

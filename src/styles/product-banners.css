@@ -137,6 +137,7 @@
     margin-right: auto;
     box-shadow: none;
     border-radius: var(--border-radius-mobile);
+    background: transparent;
     /* Effet de profondeur */
     transform: translateZ(0);
     will-change: transform;
@@ -187,6 +188,7 @@
   .product-card-tablet {
     box-shadow: none;
     border-radius: var(--border-radius-tablet);
+    background: transparent;
     /* Hauteur uniforme exacte */
     height: 520px;
     min-height: 520px;
@@ -232,6 +234,7 @@
   .product-card-desktop {
     box-shadow: none;
     border-radius: var(--border-radius-desktop);
+    background: transparent;
     /* Hauteur uniforme exacte */
     height: 560px;
     min-height: 560px;
@@ -262,6 +265,7 @@
 /* Hauteur uniforme pour toutes les cartes - Garantie exacte */
 .product-card {
   @apply flex flex-col;
+  background: transparent;
   /* Hauteur minimale pour éviter les décalages */
   min-height: 480px;
   /* Optimisation GPU */
@@ -441,7 +445,7 @@
 
 @media (prefers-color-scheme: dark) {
   .product-card {
-    @apply bg-slate-800/80 border-slate-600;
+    @apply bg-transparent border-slate-600;
   }
   
   .product-card:hover {
