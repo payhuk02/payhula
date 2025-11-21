@@ -86,6 +86,7 @@ const Marketplace = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false); // Pour savoir si on a déjà chargé une fois
   
   // Refs pour scroll animation (déclarés tôt pour éviter les erreurs d'initialisation)
   const heroRef = useScrollAnimation<HTMLDivElement>();
@@ -291,12 +292,14 @@ const Marketplace = () => {
         setProducts((data || []) as unknown as Product[]);
         setPagination(prev => ({ ...prev, totalItems: count || 0 }));
         setError(null); // Réinitialiser l'erreur en cas de succès
+        setHasLoadedOnce(true); // Marquer qu'on a chargé au moins une fois
       }
       
     } catch (error: any) {
       logger.error("❌ Erreur lors du chargement des produits :", error);
       const errorMessage = error?.message || "Impossible de charger les produits. Veuillez réessayer plus tard.";
       setError(errorMessage);
+      setHasLoadedOnce(true); // Même en cas d'erreur, on a tenté de charger
       toast({
         title: "Erreur",
         description: errorMessage,
@@ -394,8 +397,11 @@ const Marketplace = () => {
     return filtered;
   }, [hasSearchQuery, searchResults, products, filters.tags]);
   
-  // Gérer le loading
-  const isLoadingProducts = hasSearchQuery ? searchLoading : loading;
+  // Gérer le loading - Ne pas afficher de skeletons au premier chargement si pas de produits
+  // Afficher les skeletons seulement si on recharge (changement de filtre, pagination, etc.)
+  const isLoadingProducts = hasSearchQuery 
+    ? searchLoading 
+    : (loading && hasLoadedOnce); // Seulement si on a déjà chargé une fois
 
   // Catégories et types dynamiques
   const categories = useMemo(() => {
@@ -1085,6 +1091,7 @@ const Marketplace = () => {
       >
         <div className="w-full mx-auto max-w-7xl px-0 sm:px-4">
           {isLoadingProducts ? (
+            // Afficher les skeletons seulement si on recharge (pas au premier chargement)
             <ProductGrid>
               <ProductCardSkeleton variant="marketplace" count={pagination.itemsPerPage} />
             </ProductGrid>

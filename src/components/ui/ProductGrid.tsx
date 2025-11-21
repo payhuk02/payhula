@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ProductGridProps {
@@ -84,6 +84,9 @@ export const ProductGrid = ({
     );
   }
 
+  // Ne pas afficher de skeletons si children est vide ou null
+  const hasChildren = React.Children.count(children) > 0;
+
   return (
     <div 
       ref={gridRef}
@@ -94,8 +97,8 @@ export const ProductGrid = ({
           className
         )}
     >
-      {isVisible ? children : (
-        // Placeholder pendant le lazy loading
+      {isVisible || !hasChildren ? children : (
+        // Skeletons seulement si on a des enfants à afficher (lazy loading)
         Array.from({ length: Math.min(skeletonCount, 6) }).map((_, index) => (
           <SkeletonCard key={index} />
         ))
@@ -145,9 +148,13 @@ export const LazyProductCard = ({
     return () => observer.disconnect();
   }, [priority]);
 
+  // Ne pas afficher de skeleton si children est vide ou null
+  const hasChildren = React.Children.count(children) > 0;
+
   return (
     <div ref={cardRef} className={className}>
-      {isVisible ? children : (
+      {isVisible || !hasChildren ? children : (
+        // Skeleton seulement si on a des enfants à afficher (lazy loading)
         <div className="product-card product-card-mobile sm:product-card-tablet lg:product-card-desktop">
           <div className="product-card-container">
             <div className="product-banner bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 animate-pulse">

@@ -30,6 +30,7 @@ const Storefront = () => {
   const [store, setStore] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false); // Pour savoir si on a déjà chargé une fois
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [productType, setProductType] = useState("all");
@@ -69,15 +70,18 @@ const Storefront = () => {
       if (data && data.length > 0) {
         setStore(data[0]);
         logger.info(`Boutique chargée: ${data[0].name} (${slug})`);
+        setHasLoadedOnce(true); // Marquer qu'on a chargé au moins une fois
       } else {
         setStore(null);
         setError("Boutique introuvable");
+        setHasLoadedOnce(true); // Même en cas d'erreur, on a tenté de charger
       }
     } catch (error: any) {
       logger.error("Erreur lors du chargement de la boutique:", error);
       const errorMessage = error?.message || "Impossible de charger la boutique. Veuillez réessayer plus tard.";
       setError(errorMessage);
       setStore(null);
+      setHasLoadedOnce(true); // Même en cas d'erreur, on a tenté de charger
     } finally {
       setLoading(false);
     }
@@ -308,7 +312,8 @@ const Storefront = () => {
                     productTypes={productTypes}
                   />
 
-                  {productsLoading ? (
+                  {productsLoading && hasLoadedOnce ? (
+                    // Afficher les skeletons seulement si on recharge (pas au premier chargement)
                     <ProductGrid>
                       <ProductCardSkeleton variant="store" count={6} />
                     </ProductGrid>
