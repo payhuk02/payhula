@@ -379,16 +379,36 @@ export const CreateDigitalProductWizard = ({
    * Navigation handlers
    */
   const handleNext = useCallback(async () => {
-    const isValid = await validateStep(currentStep);
-    if (isValid) {
-      const nextStep = Math.min(currentStep + 1, STEPS.length);
-      setCurrentStep(nextStep);
-      logger.info('Navigation vers étape suivante', { from: currentStep, to: nextStep });
-      
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Empêcher la navigation si on est en train de soumettre
+    if (isSubmitting) {
+      logger.warn('Navigation bloquée: soumission en cours', { step: currentStep });
+      return;
     }
-  }, [currentStep, validateStep]);
+
+    try {
+      logger.info('Début validation étape', { step: currentStep });
+      const isValid = await validateStep(currentStep);
+      
+      if (isValid) {
+        const nextStep = Math.min(currentStep + 1, STEPS.length);
+        setCurrentStep(nextStep);
+        logger.info('Navigation vers étape suivante', { from: currentStep, to: nextStep });
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        logger.warn('Validation échouée, navigation bloquée', { step: currentStep });
+        // Le toast est déjà affiché par validateStep
+      }
+    } catch (error: any) {
+      logger.error('Erreur lors de la validation/navigation', { error, step: currentStep, errorMessage: error?.message });
+      toast({
+        title: '❌ Erreur',
+        description: error?.message || 'Une erreur est survenue lors de la validation. Veuillez réessayer.',
+        variant: 'destructive',
+      });
+    }
+  }, [currentStep, validateStep, toast, isSubmitting]);
 
   const handlePrevious = useCallback(() => {
     const prevStep = Math.max(currentStep - 1, 1);
