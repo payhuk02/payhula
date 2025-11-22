@@ -278,13 +278,14 @@ export default defineConfig(({ mode }) => {
             
             // CRITIQUE: Toutes les dépendances qui utilisent React doivent rester dans le chunk principal
             // Vérifier les dépendances React communes (utilisent useLayoutEffect, createContext, etc.)
+            // Note: Certaines peuvent être lazy-loaded mais doivent être chargées avec React
             const reactDependencies = [
               'react-helmet',
               'react-i18next',
               'react-day-picker',
               'react-resizable-panels',
-              'react-big-calendar',
-              'recharts', // Utilise React Context
+              'react-big-calendar', // Peut être lazy-loaded mais gardé pour compatibilité
+              'recharts', // Utilise React Context - peut être lazy-loaded pour les graphiques
               'embla-carousel-react', // Utilise React
               'cmdk', // Utilise React
               'vaul', // Utilise React
@@ -298,6 +299,16 @@ export default defineConfig(({ mode }) => {
               if (id.includes(`node_modules/${dep}`)) {
                 return undefined; // Garder dans le chunk principal
               }
+            }
+            
+            // dompurify - Séparer (ne dépend pas de React, utilisé pour sanitization)
+            if (id.includes('node_modules/dompurify')) {
+              return 'sanitization';
+            }
+            
+            // lovable-tagger - Séparer si possible (vérifier si utilise React)
+            if (id.includes('node_modules/lovable-tagger')) {
+              return 'tagging';
             }
             
             // Zod - Séparer (ne dépend pas de React)
