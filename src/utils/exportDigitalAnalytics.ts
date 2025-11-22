@@ -3,8 +3,7 @@
  * Date: 2025-01-27
  */
 
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { loadPDFModules } from '@/lib/pdf-loader';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -39,6 +38,9 @@ export const exportAnalyticsToPDF = async (
   data: DigitalAnalyticsData,
   options: ExportOptions = { format: 'pdf' }
 ): Promise<void> => {
+  // Charger jspdf et autotable de manière asynchrone
+  const { jsPDF, autoTable } = await loadPDFModules();
+  
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();

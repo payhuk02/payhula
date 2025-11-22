@@ -43,8 +43,6 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 interface SEOPagesListProps {
   data: SEOPageData[] | undefined;
