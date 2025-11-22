@@ -170,6 +170,11 @@ const menuSections = [
         url: "/account/profile",
         icon: User,
       },
+      {
+        title: "Tableau de bord Affilié",
+        url: "/affiliate/dashboard",
+        icon: TrendingUp,
+      },
     ]
   },
   {
