@@ -30,6 +30,7 @@ import { safeRedirect } from "@/lib/url-validator";
 import { logger } from "@/lib/logger";
 import { formatPrice, getDisplayPrice } from "@/lib/product-helpers";
 import { SEOMeta } from "@/components/seo/SEOMeta";
+import { stripHtmlTags } from "@/lib/utils";
 
 interface CheckoutFormData {
   firstName: string;
@@ -703,8 +704,8 @@ const Checkout = () => {
                     )}
                     {product.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {product.description.substring(0, 100)}
-                        {product.description.length > 100 ? '...' : ''}
+                        {stripHtmlTags(product.description).substring(0, 100)}
+                        {stripHtmlTags(product.description).length > 100 ? '...' : ''}
                       </p>
                     )}
                   </div>

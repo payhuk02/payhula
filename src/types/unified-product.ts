@@ -39,6 +39,10 @@ export interface BaseProduct {
   affiliate_percentage?: number;
   affiliate_earnings?: number;
   affiliate_enabled?: boolean;
+  product_affiliate_settings?: Array<{
+    commission_rate: number;
+    affiliate_enabled: boolean;
+  }> | null;
 }
 
 /**

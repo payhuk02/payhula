@@ -258,6 +258,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
           </div>
         )}
 
+
         {/* Bouton favori */}
         <button
           onClick={handleFavorite}
@@ -324,6 +325,40 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
                product.product_type === 'physical' ? 'Physique' : 'Service'}
             </Badge>
           )}
+
+          {/* Badge taux d'affiliation */}
+          {(() => {
+            // Gérer le cas où Supabase retourne un objet, un tableau, ou null
+            let affiliateSettings = null;
+            
+            if (product.product_affiliate_settings) {
+              if (Array.isArray(product.product_affiliate_settings)) {
+                // Tableau : prendre le premier élément s'il existe
+                affiliateSettings = product.product_affiliate_settings.length > 0 
+                  ? product.product_affiliate_settings[0] 
+                  : null;
+              } else {
+                // Objet direct
+                affiliateSettings = product.product_affiliate_settings;
+              }
+            }
+            
+            // Afficher le badge si l'affiliation est activée et le taux > 0
+            if (affiliateSettings?.affiliate_enabled && affiliateSettings?.commission_rate > 0) {
+              return (
+                <Badge 
+                  variant="secondary" 
+                  className="text-xs bg-gradient-to-r from-orange-500 to-pink-500 text-white border-0"
+                  title={`Taux de commission d'affiliation: ${affiliateSettings.commission_rate}%`}
+                >
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  {affiliateSettings.commission_rate}% commission
+                </Badge>
+              );
+            }
+            
+            return null;
+          })()}
           
           {(product as any).pricing_model && (
             <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800 border-0">

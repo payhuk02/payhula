@@ -953,7 +953,7 @@ const ProductDetails = () => {
               <div className="mb-8 sm:mb-10 md:mb-12 pt-6 sm:pt-8 border-t border-border">
                 <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Description</h2>
                 <div
-                  className="text-sm sm:text-base text-muted-foreground leading-relaxed prose prose-sm sm:prose-base max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-strong:text-foreground"
+                  className="bg-white dark:bg-white text-black dark:text-black text-sm sm:text-base leading-relaxed prose prose-sm sm:prose-base max-w-none prose-headings:text-black dark:prose-headings:text-black prose-p:text-black dark:prose-p:text-black prose-a:text-primary prose-strong:text-black dark:prose-strong:text-black p-4 sm:p-6 rounded-lg"
                   dangerouslySetInnerHTML={{ __html: safeDescription }}
                 />
               </div>

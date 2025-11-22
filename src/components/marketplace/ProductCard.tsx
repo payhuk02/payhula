@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star, Percent, Loader2, Shield, MessageSquare, Eye, Store, CheckCircle } from "lucide-react";
+import { ShoppingCart, Star, Percent, Loader2, Shield, MessageSquare, Eye, Store, CheckCircle, TrendingUp } from "lucide-react";
 import { initiateMonerooPayment } from "@/lib/moneroo-payment";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +24,10 @@ interface ProductCardProps {
     purchases_count?: number;
     category?: string;
     store_id?: string;
+    product_affiliate_settings?: Array<{
+      commission_rate: number;
+      affiliate_enabled: boolean;
+    }> | null;
   };
   storeSlug: string;
 }
@@ -201,6 +205,26 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               {product.category}
             </span>
           )}
+
+          {/* Badge taux d'affiliation */}
+          {(() => {
+            // Gérer le cas où Supabase retourne un objet ou un tableau
+            const affiliateSettings = Array.isArray(product.product_affiliate_settings) 
+              ? product.product_affiliate_settings[0]
+              : product.product_affiliate_settings;
+            
+            return affiliateSettings?.affiliate_enabled && affiliateSettings?.commission_rate > 0 ? (
+              <div className="mb-2">
+                <span 
+                  className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-orange-500 to-pink-500 text-white px-2 py-1 rounded-md"
+                  title={`Taux de commission d'affiliation: ${affiliateSettings.commission_rate}%`}
+                >
+                  <TrendingUp className="h-3 w-3" />
+                  {affiliateSettings.commission_rate}% commission
+                </span>
+              </div>
+            ) : null;
+          })()}
 
           <h3 
             id={`product-title-${product.id}`}

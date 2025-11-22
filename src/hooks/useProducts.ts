@@ -24,6 +24,10 @@ export interface Product {
   low_stock_threshold?: number | null;
   created_at: string;
   updated_at: string;
+  product_affiliate_settings?: Array<{
+    commission_rate: number;
+    affiliate_enabled: boolean;
+  }> | null;
 }
 
 export const useProducts = (storeId?: string | null) => {

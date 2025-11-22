@@ -158,6 +158,27 @@ const PhysicalProductCardComponent = ({
                 {product.sku}
               </Badge>
             )}
+            
+            {/* Badge taux d'affiliation */}
+            {(() => {
+              if (!product.product?.product_affiliate_settings) return null;
+              
+              // Gérer le cas où Supabase retourne un objet ou un tableau
+              const affiliateSettings = Array.isArray(product.product.product_affiliate_settings) 
+                ? product.product.product_affiliate_settings[0]
+                : product.product.product_affiliate_settings;
+              
+              return affiliateSettings?.affiliate_enabled && affiliateSettings?.commission_rate > 0 ? (
+                <Badge 
+                  variant="secondary" 
+                  className="text-xs bg-gradient-to-r from-orange-500 to-pink-500 text-white border-0"
+                  title={`Taux de commission d'affiliation: ${affiliateSettings.commission_rate}%`}
+                >
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  {affiliateSettings.commission_rate}% commission
+                </Badge>
+              ) : null;
+            })()}
           </div>
         </div>
       </CardHeader>

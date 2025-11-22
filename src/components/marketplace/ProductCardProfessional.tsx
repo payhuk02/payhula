@@ -285,6 +285,7 @@ const ProductCardProfessionalComponent = ({
           </div>
         )}
 
+
         {/* Bouton favori */}
         <button
           onClick={handleFavorite}
@@ -424,6 +425,27 @@ const ProductCardProfessionalComponent = ({
             </Badge>
           </div>
         )}
+
+        {/* Badge taux d'affiliation */}
+        {(() => {
+          // Gérer le cas où Supabase retourne un objet ou un tableau
+          const affiliateSettings = Array.isArray(product.product_affiliate_settings) 
+            ? product.product_affiliate_settings[0]
+            : product.product_affiliate_settings;
+          
+          return affiliateSettings?.affiliate_enabled && affiliateSettings?.commission_rate > 0 ? (
+            <div className="mb-3">
+              <Badge 
+                variant="secondary" 
+                className="text-xs bg-gradient-to-r from-orange-500 to-pink-500 text-white border-0"
+                title={`Taux de commission d'affiliation: ${affiliateSettings.commission_rate}%`}
+              >
+                <TrendingUp className="h-3 w-3 mr-1" />
+                {affiliateSettings.commission_rate}% commission
+              </Badge>
+            </div>
+          ) : null;
+        })()}
 
         {/* Prix et actions */}
         <div className="space-y-2">

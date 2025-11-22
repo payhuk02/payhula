@@ -610,7 +610,7 @@ export default function ServiceDetail() {
                       </CardHeader>
                       <CardContent>
                         <div
-                          className="prose dark:prose-invert max-w-none"
+                          className="bg-white dark:bg-white text-black dark:text-black prose max-w-none prose-headings:text-black dark:prose-headings:text-black prose-p:text-black dark:prose-p:text-black prose-a:text-primary prose-strong:text-black dark:prose-strong:text-black p-4 sm:p-6 rounded-lg"
                           dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(service.description || '') }}
                         />
                       </CardContent>

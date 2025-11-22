@@ -40,6 +40,7 @@ export function transformToUnifiedProduct(product: any): UnifiedProduct {
     is_affiliate: product.product_affiliate_settings?.[0]?.affiliate_enabled || false,
     affiliate_percentage: product.product_affiliate_settings?.[0]?.commission_rate,
     affiliate_enabled: product.product_affiliate_settings?.[0]?.affiliate_enabled || false,
+    product_affiliate_settings: product.product_affiliate_settings || null,
   };
 
   // Transformer selon le type

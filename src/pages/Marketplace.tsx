@@ -382,6 +382,7 @@ const Marketplace = () => {
         is_draft: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        product_affiliate_settings: result.product_affiliate_settings || null,
       })) as unknown as Product[];
     }
     

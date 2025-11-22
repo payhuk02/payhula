@@ -311,6 +311,7 @@ const ProductCardModernComponent = ({
           </div>
         )}
 
+
         {/* Bouton favori en bas à droite - Touch target optimisé mobile */}
         <button
           onClick={handleFavorite}
@@ -390,12 +391,24 @@ const ProductCardModernComponent = ({
           )}
 
           {/* Pourcentage d'affiliation */}
-          {affiliateCommissionRate !== undefined && affiliateCommissionRate > 0 && (
-            <Badge variant="secondary" className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
-              <Percent className="h-3 w-3 mr-1" />
-              {affiliateCommissionRate}% commission
-            </Badge>
-          )}
+          {(() => {
+            // Gérer le cas où Supabase retourne un objet ou un tableau
+            const affiliateSettings = Array.isArray(product.product_affiliate_settings) 
+              ? product.product_affiliate_settings[0]
+              : product.product_affiliate_settings;
+            
+            const commissionRate = 
+              (affiliateSettings?.affiliate_enabled) 
+                ? affiliateSettings.commission_rate 
+                : affiliateCommissionRate;
+            
+            return commissionRate !== undefined && commissionRate > 0 ? (
+              <Badge variant="secondary" className="text-xs bg-gradient-to-r from-orange-500 to-pink-500 text-white border-0">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                {commissionRate}% commission
+              </Badge>
+            ) : null;
+          })()}
 
           {/* Fichiers téléchargeables */}
           {product.downloadable_files && Array.isArray(product.downloadable_files) && product.downloadable_files.length > 0 && (

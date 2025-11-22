@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, ShoppingCart, Eye, Percent, MessageSquare, Store, CheckCircle } from 'lucide-react';
+import { Star, ShoppingCart, Eye, Percent, MessageSquare, Store, CheckCircle, TrendingUp, Shield } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { UnifiedProductCardProps, DigitalProduct } from '@/types/unified-product';
 import {
@@ -116,20 +116,6 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
               -{priceInfo.discount}%
             </Badge>
           )}
-
-          {/* Affiliation Badge */}
-          {showAffiliate && product.is_affiliate && product.affiliate_enabled && (
-            <Badge variant="secondary" className="bg-purple-500 text-white">
-              Affiliation {product.affiliate_percentage ? `${product.affiliate_percentage}%` : ''}
-            </Badge>
-          )}
-
-          {/* PLR Badge (Digital) */}
-          {product.type === 'digital' && (product as DigitalProduct).licensing_type === 'plr' && (
-            <Badge variant="default" className="bg-emerald-500 text-white">
-              PLR
-            </Badge>
-          )}
         </div>
 
       </div>
@@ -193,7 +179,20 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
         )}
 
         {/* Key Info - Spacing vertical cohérent */}
-        {!isCompact && keyInfo.length > 0 && (
+        {!isCompact && (keyInfo.length > 0 || (() => {
+          // Vérifier si on doit afficher le badge d'affiliation
+          let affiliateSettings = null;
+          if (product.product_affiliate_settings) {
+            if (Array.isArray(product.product_affiliate_settings)) {
+              affiliateSettings = product.product_affiliate_settings.length > 0 
+                ? product.product_affiliate_settings[0] 
+                : null;
+            } else {
+              affiliateSettings = product.product_affiliate_settings;
+            }
+          }
+          return affiliateSettings?.affiliate_enabled && affiliateSettings?.commission_rate > 0;
+        })()) && (
           <div className="flex flex-wrap gap-2 mb-4">
             {keyInfo.slice(0, 2).map((info, index) => {
               const Icon = info.icon;
@@ -210,6 +209,46 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
                 </div>
               );
             })}
+            
+            {/* Badge taux d'affiliation - Aligné avec "En préparation" et "Instantanée" */}
+            {(() => {
+              // Gérer le cas où Supabase retourne un objet, un tableau, ou null
+              let affiliateSettings = null;
+              
+              if (product.product_affiliate_settings) {
+                if (Array.isArray(product.product_affiliate_settings)) {
+                  affiliateSettings = product.product_affiliate_settings.length > 0 
+                    ? product.product_affiliate_settings[0] 
+                    : null;
+                } else {
+                  affiliateSettings = product.product_affiliate_settings;
+                }
+              }
+              
+              // Afficher le badge si l'affiliation est activée et le taux > 0
+              if (affiliateSettings?.affiliate_enabled && affiliateSettings?.commission_rate > 0) {
+                return (
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                    <TrendingUp className="h-3.5 w-3.5 flex-shrink-0 text-white" />
+                    <span className="text-white font-medium truncate">
+                      {affiliateSettings.commission_rate}% commission
+                    </span>
+                  </div>
+                );
+              }
+              
+              return null;
+            })()}
+            
+            {/* Badge PLR - Après le badge de commission */}
+            {product.type === 'digital' && (product as DigitalProduct).licensing_type === 'plr' && (
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                <Shield className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
+                <span className="text-emerald-500 font-medium truncate">
+                  PLR
+                </span>
+              </div>
+            )}
           </div>
         )}
 
