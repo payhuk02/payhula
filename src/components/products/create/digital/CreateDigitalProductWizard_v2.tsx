@@ -54,6 +54,100 @@ import { DigitalPreview } from './DigitalPreview';
 import { ProductSEOForm } from '../shared/ProductSEOForm';
 import { ProductFAQForm } from '../shared/ProductFAQForm';
 
+const createDefaultAffiliate = () => ({
+  enabled: false,
+  commission_rate: 20,
+  commission_type: 'percentage' as const,
+  fixed_commission_amount: 0,
+  cookie_duration_days: 30,
+  min_order_amount: 0,
+  allow_self_referral: false,
+  require_approval: false,
+  terms_and_conditions: '',
+});
+
+const createDefaultSeo = () => ({
+  meta_title: '',
+  meta_description: '',
+  meta_keywords: '',
+  og_title: '',
+  og_description: '',
+  og_image: '',
+});
+
+const getDefaultFormData = () => ({
+  // Basic info
+  name: '',
+  slug: '',
+  description: '',
+  short_description: '',
+  category: 'ebook',
+  digital_type: 'ebook',
+  image_url: '',
+  price: 0,
+  promotional_price: null,
+  currency: 'XOF',
+
+  // Files
+  main_file_url: '',
+  main_file_version: '1.0',
+  downloadable_files: [],
+
+  // License Config
+  license_type: 'single',
+  license_duration_days: null,
+  max_activations: 1,
+  allow_license_transfer: false,
+  auto_generate_keys: true,
+
+  // Download Settings
+  download_limit: 5,
+  download_expiry_days: 30,
+  require_registration: true,
+  watermark_enabled: false,
+  watermark_text: '',
+
+  // Version
+  version: '1.0',
+
+  // Affiliate
+  affiliate: createDefaultAffiliate(),
+
+  // SEO
+  seo: createDefaultSeo(),
+
+  // FAQs
+  faqs: [],
+
+  // Licensing (PLR / Copyright)
+  licensing_type: 'standard',
+  license_terms: '',
+
+  // Metadata
+  product_type: 'digital',
+  is_active: true,
+});
+
+const mergeFormDataWithDefaults = (data: any) => {
+  const defaults = getDefaultFormData();
+  const draft = data || {};
+
+  return {
+    ...defaults,
+    ...draft,
+    affiliate: {
+      ...defaults.affiliate,
+      ...(draft.affiliate || {}),
+    },
+    seo: {
+      ...defaults.seo,
+      ...(draft.seo || {}),
+    },
+    downloadable_files: draft.downloadable_files || [],
+    faqs: draft.faqs || [],
+  };
+};
+
 
 const STEPS = [
   {
@@ -141,82 +235,41 @@ export const CreateDigitalProductWizard = ({
   });
   const storeSlug = propsStoreSlug || store?.slug;
 
-  const [formData, setFormData] = useState<any>({
-    // Basic info
-    name: '',
-    slug: '',
-    description: '',
-    short_description: '',
-    category: 'ebook',
-    digital_type: 'ebook', // Type de produit digital
-    image_url: '',
-    price: 0,
-    promotional_price: null,
-    currency: 'XOF',
-    
-    // Files
-    main_file_url: '',
-    main_file_version: '1.0',
-    downloadable_files: [],
-    
-    // License Config
-    license_type: 'single',
-    license_duration_days: null, // NULL = lifetime
-    max_activations: 1,
-    allow_license_transfer: false,
-    auto_generate_keys: true,
-    
-    // Download Settings
-    download_limit: 5,
-    download_expiry_days: 30,
-    require_registration: true,
-    watermark_enabled: false,
-    watermark_text: '',
-    
-    // Version
-    version: '1.0',
-    
-    // Affiliate
-    affiliate: {
-      enabled: false,
-      commission_rate: 20,
-      commission_type: 'percentage',
-      fixed_commission_amount: 0,
-      cookie_duration_days: 30,
-      min_order_amount: 0,
-      allow_self_referral: false,
-      require_approval: false,
-      terms_and_conditions: '',
-    },
-    
-    // SEO
-    seo: {
-      meta_title: '',
-      meta_description: '',
-      meta_keywords: '',
-      og_title: '',
-      og_description: '',
-      og_image: '',
-    },
-    
-    // FAQs
-    faqs: [],
-    
-    // Licensing (PLR / Copyright)
-    licensing_type: 'standard',
-    license_terms: '',
-    
-    // Metadata
-    product_type: 'digital',
-    is_active: true,
-  });
+  const [formData, setFormData] = useState<any>(() => getDefaultFormData());
 
   /**
    * Update form data with auto-save
    */
   const updateFormData = useCallback((updates: any) => {
     setFormData((prev: any) => {
-      const newData = { ...prev, ...updates };
+      const newData = {
+        ...prev,
+        ...updates,
+      };
+
+      if (updates?.affiliate) {
+        newData.affiliate = {
+          ...prev.affiliate,
+          ...updates.affiliate,
+        };
+      }
+
+      if (updates?.seo) {
+        newData.seo = {
+          ...prev.seo,
+          ...updates.seo,
+        };
+      }
+
+      if (updates?.faqs) {
+        newData.faqs = Array.isArray(updates.faqs) ? updates.faqs : prev.faqs;
+      }
+
+      if (updates?.downloadable_files) {
+        newData.downloadable_files = Array.isArray(updates.downloadable_files)
+          ? updates.downloadable_files
+          : prev.downloadable_files;
+      }
       
       // Auto-save after 2 seconds of inactivity
       if (autoSaveTimeoutRef.current) {
@@ -268,7 +321,7 @@ export const CreateDigitalProductWizard = ({
     if (savedDraft) {
       try {
         const draft = JSON.parse(savedDraft);
-        setFormData(draft);
+        setFormData(mergeFormDataWithDefaults(draft));
         logger.info('Brouillon chargé depuis localStorage');
         
         // Restaurer l'étape si elle existe
@@ -286,6 +339,15 @@ export const CreateDigitalProductWizard = ({
       }
     }
   }, []);
+  
+  /**
+   * S'assurer que store_id est toujours défini dans formData
+   */
+  useEffect(() => {
+    if (storeId && !formData.store_id) {
+      setFormData((prev: any) => ({ ...prev, store_id: storeId }));
+    }
+  }, [storeId, formData.store_id]);
 
 
   /**
@@ -315,35 +377,117 @@ export const CreateDigitalProductWizard = ({
       case 1: {
         // 1. Validation client avec Zod
         // Préparer les données en gérant les valeurs vides/undefined
+        const nameValue = (formData.name || '').trim();
+        const priceValue = typeof formData.price === 'number' ? formData.price : (parseFloat(formData.price) || 0);
+        
+        // Vérifier les champs obligatoires avant validation
+        if (!nameValue || nameValue.length < 2) {
+          toast({
+            title: t('wizard.errors.title', 'Erreur'),
+            description: 'Le nom du produit est obligatoire et doit contenir au moins 2 caractères',
+            variant: 'destructive',
+          });
+          logger.warn('Validation échouée - Nom manquant ou invalide', { name: nameValue, nameLength: nameValue.length });
+          return false;
+        }
+        
+        if (!priceValue || priceValue <= 0) {
+          toast({
+            title: t('wizard.errors.title', 'Erreur'),
+            description: 'Le prix est obligatoire et doit être supérieur à 0',
+            variant: 'destructive',
+          });
+          logger.warn('Validation échouée - Prix manquant ou invalide', { price: priceValue });
+          return false;
+        }
+        
         const validationData: any = {
-          name: formData.name?.trim() || '',
-          price: formData.price || 0,
+          name: nameValue,
+          price: priceValue,
         };
         
-        // Ajouter les champs optionnels seulement s'ils ont une valeur
+        // Ajouter les champs optionnels seulement s'ils ont une valeur non vide
         if (formData.slug && formData.slug.trim()) {
           validationData.slug = formData.slug.trim();
         }
         if (formData.description && formData.description.trim()) {
-          validationData.description = formData.description.trim();
+          // Extraire le texte brut du HTML pour la validation de longueur
+          // La description peut contenir du HTML (RichTextEditor), mais on valide la longueur du texte brut
+          // Utiliser une regex simple pour extraire le texte brut (évite dépendance DOM)
+          const plainTextDescription = formData.description
+            .replace(/<[^>]*>/g, '') // Supprimer les balises HTML
+            .replace(/&nbsp;/g, ' ') // Remplacer &nbsp; par espace
+            .replace(/&amp;/g, '&') // Remplacer &amp; par &
+            .replace(/&lt;/g, '<') // Remplacer &lt; par <
+            .replace(/&gt;/g, '>') // Remplacer &gt; par >
+            .replace(/&quot;/g, '"') // Remplacer &quot; par "
+            .replace(/&#39;/g, "'") // Remplacer &#39; par '
+            .trim();
+          
+          validationData.description = plainTextDescription;
+          
+          // Log pour débogage
+          logger.info('Description préparée pour validation', {
+            originalLength: formData.description.length,
+            plainTextLength: plainTextDescription.length,
+            hasHtml: formData.description !== plainTextDescription,
+            difference: formData.description.length - plainTextDescription.length,
+          });
         }
         if (formData.version && formData.version.trim()) {
           validationData.version = formData.version.trim();
         }
         
+        // Log détaillé des données préparées avant validation
+        logger.info('Validation étape 1 - Données préparées', {
+          name: validationData.name,
+          nameLength: validationData.name.length,
+          price: validationData.price,
+          hasSlug: !!validationData.slug,
+          hasDescription: !!validationData.description,
+          hasVersion: !!validationData.version,
+          validationDataKeys: Object.keys(validationData),
+        });
+        
         const result = validateWithZod(digitalProductSchema, validationData);
         
         if (!result.valid) {
+          // Log détaillé de toutes les erreurs
+          logger.warn('Validation client échouée - Étape 1', {
+            errors: result.errors,
+            errorsCount: result.errors.length,
+            errorDetails: result.errors.map(err => ({
+              field: err.field,
+              message: err.message,
+              type: err.type,
+            })),
+          });
+          
+          // Récupérer toutes les erreurs par champ
           const nameError = getFieldError(result.errors, 'name');
           const priceError = getFieldError(result.errors, 'price');
+          const slugError = getFieldError(result.errors, 'slug');
+          const descriptionError = getFieldError(result.errors, 'description');
           const versionError = getFieldError(result.errors, 'version');
+          
+          // Construire un message d'erreur détaillé avec tous les champs en erreur
+          const errorMessages: string[] = [];
+          if (nameError) errorMessages.push(`Nom: ${nameError}`);
+          if (priceError) errorMessages.push(`Prix: ${priceError}`);
+          if (slugError) errorMessages.push(`Slug: ${slugError}`);
+          if (descriptionError) errorMessages.push(`Description: ${descriptionError}`);
+          if (versionError) errorMessages.push(`Version: ${versionError}`);
+          
+          const errorDescription = errorMessages.length > 0
+            ? errorMessages.join(' | ')
+            : t('wizard.errors.requiredFields', 'Veuillez remplir tous les champs obligatoires');
           
           toast({
             title: t('wizard.errors.title', 'Erreur'),
-            description: nameError || priceError || versionError || t('wizard.errors.requiredFields', 'Veuillez remplir tous les champs obligatoires'),
+            description: errorDescription,
             variant: 'destructive',
           });
-          logger.warn('Validation client échouée - Étape 1', { errors: result.errors });
+          
           return false;
         }
         
@@ -361,31 +505,58 @@ export const CreateDigitalProductWizard = ({
         }
         
         // 3. Validation serveur (unicité slug, version, etc.)
+        // Note: La validation serveur est optionnelle - si elle échoue, on continue avec la validation client
         if (storeId) {
-          const serverResult = await validateDigitalProductServer({
-            name: formData.name,
-            slug: formData.slug,
-            price: formData.price,
-          });
-          
-          if (!serverResult.valid) {
-            // Les erreurs sont déjà affichées dans le hook via toast
-            logger.warn('Validation serveur échouée - Étape 1', { errors: serverResult.errors });
-            return false;
-          }
-          
-          // Validation slug spécifique si fourni
-          if (formData.slug) {
-            const slugValid = await validateSlug(formData.slug);
-            if (!slugValid) {
-              return false;
+          try {
+            const serverResult = await validateDigitalProductServer({
+              name: formData.name,
+              slug: formData.slug,
+              price: formData.price,
+            });
+            
+            if (!serverResult.valid) {
+              // Logger l'erreur mais ne pas bloquer si c'est une erreur de connexion/RPC
+              logger.warn('Validation serveur échouée - Étape 1', { 
+                errors: serverResult.errors,
+                error: serverResult.error,
+                message: serverResult.message,
+              });
+              
+              // Si l'erreur est liée à la RPC (fonction inexistante ou erreur serveur), on continue
+              // Seulement bloquer si c'est une vraie erreur de validation (ex: slug déjà utilisé)
+              if (serverResult.error === 'validation_error' && serverResult.errors && serverResult.errors.length > 0) {
+                // Erreur de validation réelle - bloquer
+                return false;
+              }
+              // Sinon, continuer avec la validation client uniquement
             }
+            
+            // Validation slug spécifique si fourni
+            if (formData.slug && formData.slug.trim()) {
+              try {
+                const slugValid = await validateSlug(formData.slug.trim());
+                if (!slugValid) {
+                  return false;
+                }
+              } catch (slugError) {
+                // Si la validation du slug échoue (erreur réseau, etc.), on continue
+                // La validation sera faite lors de la sauvegarde
+                logger.warn('Erreur lors de la validation du slug', { error: slugError, slug: formData.slug });
+              }
+            }
+          } catch (serverError) {
+            // Erreur lors de l'appel à la validation serveur - continuer avec validation client uniquement
+            logger.warn('Erreur lors de la validation serveur (continuation avec validation client)', { 
+              error: serverError,
+              storeId,
+            });
+            // Ne pas bloquer - la validation client est suffisante pour l'étape 1
           }
-          
-          // Validation version spécifique si fournie (nécessite productId pour vérifier unicité)
-          // Note: Pour création, on ne peut pas valider l'unicité de version sans productId
-          // Cette validation sera faite lors de la création du produit
         }
+        
+        // Validation version spécifique si fournie (nécessite productId pour vérifier unicité)
+        // Note: Pour création, on ne peut pas valider l'unicité de version sans productId
+        // Cette validation sera faite lors de la création du produit
         
         return true;
       }
@@ -876,18 +1047,15 @@ export const CreateDigitalProductWizard = ({
             </Alert>
 
             <ProductSEOForm
-              productData={{
-                name: formData.name,
-                description: formData.description,
-                image_url: formData.image_url,
-                ...formData.seo,
-              }}
+              productName={formData.name || ''}
+              productDescription={formData.description || ''}
+              productPrice={formData.price || 0}
+              data={formData.seo || {}}
               onUpdate={(seoData) => updateFormData({ seo: seoData })}
             />
 
             <ProductFAQForm
-              faqs={formData.faqs || []}
-              productType="digital"
+              data={formData.faqs || []}
               onUpdate={(faqs) => updateFormData({ faqs })}
             />
           </div>

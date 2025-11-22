@@ -39,7 +39,8 @@ export const digitalProductSchema = z.object({
     .min(3, 'Le slug doit contenir au moins 3 caractères')
     .max(50, 'Le slug ne peut pas dépasser 50 caractères')
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Format de slug invalide')
-    .optional(),
+    .optional()
+    .or(z.literal('')),
   
   description: z.string()
     .max(2000, 'La description ne peut pas dépasser 2000 caractères')

@@ -38,7 +38,7 @@ interface ProductSEOFormProps {
   productName: string;
   productDescription?: string;
   productPrice?: number;
-  data: Partial<SEOData>;
+  data?: Partial<SEOData>;
   onUpdate: (data: Partial<SEOData>) => void;
 }
 
@@ -46,7 +46,7 @@ export const ProductSEOForm = ({
   productName,
   productDescription,
   productPrice,
-  data,
+  data = {},
   onUpdate,
 }: ProductSEOFormProps) => {
   const [seoScore, setSeoScore] = useState(0);

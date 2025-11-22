@@ -119,7 +119,7 @@ Après le déploiement, vérifiez :
 
 - [Documentation Supabase Edge Functions](https://supabase.com/docs/guides/functions)
 - [Guide de Configuration des Secrets](GUIDE_CONFIGURATION_SECRETS_SUPABASE.md)
-- [Correction de l'Erreur Failed to Fetch](CORRECTION_ERREUR_FAILED_TO_FETCH.md)
+- [Correction de l'Erreur Failed to Fetch](docs/corrections/CORRECTION_ERREUR_FAILED_TO_FETCH.md)
 
 ## ✅ Checklist de Déploiement
 

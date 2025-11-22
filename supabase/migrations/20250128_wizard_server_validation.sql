@@ -57,53 +57,9 @@ BEGIN
     );
   END IF;
 
-  -- Vérifier unicité dans digital_products
-  SELECT EXISTS(
-    SELECT 1 FROM public.digital_products
-    WHERE slug = p_slug
-      AND store_id = p_store_id
-      AND (p_product_id IS NULL OR id != p_product_id)
-  ) INTO v_exists;
-
-  IF v_exists THEN
-    RETURN jsonb_build_object(
-      'valid', false,
-      'error', 'unique',
-      'message', 'Ce slug est déjà utilisé pour un autre produit digital'
-    );
-  END IF;
-
-  -- Vérifier unicité dans physical_products
-  SELECT EXISTS(
-    SELECT 1 FROM public.physical_products
-    WHERE slug = p_slug
-      AND store_id = p_store_id
-      AND (p_product_id IS NULL OR id != p_product_id)
-  ) INTO v_exists;
-
-  IF v_exists THEN
-    RETURN jsonb_build_object(
-      'valid', false,
-      'error', 'unique',
-      'message', 'Ce slug est déjà utilisé pour un autre produit physique'
-    );
-  END IF;
-
-  -- Vérifier unicité dans services
-  SELECT EXISTS(
-    SELECT 1 FROM public.services
-    WHERE slug = p_slug
-      AND store_id = p_store_id
-      AND (p_product_id IS NULL OR id != p_product_id)
-  ) INTO v_exists;
-
-  IF v_exists THEN
-    RETURN jsonb_build_object(
-      'valid', false,
-      'error', 'unique',
-      'message', 'Ce slug est déjà utilisé pour un autre service'
-    );
-  END IF;
+  -- Note: Les tables digital_products, physical_products, et services n'ont pas de colonne slug
+  -- Le slug est uniquement dans la table products, donc la vérification ci-dessus est suffisante
+  -- Les vérifications supplémentaires ci-dessous ne sont plus nécessaires car le slug est unique dans products
 
   RETURN jsonb_build_object('valid', true);
 END;

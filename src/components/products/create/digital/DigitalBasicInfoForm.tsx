@@ -60,7 +60,7 @@ export const DigitalBasicInfoForm = ({
    * Check slug availability
    */
   const checkSlug = async (slug: string) => {
-    if (!slug) return;
+    if (!slug || !formData.store_id) return;
     
     setSlugChecking(true);
     try {
@@ -68,7 +68,7 @@ export const DigitalBasicInfoForm = ({
         .from('products')
         .select('id')
         .eq('slug', slug)
-        .eq('store_id', formData.store_id || '');
+        .eq('store_id', formData.store_id);
 
       if (error) throw error;
       

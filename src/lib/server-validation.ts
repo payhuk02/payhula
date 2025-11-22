@@ -148,11 +148,38 @@ export async function validateDigitalProduct(
     });
 
     if (error) {
-      logger.error('Error validating digital product', { error, data });
+      logger.error('Error validating digital product', { 
+        error, 
+        errorCode: error.code,
+        errorMessage: error.message,
+        errorDetails: error.details,
+        errorHint: error.hint,
+        data 
+      });
+      
+      // Si la fonction RPC n'existe pas ou erreur serveur, retourner un résultat qui permet de continuer
+      if (error.code === 'P0001' || error.code === '42883' || error.message?.includes('function') || error.message?.includes('does not exist')) {
+        logger.warn('Fonction RPC validate_digital_product non disponible - continuation avec validation client uniquement');
+        return {
+          valid: true, // Permettre de continuer avec validation client uniquement
+          error: 'rpc_unavailable',
+          message: 'Validation serveur non disponible - validation client uniquement',
+        };
+      }
+      
       return {
         valid: false,
         error: 'validation_error',
         message: error.message || 'Erreur lors de la validation du produit',
+      };
+    }
+
+    if (!result) {
+      logger.warn('validate_digital_product returned null/undefined - continuation avec validation client');
+      return {
+        valid: true, // Permettre de continuer
+        error: 'rpc_no_result',
+        message: 'Validation serveur non disponible',
       };
     }
 

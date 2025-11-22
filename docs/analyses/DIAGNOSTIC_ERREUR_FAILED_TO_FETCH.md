@@ -1,4 +1,4 @@
-# 🔍 Diagnostic de l'Erreur "Failed to fetch"
+﻿# 🔍 Diagnostic de l'Erreur "Failed to fetch"
 
 ## 📋 Analyse des Logs Supabase
 
@@ -117,7 +117,7 @@ D'après les logs de l'Edge Function `moneroo`, on observe :
 ## 🔗 Ressources
 
 - [Guide de Déploiement](DEPLOIEMENT_RAPIDE_MONEROO.md)
-- [Correction de l'Erreur](CORRECTION_ERREUR_FAILED_TO_FETCH.md)
+- [Correction de l'Erreur](docs/corrections/CORRECTION_ERREUR_FAILED_TO_FETCH.md)
 - [Code de l'Edge Function](MONEROO_EDGE_FUNCTION_CODE.txt)
 
 

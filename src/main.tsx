@@ -14,6 +14,20 @@ import { initCDNConnections } from "./lib/cdn-config";
 import { initAccessibility } from "./lib/accessibility";
 import { logger } from "./lib/logger";
 import "./i18n/config"; // Initialiser i18n
+import { validateEnv } from "./lib/env-validator";
+
+// Valider les variables d'environnement au démarrage
+try {
+  validateEnv();
+  logger.info("✅ Variables d'environnement validées");
+} catch (error) {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  logger.error("❌ Erreur de validation des variables d'environnement", { error: errorMessage });
+  // En production, on ne peut pas continuer sans les variables requises
+  if (import.meta.env.PROD) {
+    throw error;
+  }
+}
 
 // Install console guard first to neutralize console.* in production
 installConsoleGuard();

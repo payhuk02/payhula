@@ -27,6 +27,40 @@
     "or": "Ou",
     "coverage": "Couverture"
   },
+  "wizard": {
+    "title": "Nouveau Produit Digital",
+    "subtitle": "Créez un produit digital professionnel en 6 étapes",
+    "back": "Retour au choix du type",
+    "backShort": "Retour",
+    "step": "Étape",
+    "of": "sur",
+    "steps": "Étapes du formulaire",
+    "autoSaving": "Auto-sauvegarde...",
+    "previous": "Étape précédente",
+    "prev": "Préc.",
+    "next": "Suivant",
+    "nextShort": "Suiv.",
+    "saveDraft": "Sauvegarder comme brouillon",
+    "draft": "Brouillon",
+    "publish": "Publier le produit",
+    "publishShort": "Publier",
+    "publishing": "Publication...",
+    "publishingShort": "Pub...",
+    "shortcuts": "Raccourcis",
+    "shortcuts.save": "Brouillon",
+    "shortcuts.next": "Suivant",
+    "shortcuts.prev": "Précédent",
+    "seo": {
+      "faq": {
+        "description": "Optimisez votre référencement et ajoutez des réponses aux questions fréquentes"
+      }
+    },
+    "errors": {
+      "title": "Erreur",
+      "requiredFields": "Veuillez remplir tous les champs obligatoires",
+      "noFiles": "Veuillez ajouter un lien principal pour votre produit"
+    }
+  },
   "nav": {
     "home": "Accueil",
     "marketplace": "Marketplace",

@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Package, ShoppingCart, Users, DollarSign, Activity, Zap, Bell, Settings, LayoutDashboard, AlertCircle } from "lucide-react";
-import { useDashboardStats } from "@/hooks/useDashboardStatsRobust";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useStore } from "@/hooks/use-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

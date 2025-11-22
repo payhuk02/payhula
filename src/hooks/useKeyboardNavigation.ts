@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 interface KeyboardNavigationOptions {
   /**
@@ -141,7 +142,7 @@ export const useGlobalKeyboardShortcuts = () => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         // TODO: Ouvrir la recherche globale
-        console.log('Recherche globale (à implémenter)');
+        logger.debug('Recherche globale (à implémenter)');
       }
 
       // Escape : Fermer les modales

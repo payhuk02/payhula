@@ -1,4 +1,4 @@
-# 🛍️ Payhula SaaS Platform
+﻿# 🛍️ Payhula SaaS Platform
 
 > **Plateforme E-commerce SaaS Haut de Gamme Multi-Produits**  
 > Solution professionnelle pour la vente de produits digitaux, physiques, services et cours en ligne
@@ -10,7 +10,7 @@
 [![Tests](https://img.shields.io/badge/tests-50%2B-green)](./tests)
 [![Security](https://img.shields.io/badge/security-95%2F100-success)](SECURITY.md)
 [![Code Quality](https://img.shields.io/badge/quality-98%2F100-brightgreen)](TYPESCRIPT_STRICT_COMPLETE.md)
-[![Audit](https://img.shields.io/badge/audit-2025--10--30-informational)](AUDIT_COMPLET_PAYHULA_2025_PROFESSIONNEL.md)
+[![Audit](https://img.shields.io/badge/audit-2025--10--30-informational)](docs/audits/AUDIT_COMPLET_PAYHULA_2025_PROFESSIONNEL.md)
 
 ---
 
