@@ -313,7 +313,7 @@ const menuSections = [
       {
         title: "Optimisation Coûts",
         url: "/dashboard/cost-optimization",
-        icon: DollarSignIcon,
+        icon: DollarSign,
       },
       {
         title: "Fournisseurs",
@@ -620,7 +620,7 @@ const adminMenuSections = [
       {
         title: "Optimisation Coûts",
         url: "/dashboard/cost-optimization",
-        icon: DollarSignIcon,
+        icon: DollarSign,
       },
       {
         title: "Expéditions Batch",
