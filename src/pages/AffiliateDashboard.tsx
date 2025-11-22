@@ -4,7 +4,7 @@
  * Date: 25/10/2025
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import { useCurrentAffiliate, useAffiliates } from '@/hooks/useAffiliates';
 import { useAffiliateLinks } from '@/hooks/useAffiliateLinks';
 import { useAffiliateCommissions } from '@/hooks/useAffiliateCommissions';
 import { useAffiliateBalance, useAffiliateWithdrawals } from '@/hooks/useAffiliateWithdrawals';
+import { PaginationControls } from '@/components/affiliate/PaginationControls';
 import {
   Dialog,
   DialogContent,
@@ -50,10 +51,43 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const AffiliateDashboard = () => {
   const { affiliate, loading: affiliateLoading, isAffiliate } = useCurrentAffiliate();
-  const { links, loading: linksLoading } = useAffiliateLinks(affiliate?.id);
-  const { commissions, stats, loading: commissionsLoading } = useAffiliateCommissions({ 
-    affiliate_id: affiliate?.id 
-  });
+  
+  // États de pagination pour les liens
+  const [linksPage, setLinksPage] = useState(1);
+  const [linksPageSize, setLinksPageSize] = useState(20);
+  
+  // États de pagination pour les commissions
+  const [commissionsPage, setCommissionsPage] = useState(1);
+  const [commissionsPageSize, setCommissionsPageSize] = useState(20);
+  
+  const { 
+    links, 
+    loading: linksLoading,
+    pagination: linksPagination,
+    goToPage: goToLinksPage,
+    nextPage: nextLinksPage,
+    previousPage: previousLinksPage,
+    setPageSize: setLinksPageSize
+  } = useAffiliateLinks(
+    affiliate?.id, 
+    undefined,
+    { page: linksPage, pageSize: linksPageSize }
+  );
+  
+  const { 
+    commissions, 
+    stats, 
+    loading: commissionsLoading,
+    pagination: commissionsPagination,
+    goToPage: goToCommissionsPage,
+    nextPage: nextCommissionsPage,
+    previousPage: previousCommissionsPage,
+    setPageSize: setCommissionsPageSize
+  } = useAffiliateCommissions(
+    { affiliate_id: affiliate?.id },
+    { page: commissionsPage, pageSize: commissionsPageSize }
+  );
+  
   const { balance, loading: balanceLoading } = useAffiliateBalance(affiliate?.id);
   const { withdrawals, loading: withdrawalsLoading } = useAffiliateWithdrawals({ 
     affiliate_id: affiliate?.id 
@@ -74,6 +108,19 @@ const AffiliateDashboard = () => {
       setShowRegisterDialog(false);
     }
   };
+
+  // Synchroniser les états de pagination avec les hooks
+  useEffect(() => {
+    if (linksPagination) {
+      setLinksPage(linksPagination.page);
+    }
+  }, [linksPagination?.page]);
+
+  useEffect(() => {
+    if (commissionsPagination) {
+      setCommissionsPage(commissionsPagination.page);
+    }
+  }, [commissionsPagination?.page]);
 
   // Registration Dialog Component
   const RegistrationDialog = () => (
@@ -537,7 +584,26 @@ const AffiliateDashboard = () => {
                           </Card>
                         );
                       })}
-                    </div>
+                      </div>
+                      
+                      {/* Pagination pour les liens */}
+                      {linksPagination && linksPagination.totalPages > 1 && (
+                        <div className="mt-6 pt-4 border-t">
+                          <PaginationControls
+                            {...linksPagination}
+                            onPageChange={(page) => {
+                              setLinksPage(page);
+                              goToLinksPage(page);
+                            }}
+                            onPageSizeChange={(size) => {
+                              setLinksPageSize(size);
+                              setLinksPageSize(size);
+                              setLinksPage(1);
+                            }}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>

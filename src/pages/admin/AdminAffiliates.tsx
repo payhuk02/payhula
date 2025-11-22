@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAffiliates } from '@/hooks/useAffiliates';
 import { useAffiliateCommissions } from '@/hooks/useAffiliateCommissions';
 import { useAffiliateWithdrawals, usePendingWithdrawals } from '@/hooks/useAffiliateWithdrawals';
+import { PaginationControls } from '@/components/affiliate/PaginationControls';
 import {
   Dialog,
   DialogContent,
@@ -51,13 +52,44 @@ const AdminAffiliates = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   
-  const { affiliates, loading: affiliatesLoading, suspendAffiliate, activateAffiliate } = useAffiliates({ 
-    status: statusFilter !== 'all' ? statusFilter as any : undefined,
-    search: searchTerm 
-  });
+  // États de pagination pour les affiliés
+  const [affiliatesPage, setAffiliatesPage] = useState(1);
+  const [affiliatesPageSize, setAffiliatesPageSize] = useState(20);
   
-  const { commissions, stats, loading: commissionsLoading, approveCommission, rejectCommission, markAsPaid } = 
-    useAffiliateCommissions();
+  // États de pagination pour les commissions
+  const [commissionsPage, setCommissionsPage] = useState(1);
+  const [commissionsPageSize, setCommissionsPageSize] = useState(20);
+  
+  const { 
+    affiliates, 
+    loading: affiliatesLoading, 
+    suspendAffiliate, 
+    activateAffiliate,
+    pagination: affiliatesPagination,
+    goToPage: goToAffiliatesPage,
+    setPageSize: setAffiliatesPageSize
+  } = useAffiliates(
+    { 
+      status: statusFilter !== 'all' ? statusFilter as any : undefined,
+      search: searchTerm 
+    },
+    { page: affiliatesPage, pageSize: affiliatesPageSize }
+  );
+  
+  const { 
+    commissions, 
+    stats, 
+    loading: commissionsLoading, 
+    approveCommission, 
+    rejectCommission, 
+    markAsPaid,
+    pagination: commissionsPagination,
+    goToPage: goToCommissionsPage,
+    setPageSize: setCommissionsPageSize
+  } = useAffiliateCommissions(
+    undefined,
+    { page: commissionsPage, pageSize: commissionsPageSize }
+  );
   
   const { withdrawals, approveWithdrawal, rejectWithdrawal, completeWithdrawal } = useAffiliateWithdrawals();
   const { pending: pendingWithdrawals, totalAmount: pendingAmount } = usePendingWithdrawals();
@@ -95,6 +127,19 @@ const AdminAffiliates = () => {
       logger.info(`Admin Affiliates: ${affiliates.length} affiliés chargés`);
     }
   }, [affiliatesLoading, affiliates]);
+
+  // Synchroniser les états de pagination avec les hooks
+  useEffect(() => {
+    if (affiliatesPagination) {
+      setAffiliatesPage(affiliatesPagination.page);
+    }
+  }, [affiliatesPagination?.page]);
+
+  useEffect(() => {
+    if (commissionsPagination) {
+      setCommissionsPage(commissionsPagination.page);
+    }
+  }, [commissionsPagination?.page]);
 
   const handleApproveCommission = useCallback(async (commission: any) => {
     logger.info(`Approbation commission ${commission.id}`);
@@ -491,6 +536,24 @@ const AdminAffiliates = () => {
                     })}
                   </TableBody>
                 </Table>
+                
+                {/* Pagination pour les affiliés */}
+                {affiliatesPagination && affiliatesPagination.totalPages > 1 && (
+                  <div className="mt-6 pt-4 border-t px-6 pb-6">
+                    <PaginationControls
+                      {...affiliatesPagination}
+                      onPageChange={(page) => {
+                        setAffiliatesPage(page);
+                        goToAffiliatesPage(page);
+                      }}
+                      onPageSizeChange={(size) => {
+                        setAffiliatesPageSize(size);
+                        setAffiliatesPageSize(size);
+                        setAffiliatesPage(1);
+                      }}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -612,8 +675,27 @@ const AdminAffiliates = () => {
                           </TableCell>
                         </TableRow>
                       ))}
-                    </TableBody>
-                  </Table>
+                      </TableBody>
+                    </Table>
+                    
+                    {/* Pagination pour les commissions */}
+                    {commissionsPagination && commissionsPagination.totalPages > 1 && (
+                      <div className="mt-6 pt-4 border-t px-6 pb-6">
+                        <PaginationControls
+                          {...commissionsPagination}
+                          onPageChange={(page) => {
+                            setCommissionsPage(page);
+                            goToCommissionsPage(page);
+                          }}
+                          onPageSizeChange={(size) => {
+                            setCommissionsPageSize(size);
+                            setCommissionsPageSize(size);
+                            setCommissionsPage(1);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
