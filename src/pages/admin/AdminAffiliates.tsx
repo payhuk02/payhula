@@ -54,11 +54,11 @@ const AdminAffiliates = () => {
   
   // États de pagination pour les affiliés
   const [affiliatesPage, setAffiliatesPage] = useState(1);
-  const [affiliatesPageSize, setAffiliatesPageSize] = useState(20);
+  const [affiliatesPageSize, setAffiliatesPageSizeLocal] = useState(20);
   
   // États de pagination pour les commissions
   const [commissionsPage, setCommissionsPage] = useState(1);
-  const [commissionsPageSize, setCommissionsPageSize] = useState(20);
+  const [commissionsPageSize, setCommissionsPageSizeLocal] = useState(20);
   
   const { 
     affiliates, 
@@ -132,14 +132,16 @@ const AdminAffiliates = () => {
   useEffect(() => {
     if (affiliatesPagination) {
       setAffiliatesPage(affiliatesPagination.page);
+      setAffiliatesPageSizeLocal(affiliatesPagination.pageSize);
     }
-  }, [affiliatesPagination?.page]);
+  }, [affiliatesPagination?.page, affiliatesPagination?.pageSize]);
 
   useEffect(() => {
     if (commissionsPagination) {
       setCommissionsPage(commissionsPagination.page);
+      setCommissionsPageSizeLocal(commissionsPagination.pageSize);
     }
-  }, [commissionsPagination?.page]);
+  }, [commissionsPagination?.page, commissionsPagination?.pageSize]);
 
   const handleApproveCommission = useCallback(async (commission: any) => {
     logger.info(`Approbation commission ${commission.id}`);
@@ -547,6 +549,7 @@ const AdminAffiliates = () => {
                         goToAffiliatesPage(page);
                       }}
                       onPageSizeChange={(size) => {
+                        setAffiliatesPageSizeLocal(size);
                         setAffiliatesPageSize(size);
                         setAffiliatesPage(1);
                       }}
@@ -574,106 +577,107 @@ const AdminAffiliates = () => {
                     ))}
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Affilié</TableHead>
-                        <TableHead>Produit</TableHead>
-                        <TableHead className="text-right">Vente</TableHead>
-                        <TableHead className="text-right">Commission</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {commissions.slice(0, 20).map((commission) => (
-                        <TableRow key={commission.id}>
-                          <TableCell className="text-sm">
-                            {new Date(commission.created_at).toLocaleDateString('fr-FR')}
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">{commission.affiliate?.display_name}</p>
-                              <p className="text-xs text-muted-foreground">{commission.affiliate?.email}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>{commission.product?.name}</TableCell>
-                          <TableCell className="text-right font-semibold">
-                            {formatCurrency(commission.order_total)}
-                          </TableCell>
-                          <TableCell className="text-right font-bold text-orange-600">
-                            {formatCurrency(commission.commission_amount)}
-                          </TableCell>
-                          <TableCell>
-                            {commission.status === 'pending' && (
-                              <Badge variant="outline" className="gap-1">
-                                <Clock className="h-3 w-3" />
-                                En attente
-                              </Badge>
-                            )}
-                            {commission.status === 'approved' && (
-                              <Badge variant="secondary" className="gap-1">
-                                <CheckCircle2 className="h-3 w-3" />
-                                Approuvé
-                              </Badge>
-                            )}
-                            {commission.status === 'paid' && (
-                              <Badge className="gap-1">
-                                <CheckCircle2 className="h-3 w-3" />
-                                Payé
-                              </Badge>
-                            )}
-                            {commission.status === 'rejected' && (
-                              <Badge variant="destructive" className="gap-1">
-                                <XCircle className="h-3 w-3" />
-                                Rejeté
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex gap-2 justify-end">
+                  <>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Affilié</TableHead>
+                          <TableHead>Produit</TableHead>
+                          <TableHead className="text-right">Vente</TableHead>
+                          <TableHead className="text-right">Commission</TableHead>
+                          <TableHead>Statut</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {commissions.slice(0, 20).map((commission) => (
+                          <TableRow key={commission.id}>
+                            <TableCell className="text-sm">
+                              {new Date(commission.created_at).toLocaleDateString('fr-FR')}
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{commission.affiliate?.display_name}</p>
+                                <p className="text-xs text-muted-foreground">{commission.affiliate?.email}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>{commission.product?.name}</TableCell>
+                            <TableCell className="text-right font-semibold">
+                              {formatCurrency(commission.order_total)}
+                            </TableCell>
+                            <TableCell className="text-right font-bold text-orange-600">
+                              {formatCurrency(commission.commission_amount)}
+                            </TableCell>
+                            <TableCell>
                               {commission.status === 'pending' && (
-                                <>
+                                <Badge variant="outline" className="gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  En attente
+                                </Badge>
+                              )}
+                              {commission.status === 'approved' && (
+                                <Badge variant="secondary" className="gap-1">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  Approuvé
+                                </Badge>
+                              )}
+                              {commission.status === 'paid' && (
+                                <Badge className="gap-1">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  Payé
+                                </Badge>
+                              )}
+                              {commission.status === 'rejected' && (
+                                <Badge variant="destructive" className="gap-1">
+                                  <XCircle className="h-3 w-3" />
+                                  Rejeté
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex gap-2 justify-end">
+                                {commission.status === 'pending' && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleApproveCommission(commission)}
+                                      className="gap-1"
+                                    >
+                                      <CheckCircle2 className="h-3 w-3" />
+                                      Approuver
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={() => {
+                                        setSelectedCommission(commission);
+                                        setShowRejectDialog(true);
+                                      }}
+                                      className="gap-1"
+                                    >
+                                      <XCircle className="h-3 w-3" />
+                                      Rejeter
+                                    </Button>
+                                  </>
+                                )}
+                                {commission.status === 'approved' && (
                                   <Button
                                     size="sm"
-                                    onClick={() => handleApproveCommission(commission)}
-                                    className="gap-1"
-                                  >
-                                    <CheckCircle2 className="h-3 w-3" />
-                                    Approuver
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="destructive"
                                     onClick={() => {
                                       setSelectedCommission(commission);
-                                      setShowRejectDialog(true);
+                                      setShowPayDialog(true);
                                     }}
                                     className="gap-1"
                                   >
-                                    <XCircle className="h-3 w-3" />
-                                    Rejeter
+                                    <Wallet className="h-3 w-3" />
+                                    Marquer payé
                                   </Button>
-                                </>
-                              )}
-                              {commission.status === 'approved' && (
-                                <Button
-                                  size="sm"
-                                  onClick={() => {
-                                    setSelectedCommission(commission);
-                                    setShowPayDialog(true);
-                                  }}
-                                  className="gap-1"
-                                >
-                                  <Wallet className="h-3 w-3" />
-                                  Marquer payé
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                       </TableBody>
                     </Table>
                     
@@ -687,6 +691,7 @@ const AdminAffiliates = () => {
                             goToCommissionsPage(page);
                           }}
                           onPageSizeChange={(size) => {
+                            setCommissionsPageSizeLocal(size);
                             setCommissionsPageSize(size);
                             setCommissionsPage(1);
                           }}
