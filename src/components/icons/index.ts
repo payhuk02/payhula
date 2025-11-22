@@ -118,4 +118,6 @@ export {
   Info,
   ChevronsLeft,
   ChevronsRight,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
