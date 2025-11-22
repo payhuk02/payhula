@@ -305,6 +305,44 @@ export default defineConfig(({ mode }) => {
               return 'validation';
             }
             
+            // Dépendances lourdes non-React - Séparer en chunks dédiés
+            // jspdf et plugins - Très lourd (414 KB), charger seulement quand nécessaire
+            if (id.includes('node_modules/jspdf') || id.includes('node_modules/jspdf-autotable')) {
+              return 'pdf';
+            }
+            
+            // html2canvas - Lourd (201 KB), charger seulement pour les exports
+            if (id.includes('node_modules/html2canvas')) {
+              return 'canvas';
+            }
+            
+            // papaparse - CSV parsing, charger seulement pour les imports/exports
+            if (id.includes('node_modules/papaparse')) {
+              return 'csv';
+            }
+            
+            // file-saver - Export de fichiers, charger seulement quand nécessaire
+            if (id.includes('node_modules/file-saver')) {
+              return 'file-utils';
+            }
+            
+            // qrcode et html5-qrcode - Scanner QR, charger seulement pour les fonctionnalités QR
+            if (id.includes('node_modules/qrcode') || id.includes('node_modules/html5-qrcode')) {
+              return 'qrcode';
+            }
+            
+            // browser-image-compression - Compression d'images, charger seulement pour uploads
+            if (id.includes('node_modules/browser-image-compression')) {
+              return 'image-utils';
+            }
+            
+            // i18next et plugins - Internationalisation, peut être chargé séparément
+            if (id.includes('node_modules/i18next') || 
+                id.includes('node_modules/i18next-') ||
+                id.includes('node_modules/react-i18next')) {
+              return 'i18n';
+            }
+            
             // CRITIQUE: Par défaut, garder TOUTES les dépendances node_modules dans le chunk principal
             // pour éviter les erreurs React (forwardRef, createContext, useLayoutEffect, etc.)
             // Seules les dépendances explicitement identifiées comme non-React peuvent être séparées
