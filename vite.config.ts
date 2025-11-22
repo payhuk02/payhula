@@ -92,13 +92,13 @@ export default defineConfig(({ mode }) => {
     }),
     // Plugin pour garantir l'ordre de chargement des chunks (production uniquement)
     isProduction && ensureChunkOrderPlugin(),
-    // Visualizer désactivé pour accélérer le build (peut être activé manuellement si besoin)
-    // !isProduction && visualizer({
-    //   filename: './dist/stats.html',
-    //   open: false,
-    //   gzipSize: false,
-    //   brotliSize: false,
-    // }),
+    // Visualizer pour analyser le bundle size (activer avec --mode analyze)
+    mode === 'analyze' && visualizer({
+      filename: './dist/stats.html',
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+    }),
     
     // Sentry plugin pour source maps (seulement en production avec token)
     isProduction && hasSentryToken && sentryVitePlugin({

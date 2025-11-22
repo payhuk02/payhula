@@ -6,12 +6,12 @@ Cette section contient tous les guides pratiques pour les développeurs et utili
 
 ## 📋 Catégories de Guides
 
-### Guides de Démarrage
+### 🚀 Guides de Démarrage
 
 - [Démarrage Rapide](./DEMARRAGE_RAPIDE.md)
 - [Installation](./../INSTALLATION.md)
 
-### Guides de Configuration
+### ⚙️ Guides de Configuration
 
 - [Configuration Administrateur Principal](./CONFIGURATION_ADMINISTRATEUR_PRINCIPAL.md)
 - [Configuration Variables ENV](./CONFIGURATION_VARIABLES_ENV.md)
@@ -21,17 +21,17 @@ Cette section contient tous les guides pratiques pour les développeurs et utili
 - [Guide Configuration Secrets Supabase](./GUIDE_CONFIGURATION_SECRETS_SUPABASE.md)
 - [Guide Configuration PayDunya Keys](./GUIDE_CONFIGURATION_PAYDUNYA_KEYS.md)
 
-### Guides de Déploiement
+### 🚀 Guides de Déploiement
 
 Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 
-### Guides d'Intégration
+### 🔌 Guides d'Intégration
 
 - [Crisp Setup Guide](./CRISP_SETUP_GUIDE.md)
 - [SendGrid Setup Guide](./SENDGRID_SETUP_GUIDE.md)
 - [Sentry Setup Guide](./SENTRY_SETUP_GUIDE.md)
 
-### Guides de Migration
+### 🔄 Guides de Migration
 
 - [Guide Migration V1 V2](./GUIDE_MIGRATION_V1_V2.md)
 - [Guide Migration Retraits Vendeurs](./GUIDE_MIGRATION_RETRAITS_VENDEURS.md)
@@ -39,14 +39,27 @@ Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 - [Reviews Migration Guide](./REVIEWS_MIGRATION_GUIDE.md)
 - [Phase 1 Reviews Integration Guide](./PHASE_1_REVIEWS_INTEGRATION_GUIDE.md)
 
-### Guides de Test
+### 🧪 Guides de Test
 
 - [Testing Guide](./TESTING_GUIDE.md)
 - [Testing Guide Phase 2](./TESTING_GUIDE_PHASE2.md)
+- [Guide des Tests](./testing-guide.md) ⭐ **Nouveau**
 - [Quick Test Guide](./QUICK_TEST_GUIDE.md)
 - [Visual Testing Guide](./VISUAL_TESTING_GUIDE.md)
 
-### Guides Techniques
+### 🛡️ Guides de Gestion d'Erreurs
+
+- [Guide de Gestion des Erreurs](./error-handling-guide.md) ⭐ **Nouveau**
+
+### 📦 Guides d'Optimisation
+
+- [Image Optimization Guide](./IMAGE_OPTIMIZATION_GUIDE.md)
+- [Image Format Guide](./IMAGE_FORMAT_GUIDE.md)
+- [Banner Optimization Guide](./BANNER_OPTIMIZATION_GUIDE.md)
+- [Product Grid Configuration Guide](./PRODUCT_GRID_CONFIGURATION_GUIDE.md)
+- [Guide d'Optimisation du Bundle](./bundle-optimization-guide.md) ⭐ **Nouveau**
+
+### 🔧 Guides Techniques
 
 - [Guide Création Bucket Products](./GUIDE_CREATION_BUCKET_PRODUITS.md)
 - [Guide Setup Automatique Storage](./GUIDE_SETUP_AUTOMATIQUE_STORAGE.md)
@@ -56,14 +69,7 @@ Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 - [Guide Test Edge Functions](./GUIDE_TEST_EDGE_FUNCTIONS.md)
 - [Guide Tests Appareils Réels](./GUIDE_TESTS_APPAREILS_REELS.md)
 
-### Guides d'Optimisation
-
-- [Image Optimization Guide](./IMAGE_OPTIMIZATION_GUIDE.md)
-- [Image Format Guide](./IMAGE_FORMAT_GUIDE.md)
-- [Banner Optimization Guide](./BANNER_OPTIMIZATION_GUIDE.md)
-- [Product Grid Configuration Guide](./PRODUCT_GRID_CONFIGURATION_GUIDE.md)
-
-### Guides Fonctionnels
+### 📱 Guides Fonctionnels
 
 - [Advanced Features Guide](./ADVANCED_FEATURES_GUIDE.md)
 - [Advanced Profile System Guide](./ADVANCED_PROFILE_SYSTEM_GUIDE.md)
@@ -73,28 +79,25 @@ Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 - [Guide Utilisateur Produits](./GUIDE_UTILISATEUR_PRODUITS.md)
 - [Guide Activation Fonctionnalités Avancées](./GUIDE_ACTIVATION_FONCTIONNALITES_AVANCEES.md)
 
-### Guides de Correction
+### 🔧 Guides de Correction
 
 - [Guide Rapide Correction Erreur 400](./GUIDE_RAPIDE_CORRECTION_ERREUR_400.md)
 - [Guide Correction Erreur Currency](./GUIDE_CORRECTION_ERREUR_CURRENCY.md)
 - [Guide Fix Admin Users Email](./GUIDE_FIX_ADMIN_USERS_EMAIL.md)
 - [Guide Admin Settings Fix](./GUIDE_ADMIN_SETTINGS_FIX.md)
 
-### Guides GitHub
+### 🔗 Guides GitHub
 
 - [Guide Création Token GitHub](./GUIDE_CREATION_TOKEN_GITHUB.md)
 - [Guide Création Issues GitHub](./GUIDE_CREATION_ISSUES_GITHUB.md)
 - [Guide Nettoyage Clés Git](./GUIDE_NETTOYAGE_CLES_GIT.md)
 
-### Guides ESLint
+### 📝 Guides ESLint & TypeScript
 
 - [Guide ESLint No Console](./GUIDE_ESLINT_NO_CONSOLE.md)
-
-### Guides TypeScript
-
 - [Guide Amélioration TypeScript](./GUIDE_AMELIORATION_TYPESCRIPT.md)
 
-### Guides Cours
+### 🎓 Guides Cours
 
 - [Guide Création Cours Complet](./GUIDE_CREATION_COURS_COMPLET.md)
 - [Guide Test Création Cours Backend](./GUIDE_TEST_CREATION_COURS_BACKEND.md)
@@ -105,10 +108,18 @@ Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 - [Guide Tests Manuels](./GUIDE_TESTS_MANUELS.md)
 - [Guide Test Rapide 3 Pages](./GUIDE_TEST_RAPIDE_3_PAGES.md)
 
-### Guides Spécialisés
+### 🔑 Guides Spécialisés
 
 - [Guide Régénérer Clés Supabase](./GUIDE_REGENERER_CLES_SUPABASE.md)
 - [Guide Test 2FA](./GUIDE_TEST_2FA.md)
+
+---
+
+## ⭐ Nouveaux Guides (Janvier 2025)
+
+- **[Guide de Gestion des Erreurs](./error-handling-guide.md)** - Stratégies et bonnes pratiques
+- **[Guide d'Optimisation du Bundle](./bundle-optimization-guide.md)** - Optimisation des performances
+- **[Guide des Tests](./testing-guide.md)** - Stratégie de tests et couverture
 
 ---
 
@@ -129,4 +140,3 @@ Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 ---
 
 **Dernière mise à jour** : Janvier 2025
-
