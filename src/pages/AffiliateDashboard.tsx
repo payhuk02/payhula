@@ -67,7 +67,7 @@ const AffiliateDashboard = () => {
     goToPage: goToLinksPage,
     nextPage: nextLinksPage,
     previousPage: previousLinksPage,
-    setPageSize: setLinksPageSize
+    setPageSize: setLinksPageSizeFromHook
   } = useAffiliateLinks(
     affiliate?.id, 
     undefined,
@@ -82,7 +82,7 @@ const AffiliateDashboard = () => {
     goToPage: goToCommissionsPage,
     nextPage: nextCommissionsPage,
     previousPage: previousCommissionsPage,
-    setPageSize: setCommissionsPageSize
+    setPageSize: setCommissionsPageSizeFromHook
   } = useAffiliateCommissions(
     { affiliate_id: affiliate?.id },
     { page: commissionsPage, pageSize: commissionsPageSize }
@@ -598,6 +598,7 @@ const AffiliateDashboard = () => {
                             }}
                             onPageSizeChange={(size) => {
                               setLinksPageSize(size);
+                              setLinksPageSizeFromHook(size);
                               setLinksPage(1);
                             }}
                           />
