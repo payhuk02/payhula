@@ -597,7 +597,6 @@ const AffiliateDashboard = () => {
                             }}
                             onPageSizeChange={(size) => {
                               setLinksPageSize(size);
-                              setLinksPageSize(size);
                               setLinksPage(1);
                             }}
                           />

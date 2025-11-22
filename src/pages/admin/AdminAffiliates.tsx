@@ -548,7 +548,6 @@ const AdminAffiliates = () => {
                       }}
                       onPageSizeChange={(size) => {
                         setAffiliatesPageSize(size);
-                        setAffiliatesPageSize(size);
                         setAffiliatesPage(1);
                       }}
                     />
@@ -688,7 +687,6 @@ const AdminAffiliates = () => {
                             goToCommissionsPage(page);
                           }}
                           onPageSizeChange={(size) => {
-                            setCommissionsPageSize(size);
                             setCommissionsPageSize(size);
                             setCommissionsPage(1);
                           }}
