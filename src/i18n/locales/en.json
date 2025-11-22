@@ -24,7 +24,8 @@
     "show": "Show",
     "hide": "Hide",
     "manageAll": "Manage all your",
-    "or": "Or"
+    "or": "Or",
+    "coverage": "Coverage"
   },
   "nav": {
     "home": "Home",
@@ -39,6 +40,41 @@
     "logout": "Logout",
     "login": "Login",
     "signup": "Sign up"
+  },
+  "wizard": {
+    "title": "New Digital Product",
+    "subtitle": "Create a professional digital product in 6 steps",
+    "back": "Back to type selection",
+    "backShort": "Back",
+    "step": "Step",
+    "of": "of",
+    "steps": "Form steps",
+    "autoSaving": "Auto-saving...",
+    "previous": "Previous step",
+    "prev": "Prev.",
+    "next": "Next",
+    "nextShort": "Next",
+    "saveDraft": "Save as draft",
+    "draft": "Draft",
+    "publish": "Publish product",
+    "publishShort": "Publish",
+    "publishing": "Publishing...",
+    "publishingShort": "Pub...",
+    "shortcuts": {
+      "save": "Draft",
+      "next": "Next",
+      "prev": "Previous"
+    },
+    "seo": {
+      "faq": {
+        "description": "Optimize your SEO and add answers to frequently asked questions"
+      }
+    },
+    "errors": {
+      "title": "Error",
+      "requiredFields": "Please fill in all required fields",
+      "noFiles": "Please add a main link for your product"
+    }
   },
   "auth": {
     "welcome": "Welcome",
@@ -258,316 +294,6 @@
   "products": {
     "title": "My Products",
     "add": "Add product",
-    "edit": "Edit",
-    "delete": "Delete",
-    "view": "View",
-    "noProducts": "No products",
-    "create": {
-      "title": "Create product",
-      "name": "Product name",
-      "description": "Description",
-      "price": "Price",
-      "currency": "Currency",
-      "category": "Category",
-      "images": "Images",
-      "uploadImage": "Upload image",
-      "stock": "Stock",
-      "sku": "SKU",
-      "tags": "Tags",
-      "success": "Product created successfully!",
-      "error": "Error creating product"
-    },
-    "details": {
-      "description": "Description",
-      "features": "Features",
-      "reviews": "Reviews",
-      "seller": "Seller",
-      "shipping": "Shipping",
-      "returns": "Returns",
-      "addToCart": "Add to cart",
-      "buyNow": "Buy now",
-      "quantity": "Quantity",
-      "inStock": "In stock",
-      "outOfStock": "Out of stock",
-      "price": "Price"
-    }
-  },
-  "cart": {
-    "title": "Cart",
-    "empty": "Your cart is empty",
-    "items": "item(s)",
-    "subtotal": "Subtotal",
-    "shipping": "Shipping",
-    "tax": "Tax",
-    "total": "Total",
-    "checkout": "Checkout",
-    "continueShopping": "Continue shopping",
-    "removeItem": "Remove",
-    "updateQuantity": "Update",
-    "success": "Product added to cart",
-    "error": "Error adding to cart"
-  },
-  "orders": {
-    "title": "My Orders",
-    "orderNumber": "Order #{{number}}",
-    "date": "Date",
-    "status": "Status",
-    "total": "Total",
-    "items": "Items",
-    "viewDetails": "View details",
-    "trackOrder": "Track order",
-    "noOrders": "No orders",
-    "statuses": {
-      "pending": "Pending",
-      "processing": "Processing",
-      "shipped": "Shipped",
-      "delivered": "Delivered",
-      "cancelled": "Cancelled",
-      "refunded": "Refunded"
-    }
-  },
-  "dashboard": {
-    "welcome": "Welcome, {{name}}!",
-    "stats": {
-      "totalSales": "Total sales",
-      "totalOrders": "Total orders",
-      "totalProducts": "Products",
-      "totalCustomers": "Customers"
-    },
-    "recentOrders": "Recent orders",
-    "topProducts": "Top products",
-    "analytics": "Analytics",
-    "quickActions": "Quick actions"
-  },
-  "settings": {
-    "title": "Settings",
-    "profile": "Profile",
-    "store": "Store",
-    "payment": "Payment",
-    "shipping": "Shipping",
-    "notifications": "Notifications",
-    "security": "Security",
-    "language": "Language",
-    "theme": "Theme",
-    "save": "Save changes",
-    "success": "Settings updated!",
-    "error": "Error updating settings"
-  },
-  "notifications": {
-    "title": "Notifications",
-    "markAllRead": "Mark all as read",
-    "noNotifications": "No notifications",
-    "types": {
-      "order": "New order",
-      "payment": "Payment received",
-      "review": "New review",
-      "message": "New message",
-      "system": "System notification"
-    }
-  },
-  "errors": {
-    "generic": "An error occurred",
-    "network": "Connection error",
-    "notFound": "Page not found",
-    "unauthorized": "Unauthorized",
-    "serverError": "Server error",
-    "validation": "Validation error",
-    "tryAgain": "Please try again"
-  },
-  "footer": {
-    "about": "About",
-    "contact": "Contact",
-    "terms": "Terms of Service",
-    "privacy": "Privacy",
-    "help": "Help",
-    "followUs": "Follow us",
-    "allRightsReserved": "All rights reserved"
-  },
-  "seo": {
-    "home": {
-      "title": "Payhuk - Modern E-commerce Platform",
-      "description": "Create and manage your online store easily with Payhuk"
-    },
-    "marketplace": {
-      "title": "Marketplace - Discover our products",
-      "description": "Explore our selection of quality products"
-    }
-  },
-  "settings": {
-    "title": "Settings",
-    "subtitle": "Manage your preferences and settings",
-    "common": {
-      "loading": "Loading...",
-      "save": "Save",
-      "cancel": "Cancel",
-      "edit": "Edit",
-      "delete": "Delete",
-      "success": "Success",
-      "error": "Error"
-    },
-    "tabs": {
-      "profile": "Profile",
-      "store": "Store",
-      "domain": "Domain",
-      "notifications": "Notifications",
-      "security": "Security",
-      "debug": "Debug"
-    },
-    "profileSettings": {
-      "loading": "Loading profile...",
-      "error": "Unable to load profile. Please try again.",
-      "memberSince": "Member since",
-      "completed": "completed",
-      "suspended": "Suspended",
-      "edit": "Edit",
-      "cancel": "Cancel",
-      "save": "Save",
-      "referral": {
-        "linkShared": "Link shared",
-        "linkCopied": "Referral link copied to clipboard",
-        "codeCopied": "Referral code copied to clipboard"
-      }
-    },
-    "storeSettings": {
-      "loading": "Loading store...",
-      "error": "Unable to load store.",
-      "save": "Save",
-      "cancel": "Cancel"
-    },
-    "notificationSettings": {
-      "loading": "Loading preferences...",
-      "save": "Save",
-      "cancel": "Cancel"
-    },
-    "securitySettings": {
-      "loading": "Loading settings...",
-      "save": "Save",
-      "cancel": "Cancel"
-    },
-    "domainSettings": {
-      "loading": "Loading domain...",
-      "save": "Save",
-      "cancel": "Cancel"
-    },
-    "profile": {
-      "title": "Profile",
-      "subtitle": "Manage your personal information",
-      "advancedTitle": "Advanced profile settings",
-      "cardTitle": "Profile information",
-      "cardDescription": "Manage your personal information"
-    },
-    "store": {
-      "title": "Store settings",
-      "subtitle": "Configure your online store",
-      "cardTitle": "Store settings",
-      "cardDescription": "Customize your online store"
-    },
-    "domain": {
-      "title": "Custom domain",
-      "subtitle": "Configure your domain name"
-    },
-    "notifications": {
-      "title": "Notifications",
-      "subtitle": "Manage your notification preferences",
-      "cardTitle": "Notification preferences",
-      "cardDescription": "Configure how you want to be notified"
-    },
-    "security": {
-      "title": "Security",
-      "subtitle": "Protect your account",
-      "cardTitle": "Security",
-      "cardDescription": "Manage your account security"
-    },
-    "debug": {
-      "title": "Profile Debug",
-      "subtitle": "Debugging tools",
-      "cardTitle": "Profile Debug",
-      "cardDescription": "Test connection and database structure"
-    }
-  },
-  "orders": {
-    "title": "Orders",
-    "new": "New order",
-    "export": "Export CSV",
-    "filters": {
-      "search": "Search by number or customer...",
-      "status": "Status",
-      "allStatus": "All statuses",
-      "paymentStatus": "Payment",
-      "allPayments": "All payments",
-      "dateRange": "Period"
-    },
-    "status": {
-      "pending": "Pending",
-      "processing": "Processing",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "refunded": "Refunded"
-    },
-    "paymentStatus": {
-      "pending": "Pending",
-      "paid": "Paid",
-      "failed": "Failed",
-      "refunded": "Refunded"
-    },
-    "table": {
-      "orderNumber": "Number",
-      "customer": "Customer",
-      "amount": "Amount",
-      "status": "Status",
-      "payment": "Payment",
-      "date": "Date",
-      "actions": "Actions"
-    },
-    "actions": {
-      "view": "View",
-      "edit": "Edit",
-      "cancel": "Cancel",
-      "refund": "Refund",
-      "print": "Print"
-    },
-    "empty": {
-      "title": "No orders",
-      "description": "You haven't received any orders yet",
-      "noResults": "No orders match your filters",
-      "createFirst": "Create manual order"
-    },
-    "toast": {
-      "warning": "Warning",
-      "noOrders": "No orders to export",
-      "success": "Success",
-      "exported": "{{count}} order(s) exported",
-      "error": "Error",
-      "createSuccess": "Order created successfully",
-      "updateSuccess": "Order updated",
-      "cancelSuccess": "Order cancelled",
-      "refundSuccess": "Order refunded"
-    },
-    "pagination": {
-      "showing": "Showing {{from}} to {{to}} of {{total}} orders",
-      "previous": "Previous",
-      "next": "Next",
-      "rowsPerPage": "Rows per page"
-    },
-    "details": {
-      "title": "Order details",
-      "orderNumber": "Order #{{number}}",
-      "customer": "Customer",
-      "products": "Products",
-      "total": "Total",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "tax": "Tax",
-      "discount": "Discount",
-      "notes": "Notes",
-      "timeline": "Timeline",
-      "createdAt": "Created at",
-      "updatedAt": "Updated at"
-    }
-  },
-  "products": {
-    "title": "My Products",
-    "add": "Add product",
     "addNew": "New product",
     "refresh": "Refresh",
     "export": "Export CSV",
@@ -681,6 +407,101 @@
       "updatedAt": "Updated at"
     }
   },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "items": "item(s)",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continueShopping": "Continue shopping",
+    "removeItem": "Remove",
+    "updateQuantity": "Update",
+    "success": "Product added to cart",
+    "error": "Error adding to cart"
+  },
+  "orders": {
+    "title": "Orders",
+    "new": "New order",
+    "export": "Export CSV",
+    "filters": {
+      "search": "Search by number or customer...",
+      "status": "Status",
+      "allStatus": "All statuses",
+      "paymentStatus": "Payment",
+      "allPayments": "All payments",
+      "dateRange": "Period"
+    },
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "paymentStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "table": {
+      "orderNumber": "Number",
+      "customer": "Customer",
+      "amount": "Amount",
+      "status": "Status",
+      "payment": "Payment",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "refund": "Refund",
+      "print": "Print"
+    },
+    "empty": {
+      "title": "No orders",
+      "description": "You haven't received any orders yet",
+      "noResults": "No orders match your filters",
+      "createFirst": "Create manual order"
+    },
+    "toast": {
+      "warning": "Warning",
+      "noOrders": "No orders to export",
+      "success": "Success",
+      "exported": "{{count}} order(s) exported",
+      "error": "Error",
+      "createSuccess": "Order created successfully",
+      "updateSuccess": "Order updated",
+      "cancelSuccess": "Order cancelled",
+      "refundSuccess": "Order refunded"
+    },
+    "pagination": {
+      "showing": "Showing {{from}} to {{to}} of {{total}} orders",
+      "previous": "Previous",
+      "next": "Next",
+      "rowsPerPage": "Rows per page"
+    },
+    "details": {
+      "title": "Order details",
+      "orderNumber": "Order #{{number}}",
+      "customer": "Customer",
+      "products": "Products",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "discount": "Discount",
+      "notes": "Notes",
+      "timeline": "Timeline",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "loading": "Loading dashboard...",
@@ -749,6 +570,138 @@
     },
     "notificationsBadge": {
       "new": "New"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and settings",
+    "common": {
+      "loading": "Loading...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "success": "Success",
+      "error": "Error"
+    },
+    "tabs": {
+      "profile": "Profile",
+      "store": "Store",
+      "domain": "Domain",
+      "notifications": "Notifications",
+      "security": "Security",
+      "debug": "Debug"
+    },
+    "profileSettings": {
+      "loading": "Loading profile...",
+      "error": "Unable to load profile. Please try again.",
+      "memberSince": "Member since",
+      "completed": "completed",
+      "suspended": "Suspended",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "referral": {
+        "linkShared": "Link shared",
+        "linkCopied": "Referral link copied to clipboard",
+        "codeCopied": "Referral code copied to clipboard"
+      }
+    },
+    "storeSettings": {
+      "loading": "Loading store...",
+      "error": "Unable to load store.",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "notificationSettings": {
+      "loading": "Loading preferences...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "securitySettings": {
+      "loading": "Loading settings...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "domainSettings": {
+      "loading": "Loading domain...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Manage your personal information",
+      "advancedTitle": "Advanced profile settings",
+      "cardTitle": "Profile information",
+      "cardDescription": "Manage your personal information"
+    },
+    "store": {
+      "title": "Store settings",
+      "subtitle": "Configure your online store",
+      "cardTitle": "Store settings",
+      "cardDescription": "Customize your online store"
+    },
+    "domain": {
+      "title": "Custom domain",
+      "subtitle": "Configure your domain name"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Manage your notification preferences",
+      "cardTitle": "Notification preferences",
+      "cardDescription": "Configure how you want to be notified"
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Protect your account",
+      "cardTitle": "Security",
+      "cardDescription": "Manage your account security"
+    },
+    "debug": {
+      "title": "Profile Debug",
+      "subtitle": "Debugging tools",
+      "cardTitle": "Profile Debug",
+      "cardDescription": "Test connection and database structure"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "types": {
+      "order": "New order",
+      "payment": "Payment received",
+      "review": "New review",
+      "message": "New message",
+      "system": "System notification"
+    }
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Connection error",
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "serverError": "Server error",
+    "validation": "Validation error",
+    "tryAgain": "Please try again"
+  },
+  "footer": {
+    "about": "About",
+    "contact": "Contact",
+    "terms": "Terms of Service",
+    "privacy": "Privacy",
+    "help": "Help",
+    "followUs": "Follow us",
+    "allRightsReserved": "All rights reserved"
+  },
+  "seo": {
+    "home": {
+      "title": "Payhuk - Modern E-commerce Platform",
+      "description": "Create and manage your online store easily with Payhuk"
+    },
+    "marketplace": {
+      "title": "Marketplace - Discover our products",
+      "description": "Explore our selection of quality products"
     }
   },
   "landing": {
@@ -1034,27 +987,65 @@
         "zones": {
           "westAfrica": {
             "title": "West Africa (UEMOA Zone - FCFA XOF)",
-            "countries": ["Senegal", "Ivory Coast", "Mali", "Benin", "Burkina Faso", "Niger", "Togo", "Guinea-Bissau"]
+            "countries": [
+              "Senegal",
+              "Ivory Coast",
+              "Mali",
+              "Benin",
+              "Burkina Faso",
+              "Niger",
+              "Togo",
+              "Guinea-Bissau"
+            ]
           },
           "centralAfrica": {
             "title": "Central Africa (CEMAC Zone - FCFA XAF)",
-            "countries": ["Cameroon", "Gabon", "Congo-Brazzaville", "Chad", "CAR", "Equatorial Guinea"]
+            "countries": [
+              "Cameroon",
+              "Gabon",
+              "Congo-Brazzaville",
+              "Chad",
+              "CAR",
+              "Equatorial Guinea"
+            ]
           },
           "northAfrica": {
             "title": "North Africa",
-            "countries": ["Morocco (MAD)", "Algeria (DZD)", "Tunisia (TND)", "Egypt (EGP)"]
+            "countries": [
+              "Morocco (MAD)",
+              "Algeria (DZD)",
+              "Tunisia (TND)",
+              "Egypt (EGP)"
+            ]
           },
           "eastAfrica": {
             "title": "East Africa",
-            "countries": ["Kenya (KES)", "Tanzania (TZS)", "Uganda (UGX)", "Rwanda (RWF)", "Ethiopia (ETB)"]
+            "countries": [
+              "Kenya (KES)",
+              "Tanzania (TZS)",
+              "Uganda (UGX)",
+              "Rwanda (RWF)",
+              "Ethiopia (ETB)"
+            ]
           },
           "southernAfrica": {
             "title": "Southern Africa",
-            "countries": ["South Africa (ZAR)", "Nigeria (NGN)", "Ghana (GHS)", "Zimbabwe (ZWL)"]
+            "countries": [
+              "South Africa (ZAR)",
+              "Nigeria (NGN)",
+              "Ghana (GHS)",
+              "Zimbabwe (ZWL)"
+            ]
           },
           "international": {
             "title": "International (Major currencies)",
-            "countries": ["Eurozone (EUR)", "United States (USD)", "United Kingdom (GBP)", "Canada (CAD)", "Switzerland (CHF)"]
+            "countries": [
+              "Eurozone (EUR)",
+              "United States (USD)",
+              "United Kingdom (GBP)",
+              "Canada (CAD)",
+              "Switzerland (CHF)"
+            ]
           }
         },
         "note": "+ 180 other countries and territories worldwide"
@@ -1220,6 +1211,50 @@
       "quizSubmissionFailed": "Quiz submission failed",
       "certificateGenerationFailed": "Certificate generation failed"
     }
+  },
+  "admin": {
+    "batchShipping": {
+      "title": "Batch Shipping",
+      "description": "Process multiple orders simultaneously and generate labels in bulk",
+      "noStore": "No store found",
+      "noStoreDescription": "Please create a store to manage your batch shipments",
+      "stats": {
+        "total": "Total batches",
+        "processing": "Processing",
+        "labelGenerated": "Labels generated",
+        "completed": "Completed"
+      }
+    }
+  },
+  "promotions": {
+    "title": "Promotions",
+    "description": "Manage your promo codes and discounts",
+    "createButton": "New promotion",
+    "createButtonShort": "New",
+    "noStore": {
+      "title": "Store not configured",
+      "description": "Please create your store first to manage your promotions."
+    },
+    "stats": {
+      "total": "Total Promotions",
+      "active": "Active",
+      "totalUses": "Total Uses",
+      "averageDiscount": "Average Discount"
+    },
+    "empty": {
+      "title": "No promotions",
+      "description": "Start by creating your first promotion",
+      "noResults": "No promotions match your filters"
+    }
+  },
+  "withdrawals": {
+    "title": "Withdrawals",
+    "description": "Manage your withdrawals and check your available balance",
+    "requestButton": "Request withdrawal",
+    "noStore": "You must create a store before you can make withdrawals.",
+    "migration": {
+      "title": "SQL migration required:",
+      "description": "To enable the withdrawal system, please run the SQL migration {{fileName}} in your Supabase database."
+    }
   }
 }
-

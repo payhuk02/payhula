@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Promotions = () => {
+  const { t } = useTranslation();
   const { store, loading: storeLoading } = useStore();
   const { promotions, loading: promotionsLoading, refetch } = usePromotions(store?.id);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -81,9 +83,9 @@ const Promotions = () => {
             <div className="container mx-auto p-3 sm:p-4 lg:p-6">
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Boutique non configurée</CardTitle>
+                  <CardTitle>{t('promotions.noStore.title')}</CardTitle>
                   <CardDescription>
-                    Veuillez d'abord créer votre boutique pour gérer vos promotions.
+                    {t('promotions.noStore.description')}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -111,11 +113,11 @@ const Promotions = () => {
                     <Tag className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Promotions
+                    {t('promotions.title')}
                   </span>
                 </h1>
                 <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                  Gérez vos codes promo et réductions
+                  {t('promotions.description')}
                 </p>
               </div>
               <Button 
@@ -124,8 +126,8 @@ const Promotions = () => {
                 size="sm"
               >
                 <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                <span className="hidden sm:inline">Nouvelle promotion</span>
-                <span className="sm:hidden">Nouvelle</span>
+                <span className="hidden sm:inline">{t('promotions.createButton')}</span>
+                <span className="sm:hidden">{t('promotions.createButtonShort')}</span>
               </Button>
             </div>
 
@@ -136,7 +138,7 @@ const Promotions = () => {
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Promotions</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">{t('promotions.stats.total')}</p>
                         <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                           {stats.total}
                         </p>
@@ -151,7 +153,7 @@ const Promotions = () => {
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Actives</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">{t('promotions.stats.active')}</p>
                         <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                           {stats.active}
                         </p>
@@ -166,7 +168,7 @@ const Promotions = () => {
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Utilisations</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">{t('promotions.stats.totalUses')}</p>
                         <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                           {stats.totalUses}
                         </p>
@@ -181,7 +183,7 @@ const Promotions = () => {
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Moyenne Réduction</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">{t('promotions.stats.averageDiscount')}</p>
                         <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                           {stats.averageDiscount.toFixed(1)}%
                         </p>
@@ -218,11 +220,11 @@ const Promotions = () => {
                   <div className="p-4 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/5 mb-4 animate-in zoom-in duration-500">
                     <Tag className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2">Aucune promotion</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('promotions.empty.title')}</h3>
                   <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 max-w-md">
                     {searchQuery || statusFilter !== "all"
-                      ? "Aucune promotion ne correspond à vos filtres"
-                      : "Commencez par créer votre première promotion"}
+                      ? t('promotions.empty.noResults')
+                      : t('promotions.empty.description')}
                   </p>
                   {!searchQuery && statusFilter === "all" && (
                     <Button 
@@ -230,7 +232,7 @@ const Promotions = () => {
                       className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Créer une promotion
+                      {t('promotions.createButton')}
                     </Button>
                   )}
                 </CardContent>

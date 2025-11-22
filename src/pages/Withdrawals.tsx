@@ -5,6 +5,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +24,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 const Withdrawals = () => {
+  const { t } = useTranslation();
   const { store, loading: storeLoading } = useStore();
   const { earnings, loading: earningsLoading, refreshEarnings } = useStoreEarnings(store?.id);
   
@@ -151,7 +153,7 @@ const Withdrawals = () => {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Vous devez créer une boutique avant de pouvoir effectuer des retraits.
+                {t('withdrawals.noStore')}
               </AlertDescription>
             </Alert>
           </main>
@@ -171,9 +173,9 @@ const Withdrawals = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Retraits</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">{t('withdrawals.title')}</h1>
               <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-                Gérez vos retraits et consultez votre solde disponible
+                {t('withdrawals.description')}
               </p>
             </div>
             <Button 
@@ -182,7 +184,7 @@ const Withdrawals = () => {
               className="w-full sm:w-auto"
               size="sm"
             >
-              Demander un retrait
+              {t('withdrawals.requestButton')}
             </Button>
           </div>
 
@@ -191,7 +193,7 @@ const Withdrawals = () => {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Migration SQL requise :</strong> Pour activer le système de retraits, veuillez exécuter la migration SQL <code className="text-xs bg-muted px-1 py-0.5 rounded">20250131_store_withdrawals_system.sql</code> dans votre base de données Supabase.
+                <strong>{t('withdrawals.migration.title')}</strong> {t('withdrawals.migration.description', { fileName: '20250131_store_withdrawals_system.sql' })}
               </AlertDescription>
             </Alert>
           )}

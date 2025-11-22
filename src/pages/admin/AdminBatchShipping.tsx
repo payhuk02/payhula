@@ -10,6 +10,7 @@
  */
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { BatchShippingManagement } from '@/components/physical/batch-shipping';
@@ -21,6 +22,7 @@ import { useBatchShipments } from '@/hooks/physical/useBatchShipping';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 export default function AdminBatchShipping() {
+  const { t } = useTranslation();
   const { store, isLoading: storeLoading } = useStore();
   const headerRef = useScrollAnimation<HTMLDivElement>();
   const statsRef = useScrollAnimation<HTMLDivElement>();
@@ -71,10 +73,10 @@ export default function AdminBatchShipping() {
                 <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 text-center">
                   <Package className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-4 animate-in zoom-in-95 duration-500" />
                   <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                    Aucune boutique trouvée
+                    {t('admin.batchShipping.noStore')}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Veuillez créer une boutique pour gérer vos expéditions batch
+                    {t('admin.batchShipping.noStoreDescription')}
                   </p>
                 </CardContent>
               </Card>
@@ -105,12 +107,12 @@ export default function AdminBatchShipping() {
                         <Package className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                       </div>
                       <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
-                        Expéditions Batch
+                        {t('admin.batchShipping.title')}
                       </span>
                     </div>
                   </h1>
                   <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                    Traitez plusieurs commandes simultanément et générez des étiquettes en masse
+                    {t('admin.batchShipping.description')}
                   </p>
                 </div>
               </div>
@@ -123,25 +125,25 @@ export default function AdminBatchShipping() {
             >
               {[
                 {
-                  label: 'Lots totaux',
+                  label: t('admin.batchShipping.stats.total'),
                   value: stats.total,
                   icon: Package,
                   color: 'from-purple-600 to-pink-600',
                 },
                 {
-                  label: 'En traitement',
+                  label: t('admin.batchShipping.stats.processing'),
                   value: stats.processing,
                   icon: Clock,
                   color: 'from-blue-600 to-cyan-600',
                 },
                 {
-                  label: 'Étiquettes générées',
+                  label: t('admin.batchShipping.stats.labelGenerated'),
                   value: stats.labelGenerated,
                   icon: Download,
                   color: 'from-purple-600 to-pink-600',
                 },
                 {
-                  label: 'Complétés',
+                  label: t('admin.batchShipping.stats.completed'),
                   value: stats.completed,
                   icon: CheckCircle2,
                   color: 'from-green-600 to-emerald-600',

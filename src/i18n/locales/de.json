@@ -24,7 +24,8 @@
     "show": "Anzeigen",
     "hide": "Ausblenden",
     "manageAll": "Verwalten Sie alle Ihre",
-    "or": "Oder"
+    "or": "Oder",
+    "coverage": "Abdeckung"
   },
   "nav": {
     "home": "Startseite",
@@ -39,6 +40,41 @@
     "logout": "Abmelden",
     "login": "Anmelden",
     "signup": "Registrieren"
+  },
+  "wizard": {
+    "title": "Neues Digitales Produkt",
+    "subtitle": "Erstellen Sie ein professionelles digitales Produkt in 6 Schritten",
+    "back": "Zurück zur Typauswahl",
+    "backShort": "Zurück",
+    "step": "Schritt",
+    "of": "von",
+    "steps": "Formularschritte",
+    "autoSaving": "Automatisches Speichern...",
+    "previous": "Vorheriger Schritt",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "nextShort": "Weiter",
+    "saveDraft": "Als Entwurf speichern",
+    "draft": "Entwurf",
+    "publish": "Produkt veröffentlichen",
+    "publishShort": "Veröffentlichen",
+    "publishing": "Veröffentlichen...",
+    "publishingShort": "Ver...",
+    "shortcuts": {
+      "save": "Entwurf",
+      "next": "Weiter",
+      "prev": "Zurück"
+    },
+    "seo": {
+      "faq": {
+        "description": "Optimieren Sie Ihr SEO und fügen Sie Antworten auf häufig gestellte Fragen hinzu"
+      }
+    },
+    "errors": {
+      "title": "Fehler",
+      "requiredFields": "Bitte füllen Sie alle Pflichtfelder aus",
+      "noFiles": "Bitte fügen Sie einen Hauptlink für Ihr Produkt hinzu"
+    }
   },
   "auth": {
     "welcome": "Willkommen",
@@ -258,316 +294,6 @@
   "products": {
     "title": "Meine Produkte",
     "add": "Produkt hinzufügen",
-    "edit": "Bearbeiten",
-    "delete": "Löschen",
-    "view": "Ansehen",
-    "noProducts": "Keine Produkte",
-    "create": {
-      "title": "Produkt erstellen",
-      "name": "Produktname",
-      "description": "Beschreibung",
-      "price": "Preis",
-      "currency": "Währung",
-      "category": "Kategorie",
-      "images": "Bilder",
-      "uploadImage": "Bild hochladen",
-      "stock": "Bestand",
-      "sku": "SKU",
-      "tags": "Tags",
-      "success": "Produkt erfolgreich erstellt!",
-      "error": "Fehler beim Erstellen des Produkts"
-    },
-    "details": {
-      "description": "Beschreibung",
-      "features": "Funktionen",
-      "reviews": "Bewertungen",
-      "seller": "Verkäufer",
-      "shipping": "Versand",
-      "returns": "Rücksendungen",
-      "addToCart": "In den Warenkorb",
-      "buyNow": "Jetzt kaufen",
-      "quantity": "Menge",
-      "inStock": "Auf Lager",
-      "outOfStock": "Nicht vorrätig",
-      "price": "Preis"
-    }
-  },
-  "cart": {
-    "title": "Warenkorb",
-    "empty": "Ihr Warenkorb ist leer",
-    "items": "Artikel",
-    "subtotal": "Zwischensumme",
-    "shipping": "Versand",
-    "tax": "Steuer",
-    "total": "Gesamt",
-    "checkout": "Zur Kasse",
-    "continueShopping": "Weiter einkaufen",
-    "removeItem": "Entfernen",
-    "updateQuantity": "Aktualisieren",
-    "success": "Produkt zum Warenkorb hinzugefügt",
-    "error": "Fehler beim Hinzufügen zum Warenkorb"
-  },
-  "orders": {
-    "title": "Meine Bestellungen",
-    "orderNumber": "Bestellung #{{number}}",
-    "date": "Datum",
-    "status": "Status",
-    "total": "Gesamt",
-    "items": "Artikel",
-    "viewDetails": "Details ansehen",
-    "trackOrder": "Bestellung verfolgen",
-    "noOrders": "Keine Bestellungen",
-    "statuses": {
-      "pending": "Ausstehend",
-      "processing": "In Bearbeitung",
-      "shipped": "Versandt",
-      "delivered": "Zugestellt",
-      "cancelled": "Storniert",
-      "refunded": "Erstattet"
-    }
-  },
-  "dashboard": {
-    "welcome": "Willkommen, {{name}}!",
-    "stats": {
-      "totalSales": "Gesamtumsatz",
-      "totalOrders": "Gesamtbestellungen",
-      "totalProducts": "Produkte",
-      "totalCustomers": "Kunden"
-    },
-    "recentOrders": "Letzte Bestellungen",
-    "topProducts": "Top-Produkte",
-    "analytics": "Analytik",
-    "quickActions": "Schnellaktionen"
-  },
-  "settings": {
-    "title": "Einstellungen",
-    "profile": "Profil",
-    "store": "Shop",
-    "payment": "Zahlung",
-    "shipping": "Versand",
-    "notifications": "Benachrichtigungen",
-    "security": "Sicherheit",
-    "language": "Sprache",
-    "theme": "Design",
-    "save": "Änderungen speichern",
-    "success": "Einstellungen aktualisiert!",
-    "error": "Fehler beim Aktualisieren der Einstellungen"
-  },
-  "notifications": {
-    "title": "Benachrichtigungen",
-    "markAllRead": "Alle als gelesen markieren",
-    "noNotifications": "Keine Benachrichtigungen",
-    "types": {
-      "order": "Neue Bestellung",
-      "payment": "Zahlung erhalten",
-      "review": "Neue Bewertung",
-      "message": "Neue Nachricht",
-      "system": "Systembenachrichtigung"
-    }
-  },
-  "errors": {
-    "generic": "Ein Fehler ist aufgetreten",
-    "network": "Verbindungsfehler",
-    "notFound": "Seite nicht gefunden",
-    "unauthorized": "Nicht autorisiert",
-    "serverError": "Serverfehler",
-    "validation": "Validierungsfehler",
-    "tryAgain": "Bitte versuchen Sie es erneut"
-  },
-  "footer": {
-    "about": "Über uns",
-    "contact": "Kontakt",
-    "terms": "Nutzungsbedingungen",
-    "privacy": "Datenschutz",
-    "help": "Hilfe",
-    "followUs": "Folgen Sie uns",
-    "allRightsReserved": "Alle Rechte vorbehalten"
-  },
-  "seo": {
-    "home": {
-      "title": "Payhuk - Moderne E-Commerce-Plattform",
-      "description": "Erstellen und verwalten Sie Ihren Online-Shop einfach mit Payhuk"
-    },
-    "marketplace": {
-      "title": "Marktplatz - Entdecken Sie unsere Produkte",
-      "description": "Erkunden Sie unsere Auswahl an Qualitätsprodukten"
-    }
-  },
-  "settings": {
-    "title": "Einstellungen",
-    "subtitle": "Verwalten Sie Ihre Präferenzen und Einstellungen",
-    "common": {
-      "loading": "Lädt...",
-      "save": "Speichern",
-      "cancel": "Abbrechen",
-      "edit": "Bearbeiten",
-      "delete": "Löschen",
-      "success": "Erfolg",
-      "error": "Fehler"
-    },
-    "tabs": {
-      "profile": "Profil",
-      "store": "Shop",
-      "domain": "Domain",
-      "notifications": "Benachrichtigungen",
-      "security": "Sicherheit",
-      "debug": "Debug"
-    },
-    "profileSettings": {
-      "loading": "Profil wird geladen...",
-      "error": "Profil konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
-      "memberSince": "Mitglied seit",
-      "completed": "abgeschlossen",
-      "suspended": "Gesperrt",
-      "edit": "Bearbeiten",
-      "cancel": "Abbrechen",
-      "save": "Speichern",
-      "referral": {
-        "linkShared": "Link geteilt",
-        "linkCopied": "Empfehlungslink in Zwischenablage kopiert",
-        "codeCopied": "Empfehlungscode in Zwischenablage kopiert"
-      }
-    },
-    "storeSettings": {
-      "loading": "Shop wird geladen...",
-      "error": "Shop konnte nicht geladen werden.",
-      "save": "Speichern",
-      "cancel": "Abbrechen"
-    },
-    "notificationSettings": {
-      "loading": "Präferenzen werden geladen...",
-      "save": "Speichern",
-      "cancel": "Abbrechen"
-    },
-    "securitySettings": {
-      "loading": "Einstellungen werden geladen...",
-      "save": "Speichern",
-      "cancel": "Abbrechen"
-    },
-    "domainSettings": {
-      "loading": "Domain wird geladen...",
-      "save": "Speichern",
-      "cancel": "Abbrechen"
-    },
-    "profile": {
-      "title": "Profil",
-      "subtitle": "Verwalten Sie Ihre persönlichen Informationen",
-      "advancedTitle": "Erweiterte Profileinstellungen",
-      "cardTitle": "Profilinformationen",
-      "cardDescription": "Verwalten Sie Ihre persönlichen Informationen"
-    },
-    "store": {
-      "title": "Shop-Einstellungen",
-      "subtitle": "Konfigurieren Sie Ihren Online-Shop",
-      "cardTitle": "Shop-Einstellungen",
-      "cardDescription": "Passen Sie Ihren Online-Shop an"
-    },
-    "domain": {
-      "title": "Benutzerdefinierte Domain",
-      "subtitle": "Konfigurieren Sie Ihren Domainnamen"
-    },
-    "notifications": {
-      "title": "Benachrichtigungen",
-      "subtitle": "Verwalten Sie Ihre Benachrichtigungspräferenzen",
-      "cardTitle": "Benachrichtigungspräferenzen",
-      "cardDescription": "Konfigurieren Sie, wie Sie benachrichtigt werden möchten"
-    },
-    "security": {
-      "title": "Sicherheit",
-      "subtitle": "Schützen Sie Ihr Konto",
-      "cardTitle": "Sicherheit",
-      "cardDescription": "Verwalten Sie die Sicherheit Ihres Kontos"
-    },
-    "debug": {
-      "title": "Profil-Debug",
-      "subtitle": "Debug-Tools",
-      "cardTitle": "Profil-Debug",
-      "cardDescription": "Verbindung und Datenbankstruktur testen"
-    }
-  },
-  "orders": {
-    "title": "Bestellungen",
-    "new": "Neue Bestellung",
-    "export": "CSV exportieren",
-    "filters": {
-      "search": "Nach Nummer oder Kunde suchen...",
-      "status": "Status",
-      "allStatus": "Alle Status",
-      "paymentStatus": "Zahlung",
-      "allPayments": "Alle Zahlungen",
-      "dateRange": "Zeitraum"
-    },
-    "status": {
-      "pending": "Ausstehend",
-      "processing": "In Bearbeitung",
-      "completed": "Abgeschlossen",
-      "cancelled": "Storniert",
-      "refunded": "Erstattet"
-    },
-    "paymentStatus": {
-      "pending": "Ausstehend",
-      "paid": "Bezahlt",
-      "failed": "Fehlgeschlagen",
-      "refunded": "Erstattet"
-    },
-    "table": {
-      "orderNumber": "Nummer",
-      "customer": "Kunde",
-      "amount": "Betrag",
-      "status": "Status",
-      "payment": "Zahlung",
-      "date": "Datum",
-      "actions": "Aktionen"
-    },
-    "actions": {
-      "view": "Ansehen",
-      "edit": "Bearbeiten",
-      "cancel": "Stornieren",
-      "refund": "Erstatten",
-      "print": "Drucken"
-    },
-    "empty": {
-      "title": "Keine Bestellungen",
-      "description": "Sie haben noch keine Bestellungen erhalten",
-      "noResults": "Keine Bestellungen entsprechen Ihren Filtern",
-      "createFirst": "Manuelle Bestellung erstellen"
-    },
-    "toast": {
-      "warning": "Warnung",
-      "noOrders": "Keine Bestellungen zum Exportieren",
-      "success": "Erfolg",
-      "exported": "{{count}} Bestellung(en) exportiert",
-      "error": "Fehler",
-      "createSuccess": "Bestellung erfolgreich erstellt",
-      "updateSuccess": "Bestellung aktualisiert",
-      "cancelSuccess": "Bestellung storniert",
-      "refundSuccess": "Bestellung erstattet"
-    },
-    "pagination": {
-      "showing": "Zeige {{from}} bis {{to}} von {{total}} Bestellungen",
-      "previous": "Zurück",
-      "next": "Weiter",
-      "rowsPerPage": "Zeilen pro Seite"
-    },
-    "details": {
-      "title": "Bestelldetails",
-      "orderNumber": "Bestellung #{{number}}",
-      "customer": "Kunde",
-      "products": "Produkte",
-      "total": "Gesamt",
-      "subtotal": "Zwischensumme",
-      "shipping": "Versand",
-      "tax": "Steuer",
-      "discount": "Rabatt",
-      "notes": "Notizen",
-      "timeline": "Zeitachse",
-      "createdAt": "Erstellt am",
-      "updatedAt": "Aktualisiert am"
-    }
-  },
-  "products": {
-    "title": "Meine Produkte",
-    "add": "Produkt hinzufügen",
     "addNew": "Neues Produkt",
     "refresh": "Aktualisieren",
     "export": "CSV exportieren",
@@ -681,6 +407,101 @@
       "updatedAt": "Aktualisiert am"
     }
   },
+  "cart": {
+    "title": "Warenkorb",
+    "empty": "Ihr Warenkorb ist leer",
+    "items": "Artikel",
+    "subtotal": "Zwischensumme",
+    "shipping": "Versand",
+    "tax": "Steuer",
+    "total": "Gesamt",
+    "checkout": "Zur Kasse",
+    "continueShopping": "Weiter einkaufen",
+    "removeItem": "Entfernen",
+    "updateQuantity": "Aktualisieren",
+    "success": "Produkt zum Warenkorb hinzugefügt",
+    "error": "Fehler beim Hinzufügen zum Warenkorb"
+  },
+  "orders": {
+    "title": "Bestellungen",
+    "new": "Neue Bestellung",
+    "export": "CSV exportieren",
+    "filters": {
+      "search": "Nach Nummer oder Kunde suchen...",
+      "status": "Status",
+      "allStatus": "Alle Status",
+      "paymentStatus": "Zahlung",
+      "allPayments": "Alle Zahlungen",
+      "dateRange": "Zeitraum"
+    },
+    "status": {
+      "pending": "Ausstehend",
+      "processing": "In Bearbeitung",
+      "completed": "Abgeschlossen",
+      "cancelled": "Storniert",
+      "refunded": "Erstattet"
+    },
+    "paymentStatus": {
+      "pending": "Ausstehend",
+      "paid": "Bezahlt",
+      "failed": "Fehlgeschlagen",
+      "refunded": "Erstattet"
+    },
+    "table": {
+      "orderNumber": "Nummer",
+      "customer": "Kunde",
+      "amount": "Betrag",
+      "status": "Status",
+      "payment": "Zahlung",
+      "date": "Datum",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "view": "Ansehen",
+      "edit": "Bearbeiten",
+      "cancel": "Stornieren",
+      "refund": "Erstatten",
+      "print": "Drucken"
+    },
+    "empty": {
+      "title": "Keine Bestellungen",
+      "description": "Sie haben noch keine Bestellungen erhalten",
+      "noResults": "Keine Bestellungen entsprechen Ihren Filtern",
+      "createFirst": "Manuelle Bestellung erstellen"
+    },
+    "toast": {
+      "warning": "Warnung",
+      "noOrders": "Keine Bestellungen zum Exportieren",
+      "success": "Erfolg",
+      "exported": "{{count}} Bestellung(en) exportiert",
+      "error": "Fehler",
+      "createSuccess": "Bestellung erfolgreich erstellt",
+      "updateSuccess": "Bestellung aktualisiert",
+      "cancelSuccess": "Bestellung storniert",
+      "refundSuccess": "Bestellung erstattet"
+    },
+    "pagination": {
+      "showing": "Zeige {{from}} bis {{to}} von {{total}} Bestellungen",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "rowsPerPage": "Zeilen pro Seite"
+    },
+    "details": {
+      "title": "Bestelldetails",
+      "orderNumber": "Bestellung #{{number}}",
+      "customer": "Kunde",
+      "products": "Produkte",
+      "total": "Gesamt",
+      "subtotal": "Zwischensumme",
+      "shipping": "Versand",
+      "tax": "Steuer",
+      "discount": "Rabatt",
+      "notes": "Notizen",
+      "timeline": "Zeitachse",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "loading": "Dashboard wird geladen...",
@@ -749,6 +570,138 @@
     },
     "notificationsBadge": {
       "new": "Neu"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie Ihre Präferenzen und Einstellungen",
+    "common": {
+      "loading": "Lädt...",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "success": "Erfolg",
+      "error": "Fehler"
+    },
+    "tabs": {
+      "profile": "Profil",
+      "store": "Shop",
+      "domain": "Domain",
+      "notifications": "Benachrichtigungen",
+      "security": "Sicherheit",
+      "debug": "Debug"
+    },
+    "profileSettings": {
+      "loading": "Profil wird geladen...",
+      "error": "Profil konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+      "memberSince": "Mitglied seit",
+      "completed": "abgeschlossen",
+      "suspended": "Gesperrt",
+      "edit": "Bearbeiten",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "referral": {
+        "linkShared": "Link geteilt",
+        "linkCopied": "Empfehlungslink in Zwischenablage kopiert",
+        "codeCopied": "Empfehlungscode in Zwischenablage kopiert"
+      }
+    },
+    "storeSettings": {
+      "loading": "Shop wird geladen...",
+      "error": "Shop konnte nicht geladen werden.",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "notificationSettings": {
+      "loading": "Präferenzen werden geladen...",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "securitySettings": {
+      "loading": "Einstellungen werden geladen...",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "domainSettings": {
+      "loading": "Domain wird geladen...",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "profile": {
+      "title": "Profil",
+      "subtitle": "Verwalten Sie Ihre persönlichen Informationen",
+      "advancedTitle": "Erweiterte Profileinstellungen",
+      "cardTitle": "Profilinformationen",
+      "cardDescription": "Verwalten Sie Ihre persönlichen Informationen"
+    },
+    "store": {
+      "title": "Shop-Einstellungen",
+      "subtitle": "Konfigurieren Sie Ihren Online-Shop",
+      "cardTitle": "Shop-Einstellungen",
+      "cardDescription": "Passen Sie Ihren Online-Shop an"
+    },
+    "domain": {
+      "title": "Benutzerdefinierte Domain",
+      "subtitle": "Konfigurieren Sie Ihren Domainnamen"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "subtitle": "Verwalten Sie Ihre Benachrichtigungspräferenzen",
+      "cardTitle": "Benachrichtigungspräferenzen",
+      "cardDescription": "Konfigurieren Sie, wie Sie benachrichtigt werden möchten"
+    },
+    "security": {
+      "title": "Sicherheit",
+      "subtitle": "Schützen Sie Ihr Konto",
+      "cardTitle": "Sicherheit",
+      "cardDescription": "Verwalten Sie die Sicherheit Ihres Kontos"
+    },
+    "debug": {
+      "title": "Profil-Debug",
+      "subtitle": "Debug-Tools",
+      "cardTitle": "Profil-Debug",
+      "cardDescription": "Verbindung und Datenbankstruktur testen"
+    }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noNotifications": "Keine Benachrichtigungen",
+    "types": {
+      "order": "Neue Bestellung",
+      "payment": "Zahlung erhalten",
+      "review": "Neue Bewertung",
+      "message": "Neue Nachricht",
+      "system": "Systembenachrichtigung"
+    }
+  },
+  "errors": {
+    "generic": "Ein Fehler ist aufgetreten",
+    "network": "Verbindungsfehler",
+    "notFound": "Seite nicht gefunden",
+    "unauthorized": "Nicht autorisiert",
+    "serverError": "Serverfehler",
+    "validation": "Validierungsfehler",
+    "tryAgain": "Bitte versuchen Sie es erneut"
+  },
+  "footer": {
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutz",
+    "help": "Hilfe",
+    "followUs": "Folgen Sie uns",
+    "allRightsReserved": "Alle Rechte vorbehalten"
+  },
+  "seo": {
+    "home": {
+      "title": "Payhuk - Moderne E-Commerce-Plattform",
+      "description": "Erstellen und verwalten Sie Ihren Online-Shop einfach mit Payhuk"
+    },
+    "marketplace": {
+      "title": "Marktplatz - Entdecken Sie unsere Produkte",
+      "description": "Erkunden Sie unsere Auswahl an Qualitätsprodukten"
     }
   },
   "landing": {
@@ -1034,27 +987,65 @@
         "zones": {
           "westAfrica": {
             "title": "Westafrika (UEMOA-Zone - FCFA XOF)",
-            "countries": ["Senegal", "Elfenbeinküste", "Mali", "Benin", "Burkina Faso", "Niger", "Togo", "Guinea-Bissau"]
+            "countries": [
+              "Senegal",
+              "Elfenbeinküste",
+              "Mali",
+              "Benin",
+              "Burkina Faso",
+              "Niger",
+              "Togo",
+              "Guinea-Bissau"
+            ]
           },
           "centralAfrica": {
             "title": "Zentralafrika (CEMAC-Zone - FCFA XAF)",
-            "countries": ["Kamerun", "Gabun", "Kongo-Brazzaville", "Tschad", "ZAR", "Äquatorialguinea"]
+            "countries": [
+              "Kamerun",
+              "Gabun",
+              "Kongo-Brazzaville",
+              "Tschad",
+              "ZAR",
+              "Äquatorialguinea"
+            ]
           },
           "northAfrica": {
             "title": "Nordafrika",
-            "countries": ["Marokko (MAD)", "Algerien (DZD)", "Tunesien (TND)", "Ägypten (EGP)"]
+            "countries": [
+              "Marokko (MAD)",
+              "Algerien (DZD)",
+              "Tunesien (TND)",
+              "Ägypten (EGP)"
+            ]
           },
           "eastAfrica": {
             "title": "Ostafrika",
-            "countries": ["Kenia (KES)", "Tansania (TZS)", "Uganda (UGX)", "Ruanda (RWF)", "Äthiopien (ETB)"]
+            "countries": [
+              "Kenia (KES)",
+              "Tansania (TZS)",
+              "Uganda (UGX)",
+              "Ruanda (RWF)",
+              "Äthiopien (ETB)"
+            ]
           },
           "southernAfrica": {
             "title": "Südliches Afrika",
-            "countries": ["Südafrika (ZAR)", "Nigeria (NGN)", "Ghana (GHS)", "Simbabwe (ZWL)"]
+            "countries": [
+              "Südafrika (ZAR)",
+              "Nigeria (NGN)",
+              "Ghana (GHS)",
+              "Simbabwe (ZWL)"
+            ]
           },
           "international": {
             "title": "International (Hauptwährungen)",
-            "countries": ["Eurozone (EUR)", "Vereinigte Staaten (USD)", "Vereinigtes Königreich (GBP)", "Kanada (CAD)", "Schweiz (CHF)"]
+            "countries": [
+              "Eurozone (EUR)",
+              "Vereinigte Staaten (USD)",
+              "Vereinigtes Königreich (GBP)",
+              "Kanada (CAD)",
+              "Schweiz (CHF)"
+            ]
           }
         },
         "note": "+ 180 weitere Länder und Territorien weltweit"
@@ -1065,6 +1056,205 @@
       "subtitle": "Schließen Sie sich Hunderten afrikanischen Unternehmern an, die bereits Payhuk vertrauen",
       "button": "Mein kostenloses Konto erstellen"
     }
+  },
+  "courses": {
+    "title": "Online-Kurse",
+    "myCourses": "Meine Kurse",
+    "createCourse": "Kurs erstellen",
+    "viewCourse": "Kurs ansehen",
+    "enrollNow": "Jetzt einschreiben",
+    "enrolled": "Eingeschrieben",
+    "continueWatching": "Kurs fortsetzen",
+    "startCourse": "Kurs beginnen",
+    "completeCourse": "Kurs abschließen",
+    "courseCompleted": "Kurs abgeschlossen",
+    "progress": "Fortschritt",
+    "lessons": "Lektionen",
+    "sections": "Abschnitte",
+    "duration": "Dauer",
+    "level": "Niveau",
+    "instructor": "Dozent",
+    "students": "Studenten",
+    "rating": "Bewertung",
+    "reviews": "Bewertungen",
+    "certificate": "Zertifikat",
+    "quiz": "Quiz",
+    "curriculum": "Lehrplan",
+    "description": "Beschreibung",
+    "objectives": "Lernziele",
+    "prerequisites": "Voraussetzungen",
+    "targetAudience": "Zielgruppe",
+    "whatYouWillLearn": "Was Sie lernen werden",
+    "courseContent": "Kursinhalt",
+    "aboutCourse": "Über diesen Kurs",
+    "enrollmentSuccess": "Einschreibung erfolgreich!",
+    "enrollmentError": "Fehler bei der Einschreibung",
+    "completionRate": "Abschlussquote",
+    "lastViewed": "Letzte angesehene Lektion",
+    "resumeWhere": "Dort fortfahren, wo Sie aufgehört haben",
+    "markComplete": "Als abgeschlossen markieren",
+    "downloadCertificate": "Zertifikat herunterladen",
+    "generateCertificate": "Zertifikat generieren",
+    "certificateAvailable": "Zertifikat verfügbar",
+    "takeQuiz": "Quiz durchführen",
+    "quizResults": "Quiz-Ergebnisse",
+    "passingScore": "Erforderliche Punktzahl",
+    "yourScore": "Ihre Punktzahl",
+    "retakeQuiz": "Quiz wiederholen",
+    "videoUpload": "Video hochladen",
+    "youtubeLink": "YouTube-Link",
+    "vimeoLink": "Vimeo-Link",
+    "googleDriveLink": "Google Drive-Link",
+    "preview": "Vorschau",
+    "freePreview": "Kostenlose Vorschau",
+    "lesson": "Lektion",
+    "section": "Abschnitt",
+    "addSection": "Abschnitt hinzufügen",
+    "addLesson": "Lektion hinzufügen",
+    "saveProgress": "Fortschritt gespeichert",
+    "lifetimeAccess": "Lebenslanger Zugang",
+    "moneyBackGuarantee": "30-Tage-Geld-zurück-Garantie",
+    "completedLessons": "Abgeschlossene Lektionen",
+    "totalLessons": "Lektionen insgesamt",
+    "courseOverview": "Kursübersicht",
+    "enrolledStudents": "Eingeschriebene Studenten",
+    "averageRating": "Durchschnittliche Bewertung",
+    "courseMaterials": "Kursmaterialien",
+    "downloadMaterials": "Materialien herunterladen",
+    "discussion": "Diskussion",
+    "announcements": "Ankündigungen",
+    "courseLanguage": "Kurssprache",
+    "subtitles": "Untertitel",
+    "videoQuality": "Videoqualität",
+    "playbackSpeed": "Wiedergabegeschwindigkeit",
+    "fullscreen": "Vollbild",
+    "courseDashboard": "Kurs-Dashboard",
+    "myCoursesDashboard": "Mein Dashboard",
+    "coursesInProgress": "Laufende Kurse",
+    "completedCourses": "Abgeschlossene Kurse",
+    "totalCourses": "Kurse insgesamt",
+    "noCourses": "Keine Kurse gefunden",
+    "noCoursesDescription": "Sie sind derzeit in keinen Kursen eingeschrieben.",
+    "discoverCourses": "Kurse entdecken",
+    "createYourFirstCourse": "Erstellen Sie Ihren ersten Kurs",
+    "courseCreationWizard": "Kurs-Erstellungsassistent",
+    "basicInfo": "Grundinformationen",
+    "curriculumBuilder": "Lehrplan-Ersteller",
+    "advancedSettings": "Erweiterte Einstellungen",
+    "publishCourse": "Kurs veröffentlichen",
+    "saveDraft": "Entwurf speichern",
+    "courseTitle": "Kurstitel",
+    "courseSlug": "Kurs-URL",
+    "courseCategory": "Kategorie",
+    "coursePrice": "Preis",
+    "promotionalPrice": "Promotionspreis",
+    "courseImage": "Kursbild",
+    "videoPlayer": "Video-Player",
+    "uploadVideo": "Video hochladen",
+    "videoSource": "Videoquelle",
+    "directUpload": "Direkter Upload",
+    "externalLink": "Externer Link",
+    "videoProcessing": "Video wird verarbeitet...",
+    "videoReady": "Video bereit",
+    "lessonTitle": "Lektionstitel",
+    "lessonDescription": "Lektionsbeschreibung",
+    "lessonDuration": "Lektionsdauer",
+    "lessonOrder": "Lektionsreihenfolge",
+    "sectionTitle": "Abschnittstitel",
+    "sectionDescription": "Abschnittsbeschreibung",
+    "sectionOrder": "Abschnittsreihenfolge",
+    "quizTitle": "Quiz-Titel",
+    "quizPassingScore": "Erforderliche Quiz-Punktzahl",
+    "quizQuestions": "Fragen",
+    "addQuestion": "Frage hinzufügen",
+    "questionType": "Fragetyp",
+    "multipleChoice": "Multiple Choice",
+    "trueFalse": "Wahr/Falsch",
+    "textInput": "Freitext",
+    "correctAnswer": "Richtige Antwort",
+    "questionText": "Fragetext",
+    "answerOptions": "Antwortoptionen",
+    "addOption": "Option hinzufügen",
+    "certificateTemplate": "Zertifikatsvorlage",
+    "certificateCustomization": "Zertifikatsanpassung",
+    "instructorName": "Name des Dozenten",
+    "completionDate": "Abschlussdatum",
+    "courseName": "Kursname",
+    "studentName": "Studentenname",
+    "enableCertificate": "Zertifikat aktivieren",
+    "enableQuiz": "Quiz aktivieren",
+    "productTypes": {
+      "course": "Online-Kurs",
+      "digital": "Digitales Produkt",
+      "physical": "Physisches Produkt",
+      "service": "Service"
+    },
+    "levels": {
+      "beginner": "Anfänger",
+      "intermediate": "Mittelstufe",
+      "advanced": "Fortgeschritten",
+      "all": "Alle Niveaus"
+    },
+    "notifications": {
+      "lessonCompleted": "Lektion erfolgreich abgeschlossen",
+      "quizPassed": "Quiz bestanden! Glückwunsch!",
+      "quizFailed": "Punktzahl unzureichend. Versuchen Sie es erneut!",
+      "certificateGenerated": "Zertifikat erfolgreich generiert",
+      "enrollmentSuccess": "Kurseinschreibung erfolgreich",
+      "progressSaved": "Fortschritt gespeichert",
+      "videoPositionSaved": "Videoposition gespeichert"
+    },
+    "errors": {
+      "enrollmentFailed": "Fehler bei der Einschreibung",
+      "loadingCourseFailed": "Fehler beim Laden des Kurses",
+      "videoUploadFailed": "Fehler beim Hochladen des Videos",
+      "quizSubmissionFailed": "Fehler beim Einreichen des Quiz",
+      "certificateGenerationFailed": "Fehler bei der Zertifikatsgenerierung"
+    }
+  },
+  "admin": {
+    "batchShipping": {
+      "title": "Batch-Versand",
+      "description": "Verarbeiten Sie mehrere Bestellungen gleichzeitig und generieren Sie Etiketten in großen Mengen",
+      "noStore": "Kein Geschäft gefunden",
+      "noStoreDescription": "Bitte erstellen Sie ein Geschäft, um Ihre Batch-Sendungen zu verwalten",
+      "stats": {
+        "total": "Gesamte Chargen",
+        "processing": "In Bearbeitung",
+        "labelGenerated": "Etiketten generiert",
+        "completed": "Abgeschlossen"
+      }
+    }
+  },
+  "promotions": {
+    "title": "Aktionen",
+    "description": "Verwalten Sie Ihre Promo-Codes und Rabatte",
+    "createButton": "Neue Aktion",
+    "createButtonShort": "Neu",
+    "noStore": {
+      "title": "Geschäft nicht konfiguriert",
+      "description": "Bitte erstellen Sie zuerst Ihr Geschäft, um Ihre Aktionen zu verwalten."
+    },
+    "stats": {
+      "total": "Gesamte Aktionen",
+      "active": "Aktiv",
+      "totalUses": "Gesamte Nutzungen",
+      "averageDiscount": "Durchschnittlicher Rabatt"
+    },
+    "empty": {
+      "title": "Keine Aktionen",
+      "description": "Beginnen Sie mit der Erstellung Ihrer ersten Aktion",
+      "noResults": "Keine Aktionen entsprechen Ihren Filtern"
+    }
+  },
+  "withdrawals": {
+    "title": "Auszahlungen",
+    "description": "Verwalten Sie Ihre Auszahlungen und prüfen Sie Ihr verfügbares Guthaben",
+    "requestButton": "Auszahlung beantragen",
+    "noStore": "Sie müssen ein Geschäft erstellen, bevor Sie Auszahlungen vornehmen können.",
+    "migration": {
+      "title": "SQL-Migration erforderlich:",
+      "description": "Um das Auszahlungssystem zu aktivieren, führen Sie bitte die SQL-Migration {{fileName}} in Ihrer Supabase-Datenbank aus."
+    }
   }
 }
-

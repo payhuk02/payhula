@@ -46,10 +46,11 @@
     "publishShort": "Publier",
     "publishing": "Publication...",
     "publishingShort": "Pub...",
-    "shortcuts": "Raccourcis",
-    "shortcuts.save": "Brouillon",
-    "shortcuts.next": "Suivant",
-    "shortcuts.prev": "Précédent",
+    "shortcuts": {
+      "save": "Brouillon",
+      "next": "Suivant",
+      "prev": "Précédent"
+    },
     "seo": {
       "faq": {
         "description": "Optimisez votre référencement et ajoutez des réponses aux questions fréquentes"
@@ -1254,6 +1255,51 @@
       "videoUploadFailed": "Erreur lors du téléchargement de la vidéo",
       "quizSubmissionFailed": "Erreur lors de la soumission du quiz",
       "certificateGenerationFailed": "Erreur lors de la génération du certificat"
+    }
+  },
+  "admin": {
+    "batchShipping": {
+      "title": "Expéditions Batch",
+      "description": "Traitez plusieurs commandes simultanément et générez des étiquettes en masse",
+      "noStore": "Aucune boutique trouvée",
+      "noStoreDescription": "Veuillez créer une boutique pour gérer vos expéditions batch",
+      "stats": {
+        "total": "Lots totaux",
+        "processing": "En traitement",
+        "labelGenerated": "Étiquettes générées",
+        "completed": "Complétés"
+      }
+    }
+  },
+  "promotions": {
+    "title": "Promotions",
+    "description": "Gérez vos codes promo et réductions",
+    "createButton": "Nouvelle promotion",
+    "createButtonShort": "Nouvelle",
+    "noStore": {
+      "title": "Boutique non configurée",
+      "description": "Veuillez d'abord créer votre boutique pour gérer vos promotions."
+    },
+    "stats": {
+      "total": "Total Promotions",
+      "active": "Actives",
+      "totalUses": "Total Utilisations",
+      "averageDiscount": "Moyenne Réduction"
+    },
+    "empty": {
+      "title": "Aucune promotion",
+      "description": "Commencez par créer votre première promotion",
+      "noResults": "Aucune promotion ne correspond à vos filtres"
+    }
+  },
+  "withdrawals": {
+    "title": "Retraits",
+    "description": "Gérez vos retraits et consultez votre solde disponible",
+    "requestButton": "Demander un retrait",
+    "noStore": "Vous devez créer une boutique avant de pouvoir effectuer des retraits.",
+    "migration": {
+      "title": "Migration SQL requise :",
+      "description": "Pour activer le système de retraits, veuillez exécuter la migration SQL {{fileName}} dans votre base de données Supabase."
     }
   }
 }
