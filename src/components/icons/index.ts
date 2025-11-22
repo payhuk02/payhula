@@ -123,4 +123,5 @@ export {
   Copy,
   ExternalLink,
   MousePointerClick,
+  Link,
 } from 'lucide-react';

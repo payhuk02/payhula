@@ -197,7 +197,7 @@ const AffiliateDashboard = () => {
   if (affiliateLoading) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen w-full overflow-x-hidden">
+        <div className="flex h-screen w-full overflow-x-hidden bg-background">
           <AppSidebar />
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
@@ -218,7 +218,7 @@ const AffiliateDashboard = () => {
   if (!isAffiliate) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen w-full overflow-x-hidden">
+        <div className="flex h-screen w-full overflow-x-hidden bg-background">
           <AppSidebar />
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
@@ -332,7 +332,7 @@ const AffiliateDashboard = () => {
   // Registered - Main Dashboard
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full overflow-x-hidden">
+      <div className="flex h-screen w-full overflow-x-hidden bg-background">
         <AppSidebar />
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
