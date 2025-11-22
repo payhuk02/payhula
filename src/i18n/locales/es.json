@@ -1250,6 +1250,31 @@
       "title": "Previsión de Demanda",
       "description": "Analice las tendencias y pronostique la demanda futura de sus productos",
       "noStore": "Debe crear una tienda antes de usar la previsión de demanda"
+    },
+    "physicalPromotions": {
+      "title": "Promociones y Descuentos",
+      "description": "Gestione sus promociones, códigos de descuento y ofertas especiales"
+    },
+    "physicalBundles": {
+      "title": "Gestión de Paquetes",
+      "description": "Cree y gestione paquetes de productos con promociones automáticas y precios dinámicos"
+    },
+    "physicalBackorders": {
+      "title": "Gestión de Pedidos Pendientes",
+      "description": "Gestione pedidos agotados con priorización y alertas automáticas"
+    },
+    "physicalPreOrders": {
+      "title": "Gestión de Pre-pedidos",
+      "description": "Gestione pre-pedidos de sus productos físicos con notificaciones automáticas"
+    },
+    "physicalMultiCurrency": {
+      "title": "Gestión Multi-moneda",
+      "description": "Gestione monedas, tasas de cambio y precios regionales",
+      "tabs": {
+        "currencies": "Monedas y Tasas",
+        "currenciesShort": "Monedas",
+        "converter": "Convertidor"
+      }
     }
   },
   "promotions": {

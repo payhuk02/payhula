@@ -1286,6 +1286,31 @@
       "title": "Prévisions de Demande",
       "description": "Analysez les tendances et prévoyez la demande future de vos produits",
       "noStore": "Vous devez créer une boutique avant d'utiliser les prévisions de demande"
+    },
+    "physicalPromotions": {
+      "title": "Promotions et réductions",
+      "description": "Gérez vos promotions, codes de réduction et offres spéciales"
+    },
+    "physicalBundles": {
+      "title": "Gestion des Bundles",
+      "description": "Créez et gérez des bundles de produits avec promotions automatiques et prix dynamiques"
+    },
+    "physicalBackorders": {
+      "title": "Gestion des Backorders",
+      "description": "Gérez les commandes en rupture de stock avec priorisation et alertes automatiques"
+    },
+    "physicalPreOrders": {
+      "title": "Gestion des Précommandes",
+      "description": "Gérez les précommandes de vos produits physiques avec notifications automatiques"
+    },
+    "physicalMultiCurrency": {
+      "title": "Gestion Multi-devises",
+      "description": "Gérez les devises, taux de change et prix régionaux",
+      "tabs": {
+        "currencies": "Devises & Taux",
+        "currenciesShort": "Devises",
+        "converter": "Convertisseur"
+      }
     }
   },
   "promotions": {

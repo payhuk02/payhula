@@ -1250,6 +1250,31 @@
       "title": "Demand Forecasting",
       "description": "Analyze trends and forecast future demand for your products",
       "noStore": "You must create a store before using demand forecasting"
+    },
+    "physicalPromotions": {
+      "title": "Promotions and Discounts",
+      "description": "Manage your promotions, discount codes and special offers"
+    },
+    "physicalBundles": {
+      "title": "Bundle Management",
+      "description": "Create and manage product bundles with automatic promotions and dynamic pricing"
+    },
+    "physicalBackorders": {
+      "title": "Backorders Management",
+      "description": "Manage out-of-stock orders with prioritization and automatic alerts"
+    },
+    "physicalPreOrders": {
+      "title": "Pre-Orders Management",
+      "description": "Manage pre-orders for your physical products with automatic notifications"
+    },
+    "physicalMultiCurrency": {
+      "title": "Multi-Currency Management",
+      "description": "Manage currencies, exchange rates and regional prices",
+      "tabs": {
+        "currencies": "Currencies & Rates",
+        "currenciesShort": "Currencies",
+        "converter": "Converter"
+      }
     }
   },
   "promotions": {

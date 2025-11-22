@@ -4,12 +4,14 @@
  * Design responsive avec le même style que Mes Templates
  */
 
+import { useTranslation } from 'react-i18next';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { PreOrdersManager } from '@/components/physical/preorders/PreOrdersManager';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function PhysicalPreOrders() {
+  const { t } = useTranslation();
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full overflow-x-hidden">
@@ -26,11 +28,11 @@ export default function PhysicalPreOrders() {
                     </svg>
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Gestion des Précommandes
+                    {t('admin.physicalPreOrders.title')}
                   </span>
                 </h1>
                 <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                  Gérez les précommandes de vos produits physiques avec notifications automatiques
+                  {t('admin.physicalPreOrders.description')}
                 </p>
               </div>
             </div>

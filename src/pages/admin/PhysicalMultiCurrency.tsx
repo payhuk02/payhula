@@ -4,6 +4,7 @@
  * Design responsive avec le même style que Mes Templates
  */
 
+import { useTranslation } from 'react-i18next';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { CurrencyManager } from '@/components/physical/currencies/CurrencyManager';
@@ -12,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function PhysicalMultiCurrency() {
+  const { t } = useTranslation();
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full overflow-x-hidden">
@@ -28,11 +30,11 @@ export default function PhysicalMultiCurrency() {
                     </svg>
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Gestion Multi-devises
+                    {t('admin.physicalMultiCurrency.title')}
                   </span>
                 </h1>
                 <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                  Gérez les devises, taux de change et prix régionaux
+                  {t('admin.physicalMultiCurrency.description')}
                 </p>
               </div>
             </div>
@@ -43,14 +45,14 @@ export default function PhysicalMultiCurrency() {
                   value="manager"
                   className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
-                  <span className="hidden xs:inline">Devises & Taux</span>
-                  <span className="xs:hidden">Devises</span>
+                  <span className="hidden xs:inline">{t('admin.physicalMultiCurrency.tabs.currencies')}</span>
+                  <span className="xs:hidden">{t('admin.physicalMultiCurrency.tabs.currenciesShort')}</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="converter"
                   className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
-                  Convertisseur
+                  {t('admin.physicalMultiCurrency.tabs.converter')}
                 </TabsTrigger>
               </TabsList>
 

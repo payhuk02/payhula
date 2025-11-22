@@ -1250,6 +1250,31 @@
       "title": "Nachfrageprognose",
       "description": "Analysieren Sie Trends und prognostizieren Sie die zukünftige Nachfrage nach Ihren Produkten",
       "noStore": "Sie müssen ein Geschäft erstellen, bevor Sie die Nachfrageprognose verwenden können"
+    },
+    "physicalPromotions": {
+      "title": "Aktionen und Rabatte",
+      "description": "Verwalten Sie Ihre Aktionen, Rabattcodes und Sonderangebote"
+    },
+    "physicalBundles": {
+      "title": "Bündel-Verwaltung",
+      "description": "Erstellen und verwalten Sie Produktbündel mit automatischen Aktionen und dynamischen Preisen"
+    },
+    "physicalBackorders": {
+      "title": "Vorbestellungen-Verwaltung",
+      "description": "Verwalten Sie ausverkaufte Bestellungen mit Priorisierung und automatischen Benachrichtigungen"
+    },
+    "physicalPreOrders": {
+      "title": "Vorbestellungen-Verwaltung",
+      "description": "Verwalten Sie Vorbestellungen für Ihre physischen Produkte mit automatischen Benachrichtigungen"
+    },
+    "physicalMultiCurrency": {
+      "title": "Multi-Währungs-Verwaltung",
+      "description": "Verwalten Sie Währungen, Wechselkurse und regionale Preise",
+      "tabs": {
+        "currencies": "Währungen & Kurse",
+        "currenciesShort": "Währungen",
+        "converter": "Konverter"
+      }
     }
   },
   "promotions": {

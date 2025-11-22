@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { PromotionsManager } from '@/components/physical/promotions';
@@ -12,6 +13,7 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { Tag } from 'lucide-react';
 
 export default function PhysicalPromotions() {
+  const { t } = useTranslation();
   const headerRef = useScrollAnimation<HTMLDivElement>();
 
   return (
@@ -31,11 +33,11 @@ export default function PhysicalPromotions() {
                     <Tag className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Promotions et réductions
+                    {t('admin.physicalPromotions.title')}
                   </span>
                 </h1>
                 <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                  Gérez vos promotions, codes de réduction et offres spéciales
+                  {t('admin.physicalPromotions.description')}
                 </p>
               </div>
             </div>
