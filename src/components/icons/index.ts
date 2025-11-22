@@ -120,4 +120,7 @@ export {
   ChevronsRight,
   ChevronLeft,
   ChevronRight,
+  Copy,
+  ExternalLink,
+  MousePointerClick,
 } from 'lucide-react';
