@@ -116,6 +116,4 @@ export {
   TrendingDown,
   Accessibility,
   Info,
-  X,
-  Check,
 } from 'lucide-react';
