@@ -244,7 +244,7 @@ export const OptimizedImage = ({
         className={cn(
           'image-sharp', // Classe pour netteté professionnelle
           'opacity-100', // Toujours visible - pas de transition pour éviter flash gris
-          'w-full h-full object-cover',
+          'w-full h-auto object-contain',
           'block', // Forcer display block pour éviter les problèmes de layout
           className
         )}

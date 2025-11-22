@@ -141,6 +141,49 @@ export interface AffiliateLink {
     display_name?: string;
     affiliate_code: string;
   };
+  
+  // Lien court associé (optionnel)
+  short_link?: AffiliateShortLink;
+}
+
+// ==============================================
+// AFFILIATE SHORT LINK (Lien court)
+// ==============================================
+
+export interface AffiliateShortLink {
+  id: string;
+  affiliate_link_id: string;
+  affiliate_id: string;
+  
+  // Code court unique
+  short_code: string;  // Ex: "ABC123"
+  
+  // URL complète vers laquelle rediriger
+  target_url: string;
+  
+  // Statistiques
+  total_clicks: number;
+  unique_clicks: number;
+  
+  // Métadonnées
+  custom_alias?: string;  // Alias personnalisé optionnel
+  expires_at?: string;  // Date d'expiration optionnelle
+  is_active: boolean;
+  
+  // Dates
+  created_at: string;
+  updated_at: string;
+  last_used_at?: string;
+  
+  // Relations (optionnel)
+  affiliate_link?: AffiliateLink;
+}
+
+export interface CreateShortLinkForm {
+  affiliate_link_id: string;
+  custom_alias?: string;  // Alias personnalisé (optionnel)
+  expires_at?: string;  // Date d'expiration (optionnelle)
+  short_code_length?: number;  // Longueur du code (4-10, défaut: 6)
 }
 
 // ==============================================

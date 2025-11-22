@@ -4,13 +4,11 @@
  * Date: 25/10/2025
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense, memo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -18,17 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { useCurrentAffiliate, useAffiliates } from '@/hooks/useAffiliates';
 import { useAffiliateLinks } from '@/hooks/useAffiliateLinks';
+import { CreateAffiliateLinkDialog } from '@/components/affiliate/CreateAffiliateLinkDialog';
 import { useAffiliateCommissions } from '@/hooks/useAffiliateCommissions';
 import { useAffiliateBalance, useAffiliateWithdrawals } from '@/hooks/useAffiliateWithdrawals';
 import { PaginationControls } from '@/components/affiliate/PaginationControls';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -50,8 +41,179 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
+import { RegistrationDialog } from '@/components/affiliate/RegistrationDialog';
+import { ShortLinkManager } from '@/components/affiliate/ShortLinkManager';
+
+// Composant mémorisé pour les liens d'affiliation
+const AffiliateLinkCard = memo(({ link, index }: { link: any, index: number }) => {
+  const handleCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(link.full_url);
+  }, [link.full_url]);
+  
+  const handleOpen = useCallback(() => {
+    window.open(link.full_url, '_blank');
+  }, [link.full_url]);
+  
+  return (
+    <Card 
+      className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+      style={{ animationDelay: `${index * 50}ms` }}
+    >
+      <CardContent className="p-3 sm:p-4">
+        <div className="space-y-3 sm:space-y-4">
+          {/* Product info */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+              {link.product?.image_url && (
+                <img
+                  src={link.product.image_url}
+                  alt={link.product.name}
+                  className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0"
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-sm sm:text-base truncate">{link.product?.name}</h4>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                  {link.product?.store?.name}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 flex-shrink-0">
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={handleCopy}
+                className="gap-1.5 sm:gap-2 text-xs"
+              >
+                <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Copier</span>
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={handleOpen}
+                className="gap-1.5 sm:gap-2 text-xs"
+              >
+                <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Ouvrir</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
+            <div>
+              <p className="text-xs text-muted-foreground">Clics</p>
+              <p className="text-base sm:text-lg font-semibold">{link.total_clicks}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Ventes</p>
+              <p className="text-base sm:text-lg font-semibold">{link.total_sales}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">CA généré</p>
+              <p className="text-base sm:text-lg font-semibold truncate">{formatCurrency(link.total_revenue)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Commission</p>
+              <p className="text-base sm:text-lg font-semibold text-orange-600 truncate">
+                {formatCurrency(link.total_commission)}
+              </p>
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+              <p className="text-xs text-muted-foreground">Conversion</p>
+              <Badge variant={parseFloat(link.conversionRate) > 2 ? 'default' : 'outline'} className="text-xs">
+                {link.conversionRate}%
+              </Badge>
+            </div>
+          </div>
+
+          {/* Short Links Manager */}
+          <div className="pt-3 sm:pt-4 border-t">
+            <ShortLinkManager 
+              affiliateLinkId={link.id} 
+              fullUrl={link.full_url}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+AffiliateLinkCard.displayName = 'AffiliateLinkCard';
+
+// Composant mémorisé pour la liste des liens
+const AffiliateLinksList = memo(({ links }: { links: any[] }) => {
+  return (
+    <div className="space-y-3 sm:space-y-4">
+      {links.map((link, index) => (
+        <AffiliateLinkCard key={link.id} link={link} index={index} />
+      ))}
+    </div>
+  );
+}, (prevProps, nextProps) => {
+  // Comparaison optimisée pour éviter les re-renders inutiles
+  return prevProps.links.length === nextProps.links.length &&
+    prevProps.links.every((link, index) => 
+      link.id === nextProps.links[index]?.id &&
+      link.total_clicks === nextProps.links[index]?.total_clicks &&
+      link.total_sales === nextProps.links[index]?.total_sales
+    );
+});
+
+AffiliateLinksList.displayName = 'AffiliateLinksList';
+
+// Composant mémorisé pour les lignes de commission
+const CommissionRow = memo(({ commission }: { commission: any }) => {
+  return (
+    <TableRow key={commission.id}>
+      <TableCell className="text-xs sm:text-sm">
+        {new Date(commission.created_at).toLocaleDateString('fr-FR')}
+      </TableCell>
+      <TableCell className="text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">
+        {commission.product?.name || 'N/A'}
+      </TableCell>
+      <TableCell className="text-right font-semibold text-xs sm:text-sm">
+        {formatCurrency(commission.order_total)}
+      </TableCell>
+      <TableCell className="text-right font-bold text-orange-600 text-xs sm:text-sm">
+        {formatCurrency(commission.commission_amount)}
+      </TableCell>
+      <TableCell>
+        {commission.status === 'pending' && (
+          <Badge variant="outline" className="gap-1 text-xs">
+            <Clock className="h-3 w-3" />
+            <span className="hidden sm:inline">En attente</span>
+            <span className="sm:hidden">Att.</span>
+          </Badge>
+        )}
+        {commission.status === 'approved' && (
+          <Badge variant="secondary" className="gap-1 text-xs">
+            <CheckCircle2 className="h-3 w-3" />
+            <span className="hidden sm:inline">Approuvé</span>
+            <span className="sm:hidden">App.</span>
+          </Badge>
+        )}
+        {commission.status === 'paid' && (
+          <Badge className="gap-1 text-xs">
+            <CheckCircle2 className="h-3 w-3" />
+            <span className="hidden sm:inline">Payé</span>
+            <span className="sm:hidden">Payé</span>
+          </Badge>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+}, (prevProps, nextProps) => {
+  return prevProps.commission.id === nextProps.commission.id &&
+    prevProps.commission.status === nextProps.commission.status;
+});
+
+CommissionRow.displayName = 'CommissionRow';
 
 const AffiliateDashboard = () => {
   const { affiliate, loading: affiliateLoading, isAffiliate, refetch: refetchAffiliate } = useCurrentAffiliate();
@@ -122,6 +284,7 @@ const AffiliateDashboard = () => {
     [links]
   );
   
+  // Charger les données critiques en priorité
   const { balance, loading: balanceLoading } = useAffiliateBalance(affiliate?.id);
   const { withdrawals, loading: withdrawalsLoading } = useAffiliateWithdrawals({ 
     affiliate_id: affiliate?.id 
@@ -131,82 +294,15 @@ const AffiliateDashboard = () => {
 
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [registrationData, setRegistrationData] = useState({
-    email: '',
-    first_name: '',
-    last_name: '',
-    display_name: '',
-  });
-  const [registrationErrors, setRegistrationErrors] = useState<Record<string, string>>({});
+  const [showCreateLinkDialog, setShowCreateLinkDialog] = useState(false);
 
-  // Schéma de validation Zod pour l'inscription
-  const registrationSchema = z.object({
-    email: z.string()
-      .min(1, 'L\'email est requis')
-      .email('L\'email doit être valide'),
-    first_name: z.union([
-      z.string().length(0), // Chaîne vide autorisée
-      z.string()
-        .min(2, 'Le prénom doit contenir au moins 2 caractères')
-        .max(50, 'Le prénom ne peut pas dépasser 50 caractères')
-        .regex(/^[a-zA-ZàâäéèêëïîôùûüÿñçÀÂÄÉÈÊËÏÎÔÙÛÜŸÑÇ\s'-]+$/, 'Le prénom ne peut contenir que des lettres')
-    ]),
-    last_name: z.union([
-      z.string().length(0), // Chaîne vide autorisée
-      z.string()
-        .min(2, 'Le nom doit contenir au moins 2 caractères')
-        .max(50, 'Le nom ne peut pas dépasser 50 caractères')
-        .regex(/^[a-zA-ZàâäéèêëïîôùûüÿñçÀÂÄÉÈÊËÏÎÔÙÛÜŸÑÇ\s'-]+$/, 'Le nom ne peut contenir que des lettres')
-    ]),
-    display_name: z.union([
-      z.string().length(0), // Chaîne vide autorisée
-      z.string().max(50, 'Le nom d\'affichage ne peut pas dépasser 50 caractères')
-    ]),
-  });
-
-  const validateRegistration = (data: typeof registrationData): boolean => {
-    try {
-      registrationSchema.parse(data);
-      setRegistrationErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          const path = err.path[0] as string;
-          if (path) {
-            errors[path] = err.message;
-          }
-        });
-        setRegistrationErrors(errors);
-      }
-      return false;
-    }
-  };
-
-  // Protection contre les soumissions multiples
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleRegister = useCallback(async () => {
-    // Protection contre les soumissions multiples
-    if (isSubmitting || isRegistering) {
-      return;
-    }
-
-    // Validation
-    if (!validateRegistration(registrationData)) {
-      toast({
-        title: 'Erreur de validation',
-        description: 'Veuillez corriger les erreurs dans le formulaire',
-        variant: 'destructive',
-      });
-      return;
-    }
-
+  const handleRegister = useCallback(async (registrationData: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    display_name: string;
+  }) => {
     setIsRegistering(true);
-    setIsSubmitting(true);
-    setRegistrationErrors({});
-
     try {
       const result = await registerAffiliate(registrationData);
       if (result) {
@@ -214,15 +310,7 @@ const AffiliateDashboard = () => {
           title: 'Inscription réussie !',
           description: 'Vous êtes maintenant inscrit au programme d\'affiliation',
         });
-        // Réinitialiser le formulaire
-        setRegistrationData({
-          email: '',
-          first_name: '',
-          last_name: '',
-          display_name: '',
-        });
         setShowRegisterDialog(false);
-        // Recharger les données de l'affilié au lieu de recharger toute la page
         await refetchAffiliate();
       }
     } catch (error: any) {
@@ -233,35 +321,8 @@ const AffiliateDashboard = () => {
       });
     } finally {
       setIsRegistering(false);
-      // Délai avant de permettre une nouvelle soumission
-      setTimeout(() => setIsSubmitting(false), 1000);
     }
-  }, [registrationData, isSubmitting, isRegistering, refetchAffiliate, toast, validateRegistration]);
-
-  const handleInputChange = (field: keyof typeof registrationData, value: string) => {
-    setRegistrationData(prev => ({ ...prev, [field]: value }));
-    // Effacer l'erreur du champ modifié
-    if (registrationErrors[field]) {
-      setRegistrationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
-  // Réinitialiser les erreurs et le formulaire quand le dialog se ferme
-  useEffect(() => {
-    if (!showRegisterDialog) {
-      setRegistrationErrors({});
-      setRegistrationData({
-        email: '',
-        first_name: '',
-        last_name: '',
-        display_name: '',
-      });
-    }
-  }, [showRegisterDialog]);
+  }, [registerAffiliate, refetchAffiliate, toast]);
 
   // Handlers de pagination optimisés avec useCallback
   const handleLinksPageChange = useCallback((page: number) => {
@@ -288,145 +349,6 @@ const AffiliateDashboard = () => {
     goToCommissionsPage(1); // Retour à la première page
   }, [setCommissionsPageSizeFromHook, goToCommissionsPage]);
 
-  // Registration Dialog Component
-  const RegistrationDialog = () => (
-    <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
-      <DialogTrigger asChild>
-        <Button 
-          size="lg" 
-          className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-        >
-          <UserPlus className="h-5 w-5" />
-          Devenir affilié
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl">Inscription au programme d'affiliation</DialogTitle>
-          <DialogDescription className="text-sm sm:text-base">
-            Rejoignez notre programme et commencez à gagner des commissions dès aujourd'hui
-          </DialogDescription>
-        </DialogHeader>
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRegister();
-          }}
-          className="space-y-4"
-        >
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">
-              Email <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="votre@email.com"
-              value={registrationData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              disabled={isRegistering}
-              className={registrationErrors.email ? 'border-destructive' : ''}
-              aria-invalid={!!registrationErrors.email}
-              aria-describedby={registrationErrors.email ? 'email-error' : undefined}
-            />
-            {registrationErrors.email && (
-              <p id="email-error" className="text-xs text-destructive flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" />
-                {registrationErrors.email}
-              </p>
-            )}
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="first_name" className="text-sm font-medium">Prénom</Label>
-              <Input
-                id="first_name"
-                placeholder="Jean"
-                value={registrationData.first_name}
-                onChange={(e) => handleInputChange('first_name', e.target.value)}
-                disabled={isRegistering}
-                className={registrationErrors.first_name ? 'border-destructive' : ''}
-                aria-invalid={!!registrationErrors.first_name}
-                aria-describedby={registrationErrors.first_name ? 'first_name-error' : undefined}
-              />
-              {registrationErrors.first_name && (
-                <p id="first_name-error" className="text-xs text-destructive flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {registrationErrors.first_name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="last_name" className="text-sm font-medium">Nom</Label>
-              <Input
-                id="last_name"
-                placeholder="Dupont"
-                value={registrationData.last_name}
-                onChange={(e) => handleInputChange('last_name', e.target.value)}
-                disabled={isRegistering}
-                className={registrationErrors.last_name ? 'border-destructive' : ''}
-                aria-invalid={!!registrationErrors.last_name}
-                aria-describedby={registrationErrors.last_name ? 'last_name-error' : undefined}
-              />
-              {registrationErrors.last_name && (
-                <p id="last_name-error" className="text-xs text-destructive flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {registrationErrors.last_name}
-                </p>
-              )}
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="display_name" className="text-sm font-medium">
-              Nom d'affichage <span className="text-muted-foreground text-xs">(optionnel)</span>
-            </Label>
-            <Input
-              id="display_name"
-              placeholder="JeanD"
-              value={registrationData.display_name}
-              onChange={(e) => handleInputChange('display_name', e.target.value)}
-              disabled={isRegistering}
-              className={registrationErrors.display_name ? 'border-destructive' : ''}
-              aria-invalid={!!registrationErrors.display_name}
-              aria-describedby={registrationErrors.display_name ? 'display_name-error' : undefined}
-            />
-            {registrationErrors.display_name && (
-              <p id="display_name-error" className="text-xs text-destructive flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" />
-                {registrationErrors.display_name}
-              </p>
-            )}
-          </div>
-          
-          <div className="pt-2">
-            <Button 
-              type="submit"
-              disabled={isRegistering}
-              className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              {isRegistering ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Inscription en cours...
-                </>
-              ) : (
-                <>
-                  <UserPlus className="h-4 w-4" />
-                  S'inscrire
-                </>
-              )}
-            </Button>
-          </div>
-          
-          <p className="text-xs text-center text-muted-foreground pt-2">
-            Aucun frais • Aucun engagement • Commencez immédiatement
-          </p>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
 
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -552,7 +474,12 @@ const AffiliateDashboard = () => {
 
                       {/* CTA */}
                       <div className="text-center pt-2 sm:pt-4">
-                        <RegistrationDialog />
+                        <RegistrationDialog 
+                          open={showRegisterDialog}
+                          onOpenChange={setShowRegisterDialog}
+                          onRegister={handleRegister}
+                          isRegistering={isRegistering}
+                        />
                         <p className="text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4">
                           Aucun frais • Aucun engagement • Commencez immédiatement
                         </p>
@@ -595,6 +522,7 @@ const AffiliateDashboard = () => {
               <Button 
                 className="gap-2 w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 size="sm"
+                onClick={() => setShowCreateLinkDialog(true)}
               >
                 <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Nouveau lien</span>
@@ -764,6 +692,7 @@ const AffiliateDashboard = () => {
                         <Button 
                           className="gap-2 w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                           size="sm"
+                          onClick={() => setShowCreateLinkDialog(true)}
                         >
                           <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           <span className="hidden sm:inline">Créer un lien</span>
@@ -788,91 +717,7 @@ const AffiliateDashboard = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="space-y-3 sm:space-y-4">
-                        {linksWithConversionRates.map((link, index) => {
-                        return (
-                          <Card 
-                            key={link.id} 
-                            className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
-                            style={{ animationDelay: `${index * 50}ms` }}
-                          >
-                            <CardContent className="p-3 sm:p-4">
-                              <div className="space-y-3 sm:space-y-4">
-                                {/* Product info */}
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                                  <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                                    {link.product?.image_url && (
-                                      <img
-                                        src={link.product.image_url}
-                                        alt={link.product.name}
-                                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0"
-                                        loading="lazy"
-                                      />
-                                    )}
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="font-semibold text-sm sm:text-base truncate">{link.product?.name}</h4>
-                                      <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                                        {link.product?.store?.name}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex gap-2 flex-shrink-0">
-                                    <Button 
-                                      size="sm" 
-                                      variant="outline"
-                                      onClick={async () => {
-                                        await navigator.clipboard.writeText(link.full_url);
-                                      }}
-                                      className="gap-1.5 sm:gap-2 text-xs"
-                                    >
-                                      <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                      <span className="hidden sm:inline">Copier</span>
-                                    </Button>
-                                    <Button 
-                                      size="sm" 
-                                      variant="outline"
-                                      onClick={() => window.open(link.full_url, '_blank')}
-                                      className="gap-1.5 sm:gap-2 text-xs"
-                                    >
-                                      <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                      <span className="hidden sm:inline">Ouvrir</span>
-                                    </Button>
-                                  </div>
-                                </div>
-
-                                {/* Stats */}
-                                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
-                                  <div>
-                                    <p className="text-xs text-muted-foreground">Clics</p>
-                                    <p className="text-base sm:text-lg font-semibold">{link.total_clicks}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-muted-foreground">Ventes</p>
-                                    <p className="text-base sm:text-lg font-semibold">{link.total_sales}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-muted-foreground">CA généré</p>
-                                    <p className="text-base sm:text-lg font-semibold truncate">{formatCurrency(link.total_revenue)}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-muted-foreground">Commission</p>
-                                    <p className="text-base sm:text-lg font-semibold text-orange-600 truncate">
-                                      {formatCurrency(link.total_commission)}
-                                    </p>
-                                  </div>
-                                  <div className="col-span-2 sm:col-span-1">
-                                    <p className="text-xs text-muted-foreground">Conversion</p>
-                                    <Badge variant={parseFloat(link.conversionRate) > 2 ? 'default' : 'outline'} className="text-xs">
-                                      {link.conversionRate}%
-                                    </Badge>
-                                  </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                        })}
-                      </div>
+                      <AffiliateLinksList links={linksWithConversionRates} />
                       
                       {/* Pagination pour les liens */}
                       {linksPagination && linksPagination.totalPages > 1 && (
@@ -931,43 +776,7 @@ const AffiliateDashboard = () => {
                               </TableHeader>
                               <TableBody>
                                 {commissions.map((commission) => (
-                                  <TableRow key={commission.id}>
-                                    <TableCell className="text-xs sm:text-sm">
-                                      {new Date(commission.created_at).toLocaleDateString('fr-FR')}
-                                    </TableCell>
-                                    <TableCell className="text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">
-                                      {commission.product?.name}
-                                    </TableCell>
-                                    <TableCell className="text-right font-semibold text-xs sm:text-sm">
-                                      {formatCurrency(commission.order_total)}
-                                    </TableCell>
-                                    <TableCell className="text-right font-bold text-orange-600 text-xs sm:text-sm">
-                                      {formatCurrency(commission.commission_amount)}
-                                    </TableCell>
-                                    <TableCell>
-                                      {commission.status === 'pending' && (
-                                        <Badge variant="outline" className="gap-1 text-xs">
-                                          <Clock className="h-3 w-3" />
-                                          <span className="hidden sm:inline">En attente</span>
-                                          <span className="sm:hidden">Att.</span>
-                                        </Badge>
-                                      )}
-                                      {commission.status === 'approved' && (
-                                        <Badge variant="secondary" className="gap-1 text-xs">
-                                          <CheckCircle2 className="h-3 w-3" />
-                                          <span className="hidden sm:inline">Approuvé</span>
-                                          <span className="sm:hidden">App.</span>
-                                        </Badge>
-                                      )}
-                                      {commission.status === 'paid' && (
-                                        <Badge className="gap-1 text-xs">
-                                          <CheckCircle2 className="h-3 w-3" />
-                                          <span className="hidden sm:inline">Payé</span>
-                                          <span className="sm:hidden">Payé</span>
-                                        </Badge>
-                                      )}
-                                    </TableCell>
-                                  </TableRow>
+                                  <CommissionRow key={commission.id} commission={commission} />
                                 ))}
                               </TableBody>
                             </Table>
@@ -1074,6 +883,17 @@ const AffiliateDashboard = () => {
           </div>
         </main>
       </div>
+      {/* Dialog de création de lien */}
+      {affiliate?.id && (
+        <CreateAffiliateLinkDialog
+          open={showCreateLinkDialog}
+          onOpenChange={setShowCreateLinkDialog}
+          affiliateId={affiliate.id}
+          onSuccess={() => {
+            // La liste sera automatiquement rafraîchie par le hook
+          }}
+        />
+      )}
     </SidebarProvider>
   );
 };

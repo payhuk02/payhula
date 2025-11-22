@@ -74,15 +74,15 @@ const UnifiedProductCardComponent: React.FC<UnifiedProductCardProps> = ({
       aria-describedby={`product-price-${product.id}`}
       tabIndex={0}
     >
-      {/* Image Section - Ratio constant 16:9 avec styles professionnels */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-transparent">
+      {/* Image Section - Prend plus d'espace, contenu repoussé en bas */}
+      <div className="relative w-full overflow-hidden bg-muted/30 flex-grow min-h-[250px] sm:min-h-[300px]">
         {productImage ? (
           <OptimizedImage
             src={productImage}
             alt={product.name}
             width={1000}
             height={562}
-            className="w-full h-full object-cover product-image"
+            className="w-full h-auto object-contain product-image"
             preset="productImage"
             responsive={true}
             sizes={{

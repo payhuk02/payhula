@@ -89,6 +89,11 @@ export class AffiliateError extends Error {
    * Crée un message utilisateur-friendly
    */
   getUserMessage(): string {
+    // Si le message personnalisé contient des informations sur une migration, l'utiliser directement
+    if (this.details?.migration && this.message.includes('migration')) {
+      return this.message;
+    }
+    
     const messages: Record<AffiliateErrorCode, string> = {
       [AffiliateErrorCode.AFFILIATE_NOT_FOUND]: 'Affilié introuvable',
       [AffiliateErrorCode.AFFILIATE_ALREADY_EXISTS]: 'Cet affilié existe déjà',
@@ -166,11 +171,27 @@ export const AffiliateErrors = {
       410
     ),
 
+  linkAlreadyExists: (productId?: string, existingLinkUrl?: string) =>
+    new AffiliateError(
+      `Un lien existe déjà pour ce produit${productId ? `: ${productId}` : ''}${existingLinkUrl ? `. Lien existant: ${existingLinkUrl}` : ''}`,
+      AffiliateErrorCode.LINK_ALREADY_EXISTS,
+      409,
+      { productId, existingLinkUrl }
+    ),
+
   productAffiliateDisabled: (productId?: string) =>
     new AffiliateError(
       `L'affiliation n'est pas activée pour ce produit${productId ? `: ${productId}` : ''}`,
       AffiliateErrorCode.PRODUCT_AFFILIATE_DISABLED,
       400,
+      { productId }
+    ),
+
+  productNotFound: (productId?: string) =>
+    new AffiliateError(
+      `Produit introuvable${productId ? `: ${productId}` : ''}`,
+      AffiliateErrorCode.PRODUCT_NOT_FOUND,
+      404,
       { productId }
     ),
 
@@ -256,10 +277,57 @@ export function handleSupabaseError(error: unknown): AffiliateError {
 
   // Erreur Supabase
   if (error && typeof error === 'object' && 'code' in error) {
-    const supabaseError = error as { code: string; message: string; details?: string };
+    const supabaseError = error as { 
+      code: string; 
+      message: string; 
+      details?: string; 
+      hint?: string;
+    };
     
-    // Erreurs de contrainte
+    // Erreur 404 - Table ou fonction non trouvée (migration non exécutée)
+    if (supabaseError.code === 'PGRST301' || supabaseError.code === '42P01' || 
+        supabaseError.code === 'PGRST202' || 
+        supabaseError.message?.includes('404') ||
+        supabaseError.message?.includes('does not exist') ||
+        supabaseError.message?.includes('not found in the schema cache')) {
+      
+      // Si c'est une fonction RPC pour les liens courts
+      if (supabaseError.message?.includes('generate_short_link_code') || 
+          supabaseError.hint?.includes('generate_short_link_code')) {
+        return new AffiliateError(
+          'La fonctionnalité de liens courts nécessite l\'exécution de la migration SQL: 20250131_affiliate_short_links.sql',
+          AffiliateErrorCode.DATABASE_ERROR,
+          503,
+          { migration: '20250131_affiliate_short_links.sql', type: 'rpc_function' }
+        );
+      }
+      
+      // Si c'est la table affiliate_short_links
+      if (supabaseError.message?.includes('affiliate_short_links') || 
+          supabaseError.details?.includes('affiliate_short_links') ||
+          supabaseError.message?.includes('relation "affiliate_short_links"')) {
+        return new AffiliateError(
+          'La fonctionnalité de liens courts nécessite l\'exécution de la migration SQL: 20250131_affiliate_short_links.sql',
+          AffiliateErrorCode.DATABASE_ERROR,
+          503,
+          { migration: '20250131_affiliate_short_links.sql', type: 'table' }
+        );
+      }
+      
+      // Erreur générique de ressource non trouvée
+      return AffiliateErrors.linkNotFound();
+    }
+    
+    // Erreurs de contrainte unique
     if (supabaseError.code === '23505') {
+      // Vérifier si c'est une erreur de lien existant
+      if (supabaseError.message?.includes('affiliate_links') || supabaseError.message?.includes('affiliate_id') || supabaseError.message?.includes('product_id')) {
+        return new AffiliateError(
+          'Un lien existe déjà pour ce produit',
+          AffiliateErrorCode.LINK_ALREADY_EXISTS,
+          409
+        );
+      }
       return new AffiliateError(
         'Cette entrée existe déjà',
         AffiliateErrorCode.AFFILIATE_ALREADY_EXISTS,
@@ -275,6 +343,11 @@ export function handleSupabaseError(error: unknown): AffiliateError {
     // Erreur de valeur nulle
     if (supabaseError.code === '23502') {
       return AffiliateErrors.validationError('required_field', 'Un champ requis est manquant');
+    }
+    
+    // Erreur de permission
+    if (supabaseError.code === '42501') {
+      return AffiliateErrors.databaseError(error);
     }
   }
 

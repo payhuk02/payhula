@@ -76,7 +76,36 @@
 .product-image-container {
   position: relative;
   overflow: hidden;
-  background: transparent;
+  background: hsl(var(--muted) / 0.3); /* Fond adaptatif pour les espaces vides */
+  width: 100%;
+  min-height: 250px; /* Hauteur minimale mobile */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Prend plus d'espace avec flex-grow, contenu repoussé en bas */
+}
+
+/* Assurer que l'image occupe toute la largeur disponible */
+.product-image-container .product-image,
+.product-image-container picture,
+.product-image-container img {
+  width: 100% !important;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Hauteur minimale responsive */
+@media (min-width: 640px) {
+  .product-image-container {
+    min-height: 350px; /* Tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-image-container {
+    min-height: 450px; /* Desktop */
+  }
 }
 
 /* Image produit - Affichage statique et professionnel - Pas d'ombres, pas d'animations */
@@ -90,6 +119,11 @@
   /* Pas d'ombres, affichage statique */
   box-shadow: none !important;
   filter: none;
+  /* Assurer que l'image occupe toute la largeur */
+  width: 100% !important;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 /* Classe pour netteté professionnelle des images */

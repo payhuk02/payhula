@@ -414,27 +414,65 @@ export const useCurrentAffiliate = () => {
   const fetchCurrentAffiliate = async () => {
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-      if (!user) {
+      if (authError) {
+        logger.error('Auth error in fetchCurrentAffiliate:', authError);
         setAffiliate(null);
+        setLoading(false);
         return;
       }
 
+      if (!user) {
+        setAffiliate(null);
+        setLoading(false);
+        return;
+      }
+
+      // Requête avec gestion explicite des en-têtes
       const { data, error } = await supabase
         .from('affiliates')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle(); // Utiliser maybeSingle au lieu de single pour éviter l'erreur si aucun résultat
 
-      if (error && error.code !== 'PGRST116') throw error;
+      // PGRST116 = "No rows returned" - c'est normal si l'utilisateur n'est pas encore affilié
+      if (error && error.code !== 'PGRST116') {
+        // Gestion spécifique de l'erreur 406
+        if (error.message?.includes('406') || error.status === 406) {
+          logger.error('406 Not Acceptable error - Possible RLS or header issue:', {
+            error,
+            userId: user.id,
+            url: supabase.supabaseUrl,
+          });
+          // Ne pas afficher de toast pour cette erreur spécifique, juste logger
+          setAffiliate(null);
+          setLoading(false);
+          return;
+        }
+        throw error;
+      }
 
       setAffiliate(data || null);
     } catch (error: any) {
-      logger.error('Error fetching current affiliate:', error);
+      logger.error('Error fetching current affiliate:', {
+        error,
+        message: error?.message,
+        code: error?.code,
+        status: error?.status,
+        details: error?.details,
+      });
+      
+      // Ne pas afficher de toast pour les erreurs 406 ou PGRST116 (utilisateur non affilié)
+      if (error?.code === 'PGRST116' || error?.status === 406) {
+        setAffiliate(null);
+        setLoading(false);
+        return;
+      }
+      
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error?.message || 'Une erreur est survenue lors du chargement de votre profil affilié',
         variant: 'destructive',
       });
     } finally {

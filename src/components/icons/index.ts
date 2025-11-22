@@ -100,6 +100,7 @@ export {
   MoreVertical,
   Loader2,
   CheckCircle2,
+  XCircle,
   AlertCircle,
   Trash2,
   Plus,

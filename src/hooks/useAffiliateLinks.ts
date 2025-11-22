@@ -16,6 +16,38 @@ import {
 import { logger } from '@/lib/logger';
 import { handleSupabaseError, AffiliateErrors } from '@/lib/affiliate-errors';
 
+/**
+ * Fonction de fallback pour générer le code de lien côté client
+ * Utilisée temporairement si la fonction RPC n'est pas disponible
+ * TODO: Retirer cette fonction une fois la migration SQL exécutée
+ */
+async function generateLinkCodeClientSide(affiliateCode: string, productSlug: string): Promise<string> {
+  try {
+    // Générer un UUID v4 côté client
+    const uuid = crypto.randomUUID();
+    
+    // Créer la chaîne d'entrée
+    const input = `${affiliateCode}-${productSlug}-${uuid}`;
+    
+    // Utiliser l'API Web Crypto native pour créer un hash SHA256
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    
+    // Convertir le hash en hexadécimal
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    // Prendre les 12 premiers caractères et les mettre en majuscules
+    return hashHex.substring(0, 12).toUpperCase();
+  } catch (error) {
+    logger.error('Error in client-side link code generation:', error);
+    // Fallback ultime : générer un code aléatoire simple
+    const randomPart = Math.random().toString(36).substring(2, 14).toUpperCase();
+    return randomPart.padEnd(12, '0').substring(0, 12);
+  }
+}
+
 export const useAffiliateLinks = (
   affiliateId?: string, 
   filters?: LinkFilters,
@@ -134,14 +166,41 @@ export const useAffiliateLinks = (
         .from('product_affiliate_settings')
         .select(`
           *,
-          product:products!inner(slug, store_id, name)
+          product:products!inner(
+            id,
+            slug,
+            store_id,
+            name,
+            store:stores!inner(id, slug)
+          )
         `)
         .eq('product_id', formData.product_id)
         .eq('affiliate_enabled', true)
         .single();
 
       if (settingsError || !settingsData) {
+        logger.error('Error fetching product affiliate settings:', { settingsError, productId: formData.product_id });
         throw AffiliateErrors.productAffiliateDisabled(formData.product_id);
+      }
+
+      // Vérifier que les données nécessaires sont présentes
+      if (!settingsData.product || !settingsData.product.slug || !settingsData.product.store_id) {
+        logger.error('Invalid product data in settings:', { settingsData });
+        throw AffiliateErrors.productNotFound(formData.product_id);
+      }
+
+      // Vérifier si un lien existe déjà pour ce produit et cet affilié
+      const { data: existingLink, error: existingLinkError } = await supabase
+        .from('affiliate_links')
+        .select('id, status, full_url, link_code')
+        .eq('affiliate_id', affiliateId)
+        .eq('product_id', formData.product_id)
+        .maybeSingle(); // Utiliser maybeSingle au lieu de single pour éviter erreur si aucun lien
+
+      // Si un lien existe et n'est pas supprimé, on ne peut pas en créer un nouveau
+      if (existingLink && existingLink.status !== 'deleted') {
+        // Inclure l'URL du lien existant dans l'erreur pour améliorer l'UX
+        throw AffiliateErrors.linkAlreadyExists(formData.product_id, existingLink.full_url);
       }
 
       // Récupérer le code de l'affilié
@@ -156,20 +215,57 @@ export const useAffiliateLinks = (
       }
 
       // Générer le code du lien
-      const { data: codeData, error: codeError } = await supabase.rpc('generate_affiliate_link_code', {
-        p_affiliate_code: affiliateData.affiliate_code,
-        p_product_slug: settingsData.product.slug,
-      });
+      // Solution temporaire : génération côté client si la fonction RPC échoue
+      let linkCode: string;
+      
+      try {
+        const { data: codeData, error: codeError } = await supabase.rpc('generate_affiliate_link_code', {
+          p_affiliate_code: affiliateData.affiliate_code,
+          p_product_slug: settingsData.product.slug,
+        });
 
-      if (codeError) {
-        throw handleSupabaseError(codeError);
+        if (codeError) {
+          // Si l'erreur est liée à la fonction manquante (404) ou à pgcrypto (42883),
+          // utiliser la génération côté client comme fallback
+          if (codeError.code === '42883' || codeError.code === 'PGRST301' || codeError.message?.includes('digest')) {
+            logger.warn('RPC function unavailable, using client-side code generation as fallback:', codeError);
+            linkCode = await generateLinkCodeClientSide(affiliateData.affiliate_code, settingsData.product.slug);
+          } else {
+            logger.error('Error generating affiliate link code:', codeError);
+            throw handleSupabaseError(codeError);
+          }
+        } else {
+          // La fonction RPC retourne directement le TEXT
+          // Gérer le cas où Supabase pourrait retourner un tableau ou une valeur directe
+          if (Array.isArray(codeData)) {
+            linkCode = codeData[0] as string;
+          } else if (typeof codeData === 'string') {
+            linkCode = codeData;
+          } else {
+            logger.error('Invalid link code returned from RPC:', { codeData, type: typeof codeData });
+            throw AffiliateErrors.databaseError(new Error('Impossible de générer le code du lien d\'affiliation'));
+          }
+
+          if (!linkCode || linkCode.trim() === '') {
+            logger.error('Empty link code returned from RPC:', { codeData, linkCode });
+            throw AffiliateErrors.databaseError(new Error('Le code du lien généré est vide'));
+          }
+        }
+      } catch (error: unknown) {
+        // Fallback vers génération côté client en cas d'erreur réseau ou autre
+        if (error instanceof Error && (error.message.includes('404') || error.message.includes('digest'))) {
+          logger.warn('Using client-side code generation as fallback due to error:', error);
+          linkCode = await generateLinkCodeClientSide(affiliateData.affiliate_code, settingsData.product.slug);
+        } else {
+          throw error;
+        }
       }
 
-      // Générer l'URL complète
+      // Générer l'URL complète avec le slug du store
       const baseUrl = window.location.origin;
-      const storeSlug = settingsData.product.store_id; // TODO: Adapter selon votre routing
-      const productUrl = `${baseUrl}/${storeSlug}/products/${settingsData.product.slug}`;
-      const fullUrl = `${productUrl}?aff=${codeData}`;
+      const storeSlug = settingsData.product.store?.slug || settingsData.product.store_id;
+      const productUrl = `${baseUrl}/stores/${storeSlug}/products/${settingsData.product.slug}`;
+      const fullUrl = `${productUrl}?aff=${linkCode}`;
 
       // Créer le lien
       const { data, error } = await supabase
@@ -178,7 +274,7 @@ export const useAffiliateLinks = (
           affiliate_id: affiliateId,
           product_id: formData.product_id,
           store_id: settingsData.product.store_id,
-          link_code: codeData,
+          link_code: linkCode,
           full_url: fullUrl,
           utm_source: formData.utm_source,
           utm_medium: formData.utm_medium,

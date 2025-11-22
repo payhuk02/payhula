@@ -115,7 +115,7 @@ export const ResponsiveProductImage = ({
           width={1280}
           height={720}
           className={cn(
-            "w-full h-full object-cover",
+            "w-full h-auto object-contain",
             "product-image",
             isLoaded ? "opacity-100" : "opacity-100"
           )}
@@ -179,7 +179,8 @@ export const ProductBanner = ({
       {/* Container avec ratio 16:9 optimisé pour tous les écrans */}
       <div className="relative w-full aspect-[16/9] overflow-hidden 
                       rounded-lg sm:rounded-xl lg:rounded-2xl
-                      shadow-sm hover:shadow-lg transition-shadow duration-300">
+                      shadow-sm hover:shadow-lg transition-shadow duration-300
+                      bg-muted/30 flex items-center justify-center">
         <ResponsiveProductImage
           src={src}
           alt={alt}

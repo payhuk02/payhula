@@ -141,7 +141,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
         <ProductBanner
           src={product.image_url}
           alt={`Image du produit ${product.name}`}
-          className="w-full h-full product-banner object-cover"
+          className="w-full h-full product-banner object-contain"
           fallbackIcon={<ShoppingCart className="h-16 w-16 opacity-20" />}
           badges={
             <div className="flex flex-col gap-1">

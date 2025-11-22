@@ -258,15 +258,15 @@ const ProductCardModernComponent = ({
       aria-describedby={`product-price-${product.id}`}
       tabIndex={0}
     >
-      {/* Image Container - Ratio 16:9 uniforme pour professionnalisme */}
-      <div className="relative aspect-[16/9] overflow-hidden bg-transparent">
+      {/* Image Container - Prend plus d'espace, contenu repoussé en bas */}
+      <div className="relative overflow-hidden bg-muted/30 flex-grow min-h-[250px] sm:min-h-[300px]">
         <Link to={`/stores/${currentStoreSlug}/products/${product.slug}`} className="block w-full h-full">
           <OptimizedImage
             src={product.image_url || '/placeholder-image.png'}
             alt={product.name}
             width={1000}
             height={562}
-            className="w-full h-full object-cover product-image"
+            className="w-full h-auto object-contain product-image"
             priority={true}
             preset="productImage"
             responsive={true}
@@ -327,8 +327,8 @@ const ProductCardModernComponent = ({
         </button>
       </div>
 
-      {/* Contenu de la carte - 40% de la hauteur - Optimisé mobile */}
-      <div className="flex-1 flex flex-col p-3 sm:p-4">
+      {/* Contenu de la carte - Repoussé en bas pour laisser plus d'espace à l'image */}
+      <div className="flex-shrink-0 flex flex-col p-3 sm:p-4 gap-2 sm:gap-3">
         {/* Logo et nom de la boutique */}
         {product.stores && (
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">

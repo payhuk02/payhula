@@ -251,6 +251,7 @@ const StoreAffiliates = lazy(() => import("./pages/StoreAffiliates"));
 const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
 const CourseAffiliate = lazy(() => import("./pages/affiliate/CourseAffiliate"));
 const AffiliateCoursesDashboard = lazy(() => import("./pages/affiliate/AffiliateCoursesDashboard"));
+const ShortLinkRedirect = lazy(() => import("./pages/affiliate/ShortLinkRedirect"));
 
 // Pages Légales - Lazy loading
 const TermsOfService = lazy(() => import("./pages/legal/TermsOfService"));
@@ -457,6 +458,9 @@ const AppContent = () => {
           <Route path="/affiliate/dashboard" element={<ProtectedRoute><AffiliateDashboard /></ProtectedRoute>} />
           <Route path="/affiliate/courses" element={<ProtectedRoute><AffiliateCoursesDashboard /></ProtectedRoute>} />
           <Route path="/affiliate/courses/:slug" element={<ProtectedRoute><CourseAffiliate /></ProtectedRoute>} />
+          
+          {/* --- Route de redirection pour liens courts d'affiliation --- */}
+          <Route path="/aff/:code" element={<ShortLinkRedirect />} />
 
           {/* --- Routes Notifications --- */}
           <Route path="/notifications" element={<ProtectedRoute><NotificationsCenter /></ProtectedRoute>} />
