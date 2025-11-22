@@ -222,8 +222,7 @@ const AffiliateDashboard = () => {
           <AppSidebar />
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
-              <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
-                <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-700">
+              <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-700">
                   <CardHeader className="text-center p-4 sm:p-6">
                     <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 flex items-center justify-center mb-3 sm:mb-4 animate-in zoom-in duration-500">
                       <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 dark:text-purple-400" />
@@ -321,7 +320,6 @@ const AffiliateDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
             </div>
           </main>
         </div>
