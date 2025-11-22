@@ -198,11 +198,16 @@ export default function StoreAffiliateManagement() {
                 <CardHeader>
                   <CardTitle>Liens d'Affiliation</CardTitle>
                   <CardDescription>
-                    {links.length} lien(s) d'affiliation actif(s)
+                    Liens d'affiliation créés par vos affiliés
+                    {linksPagination && linksPagination.total > 0 && (
+                      <span className="ml-2">
+                        ({linksPagination.total} lien{linksPagination.total > 1 ? 's' : ''})
+                      </span>
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {isLoading ? (
+                  {linksLoading ? (
                     <div className="space-y-4">
                       <Skeleton className="h-12 w-full" />
                       <Skeleton className="h-12 w-full" />
@@ -274,6 +279,22 @@ export default function StoreAffiliateManagement() {
                           ))}
                         </TableBody>
                       </Table>
+                      
+                      {/* Pagination pour les liens */}
+                      {linksPagination && linksPagination.totalPages > 1 && (
+                        <div className="mt-6 pt-4 border-t px-6 pb-6">
+                          <PaginationControls
+                            {...linksPagination}
+                            onPageChange={(page) => {
+                              setLinksPage(page);
+                            }}
+                            onPageSizeChange={(size) => {
+                              setLinksPageSize(size);
+                              setLinksPage(1);
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>
@@ -288,7 +309,12 @@ export default function StoreAffiliateManagement() {
                     <div>
                       <CardTitle>Commissions</CardTitle>
                       <CardDescription>
-                        {filteredCommissions.length} commission(s) au total
+                        Gérer les commissions de vos affiliés
+                        {commissionsPagination && commissionsPagination.total > 0 && (
+                          <span className="ml-2">
+                            ({commissionsPagination.total} commission{commissionsPagination.total > 1 ? 's' : ''})
+                          </span>
+                        )}
                       </CardDescription>
                     </div>
                     <Select value={commissionStatusFilter} onValueChange={setCommissionStatusFilter}>
@@ -307,7 +333,7 @@ export default function StoreAffiliateManagement() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {isLoading ? (
+                  {linksLoading ? (
                     <div className="space-y-4">
                       <Skeleton className="h-12 w-full" />
                       <Skeleton className="h-12 w-full" />
