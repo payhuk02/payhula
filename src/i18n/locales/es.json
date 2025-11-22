@@ -1217,6 +1217,15 @@
       "backToProducts": "Volver a productos",
       "useTemplate": "Usar una plantilla",
       "useTemplateShort": "Plantilla"
+    },
+    "analytics": {
+      "title": "Análisis",
+      "accessDenied": "Acceso denegado",
+      "mustBeLoggedIn": "Debe iniciar sesión para acceder a esta página.",
+      "courseNotFound": "Curso no encontrado",
+      "backToMyCourses": "Volver a mis cursos",
+      "backToCourse": "Volver al curso",
+      "noPermission": "No tiene permiso para ver los análisis de este curso."
     }
   },
   "admin": {
@@ -1231,6 +1240,16 @@
         "labelGenerated": "Etiquetas generadas",
         "completed": "Completados"
       }
+    },
+    "costOptimization": {
+      "title": "Optimización de Costos y Márgenes",
+      "description": "Analice sus costos, márgenes y optimice sus precios para maximizar la rentabilidad",
+      "noStore": "Debe crear una tienda antes de usar la optimización de costos"
+    },
+    "demandForecasting": {
+      "title": "Previsión de Demanda",
+      "description": "Analice las tendencias y pronostique la demanda futura de sus productos",
+      "noStore": "Debe crear una tienda antes de usar la previsión de demanda"
     }
   },
   "promotions": {
@@ -1299,5 +1318,71 @@
       "feature4": "Gestione todo desde su panel de control"
     },
     "goToSettings": "Ir a configuración"
+  },
+  "affiliate": {
+    "dashboard": {
+      "title": "Panel de Afiliados",
+      "description": "Resumen de sus promociones de cursos",
+      "loginRequired": "Inicio de sesión requerido",
+      "mustBeLoggedIn": "Debe iniciar sesión para acceder al panel de afiliados.",
+      "findCourses": "Buscar cursos",
+      "discoverCourses": "Descubrir cursos disponibles",
+      "welcome": {
+        "title": "¡Bienvenido al Programa de Afiliados!",
+        "description": "Comience a ganar comisiones promocionando cursos en línea de calidad."
+      },
+      "steps": {
+        "step1": {
+          "title": "Encuentre un curso",
+          "description": "Navegue por nuestro marketplace y encuentre cursos con afiliación activada"
+        },
+        "step2": {
+          "title": "Cree sus enlaces",
+          "description": "Genere enlaces personalizados para cada canal (blog, YouTube, etc.)"
+        },
+        "step3": {
+          "title": "¡Gane!",
+          "description": "Reciba comisiones en cada inscripción a través de sus enlaces"
+        }
+      },
+      "tips": {
+        "title": "Consejos de Promoción",
+        "tip1": {
+          "title": "Cree contenido valioso",
+          "description": "Escriba artículos o cree videos que aporten valor a su audiencia"
+        },
+        "tip2": {
+          "title": "Pruebe diferentes canales",
+          "description": "Cree enlaces específicos para blog, YouTube, Instagram para analizar el rendimiento"
+        },
+        "tip3": {
+          "title": "Sea transparente",
+          "description": "Indique siempre que está usando un enlace de afiliado"
+        },
+        "tip4": {
+          "title": "Analice sus estadísticas",
+          "description": "Siga regularmente su rendimiento y optimice sus estrategias"
+        }
+      },
+      "faq": {
+        "title": "Preguntas Frecuentes",
+        "q1": {
+          "question": "¿Cuándo me pagan?",
+          "answer": "Las comisiones se pagan mensualmente una vez que alcanza el umbral mínimo de 50,000 XOF."
+        },
+        "q2": {
+          "question": "¿Cuánto dura la cookie?",
+          "answer": "Depende del curso. La duración se muestra en cada página de generación de enlaces (generalmente 30 días)."
+        },
+        "q3": {
+          "question": "¿Puedo promocionar varios cursos?",
+          "answer": "¡Sí! Puede promocionar tantos cursos como desee y crear enlaces ilimitados."
+        },
+        "q4": {
+          "question": "¿Cómo optimizar mis conversiones?",
+          "answer": "Cree contenido relevante, use llamadas a la acción claras y diríjase a la audiencia correcta para cada curso."
+        }
+      }
+    }
   }
 }

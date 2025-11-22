@@ -4,6 +4,7 @@
  * Date : 27 octobre 2025
  */
 
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +15,7 @@ import { CourseAnalyticsDashboard } from '@/components/courses/analytics/CourseA
 import { useAuth } from '@/contexts/AuthContext';
 
 const CourseAnalytics = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -24,13 +26,13 @@ const CourseAnalytics = () => {
       <div className="container mx-auto py-8">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Accès refusé</AlertTitle>
+          <AlertTitle>{t('courses.analytics.accessDenied')}</AlertTitle>
           <AlertDescription>
-            Vous devez être connecté pour accéder à cette page.
+            {t('courses.analytics.mustBeLoggedIn')}
           </AlertDescription>
         </Alert>
         <Button onClick={() => navigate('/auth/login')} className="mt-4">
-          Se connecter
+          {t('auth.login.button')}
         </Button>
       </div>
     );
@@ -55,13 +57,13 @@ const CourseAnalytics = () => {
       <div className="container mx-auto py-8">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Erreur</AlertTitle>
+          <AlertTitle>{t('common.error')}</AlertTitle>
           <AlertDescription>
-            {error?.message || 'Cours introuvable'}
+            {error?.message || t('courses.analytics.courseNotFound')}
           </AlertDescription>
         </Alert>
         <Button onClick={() => navigate('/dashboard/my-courses')} className="mt-4">
-          Retour à mes cours
+          {t('courses.analytics.backToMyCourses')}
         </Button>
       </div>
     );
@@ -75,13 +77,13 @@ const CourseAnalytics = () => {
       <div className="container mx-auto py-8">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Accès refusé</AlertTitle>
+          <AlertTitle>{t('courses.analytics.accessDenied')}</AlertTitle>
           <AlertDescription>
-            Vous n'avez pas l'autorisation de voir les analytics de ce cours.
+            {t('courses.analytics.noPermission')}
           </AlertDescription>
         </Alert>
         <Button onClick={() => navigate('/dashboard/my-courses')} className="mt-4">
-          Retour à mes cours
+          {t('courses.analytics.backToMyCourses')}
         </Button>
       </div>
     );
@@ -98,10 +100,10 @@ const CourseAnalytics = () => {
             className="mb-4 text-white hover:bg-white/20"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour au cours
+            {t('courses.analytics.backToCourse')}
           </Button>
 
-          <h1 className="text-3xl font-bold mb-2">Analytics</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('courses.analytics.title')}</h1>
           <p className="text-xl text-blue-100">{product.name}</p>
         </div>
       </div>

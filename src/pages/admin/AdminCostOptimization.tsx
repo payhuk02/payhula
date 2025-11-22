@@ -8,6 +8,7 @@
  * - Analyse de rentabilité
  */
 
+import { useTranslation } from 'react-i18next';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { CostOptimizationDashboard } from '@/components/physical/cost-optimization';
@@ -18,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function AdminCostOptimization() {
+  const { t } = useTranslation();
   const headerRef = useScrollAnimation<HTMLDivElement>();
   const { store, loading: storeLoading } = useStore();
 
@@ -55,7 +57,7 @@ export default function AdminCostOptimization() {
                 <CardContent className="pt-8 sm:pt-12 pb-8 sm:pb-12 text-center">
                   <DollarSign className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-4 animate-in zoom-in-95 duration-500" />
                   <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                    Vous devez créer une boutique avant d'utiliser l'optimisation des coûts
+                    {t('admin.costOptimization.noStore')}
                   </p>
                 </CardContent>
               </Card>
@@ -86,12 +88,12 @@ export default function AdminCostOptimization() {
                         <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                       </div>
                       <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
-                        Optimisation des Coûts et Marges
+                        {t('admin.costOptimization.title')}
                       </span>
                     </div>
                   </h1>
                   <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                    Analysez vos coûts, marges et optimisez vos prix pour maximiser la rentabilité
+                    {t('admin.costOptimization.description')}
                   </p>
                 </div>
               </div>

@@ -1217,6 +1217,15 @@
       "backToProducts": "Zurück zu Produkten",
       "useTemplate": "Vorlage verwenden",
       "useTemplateShort": "Vorlage"
+    },
+    "analytics": {
+      "title": "Analysen",
+      "accessDenied": "Zugriff verweigert",
+      "mustBeLoggedIn": "Sie müssen angemeldet sein, um auf diese Seite zuzugreifen.",
+      "courseNotFound": "Kurs nicht gefunden",
+      "backToMyCourses": "Zurück zu meinen Kursen",
+      "backToCourse": "Zurück zum Kurs",
+      "noPermission": "Sie haben keine Berechtigung, die Analysen für diesen Kurs anzuzeigen."
     }
   },
   "admin": {
@@ -1231,6 +1240,16 @@
         "labelGenerated": "Etiketten generiert",
         "completed": "Abgeschlossen"
       }
+    },
+    "costOptimization": {
+      "title": "Kosten- und Margenoptimierung",
+      "description": "Analysieren Sie Ihre Kosten, Margen und optimieren Sie Ihre Preise, um die Rentabilität zu maximieren",
+      "noStore": "Sie müssen ein Geschäft erstellen, bevor Sie die Kostenoptimierung verwenden können"
+    },
+    "demandForecasting": {
+      "title": "Nachfrageprognose",
+      "description": "Analysieren Sie Trends und prognostizieren Sie die zukünftige Nachfrage nach Ihren Produkten",
+      "noStore": "Sie müssen ein Geschäft erstellen, bevor Sie die Nachfrageprognose verwenden können"
     }
   },
   "promotions": {
@@ -1299,5 +1318,71 @@
       "feature4": "Verwalten Sie alles von Ihrem Dashboard aus"
     },
     "goToSettings": "Zu den Einstellungen gehen"
+  },
+  "affiliate": {
+    "dashboard": {
+      "title": "Partner-Dashboard",
+      "description": "Übersicht über Ihre Kurs-Promotionen",
+      "loginRequired": "Anmeldung erforderlich",
+      "mustBeLoggedIn": "Sie müssen angemeldet sein, um auf das Partner-Dashboard zuzugreifen.",
+      "findCourses": "Kurse finden",
+      "discoverCourses": "Verfügbare Kurse entdecken",
+      "welcome": {
+        "title": "Willkommen im Partner-Programm!",
+        "description": "Beginnen Sie, Provisionen zu verdienen, indem Sie qualitativ hochwertige Online-Kurse bewerben."
+      },
+      "steps": {
+        "step1": {
+          "title": "Einen Kurs finden",
+          "description": "Durchsuchen Sie unseren Marktplatz und finden Sie Kurse mit aktivierter Partnerschaft"
+        },
+        "step2": {
+          "title": "Ihre Links erstellen",
+          "description": "Generieren Sie personalisierte Links für jeden Kanal (Blog, YouTube, etc.)"
+        },
+        "step3": {
+          "title": "Verdienen!",
+          "description": "Erhalten Sie Provisionen bei jeder Einschreibung über Ihre Links"
+        }
+      },
+      "tips": {
+        "title": "Promotion-Tipps",
+        "tip1": {
+          "title": "Erstellen Sie wertvollen Inhalt",
+          "description": "Schreiben Sie Artikel oder erstellen Sie Videos, die Ihrem Publikum einen Mehrwert bieten"
+        },
+        "tip2": {
+          "title": "Testen Sie verschiedene Kanäle",
+          "description": "Erstellen Sie spezifische Links für Blog, YouTube, Instagram, um die Leistung zu analysieren"
+        },
+        "tip3": {
+          "title": "Seien Sie transparent",
+          "description": "Geben Sie immer an, dass Sie einen Partner-Link verwenden"
+        },
+        "tip4": {
+          "title": "Analysieren Sie Ihre Statistiken",
+          "description": "Verfolgen Sie regelmäßig Ihre Leistung und optimieren Sie Ihre Strategien"
+        }
+      },
+      "faq": {
+        "title": "Häufig gestellte Fragen",
+        "q1": {
+          "question": "Wann werde ich bezahlt?",
+          "answer": "Provisionen werden monatlich ausgezahlt, sobald Sie die Mindestschwelle von 50.000 XOF erreichen."
+        },
+        "q2": {
+          "question": "Wie lange hält das Cookie?",
+          "answer": "Es hängt vom Kurs ab. Die Dauer wird auf jeder Link-Generierungsseite angezeigt (normalerweise 30 Tage)."
+        },
+        "q3": {
+          "question": "Kann ich mehrere Kurse bewerben?",
+          "answer": "Ja! Sie können so viele Kurse bewerben, wie Sie möchten, und unbegrenzt Links erstellen."
+        },
+        "q4": {
+          "question": "Wie optimiere ich meine Conversion-Rate?",
+          "answer": "Erstellen Sie relevante Inhalte, verwenden Sie klare Handlungsaufforderungen und zielen Sie auf die richtige Zielgruppe für jeden Kurs."
+        }
+      }
+    }
   }
 }

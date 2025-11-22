@@ -1276,6 +1276,16 @@
         "labelGenerated": "Étiquettes générées",
         "completed": "Complétés"
       }
+    },
+    "costOptimization": {
+      "title": "Optimisation des Coûts et Marges",
+      "description": "Analysez vos coûts, marges et optimisez vos prix pour maximiser la rentabilité",
+      "noStore": "Vous devez créer une boutique avant d'utiliser l'optimisation des coûts"
+    },
+    "demandForecasting": {
+      "title": "Prévisions de Demande",
+      "description": "Analysez les tendances et prévoyez la demande future de vos produits",
+      "noStore": "Vous devez créer une boutique avant d'utiliser les prévisions de demande"
     }
   },
   "promotions": {
@@ -1344,6 +1354,72 @@
       "feature4": "Gérez tout depuis votre tableau de bord"
     },
     "goToSettings": "Aller aux paramètres"
+  },
+  "affiliate": {
+    "dashboard": {
+      "title": "Dashboard Affilié",
+      "description": "Vue d'ensemble de vos promotions de cours",
+      "loginRequired": "Connexion requise",
+      "mustBeLoggedIn": "Vous devez être connecté pour accéder au dashboard affilié.",
+      "findCourses": "Trouver des cours",
+      "discoverCourses": "Découvrir les cours disponibles",
+      "welcome": {
+        "title": "Bienvenue dans le Programme d'Affiliation !",
+        "description": "Commencez à gagner des commissions en promouvant des cours en ligne de qualité."
+      },
+      "steps": {
+        "step1": {
+          "title": "Trouvez un cours",
+          "description": "Parcourez notre marketplace et trouvez des cours avec l'affiliation activée"
+        },
+        "step2": {
+          "title": "Créez vos liens",
+          "description": "Générez des liens personnalisés pour chaque canal (blog, YouTube, etc.)"
+        },
+        "step3": {
+          "title": "Gagnez !",
+          "description": "Recevez des commissions à chaque inscription via vos liens"
+        }
+      },
+      "tips": {
+        "title": "Conseils de Promotion",
+        "tip1": {
+          "title": "Créez du contenu de valeur",
+          "description": "Rédigez des articles ou créez des vidéos qui apportent de la valeur à votre audience"
+        },
+        "tip2": {
+          "title": "Testez différents canaux",
+          "description": "Créez des liens spécifiques pour blog, YouTube, Instagram pour analyser les performances"
+        },
+        "tip3": {
+          "title": "Soyez transparent",
+          "description": "Indiquez toujours que vous utilisez un lien d'affiliation"
+        },
+        "tip4": {
+          "title": "Analysez vos statistiques",
+          "description": "Suivez régulièrement vos performances et optimisez vos stratégies"
+        }
+      },
+      "faq": {
+        "title": "Questions Fréquentes",
+        "q1": {
+          "question": "Quand suis-je payé ?",
+          "answer": "Les commissions sont payées mensuellement une fois que vous atteignez le seuil minimum de 50,000 XOF."
+        },
+        "q2": {
+          "question": "Combien de temps dure le cookie ?",
+          "answer": "Cela dépend du cours. La durée est affichée sur chaque page de génération de liens (généralement 30 jours)."
+        },
+        "q3": {
+          "question": "Puis-je promouvoir plusieurs cours ?",
+          "answer": "Oui ! Vous pouvez promouvoir autant de cours que vous le souhaitez et créer des liens illimités."
+        },
+        "q4": {
+          "question": "Comment optimiser mes conversions ?",
+          "answer": "Créez du contenu pertinent, utilisez des appels à l'action clairs, et ciblez la bonne audience pour chaque cours."
+        }
+      }
+    }
   }
 }
 

@@ -1153,6 +1153,15 @@
       "backToProducts": "Voltar para produtos",
       "useTemplate": "Usar um modelo",
       "useTemplateShort": "Modelo"
+    },
+    "analytics": {
+      "title": "Análises",
+      "accessDenied": "Acesso negado",
+      "mustBeLoggedIn": "Você deve estar conectado para acessar esta página.",
+      "courseNotFound": "Curso não encontrado",
+      "backToMyCourses": "Voltar para meus cursos",
+      "backToCourse": "Voltar para o curso",
+      "noPermission": "Você não tem permissão para ver as análises deste curso."
     }
   },
   "admin": {
@@ -1167,6 +1176,16 @@
         "labelGenerated": "Etiquetas geradas",
         "completed": "Concluídos"
       }
+    },
+    "costOptimization": {
+      "title": "Otimização de Custos e Margens",
+      "description": "Analise seus custos, margens e otimize seus preços para maximizar a rentabilidade",
+      "noStore": "Você deve criar uma loja antes de usar a otimização de custos"
+    },
+    "demandForecasting": {
+      "title": "Previsão de Demanda",
+      "description": "Analise tendências e preveja a demanda futura de seus produtos",
+      "noStore": "Você deve criar uma loja antes de usar a previsão de demanda"
     }
   },
   "promotions": {
@@ -1235,5 +1254,71 @@
       "feature4": "Gerencie tudo do seu painel"
     },
     "goToSettings": "Ir para configurações"
+  },
+  "affiliate": {
+    "dashboard": {
+      "title": "Painel de Afiliados",
+      "description": "Visão geral de suas promoções de cursos",
+      "loginRequired": "Login necessário",
+      "mustBeLoggedIn": "Você deve estar conectado para acessar o painel de afiliados.",
+      "findCourses": "Encontrar cursos",
+      "discoverCourses": "Descobrir cursos disponíveis",
+      "welcome": {
+        "title": "Bem-vindo ao Programa de Afiliados!",
+        "description": "Comece a ganhar comissões promovendo cursos online de qualidade."
+      },
+      "steps": {
+        "step1": {
+          "title": "Encontre um curso",
+          "description": "Navegue pelo nosso marketplace e encontre cursos com afiliação ativada"
+        },
+        "step2": {
+          "title": "Crie seus links",
+          "description": "Gere links personalizados para cada canal (blog, YouTube, etc.)"
+        },
+        "step3": {
+          "title": "Ganhe!",
+          "description": "Receba comissões em cada inscrição através de seus links"
+        }
+      },
+      "tips": {
+        "title": "Dicas de Promoção",
+        "tip1": {
+          "title": "Crie conteúdo valioso",
+          "description": "Escreva artigos ou crie vídeos que agreguem valor ao seu público"
+        },
+        "tip2": {
+          "title": "Teste diferentes canais",
+          "description": "Crie links específicos para blog, YouTube, Instagram para analisar o desempenho"
+        },
+        "tip3": {
+          "title": "Seja transparente",
+          "description": "Sempre indique que você está usando um link de afiliado"
+        },
+        "tip4": {
+          "title": "Analise suas estatísticas",
+          "description": "Acompanhe regularmente seu desempenho e otimize suas estratégias"
+        }
+      },
+      "faq": {
+        "title": "Perguntas Frequentes",
+        "q1": {
+          "question": "Quando sou pago?",
+          "answer": "As comissões são pagas mensalmente assim que você atingir o limite mínimo de 50.000 XOF."
+        },
+        "q2": {
+          "question": "Quanto tempo dura o cookie?",
+          "answer": "Depende do curso. A duração é exibida em cada página de geração de links (geralmente 30 dias)."
+        },
+        "q3": {
+          "question": "Posso promover vários cursos?",
+          "answer": "Sim! Você pode promover quantos cursos quiser e criar links ilimitados."
+        },
+        "q4": {
+          "question": "Como otimizar minhas conversões?",
+          "answer": "Crie conteúdo relevante, use chamadas para ação claras e direcione o público certo para cada curso."
+        }
+      }
+    }
   }
 }

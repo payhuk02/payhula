@@ -1217,6 +1217,15 @@
       "backToProducts": "Back to products",
       "useTemplate": "Use a template",
       "useTemplateShort": "Template"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "accessDenied": "Access denied",
+      "mustBeLoggedIn": "You must be logged in to access this page.",
+      "courseNotFound": "Course not found",
+      "backToMyCourses": "Back to my courses",
+      "backToCourse": "Back to course",
+      "noPermission": "You do not have permission to view analytics for this course."
     }
   },
   "admin": {
@@ -1231,6 +1240,16 @@
         "labelGenerated": "Labels generated",
         "completed": "Completed"
       }
+    },
+    "costOptimization": {
+      "title": "Cost and Margin Optimization",
+      "description": "Analyze your costs, margins and optimize your prices to maximize profitability",
+      "noStore": "You must create a store before using cost optimization"
+    },
+    "demandForecasting": {
+      "title": "Demand Forecasting",
+      "description": "Analyze trends and forecast future demand for your products",
+      "noStore": "You must create a store before using demand forecasting"
     }
   },
   "promotions": {
@@ -1299,5 +1318,71 @@
       "feature4": "Manage everything from your dashboard"
     },
     "goToSettings": "Go to settings"
+  },
+  "affiliate": {
+    "dashboard": {
+      "title": "Affiliate Dashboard",
+      "description": "Overview of your course promotions",
+      "loginRequired": "Login required",
+      "mustBeLoggedIn": "You must be logged in to access the affiliate dashboard.",
+      "findCourses": "Find courses",
+      "discoverCourses": "Discover available courses",
+      "welcome": {
+        "title": "Welcome to the Affiliate Program!",
+        "description": "Start earning commissions by promoting quality online courses."
+      },
+      "steps": {
+        "step1": {
+          "title": "Find a course",
+          "description": "Browse our marketplace and find courses with affiliate enabled"
+        },
+        "step2": {
+          "title": "Create your links",
+          "description": "Generate personalized links for each channel (blog, YouTube, etc.)"
+        },
+        "step3": {
+          "title": "Earn!",
+          "description": "Receive commissions on every enrollment through your links"
+        }
+      },
+      "tips": {
+        "title": "Promotion Tips",
+        "tip1": {
+          "title": "Create valuable content",
+          "description": "Write articles or create videos that bring value to your audience"
+        },
+        "tip2": {
+          "title": "Test different channels",
+          "description": "Create specific links for blog, YouTube, Instagram to analyze performance"
+        },
+        "tip3": {
+          "title": "Be transparent",
+          "description": "Always indicate that you are using an affiliate link"
+        },
+        "tip4": {
+          "title": "Analyze your statistics",
+          "description": "Regularly track your performance and optimize your strategies"
+        }
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "q1": {
+          "question": "When am I paid?",
+          "answer": "Commissions are paid monthly once you reach the minimum threshold of 50,000 XOF."
+        },
+        "q2": {
+          "question": "How long does the cookie last?",
+          "answer": "It depends on the course. The duration is displayed on each link generation page (usually 30 days)."
+        },
+        "q3": {
+          "question": "Can I promote multiple courses?",
+          "answer": "Yes! You can promote as many courses as you want and create unlimited links."
+        },
+        "q4": {
+          "question": "How to optimize my conversions?",
+          "answer": "Create relevant content, use clear calls to action, and target the right audience for each course."
+        }
+      }
+    }
   }
 }
