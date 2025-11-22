@@ -31,6 +31,9 @@ import {
   RefreshCw,
   Layout,
   Home,
+  Download,
+  Upload,
+  AlertCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DesignBrandingSection } from '@/components/admin/customization/DesignBrandingSection';
@@ -43,6 +46,25 @@ import { NotificationsSection } from '@/components/admin/customization/Notificat
 import { PagesCustomizationSection } from '@/components/admin/customization/PagesCustomizationSection';
 import { LandingPageCustomizationSection } from '@/components/admin/customization/LandingPageCustomizationSection';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
+import { exportCustomization, importCustomization, importCustomizationFromString } from '@/lib/platform-customization-export';
+import { logger } from '@/lib/logger';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type CustomizationSection = 
   | 'design'
@@ -127,8 +149,12 @@ export const PlatformCustomization = () => {
   const [activeSection, setActiveSection] = useState<CustomizationSection>('design');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const { saveAll, isSaving, previewMode, togglePreview, load, customizationData } = usePlatformCustomization();
+  const { saveAll, isSaving, previewMode, togglePreview, load, customizationData, setCustomizationData } = usePlatformCustomization();
   
   // Charger les données au montage
   useEffect(() => {
@@ -137,7 +163,11 @@ export const PlatformCustomization = () => {
         setIsLoading(true);
         await load();
       } catch (error) {
-        console.warn('Error loading customization data:', error);
+        logger.warn('Error loading customization data', {
+          error: error instanceof Error ? error.message : String(error),
+          level: 'section',
+          extra: { error },
+        });
         toast({
           title: 'Avertissement',
           description: 'Impossible de charger les paramètres de personnalisation. Utilisation des valeurs par défaut.',
@@ -188,6 +218,71 @@ export const PlatformCustomization = () => {
   const handleChange = useCallback(() => {
     setHasUnsavedChanges(true);
   }, []);
+
+  const handleExport = useCallback(() => {
+    try {
+      exportCustomization(customizationData);
+      toast({
+        title: '✅ Export réussi',
+        description: 'Les personnalisations ont été exportées avec succès.',
+      });
+    } catch (error: any) {
+      toast({
+        title: '❌ Erreur d\'export',
+        description: error.message || 'Impossible d\'exporter les personnalisations.',
+        variant: 'destructive',
+      });
+    }
+  }, [customizationData, toast]);
+
+  const handleImportFile = useCallback(async (file: File) => {
+    setIsImporting(true);
+    try {
+      const result = await importCustomization(file);
+      
+      if (!result.valid) {
+        toast({
+          title: '❌ Erreur d\'import',
+          description: result.errors?.join(', ') || 'Le fichier importé contient des erreurs.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (result.data) {
+        setCustomizationData(result.data);
+        setHasUnsavedChanges(true);
+        toast({
+          title: '✅ Import réussi',
+          description: 'Les personnalisations ont été importées avec succès. N\'oubliez pas de sauvegarder.',
+        });
+        setShowImportDialog(false);
+        setImportFile(null);
+      }
+    } catch (error: any) {
+      toast({
+        title: '❌ Erreur d\'import',
+        description: error.message || 'Impossible d\'importer le fichier.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  }, [setCustomizationData, toast]);
+
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImportFile(file);
+      setShowImportDialog(true);
+    }
+  }, []);
+
+  const handleImportConfirm = useCallback(async () => {
+    if (importFile) {
+      await handleImportFile(importFile);
+    }
+  }, [importFile, handleImportFile]);
 
   const renderSectionContent = useMemo(() => {
     switch (activeSection) {
@@ -314,17 +409,56 @@ export const PlatformCustomization = () => {
             <div className="mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-3 sm:mb-2">
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2 sm:gap-3 flex-wrap">
-                    {activeSectionConfig && (
-                      <>
-                        <activeSectionConfig.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary shrink-0" />
-                        <span className="truncate">{activeSectionConfig.label}</span>
-                      </>
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2 sm:gap-3 flex-wrap">
+                      {activeSectionConfig && (
+                        <>
+                          <activeSectionConfig.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary shrink-0" />
+                          <span className="truncate">{activeSectionConfig.label}</span>
+                        </>
+                      )}
+                    </h1>
+                    {hasUnsavedChanges && !previewMode && (
+                      <Badge variant="outline" className="text-xs sm:text-sm bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                        <span className="hidden sm:inline">Modifications non sauvegardées</span>
+                        <span className="sm:hidden">Non sauvegardé</span>
+                      </Badge>
                     )}
-                  </h1>
+                  </div>
                   <p className="text-sm sm:text-base text-muted-foreground mt-1 line-clamp-2">
                     {activeSectionConfig?.description}
                   </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Settings className="h-4 w-4" />
+                        <span className="hidden sm:inline">Actions</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={handleExport} className="cursor-pointer">
+                        <Download className="h-4 w-4 mr-2" />
+                        Exporter JSON
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => fileInputRef.current?.click()} 
+                        className="cursor-pointer"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Importer JSON
+                      </DropdownMenuItem>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="application/json"
+                        className="hidden"
+                        onChange={handleFileSelect}
+                      />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
               <Separator />
@@ -346,6 +480,52 @@ export const PlatformCustomization = () => {
           </div>
         </main>
       </div>
+
+      {/* Dialog d'import */}
+      <AlertDialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Importer des personnalisations</AlertDialogTitle>
+            <AlertDialogDescription>
+              {importFile ? (
+                <>
+                  Vous êtes sur le point d'importer le fichier <strong>{importFile.name}</strong>.
+                  <br />
+                  <br />
+                  <span className="text-amber-600 dark:text-amber-400 font-medium">
+                    ⚠️ Attention : Cette action remplacera toutes vos personnalisations actuelles.
+                  </span>
+                  <br />
+                  <br />
+                  Assurez-vous d'avoir exporté vos personnalisations actuelles avant de continuer.
+                </>
+              ) : (
+                'Sélectionnez un fichier JSON de personnalisation à importer.'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isImporting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleImportConfirm}
+              disabled={!importFile || isImporting}
+              className="bg-primary text-primary-foreground"
+            >
+              {isImporting ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Import en cours...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importer
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };

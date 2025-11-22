@@ -30,6 +30,7 @@ import {
   ShoppingCart,
   Users,
   Package,
+  TrendingUp,
 } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 import { useToast } from '@/hooks/use-toast';
@@ -274,6 +275,89 @@ const PAGES_CONFIG: PageConfig[] = [
           { id: 'forgotPassword', label: 'Lien Mot de passe oublié', type: 'text', key: 'auth.forgotPassword.link', defaultValue: 'Mot de passe oublié ?' },
           { id: 'alreadyHaveAccount', label: 'Message Déjà un compte', type: 'text', key: 'auth.alreadyHaveAccount', defaultValue: 'Déjà un compte ?' },
           { id: 'noAccount', label: 'Message Pas de compte', type: 'text', key: 'auth.noAccount', defaultValue: 'Pas encore de compte ?' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'affiliateDashboard',
+    name: 'Tableau de bord affilié',
+    route: '/affiliate/dashboard',
+    description: 'Personnalisez tous les éléments du tableau de bord des affiliés',
+    icon: TrendingUp,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre principal', type: 'text', key: 'affiliateDashboard.title', defaultValue: 'Tableau de bord affilié' },
+          { id: 'welcomeMessage', label: 'Message de bienvenue', type: 'textarea', key: 'affiliateDashboard.welcome', defaultValue: 'Bienvenue, {name} • Code : {code}' },
+          { id: 'newLinkButton', label: 'Bouton Nouveau lien', type: 'text', key: 'affiliateDashboard.newLinkButton', defaultValue: 'Nouveau lien' },
+        ],
+      },
+      {
+        id: 'stats',
+        name: 'Statistiques',
+        type: 'content',
+        elements: [
+          { id: 'clicksLabel', label: 'Label Clics totaux', type: 'text', key: 'affiliateDashboard.stats.clicks', defaultValue: 'Clics totaux' },
+          { id: 'salesLabel', label: 'Label Ventes générées', type: 'text', key: 'affiliateDashboard.stats.sales', defaultValue: 'Ventes générées' },
+          { id: 'revenueLabel', label: 'Label CA généré', type: 'text', key: 'affiliateDashboard.stats.revenue', defaultValue: 'CA généré' },
+          { id: 'earningsLabel', label: 'Label Gains totaux', type: 'text', key: 'affiliateDashboard.stats.earnings', defaultValue: 'Gains totaux' },
+          { id: 'balanceLabel', label: 'Label Solde disponible', type: 'text', key: 'affiliateDashboard.stats.balance', defaultValue: 'Solde disponible' },
+          { id: 'conversionRateLabel', label: 'Label Taux de conversion', type: 'text', key: 'affiliateDashboard.stats.conversionRate', defaultValue: 'Taux de conversion' },
+        ],
+      },
+      {
+        id: 'links',
+        name: 'Mes liens',
+        type: 'content',
+        elements: [
+          { id: 'tabTitle', label: 'Titre onglet Mes liens', type: 'text', key: 'affiliateDashboard.links.title', defaultValue: 'Mes liens d\'affiliation' },
+          { id: 'createLinkButton', label: 'Bouton Créer un lien', type: 'text', key: 'affiliateDashboard.links.createButton', defaultValue: 'Créer un lien' },
+          { id: 'noLinksMessage', label: 'Message Aucun lien', type: 'textarea', key: 'affiliateDashboard.links.noLinks', defaultValue: 'Aucun lien d\'affiliation pour le moment' },
+          { id: 'copyButton', label: 'Bouton Copier', type: 'text', key: 'affiliateDashboard.links.copyButton', defaultValue: 'Copier' },
+          { id: 'openButton', label: 'Bouton Ouvrir', type: 'text', key: 'affiliateDashboard.links.openButton', defaultValue: 'Ouvrir' },
+          { id: 'clicksLabel', label: 'Label Clics', type: 'text', key: 'affiliateDashboard.links.clicks', defaultValue: 'Clics' },
+          { id: 'salesLabel', label: 'Label Ventes', type: 'text', key: 'affiliateDashboard.links.sales', defaultValue: 'Ventes' },
+          { id: 'revenueLabel', label: 'Label CA généré', type: 'text', key: 'affiliateDashboard.links.revenue', defaultValue: 'CA généré' },
+          { id: 'commissionLabel', label: 'Label Commission', type: 'text', key: 'affiliateDashboard.links.commission', defaultValue: 'Commission' },
+          { id: 'conversionLabel', label: 'Label Conversion', type: 'text', key: 'affiliateDashboard.links.conversion', defaultValue: 'Conversion' },
+        ],
+      },
+      {
+        id: 'commissions',
+        name: 'Commissions',
+        type: 'content',
+        elements: [
+          { id: 'tabTitle', label: 'Titre onglet Commissions', type: 'text', key: 'affiliateDashboard.commissions.title', defaultValue: 'Mes commissions' },
+          { id: 'pendingLabel', label: 'Label En attente', type: 'text', key: 'affiliateDashboard.commissions.pending', defaultValue: 'En attente' },
+          { id: 'approvedLabel', label: 'Label Approuvées', type: 'text', key: 'affiliateDashboard.commissions.approved', defaultValue: 'Approuvées' },
+          { id: 'paidLabel', label: 'Label Payées', type: 'text', key: 'affiliateDashboard.commissions.paid', defaultValue: 'Payées' },
+          { id: 'rejectedLabel', label: 'Label Rejetées', type: 'text', key: 'affiliateDashboard.commissions.rejected', defaultValue: 'Rejetées' },
+          { id: 'noCommissionsMessage', label: 'Message Aucune commission', type: 'textarea', key: 'affiliateDashboard.commissions.noCommissions', defaultValue: 'Aucune commission pour le moment' },
+        ],
+      },
+      {
+        id: 'withdrawals',
+        name: 'Retraits',
+        type: 'content',
+        elements: [
+          { id: 'tabTitle', label: 'Titre onglet Retraits', type: 'text', key: 'affiliateDashboard.withdrawals.title', defaultValue: 'Mes retraits' },
+          { id: 'requestButton', label: 'Bouton Demander un retrait', type: 'text', key: 'affiliateDashboard.withdrawals.requestButton', defaultValue: 'Demander un retrait' },
+          { id: 'minimumAmount', label: 'Message Montant minimum', type: 'textarea', key: 'affiliateDashboard.withdrawals.minimumAmount', defaultValue: 'Montant minimum pour retrait : {amount}' },
+          { id: 'noWithdrawalsMessage', label: 'Message Aucun retrait', type: 'textarea', key: 'affiliateDashboard.withdrawals.noWithdrawals', defaultValue: 'Aucun retrait pour le moment' },
+        ],
+      },
+      {
+        id: 'registration',
+        name: 'Inscription',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre page inscription', type: 'text', key: 'affiliateDashboard.registration.title', defaultValue: 'Rejoignez notre programme d\'affiliation' },
+          { id: 'description', label: 'Description programme', type: 'textarea', key: 'affiliateDashboard.registration.description', defaultValue: 'Gagnez des commissions en promouvant nos produits' },
+          { id: 'registerButton', label: 'Bouton Devenir affilié', type: 'text', key: 'affiliateDashboard.registration.registerButton', defaultValue: 'Devenir affilié' },
         ],
       },
     ],

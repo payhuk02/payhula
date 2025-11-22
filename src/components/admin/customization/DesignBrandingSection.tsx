@@ -15,6 +15,16 @@ import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization
 import { designTokens } from '@/lib/design-system';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface DesignBrandingSectionProps {
   onChange?: () => void;
@@ -23,6 +33,7 @@ interface DesignBrandingSectionProps {
 export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) => {
   const { customizationData, setCustomizationData, save } = usePlatformCustomization();
   const { toast } = useToast();
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const [localColors, setLocalColors] = useState({
     primary: customizationData?.design?.colors?.primary || 'hsl(210, 100%, 60%)',
     secondary: customizationData?.design?.colors?.secondary || 'hsl(220, 20%, 50%)',
@@ -296,16 +307,46 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
     });
   };
 
-  const resetToDefault = () => {
-    setLocalColors({
+  const resetToDefault = useCallback(() => {
+    const defaultColors = {
       primary: designTokens.colors.primary[500],
       secondary: designTokens.colors.secondary[500],
       accent: designTokens.colors.accent[500],
       success: designTokens.colors.success[500],
       warning: designTokens.colors.warning[500],
       error: designTokens.colors.error[500],
+    };
+    
+    setLocalColors(defaultColors);
+    
+    // Mettre à jour l'état global
+    setCustomizationData(prev => ({
+      ...prev,
+      design: {
+        ...prev?.design,
+        colors: defaultColors,
+      },
+    }));
+    
+    // Sauvegarder
+    save('design', {
+      ...customizationData?.design,
+      colors: defaultColors,
+    }).catch((error) => {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de réinitialiser les couleurs',
+        variant: 'destructive',
+      });
     });
-  };
+    
+    if (onChange) onChange();
+    
+    toast({
+      title: '✅ Réinitialisation réussie',
+      description: 'Les couleurs ont été réinitialisées aux valeurs par défaut.',
+    });
+  }, [customizationData, setCustomizationData, save, toast, onChange]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -344,7 +385,7 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                     Personnalisez les couleurs principales de la plateforme
                   </CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={resetToDefault}>
+                <Button variant="outline" size="sm" onClick={() => setShowResetDialog(true)}>
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Réinitialiser
                 </Button>
@@ -821,7 +862,7 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
       <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t">
         <Button 
           variant="outline" 
-          onClick={resetToDefault}
+          onClick={() => setShowResetDialog(true)}
           className="w-full sm:w-auto"
         >
           <RefreshCw className="h-4 w-4 mr-2" />
@@ -835,6 +876,35 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
           Sauvegarder les modifications
         </Button>
       </div>
+
+      {/* Dialog de confirmation pour réinitialisation */}
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Réinitialiser les couleurs</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir réinitialiser toutes les couleurs aux valeurs par défaut ?
+              <br />
+              <br />
+              <span className="text-amber-600 dark:text-amber-400 font-medium">
+                ⚠️ Cette action remplacera toutes vos couleurs personnalisées.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                resetToDefault();
+                setShowResetDialog(false);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Réinitialiser
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

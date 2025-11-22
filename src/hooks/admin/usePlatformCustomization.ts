@@ -7,6 +7,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
+import { logger } from '@/lib/logger';
+import { validateSection, validateCustomizationData } from '@/lib/schemas/platform-customization';
 
 export interface PlatformCustomizationData {
   design?: {
@@ -75,11 +77,15 @@ export interface PlatformCustomizationData {
   pages?: Record<string, Record<string, any>>;
 }
 
+const PREVIEW_STORAGE_KEY = 'platform-customization-preview';
+const LAST_SAVED_KEY = 'platform-customization-last-saved';
+
 export const usePlatformCustomization = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [customizationData, setCustomizationData] = useState<PlatformCustomizationData>({});
   const customizationDataRef = useRef<PlatformCustomizationData>({});
+  const lastSavedTimestampRef = useRef<string | null>(null);
   const { toast } = useToast();
   
   // Synchroniser le ref avec le state
@@ -87,37 +93,131 @@ export const usePlatformCustomization = () => {
     customizationDataRef.current = customizationData;
   }, [customizationData]);
 
+  // Charger les données d'aperçu depuis localStorage au montage
+  useEffect(() => {
+    try {
+      const savedPreview = localStorage.getItem(PREVIEW_STORAGE_KEY);
+      if (savedPreview) {
+        const previewData = JSON.parse(savedPreview);
+        setCustomizationData(previewData);
+        logger.debug('Données d\'aperçu restaurées depuis localStorage', { previewData });
+      }
+    } catch (error) {
+      logger.warn('Erreur lors de la restauration des données d\'aperçu', { error });
+    }
+  }, []);
+
+  // Sauvegarder les données d'aperçu dans localStorage
+  const savePreviewToLocalStorage = useCallback((data: PlatformCustomizationData) => {
+    try {
+      localStorage.setItem(PREVIEW_STORAGE_KEY, JSON.stringify(data));
+      logger.debug('Données d\'aperçu sauvegardées dans localStorage');
+    } catch (error) {
+      logger.warn('Erreur lors de la sauvegarde des données d\'aperçu', { error });
+    }
+  }, []);
+
+  // Charger le timestamp de dernière sauvegarde
+  useEffect(() => {
+    try {
+      const lastSaved = localStorage.getItem(LAST_SAVED_KEY);
+      if (lastSaved) {
+        lastSavedTimestampRef.current = lastSaved;
+      }
+    } catch (error) {
+      logger.warn('Erreur lors du chargement du timestamp de sauvegarde', { error });
+    }
+  }, []);
+
   const load = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('platform_settings')
-        .select('settings')
+        .select('settings, updated_at')
         .eq('key', 'customization')
         .maybeSingle();
 
       if (error) {
         // Si la table n'existe pas encore ou si la clé n'existe pas, on continue avec des données vides
         if (error.code === 'PGRST116' || error.code === '42P01' || error.message.includes('does not exist')) {
-          console.log('Customization settings not found, using defaults');
+          logger.debug('Customization settings not found, using defaults');
           return;
         }
-        // Pour les autres erreurs, on log mais on ne bloque pas
-        console.warn('Error loading customization settings:', error);
+        // Pour les autres erreurs, on log dans Sentry
+        logger.error('Error loading customization settings', {
+          error: error.message,
+          code: error.code,
+          level: 'section',
+          extra: { error },
+        });
         return;
       }
       
       if (data?.settings) {
-        setCustomizationData(data.settings as PlatformCustomizationData);
+        // Valider les données chargées
+        const validation = validateCustomizationData(data.settings);
+        if (!validation.valid) {
+          logger.warn('Données de personnalisation invalides', {
+            errors: validation.errors,
+            level: 'section',
+          });
+          // Utiliser les données validées si disponibles, sinon les données brutes
+          if (validation.data) {
+            setCustomizationData(validation.data);
+          } else {
+            setCustomizationData(data.settings as PlatformCustomizationData);
+          }
+        } else {
+          setCustomizationData(validation.data || data.settings as PlatformCustomizationData);
+        }
+        
+        // Sauvegarder le timestamp de dernière sauvegarde
+        if (data.updated_at) {
+          lastSavedTimestampRef.current = data.updated_at;
+          try {
+            localStorage.setItem(LAST_SAVED_KEY, data.updated_at);
+          } catch (e) {
+            // Ignorer les erreurs localStorage
+          }
+        }
       }
     } catch (error: any) {
-      // Gestion silencieuse des erreurs pour ne pas bloquer le chargement de la page
-      console.warn('Error loading customization:', error);
+      // Logger dans Sentry pour les erreurs inattendues
+      logger.error('Error loading customization', {
+        error: error.message || String(error),
+        level: 'section',
+        extra: { error },
+      });
     }
   }, []);
 
   const save = useCallback(async (section: string, data: any) => {
     try {
       setIsSaving(true);
+      
+      // Valider les données de la section
+      const validation = validateSection(section, data);
+      if (!validation.valid) {
+        const errorMessages = validation.errors.map(e => {
+          const fieldName = e.path || 'champ inconnu';
+          return `• ${fieldName}: ${e.message}`;
+        });
+        
+        logger.warn('Validation échouée pour la section', {
+          section,
+          errors: validation.errors,
+          level: 'section',
+        });
+        
+        toast({
+          title: 'Erreur de validation',
+          description: `Données invalides pour "${section}":\n\n${errorMessages.join('\n')}`,
+          variant: 'destructive',
+          duration: 10000, // Afficher plus longtemps pour lire les erreurs
+        });
+        setIsSaving(false);
+        return false;
+      }
       
       // Utiliser le ref pour avoir les données les plus récentes
       const currentData = customizationDataRef.current;
@@ -134,10 +234,42 @@ export const usePlatformCustomization = () => {
       // Mettre à jour l'état local immédiatement
       setCustomizationData(updatedData);
       
-      // Si on est en mode preview, on ne sauvegarde pas en base mais on met à jour l'état local
+      // Si on est en mode preview, sauvegarder dans localStorage
       if (previewMode) {
+        savePreviewToLocalStorage(updatedData);
         setIsSaving(false);
         return true;
+      }
+      
+      // Vérifier optimistic locking (conflit de modification)
+      const { data: currentSettings, error: fetchError } = await supabase
+        .from('platform_settings')
+        .select('updated_at')
+        .eq('key', 'customization')
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      // Si les données ont été modifiées depuis le dernier chargement
+      if (currentSettings?.updated_at && lastSavedTimestampRef.current) {
+        if (currentSettings.updated_at !== lastSavedTimestampRef.current) {
+          logger.warn('Conflit de modification détecté', {
+            lastSaved: lastSavedTimestampRef.current,
+            current: currentSettings.updated_at,
+            level: 'section',
+          });
+          toast({
+            title: '⚠️ Conflit de modification',
+            description: 'Les données ont été modifiées par un autre administrateur. Rechargez la page pour voir les dernières modifications.',
+            variant: 'default',
+          });
+          // Recharger les données
+          await load();
+          setIsSaving(false);
+          return false;
+        }
       }
       
       // Sauvegarder dans Supabase
@@ -151,6 +283,15 @@ export const usePlatformCustomization = () => {
 
       if (error) throw error;
 
+      // Mettre à jour le timestamp de dernière sauvegarde
+      const newTimestamp = new Date().toISOString();
+      lastSavedTimestampRef.current = newTimestamp;
+      try {
+        localStorage.setItem(LAST_SAVED_KEY, newTimestamp);
+      } catch (e) {
+        // Ignorer les erreurs localStorage
+      }
+
       // Déclencher l'événement pour synchroniser avec la plateforme
       window.dispatchEvent(new CustomEvent('platform-customization-updated', {
         detail: { customizationData: updatedData }
@@ -159,16 +300,21 @@ export const usePlatformCustomization = () => {
       setIsSaving(false);
       return true;
     } catch (error: any) {
-      console.error('Error saving customization:', error);
+      logger.error('Error saving customization', {
+        error: error.message || String(error),
+        section,
+        level: 'section',
+        extra: { error },
+      });
       toast({
         title: 'Erreur de sauvegarde',
-        description: error.message,
+        description: error.message || 'Impossible de sauvegarder les modifications',
         variant: 'destructive',
       });
       setIsSaving(false);
       return false;
     }
-  }, [toast, previewMode]);
+  }, [toast, previewMode, savePreviewToLocalStorage, load]);
 
   const saveAll = useCallback(async () => {
     try {
@@ -176,7 +322,7 @@ export const usePlatformCustomization = () => {
       
       // Si on est en mode preview, on ne sauvegarde pas en base
       if (previewMode) {
-        console.log('Preview mode: changes not saved to database');
+        logger.debug('Preview mode: changes not saved to database');
         setIsSaving(false);
         return true;
       }
@@ -184,34 +330,128 @@ export const usePlatformCustomization = () => {
       // Utiliser le ref pour avoir les données les plus récentes
       const currentData = customizationDataRef.current;
       
+      // Valider toutes les données avant sauvegarde
+      const validation = validateCustomizationData(currentData);
+      if (!validation.valid) {
+        const errorMessages = validation.errors.map(e => {
+          const fieldName = e.path || 'champ inconnu';
+          return `• ${fieldName}: ${e.message}`;
+        });
+        
+        logger.warn('Validation échouée pour toutes les données', {
+          errors: validation.errors,
+          level: 'section',
+        });
+        
+        toast({
+          title: 'Erreur de validation',
+          description: `Données invalides détectées:\n\n${errorMessages.join('\n')}`,
+          variant: 'destructive',
+          duration: 10000, // Afficher plus longtemps pour lire les erreurs
+        });
+        setIsSaving(false);
+        return false;
+      }
+      
+      // Vérifier optimistic locking
+      const { data: currentSettings, error: fetchError } = await supabase
+        .from('platform_settings')
+        .select('updated_at')
+        .eq('key', 'customization')
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      if (currentSettings?.updated_at && lastSavedTimestampRef.current) {
+        if (currentSettings.updated_at !== lastSavedTimestampRef.current) {
+          logger.warn('Conflit de modification détecté lors de la sauvegarde globale', {
+            lastSaved: lastSavedTimestampRef.current,
+            current: currentSettings.updated_at,
+            level: 'section',
+          });
+          toast({
+            title: '⚠️ Conflit de modification',
+            description: 'Les données ont été modifiées par un autre administrateur. Rechargez la page pour voir les dernières modifications.',
+            variant: 'default',
+          });
+          await load();
+          setIsSaving(false);
+          return false;
+        }
+      }
+      
       // Supabase upsert avec gestion du conflit sur la clé primaire
       const { error } = await supabase
         .from('platform_settings')
         .upsert({
           key: 'customization',
-          settings: currentData,
+          settings: validation.data || currentData,
           updated_at: new Date().toISOString(),
         });
 
       if (error) throw error;
 
+      // Mettre à jour le timestamp
+      const newTimestamp = new Date().toISOString();
+      lastSavedTimestampRef.current = newTimestamp;
+      try {
+        localStorage.setItem(LAST_SAVED_KEY, newTimestamp);
+      } catch (e) {
+        // Ignorer les erreurs localStorage
+      }
+
+      // Nettoyer les données d'aperçu sauvegardées
+      try {
+        localStorage.removeItem(PREVIEW_STORAGE_KEY);
+      } catch (e) {
+        // Ignorer les erreurs localStorage
+      }
+
       // Déclencher l'événement pour synchroniser avec la plateforme
       window.dispatchEvent(new CustomEvent('platform-customization-updated', {
-        detail: { customizationData: currentData }
+        detail: { customizationData: validation.data || currentData }
       }));
 
       return true;
     } catch (error: any) {
-      console.error('Error saving all customization:', error);
+      logger.error('Error saving all customization', {
+        error: error.message || String(error),
+        level: 'section',
+        extra: { error },
+      });
       throw error;
     } finally {
       setIsSaving(false);
     }
-  }, [previewMode]);
+  }, [previewMode, load, toast]);
 
   const togglePreview = useCallback(() => {
-    setPreviewMode(prev => !prev);
-  }, []);
+    setPreviewMode(prev => {
+      const newMode = !prev;
+      
+      if (newMode) {
+        // Activer le mode aperçu : sauvegarder l'état actuel dans localStorage
+        savePreviewToLocalStorage(customizationDataRef.current);
+        logger.debug('Mode aperçu activé', { level: 'section' });
+      } else {
+        // Désactiver le mode aperçu : restaurer depuis localStorage ou nettoyer
+        try {
+          const savedPreview = localStorage.getItem(PREVIEW_STORAGE_KEY);
+          if (savedPreview) {
+            const previewData = JSON.parse(savedPreview);
+            setCustomizationData(previewData);
+            logger.debug('Données d\'aperçu restaurées', { level: 'section' });
+          }
+        } catch (error) {
+          logger.warn('Erreur lors de la restauration des données d\'aperçu', { error, level: 'section' });
+        }
+      }
+      
+      return newMode;
+    });
+  }, [savePreviewToLocalStorage]);
 
   return {
     customizationData,

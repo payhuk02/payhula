@@ -299,31 +299,32 @@ export default function SupplierOrders() {
         ref={actionsRef}
         className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 items-stretch sm:items-center animate-in fade-in slide-in-from-bottom-4 duration-700"
       >
-        <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm flex-1 hover:shadow-lg transition-all duration-300">
-          <CardContent className="p-2.5 sm:p-3 md:p-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 sm:left-3 md:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-muted-foreground z-10" />
+        <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm flex-1 w-full hover:shadow-lg transition-all duration-300">
+          <CardContent className="p-2 sm:p-2.5 sm:p-3 md:p-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2 sm:left-2.5 md:left-3 lg:left-4 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 text-muted-foreground z-10" />
               <Input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Rechercher par numéro de commande ou fournisseur..."
+                placeholder="Rechercher..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="pl-8 sm:pl-9 md:pl-10 pr-8 sm:pr-9 md:pr-10 h-10 sm:h-11 md:h-12 text-xs sm:text-sm md:text-base touch-manipulation"
+                className="pl-7 sm:pl-8 md:pl-9 lg:pl-10 pr-7 sm:pr-8 md:pr-9 lg:pr-10 h-9 sm:h-10 md:h-11 lg:h-12 text-xs sm:text-sm md:text-base w-full touch-manipulation"
+                title="Rechercher par numéro de commande ou fournisseur"
               />
               {searchInput && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 sm:right-1.5 md:right-2 top-1/2 transform -translate-y-1/2 h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 p-0 hover:bg-muted touch-manipulation"
+                  className="absolute right-1 sm:right-1.5 md:right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 p-0 hover:bg-muted touch-manipulation"
                   onClick={() => setSearchInput('')}
                   aria-label="Effacer la recherche"
                 >
-                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                  <X className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5" />
                 </Button>
               )}
-              <div className="absolute right-2.5 sm:right-3 md:right-4 top-1/2 transform -translate-y-1/2 hidden lg:flex items-center gap-1.5 pointer-events-none">
+              <div className="absolute right-2 sm:right-2.5 md:right-3 lg:right-4 top-1/2 transform -translate-y-1/2 hidden lg:flex items-center gap-1.5 pointer-events-none">
                 <Badge variant="outline" className="text-xs font-mono">
                   ⌘K
                 </Badge>
@@ -333,9 +334,9 @@ export default function SupplierOrders() {
         </Card>
         <Button 
           onClick={() => setIsDialogOpen(true)}
-          className="h-10 sm:h-11 md:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation text-xs sm:text-sm md:text-base px-4 sm:px-5 md:px-6 w-full sm:w-auto"
+          className="h-9 sm:h-10 md:h-11 lg:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 lg:px-6 w-full sm:w-auto shrink-0"
         >
-          <Plus className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+          <Plus className="mr-1 sm:mr-1.5 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5" />
           <span className="hidden sm:inline">Nouvelle commande</span>
           <span className="sm:hidden">Nouvelle</span>
         </Button>
@@ -344,29 +345,29 @@ export default function SupplierOrders() {
       {/* Stats - Totalement Responsive */}
       <div
         ref={statsRef}
-        className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
+        className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
       >
         {statsCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card
               key={stat.label}
-              className="border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] touch-manipulation"
+              className="border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] touch-manipulation w-full"
               style={{ animationDelay: `${index * 70}ms` }}
             >
-              <CardHeader className="pb-2 sm:pb-2.5 md:pb-3 p-2.5 sm:p-3 md:p-4">
-                <CardTitle className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2">
-                  <div className={`h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 rounded-lg bg-gradient-to-br ${stat.iconGradient} border ${stat.iconBorder} flex items-center justify-center shrink-0`}>
-                    <Icon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 ${stat.iconColor}`} />
+              <CardHeader className="pb-1.5 sm:pb-2 md:pb-2.5 lg:pb-3 p-2 sm:p-2.5 md:p-3 lg:p-4">
+                <CardTitle className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium text-muted-foreground flex items-center gap-1 sm:gap-1.5 md:gap-2">
+                  <div className={`h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 rounded-lg bg-gradient-to-br ${stat.iconGradient} border ${stat.iconBorder} flex items-center justify-center shrink-0`}>
+                    <Icon className={`h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 ${stat.iconColor}`} />
                   </div>
-                  <span className="truncate">{stat.label}</span>
+                  <span className="truncate leading-tight">{stat.label}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-2.5 sm:p-3 md:p-4 pt-0 space-y-1 sm:space-y-1.5">
-                <div className={`text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent break-words`}>
+              <CardContent className="p-2 sm:p-2.5 md:p-3 lg:p-4 pt-0 space-y-1 sm:space-y-1.5">
+                <div className={`text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent break-words leading-tight`}>
                   {stat.value}
                 </div>
-                <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2">
+                <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 leading-tight">
                   {stat.description}
                 </p>
               </CardContent>
@@ -431,10 +432,10 @@ export default function SupplierOrders() {
                   <TabsTrigger
                     key={status.value}
                     value={status.value}
-                    className="flex-none gap-1 sm:gap-1.5 md:gap-2 px-2 sm:px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-1.5 sm:py-2 md:py-2.5 text-[9px] xs:text-[10px] sm:text-xs md:text-sm min-h-[34px] sm:min-h-[38px] md:min-h-[40px] lg:min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 whitespace-nowrap shrink-0 touch-manipulation active:scale-95"
+                    className="flex-none gap-1 sm:gap-1.5 md:gap-2 px-2 sm:px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-1.5 sm:py-2 md:py-2.5 text-[9px] xs:text-[10px] sm:text-xs md:text-sm min-h-[36px] xs:min-h-[38px] sm:min-h-[40px] md:min-h-[42px] lg:min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 whitespace-nowrap shrink-0 touch-manipulation active:scale-95"
                   >
-                    <span className="hidden md:inline">{status.label}</span>
-                    <span className="md:hidden">{status.shortLabel}</span>
+                    <span className="hidden sm:inline">{status.label}</span>
+                    <span className="sm:hidden">{status.shortLabel}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -470,16 +471,16 @@ export default function SupplierOrders() {
             <Card className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm overflow-hidden hidden lg:block relative group">
               {/* Indicateur de scroll à gauche - Dynamique */}
               {canScrollTableLeft && (
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-card via-card/90 to-transparent z-20 flex items-center justify-start pl-2 transition-opacity duration-300">
+                <div className="absolute left-0 top-0 bottom-0 w-10 lg:w-12 bg-gradient-to-r from-card via-card/90 to-transparent z-20 flex items-center justify-start pl-1.5 lg:pl-2 transition-opacity duration-300">
                   <div className="pointer-events-auto">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200"
+                      className="h-9 w-9 lg:h-10 lg:w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200 touch-manipulation"
                       onClick={scrollTableLeft}
                       aria-label="Défiler vers la gauche"
                     >
-                      <ChevronLeft className="h-5 w-5" />
+                      <ChevronLeft className="h-4 w-4 lg:h-5 lg:w-5" />
                     </Button>
                   </div>
                 </div>
@@ -487,16 +488,16 @@ export default function SupplierOrders() {
               
               {/* Indicateur de scroll à droite - Dynamique */}
               {canScrollTableRight && (
-                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-card via-card/90 to-transparent z-20 flex items-center justify-end pr-2 transition-opacity duration-300">
+                <div className="absolute right-0 top-0 bottom-0 w-10 lg:w-12 bg-gradient-to-l from-card via-card/90 to-transparent z-20 flex items-center justify-end pr-1.5 lg:pr-2 transition-opacity duration-300">
                   <div className="pointer-events-auto">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200"
+                      className="h-9 w-9 lg:h-10 lg:w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200 touch-manipulation"
                       onClick={scrollTableRight}
                       aria-label="Défiler vers la droite"
                     >
-                      <ChevronRight className="h-5 w-5" />
+                      <ChevronRight className="h-4 w-4 lg:h-5 lg:w-5" />
                     </Button>
                   </div>
                 </div>
@@ -510,16 +511,16 @@ export default function SupplierOrders() {
                     WebkitOverflowScrolling: 'touch',
                   }}
                 >
-                  <Table className="min-w-[900px] lg:min-w-[1000px] xl:min-w-[1100px] w-full">
+                  <Table className="min-w-[900px] lg:min-w-[1000px] xl:min-w-[1100px] 2xl:min-w-[1200px] w-full">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-xs md:text-sm whitespace-nowrap min-w-[140px] px-3 md:px-4 lg:px-6">Numéro</TableHead>
-                        <TableHead className="text-xs md:text-sm whitespace-nowrap min-w-[150px] px-3 md:px-4 lg:px-6">Fournisseur</TableHead>
-                        <TableHead className="text-xs md:text-sm whitespace-nowrap min-w-[120px] px-3 md:px-4 lg:px-6">Date</TableHead>
-                        <TableHead className="text-xs md:text-sm whitespace-nowrap min-w-[120px] px-3 md:px-4 lg:px-6">Montant</TableHead>
-                        <TableHead className="text-xs md:text-sm whitespace-nowrap min-w-[160px] px-3 md:px-4 lg:px-6">Statut</TableHead>
-                        <TableHead className="text-xs md:text-sm whitespace-nowrap min-w-[150px] px-3 md:px-4 lg:px-6">Livraison prévue</TableHead>
-                        <TableHead className="text-right text-xs md:text-sm whitespace-nowrap min-w-[100px] px-3 md:px-4 lg:px-6">Actions</TableHead>
+                        <TableHead className="text-xs lg:text-sm whitespace-nowrap min-w-[120px] lg:min-w-[140px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Numéro</TableHead>
+                        <TableHead className="text-xs lg:text-sm whitespace-nowrap min-w-[130px] lg:min-w-[150px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Fournisseur</TableHead>
+                        <TableHead className="text-xs lg:text-sm whitespace-nowrap min-w-[100px] lg:min-w-[120px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Date</TableHead>
+                        <TableHead className="text-xs lg:text-sm whitespace-nowrap min-w-[100px] lg:min-w-[120px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Montant</TableHead>
+                        <TableHead className="text-xs lg:text-sm whitespace-nowrap min-w-[140px] lg:min-w-[160px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Statut</TableHead>
+                        <TableHead className="text-xs lg:text-sm whitespace-nowrap min-w-[130px] lg:min-w-[150px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Livraison prévue</TableHead>
+                        <TableHead className="text-right text-xs lg:text-sm whitespace-nowrap min-w-[80px] lg:min-w-[100px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -527,25 +528,25 @@ export default function SupplierOrders() {
                         const status = ORDER_STATUSES.find(s => s.value === order.status);
                         return (
                           <TableRow key={order.id} className="hover:bg-muted/50 transition-colors">
-                            <TableCell className="text-xs md:text-sm font-medium whitespace-nowrap min-w-[140px] px-3 md:px-4 lg:px-6">
-                              <div className="flex items-center gap-2">
-                                <div className="h-6 w-6 md:h-7 md:w-7 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center shrink-0">
-                                  <Package className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-600 dark:text-blue-400" />
+                            <TableCell className="text-xs lg:text-sm font-medium whitespace-nowrap min-w-[120px] lg:min-w-[140px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
+                              <div className="flex items-center gap-1.5 lg:gap-2">
+                                <div className="h-5 w-5 lg:h-6 lg:w-6 xl:h-7 xl:w-7 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center shrink-0">
+                                  <Package className="h-3 w-3 lg:h-3.5 lg:w-3.5 xl:h-4 xl:w-4 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <span className="truncate">{order.order_number}</span>
                               </div>
                             </TableCell>
-                            <TableCell className="text-xs md:text-sm whitespace-nowrap min-w-[150px] px-3 md:px-4 lg:px-6">
+                            <TableCell className="text-xs lg:text-sm whitespace-nowrap min-w-[130px] lg:min-w-[150px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
                               <span className="truncate block">
                                 {(order.supplier as any)?.name || 'N/A'}
                               </span>
                             </TableCell>
-                            <TableCell className="text-xs md:text-sm whitespace-nowrap min-w-[120px] px-3 md:px-4 lg:px-6">
+                            <TableCell className="text-xs lg:text-sm whitespace-nowrap min-w-[100px] lg:min-w-[120px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
                               {format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}
                             </TableCell>
-                            <TableCell className="text-xs md:text-sm whitespace-nowrap min-w-[120px] px-3 md:px-4 lg:px-6">
-                              <div className="flex items-center gap-1.5">
-                                <DollarSign className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+                            <TableCell className="text-xs lg:text-sm whitespace-nowrap min-w-[100px] lg:min-w-[120px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
+                              <div className="flex items-center gap-1 lg:gap-1.5">
+                                <DollarSign className="h-3 w-3 lg:h-3.5 lg:w-3.5 xl:h-4 xl:w-4 text-muted-foreground shrink-0" />
                                 <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent font-semibold">
                                   {new Intl.NumberFormat('fr-FR', {
                                     style: 'currency',
@@ -556,55 +557,55 @@ export default function SupplierOrders() {
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell className="text-xs md:text-sm whitespace-nowrap min-w-[160px] px-3 md:px-4 lg:px-6">
+                            <TableCell className="text-xs lg:text-sm whitespace-nowrap min-w-[140px] lg:min-w-[160px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
                               <Select
                                 value={order.status}
                                 onValueChange={(value: SupplierOrder['status']) =>
                                   handleStatusUpdate(order.id, value)
                                 }
                               >
-                                <SelectTrigger className="w-full max-w-[180px] h-9 md:h-10 text-xs md:text-sm">
+                                <SelectTrigger className="w-full max-w-[160px] lg:max-w-[180px] h-8 lg:h-9 xl:h-10 text-xs lg:text-sm touch-manipulation">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[300px]">
                                   {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
-                                    <SelectItem key={s.value} value={s.value} className="text-xs md:text-sm">
+                                    <SelectItem key={s.value} value={s.value} className="text-xs lg:text-sm">
                                       {s.label}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </TableCell>
-                            <TableCell className="text-xs md:text-sm whitespace-nowrap min-w-[150px] px-3 md:px-4 lg:px-6">
+                            <TableCell className="text-xs lg:text-sm whitespace-nowrap min-w-[130px] lg:min-w-[150px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
                               {order.expected_delivery_date ? (
-                                <div className="flex items-center gap-1.5">
-                                  <Calendar className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+                                <div className="flex items-center gap-1 lg:gap-1.5">
+                                  <Calendar className="h-3 w-3 lg:h-3.5 lg:w-3.5 xl:h-4 xl:w-4 text-muted-foreground shrink-0" />
                                   <span>
                                     {format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-muted-foreground text-xs md:text-sm">Non définie</span>
+                                <span className="text-muted-foreground text-xs lg:text-sm">Non définie</span>
                               )}
                             </TableCell>
-                            <TableCell className="text-right whitespace-nowrap min-w-[100px] px-3 md:px-4 lg:px-6">
+                            <TableCell className="text-right whitespace-nowrap min-w-[80px] lg:min-w-[100px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 md:h-9 md:w-9 p-0 touch-manipulation">
-                                    <MoreVertical className="h-4 w-4 md:h-5 md:w-5" />
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 lg:h-8 lg:w-8 xl:h-9 xl:w-9 p-0 touch-manipulation">
+                                    <MoreVertical className="h-3.5 w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 md:w-56">
-                                  <DropdownMenuItem className="text-xs md:text-sm cursor-pointer">
-                                    <Eye className="mr-2 h-4 w-4" />
+                                <DropdownMenuContent align="end" className="w-44 lg:w-48 xl:w-56">
+                                  <DropdownMenuItem className="text-xs lg:text-sm cursor-pointer">
+                                    <Eye className="mr-2 h-3.5 w-3.5 lg:h-4 lg:w-4" />
                                     Voir détails
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
                                     onClick={() => handleStatusUpdate(order.id, 'completed')}
-                                    className="text-xs md:text-sm cursor-pointer"
+                                    className="text-xs lg:text-sm cursor-pointer"
                                     disabled={order.status === 'completed'}
                                   >
-                                    <Package className="mr-2 h-4 w-4" />
+                                    <Package className="mr-2 h-3.5 w-3.5 lg:h-4 lg:w-4" />
                                     Marquer comme terminée
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -620,61 +621,61 @@ export default function SupplierOrders() {
             </Card>
 
             {/* Mobile & Tablet Card View - Totalement Responsive */}
-            <div className="lg:hidden space-y-2.5 sm:space-y-3 md:space-y-4">
+            <div className="lg:hidden space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-4 w-full">
               {filteredOrders.map((order, index) => {
                 const status = ORDER_STATUSES.find(s => s.value === order.status);
                 return (
                   <Card
                     key={order.id}
-                    className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 active:scale-[0.98] touch-manipulation animate-in fade-in slide-in-from-bottom-4"
+                    className="border border-border/50 bg-gradient-to-br from-card/60 via-card/40 to-card/20 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 active:scale-[0.98] touch-manipulation animate-in fade-in slide-in-from-bottom-4 w-full"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <CardHeader className="pb-2.5 sm:pb-3 px-3 sm:px-4 md:px-5 pt-3 sm:pt-4">
-                      <div className="flex items-start justify-between gap-2 sm:gap-3">
+                    <CardHeader className="pb-2 sm:pb-2.5 md:pb-3 px-2.5 sm:px-3 md:px-4 lg:px-5 pt-2.5 sm:pt-3 md:pt-4 lg:pt-5">
+                      <div className="flex items-start justify-between gap-2 sm:gap-3 w-full">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="flex items-center gap-2 sm:gap-2.5 text-sm sm:text-base md:text-lg mb-1.5 sm:mb-2">
-                            <div className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center shrink-0">
-                              <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
+                          <CardTitle className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 text-xs sm:text-sm md:text-base lg:text-lg mb-1 sm:mb-1.5 md:mb-2">
+                            <div className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 flex items-center justify-center shrink-0">
+                              <Package className="h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
                             </div>
-                            <span className="truncate font-semibold">{order.order_number}</span>
+                            <span className="truncate font-semibold leading-tight">{order.order_number}</span>
                           </CardTitle>
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
-                            <span className="truncate max-w-[120px] sm:max-w-none">{(order.supplier as any)?.name || 'N/A'}</span>
-                            <span className="hidden sm:inline">•</span>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
-                              <span className="whitespace-nowrap">{format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}</span>
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 md:gap-2 text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-muted-foreground">
+                            <span className="truncate max-w-[90px] xs:max-w-[110px] sm:max-w-[140px] md:max-w-none">{(order.supplier as any)?.name || 'N/A'}</span>
+                            <span className="hidden xs:inline">•</span>
+                            <div className="flex items-center gap-0.5 sm:gap-1">
+                              <Calendar className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                              <span className="whitespace-nowrap leading-tight">{format(new Date(order.order_date), 'dd MMM yyyy', { locale: fr })}</span>
                             </div>
                           </div>
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0 shrink-0 touch-manipulation">
-                              <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
+                            <Button variant="ghost" size="sm" className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 p-0 shrink-0 touch-manipulation">
+                              <MoreVertical className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48 sm:w-56">
-                            <DropdownMenuItem className="text-xs sm:text-sm md:text-base cursor-pointer">
-                              <Eye className="mr-2 h-4 w-4" />
+                          <DropdownMenuContent align="end" className="w-44 xs:w-48 sm:w-56">
+                            <DropdownMenuItem className="text-xs sm:text-sm md:text-base cursor-pointer touch-manipulation">
+                              <Eye className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               Voir détails
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => handleStatusUpdate(order.id, 'completed')}
-                              className="text-xs sm:text-sm md:text-base cursor-pointer"
+                              className="text-xs sm:text-sm md:text-base cursor-pointer touch-manipulation"
                               disabled={order.status === 'completed'}
                             >
-                              <Package className="mr-2 h-4 w-4" />
+                              <Package className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               Marquer comme terminée
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
                     </CardHeader>
-                    <CardContent className="px-3 sm:px-4 md:px-5 pb-3 sm:pb-4 space-y-2.5 sm:space-y-3">
+                    <CardContent className="px-2.5 sm:px-3 md:px-4 lg:px-5 pb-2.5 sm:pb-3 md:pb-4 lg:pb-5 space-y-2 sm:space-y-2.5 md:space-y-3 w-full">
                       {/* Montant */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
-                        <span className="text-[10px] xs:text-xs sm:text-sm md:text-base text-muted-foreground">Montant</span>
-                        <span className="text-sm sm:text-base md:text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1 sm:gap-2 w-full">
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-muted-foreground shrink-0">Montant</span>
+                        <span className="text-xs xs:text-sm sm:text-base md:text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent break-words text-right xs:text-left">
                           {new Intl.NumberFormat('fr-FR', {
                             style: 'currency',
                             currency: order.currency || 'XOF',
@@ -685,18 +686,18 @@ export default function SupplierOrders() {
                       </div>
                       
                       {/* Statut */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-                        <span className="text-[10px] xs:text-xs sm:text-sm md:text-base text-muted-foreground">Statut</span>
+                      <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1.5 sm:gap-2 md:gap-3 w-full">
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-muted-foreground shrink-0">Statut</span>
                         <Select
                           value={order.status}
                           onValueChange={(value: SupplierOrder['status']) =>
                             handleStatusUpdate(order.id, value)
                           }
                         >
-                          <SelectTrigger className="w-full sm:w-[160px] md:w-[180px] h-9 sm:h-10 text-xs sm:text-sm md:text-base">
+                          <SelectTrigger className="w-full xs:w-[140px] sm:w-[160px] md:w-[180px] h-8 xs:h-9 sm:h-10 text-[10px] xs:text-xs sm:text-sm md:text-base touch-manipulation">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="max-h-[300px]">
+                          <SelectContent className="max-h-[300px] w-[var(--radix-select-trigger-width)]">
                             {ORDER_STATUSES.filter(s => s.value !== 'all').map((s) => (
                               <SelectItem key={s.value} value={s.value} className="text-xs sm:text-sm md:text-base">
                                 {s.label}
@@ -708,11 +709,11 @@ export default function SupplierOrders() {
                       
                       {/* Livraison prévue */}
                       {order.expected_delivery_date && (
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-border/50">
-                          <span className="text-[10px] xs:text-xs sm:text-sm md:text-base text-muted-foreground">Livraison prévue</span>
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm md:text-base">
-                            <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
-                            <span className="whitespace-nowrap">{format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}</span>
+                        <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1 sm:gap-2 pt-1.5 sm:pt-2 xs:pt-0 border-t xs:border-0 border-border/50 w-full">
+                          <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm text-muted-foreground shrink-0">Livraison prévue</span>
+                          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 text-[9px] xs:text-[10px] sm:text-xs md:text-sm">
+                            <Calendar className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+                            <span className="whitespace-nowrap leading-tight">{format(new Date(order.expected_delivery_date), 'dd MMM yyyy', { locale: fr })}</span>
                           </div>
                         </div>
                       )}
@@ -727,29 +728,29 @@ export default function SupplierOrders() {
 
       {/* Dialog Create Order - Totalement Responsive */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-4 md:p-6">
-          <DialogHeader className="px-0 sm:px-0">
-            <DialogTitle className="text-base sm:text-lg md:text-xl lg:text-2xl pr-6 sm:pr-8">Nouvelle commande fournisseur</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm md:text-base">
+        <DialogContent className="!max-w-[calc(100vw-1rem)] sm:!max-w-[calc(100vw-2rem)] md:!max-w-[90vw] lg:!max-w-2xl xl:!max-w-3xl !max-h-[calc(100vh-1rem)] sm:!max-h-[calc(100vh-2rem)] md:!max-h-[90vh] !w-[calc(100vw-1rem)] sm:!w-[calc(100vw-2rem)] md:!w-auto p-2.5 sm:p-3 md:p-4 lg:p-5 xl:p-6 m-2 sm:m-4 overflow-hidden">
+          <DialogHeader className="px-0 sm:px-0 pr-6 sm:pr-8">
+            <DialogTitle className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl leading-tight break-words">Nouvelle commande fournisseur</DialogTitle>
+            <DialogDescription className="text-[10px] xs:text-xs sm:text-sm md:text-base leading-tight">
               Créez une nouvelle commande auprès d'un fournisseur
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="mt-2 sm:mt-4">
-            <div className="grid gap-3 sm:gap-4 md:gap-5 py-2 sm:py-3 md:py-4">
+          <form onSubmit={handleSubmit} className="mt-2 sm:mt-3 md:mt-4 overflow-y-auto max-h-[calc(100vh-12rem)] sm:max-h-[calc(100vh-14rem)] md:max-h-[calc(100vh-16rem)] -mx-2.5 sm:-mx-3 md:-mx-4 lg:-mx-5 xl:-mx-6 px-2.5 sm:px-3 md:px-4 lg:px-5 xl:px-6">
+            <div className="grid gap-2.5 sm:gap-3 md:gap-4 lg:gap-5 py-2 sm:py-3 md:py-4">
               {/* Fournisseur Selection */}
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="space-y-1.5 sm:space-y-2 w-full">
                 <Label htmlFor="supplier" className="text-xs sm:text-sm md:text-base font-medium">Fournisseur *</Label>
                 <Select value={selectedSupplier} onValueChange={setSelectedSupplier} required>
-                  <SelectTrigger className="h-10 sm:h-11 md:h-12 text-xs sm:text-sm md:text-base w-full">
+                  <SelectTrigger className="h-9 sm:h-10 md:h-11 lg:h-12 text-xs sm:text-sm md:text-base w-full touch-manipulation">
                     <SelectValue placeholder="Sélectionner un fournisseur" />
                   </SelectTrigger>
-                  <SelectContent className="max-h-[200px] sm:max-h-[300px]">
+                  <SelectContent className="max-h-[200px] sm:max-h-[300px] w-[var(--radix-select-trigger-width)]">
                     {suppliers?.map((supplier) => (
                       <SelectItem key={supplier.id} value={supplier.id} className="text-xs sm:text-sm md:text-base">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                          <span className="font-medium">{supplier.name}</span>
+                          <span className="font-medium truncate">{supplier.name}</span>
                           {supplier.company_name && (
-                            <span className="text-muted-foreground text-xs sm:text-sm">({supplier.company_name})</span>
+                            <span className="text-muted-foreground text-xs sm:text-sm truncate">({supplier.company_name})</span>
                           )}
                         </div>
                       </SelectItem>
@@ -759,45 +760,45 @@ export default function SupplierOrders() {
               </div>
 
               {/* Articles Section */}
-              <div className="space-y-3 sm:space-y-4 md:space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+              <div className="space-y-2.5 sm:space-y-3 md:space-y-4 lg:space-y-5 w-full">
+                <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 sm:gap-3">
                   <Label className="text-xs sm:text-sm md:text-base font-medium">Articles</Label>
                   <Button 
                     type="button" 
                     variant="outline" 
                     size="sm" 
                     onClick={handleAddItem} 
-                    className="h-9 sm:h-10 md:h-11 text-xs sm:text-sm md:text-base w-full sm:w-auto"
+                    className="h-8 sm:h-9 md:h-10 lg:h-11 text-xs sm:text-sm md:text-base w-full xs:w-auto shrink-0 touch-manipulation"
                   >
-                    <Plus className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                    <Plus className="mr-1 sm:mr-1.5 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5" />
                     <span className="hidden sm:inline">Ajouter un article</span>
                     <span className="sm:hidden">Ajouter</span>
                   </Button>
                 </div>
 
                 {/* Articles List */}
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-4 w-full">
                   {orderItems.map((item, index) => (
-                    <Card key={index} className="border border-border/50 bg-card/50 backdrop-blur-sm p-3 sm:p-4 md:p-5">
-                      <div className="space-y-3 sm:space-y-4">
-                        {/* Mobile Layout: Stacked */}
-                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-2 md:gap-3">
+                    <Card key={index} className="border border-border/50 bg-card/50 backdrop-blur-sm p-2 sm:p-2.5 md:p-3 lg:p-4 xl:p-5 w-full">
+                      <div className="space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-4 w-full">
+                        {/* Mobile Layout: Stacked, Desktop: Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2 sm:gap-2.5 md:gap-3 w-full">
                           {/* Produit / SKU - Full width on mobile, 5 cols on desktop */}
-                          <div className="col-span-1 sm:col-span-5 md:col-span-5 space-y-1.5 sm:space-y-2">
-                            <Label className="text-xs sm:text-sm md:text-base font-medium">Produit / SKU</Label>
+                          <div className="col-span-1 sm:col-span-2 md:col-span-5 space-y-1 sm:space-y-1.5 md:space-y-2 w-full">
+                            <Label className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium leading-tight">Produit / SKU</Label>
                             <Input
                               placeholder="ID produit ou SKU"
                               value={item.product_id || item.supplier_product_id || ''}
                               onChange={(e) =>
                                 handleUpdateItem(index, item.product_id ? 'product_id' : 'supplier_product_id', e.target.value)
                               }
-                              className="text-xs sm:text-sm md:text-base h-10 sm:h-11 md:h-12 w-full"
+                              className="text-xs sm:text-sm md:text-base h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 w-full touch-manipulation"
                             />
                           </div>
                           
                           {/* Quantité - Full width on mobile, 2 cols on desktop */}
-                          <div className="col-span-1 sm:col-span-2 md:col-span-2 space-y-1.5 sm:space-y-2">
-                            <Label className="text-xs sm:text-sm md:text-base font-medium">Quantité</Label>
+                          <div className="col-span-1 sm:col-span-1 md:col-span-2 space-y-1 sm:space-y-1.5 md:space-y-2 w-full">
+                            <Label className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium leading-tight">Quantité</Label>
                             <Input
                               type="number"
                               min="1"
@@ -805,13 +806,13 @@ export default function SupplierOrders() {
                               onChange={(e) =>
                                 handleUpdateItem(index, 'quantity', parseInt(e.target.value) || 0)
                               }
-                              className="text-xs sm:text-sm md:text-base h-10 sm:h-11 md:h-12 w-full"
+                              className="text-xs sm:text-sm md:text-base h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 w-full touch-manipulation"
                             />
                           </div>
                           
                           {/* Coût unitaire - Full width on mobile, 3 cols on desktop */}
-                          <div className="col-span-1 sm:col-span-3 md:col-span-3 space-y-1.5 sm:space-y-2">
-                            <Label className="text-xs sm:text-sm md:text-base font-medium">Coût unitaire</Label>
+                          <div className="col-span-1 sm:col-span-1 md:col-span-3 space-y-1 sm:space-y-1.5 md:space-y-2 w-full">
+                            <Label className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium leading-tight">Coût unitaire</Label>
                             <Input
                               type="number"
                               step="0.01"
@@ -820,14 +821,14 @@ export default function SupplierOrders() {
                               onChange={(e) =>
                                 handleUpdateItem(index, 'unit_cost', parseFloat(e.target.value) || 0)
                               }
-                              className="text-xs sm:text-sm md:text-base h-10 sm:h-11 md:h-12 w-full"
+                              className="text-xs sm:text-sm md:text-base h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 w-full touch-manipulation"
                             />
                           </div>
                           
                           {/* Total - Full width on mobile, 2 cols on desktop */}
-                          <div className="col-span-1 sm:col-span-2 md:col-span-2 space-y-1.5 sm:space-y-2">
-                            <Label className="text-xs sm:text-sm md:text-base font-medium">Total</Label>
-                            <div className="flex items-center h-10 sm:h-11 md:h-12 px-3 sm:px-4 bg-muted/50 rounded-md text-xs sm:text-sm md:text-base font-medium">
+                          <div className="col-span-1 sm:col-span-2 md:col-span-2 space-y-1 sm:space-y-1.5 md:space-y-2 w-full">
+                            <Label className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium leading-tight">Total</Label>
+                            <div className="flex items-center h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 px-2 sm:px-2.5 md:px-3 lg:px-4 bg-muted/50 rounded-md text-[10px] xs:text-xs sm:text-sm md:text-base font-medium">
                               {new Intl.NumberFormat('fr-FR', {
                                 style: 'currency',
                                 currency: 'XOF',
@@ -840,17 +841,18 @@ export default function SupplierOrders() {
                         
                         {/* Remove Button - Always visible on mobile, only when multiple items on desktop */}
                         {orderItems.length > 1 && (
-                          <div className="flex justify-end pt-2 sm:pt-0 border-t sm:border-0 border-border/50">
+                          <div className="flex justify-end pt-1.5 sm:pt-2 md:pt-0 border-t md:border-0 border-border/50 w-full">
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
                               onClick={() => handleRemoveItem(index)}
-                              className="h-9 sm:h-10 w-full sm:w-auto px-3 sm:px-4 text-xs sm:text-sm md:text-base text-destructive hover:text-destructive hover:bg-destructive/10"
+                              className="h-8 sm:h-9 md:h-10 w-full sm:w-auto px-3 sm:px-4 text-[10px] xs:text-xs sm:text-sm md:text-base text-destructive hover:text-destructive hover:bg-destructive/10 touch-manipulation"
                             >
-                              <X className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-0" />
-                              <span className="sm:hidden">Supprimer cet article</span>
-                              <span className="hidden sm:inline">Supprimer</span>
+                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1.5 sm:mr-2 md:mr-0" />
+                              <span className="sm:hidden">Supprimer</span>
+                              <span className="hidden sm:inline md:hidden">Supprimer article</span>
+                              <span className="hidden md:inline">Supprimer</span>
                             </Button>
                           </div>
                         )}
@@ -860,11 +862,11 @@ export default function SupplierOrders() {
                 </div>
 
                 {/* Total Section */}
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-border/50">
-                  <span className="text-sm sm:text-base md:text-lg font-medium text-muted-foreground sm:hidden">Total de la commande:</span>
-                  <div className="flex items-center justify-between sm:justify-end gap-2">
-                    <span className="text-sm sm:text-base md:text-lg font-medium text-muted-foreground hidden sm:inline">Total:</span>
-                    <div className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-2 sm:gap-3 pt-2 sm:pt-3 md:pt-4 border-t border-border/50 w-full">
+                  <span className="text-xs sm:text-sm md:text-base lg:text-lg font-medium text-muted-foreground xs:hidden">Total de la commande:</span>
+                  <div className="flex items-center justify-between xs:justify-end gap-2 w-full xs:w-auto">
+                    <span className="text-xs sm:text-sm md:text-base lg:text-lg font-medium text-muted-foreground hidden xs:inline">Total:</span>
+                    <div className="text-sm sm:text-base md:text-lg lg:text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
                       {new Intl.NumberFormat('fr-FR', {
                         style: 'currency',
                         currency: 'XOF',
@@ -879,7 +881,7 @@ export default function SupplierOrders() {
               </div>
 
               {/* Notes Section */}
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="space-y-1.5 sm:space-y-2 w-full">
                 <Label htmlFor="notes" className="text-xs sm:text-sm md:text-base font-medium">Notes (optionnel)</Label>
                 <Textarea
                   id="notes"
@@ -887,25 +889,25 @@ export default function SupplierOrders() {
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Notes supplémentaires sur la commande..."
-                  className="text-xs sm:text-sm md:text-base resize-none min-h-[80px] sm:min-h-[100px]"
+                  className="text-xs sm:text-sm md:text-base resize-none min-h-[70px] sm:min-h-[80px] md:min-h-[100px] w-full touch-manipulation"
                 />
               </div>
             </div>
             
             {/* Footer Buttons - Responsive */}
-            <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6 px-0 sm:px-0">
+            <DialogFooter className="flex-col xs:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4 md:mt-6 px-0 sm:px-0 w-full border-t border-border/50 pt-3 sm:pt-4 -mb-2.5 sm:-mb-3 md:-mb-4 lg:-mb-5 xl:-mb-6 pb-2.5 sm:pb-3 md:pb-4 lg:pb-5 xl:pb-6 bg-background sticky bottom-0">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsDialogOpen(false)} 
-                className="w-full sm:w-auto h-10 sm:h-11 md:h-12 text-xs sm:text-sm md:text-base order-2 sm:order-1"
+                className="w-full xs:w-auto h-9 sm:h-10 md:h-11 lg:h-12 text-xs sm:text-sm md:text-base order-2 xs:order-1 touch-manipulation shrink-0"
               >
                 Annuler
               </Button>
               <Button 
                 type="submit" 
                 disabled={createOrder.isPending} 
-                className="w-full sm:w-auto h-10 sm:h-11 md:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 text-xs sm:text-sm md:text-base order-1 sm:order-2"
+                className="w-full xs:w-auto h-9 sm:h-10 md:h-11 lg:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 text-xs sm:text-sm md:text-base order-1 xs:order-2 touch-manipulation shrink-0"
               >
                 {createOrder.isPending ? (
                   <>

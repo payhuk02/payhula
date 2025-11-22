@@ -14,22 +14,17 @@ import {
   Loader2, 
   ShoppingBag, 
   User, 
-  Mail, 
-  Phone, 
-  MapPin, 
   CreditCard,
   AlertCircle,
   Shield,
-  CheckCircle2,
   Tag
 } from "lucide-react";
 import CouponInput from '@/components/checkout/CouponInput';
-import { loadMonerooPayment, prefetchMoneroo } from "@/lib/moneroo-lazy";
+import { loadMonerooPayment } from "@/lib/moneroo-lazy";
 import { useToast } from "@/hooks/use-toast";
 import { safeRedirect } from "@/lib/url-validator";
 import { logger } from "@/lib/logger";
-import { formatPrice, getDisplayPrice } from "@/lib/product-helpers";
-import { SEOMeta } from "@/components/seo/SEOMeta";
+import { formatPrice } from "@/lib/product-helpers";
 import { stripHtmlTags } from "@/lib/utils";
 
 interface CheckoutFormData {
@@ -98,7 +93,7 @@ const Checkout = () => {
         }
       }
     } catch (error) {
-      logger.warn('Error loading coupon from localStorage:', error);
+      logger.warn('Error loading coupon from localStorage:', error as Error);
       localStorage.removeItem('applied_coupon');
     }
   }, []);
@@ -184,7 +179,7 @@ const Checkout = () => {
         if (variantId) {
           try {
             // Essayer d'abord physical_product_variants (pour produits physiques)
-            const { data: physicalVariant } = await supabase
+            const { data: physicalVariant } = await (supabase as any)
               .from("physical_product_variants")
               .select("*")
               .eq("id", variantId)
@@ -194,7 +189,7 @@ const Checkout = () => {
               setSelectedVariant(physicalVariant);
             } else {
               // Si pas trouvé, essayer product_variants (relation générique si elle existe)
-              const { data: genericVariant } = await supabase
+              const { data: genericVariant } = await (supabase as any)
                 .from("product_variants")
                 .select("*")
                 .eq("id", variantId)
@@ -206,7 +201,7 @@ const Checkout = () => {
             }
           } catch (variantError) {
             // Ne pas bloquer le checkout si la variante n'est pas trouvée
-            logger.warn("Variant not found:", variantError);
+            logger.warn("Variant not found:", variantError as Error);
           }
         }
 
@@ -224,7 +219,7 @@ const Checkout = () => {
           postalCode: currentUser.user_metadata?.postal_code || "",
         });
       } catch (err: unknown) {
-        logger.error("Error loading checkout data:", err);
+        logger.error("Error loading checkout data:", err instanceof Error ? err : new Error(String(err)));
         setError("Erreur lors du chargement des données");
       } finally {
         setLoading(false);
@@ -394,7 +389,7 @@ const Checkout = () => {
           });
         } catch (updateError) {
           // Ne pas bloquer le paiement si la mise à jour échoue
-          logger.warn("Failed to update user metadata:", updateError);
+          logger.warn("Failed to update user metadata:", updateError instanceof Error ? updateError : new Error(String(updateError)));
         }
 
         // Rediriger vers Moneroo
@@ -410,10 +405,10 @@ const Checkout = () => {
         throw new Error("URL de paiement non reçue");
       }
     } catch (error: unknown) {
-      logger.error("Payment initiation error:", error);
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      logger.error("Payment initiation error:", errorObj);
       
       // Extraire le message d'erreur de manière plus lisible
-      const errorObj = error instanceof Error ? error : new Error(String(error));
       let errorMessage = errorObj.message || "Impossible d'initialiser le paiement. Veuillez réessayer.";
       
       // Si le message contient des sauts de ligne, prendre seulement la première ligne pour le toast
@@ -433,8 +428,8 @@ const Checkout = () => {
       if (hasMoreDetails) {
         logger.error("Payment error details:", {
           fullMessage: errorMessage,
-          error: error,
-        });
+          error: errorObj,
+        } as any);
       }
       
       setSubmitting(false);
