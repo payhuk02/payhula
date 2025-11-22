@@ -47,22 +47,37 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { PaginationControls } from '@/components/affiliate/PaginationControls';
+import { useState, useEffect } from 'react';
 
 export default function StoreAffiliateManagement() {
   const { store, loading: storeLoading } = useStore();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [commissionStatusFilter, setCommissionStatusFilter] = useState<string>('all');
+  
+  // États de pagination
+  const [linksPage, setLinksPage] = useState(1);
+  const [linksPageSize, setLinksPageSize] = useState(20);
+  const [commissionsPage, setCommissionsPage] = useState(1);
+  const [commissionsPageSize, setCommissionsPageSize] = useState(20);
 
   // ⚠️ IMPORTANT: Tous les hooks doivent être appelés AVANT les retours conditionnels
   // pour respecter les règles des Hooks React
   const {
     links,
+    linksPagination,
+    linksLoading,
     commissions,
+    commissionsPagination,
+    commissionsLoading,
     approveCommission,
     rejectCommission,
     isLoading,
-  } = useStoreAffiliates(store?.id || '');
+  } = useStoreAffiliates(store?.id || '', {
+    links: { page: linksPage, pageSize: linksPageSize },
+    commissions: { page: commissionsPage, pageSize: commissionsPageSize },
+  });
 
   if (storeLoading) {
     return (
@@ -94,7 +109,20 @@ export default function StoreAffiliateManagement() {
     );
   }
 
-  // Filtrer les commissions
+  // Synchroniser les états de pagination avec les hooks
+  useEffect(() => {
+    if (linksPagination) {
+      setLinksPage(linksPagination.page);
+    }
+  }, [linksPagination?.page]);
+
+  useEffect(() => {
+    if (commissionsPagination) {
+      setCommissionsPage(commissionsPagination.page);
+    }
+  }, [commissionsPagination?.page]);
+
+  // Filtrer les commissions (filtrage côté client pour le statut)
   const filteredCommissions = commissions.filter((commission) => {
     return commissionStatusFilter === 'all' || commission.status === commissionStatusFilter;
   });

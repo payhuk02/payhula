@@ -94,12 +94,37 @@ export interface StoreAffiliateCommission {
   };
 }
 
+export interface PaginationParams {
+  page: number;
+  pageSize: number;
+}
+
+export interface PaginationInfo {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 /**
  * Récupère tous les affiliés d'un store
  */
-export const useStoreAffiliates = (storeId: string) => {
+export const useStoreAffiliates = (
+  storeId: string,
+  pagination?: {
+    links?: PaginationParams;
+    commissions?: PaginationParams;
+  }
+) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const linksPage = pagination?.links?.page || 1;
+  const linksPageSize = pagination?.links?.pageSize || 20;
+  const commissionsPage = pagination?.commissions?.page || 1;
+  const commissionsPageSize = pagination?.commissions?.pageSize || 20;
 
   // Récupérer les affiliés
   const { data: affiliates = [], isLoading, error } = useQuery({
@@ -169,10 +194,22 @@ export const useStoreAffiliates = (storeId: string) => {
     enabled: !!storeId,
   });
 
-  // Récupérer les liens d'affiliation
-  const { data: links = [] } = useQuery({
-    queryKey: ['store-affiliate-links', storeId],
+  // Récupérer les liens d'affiliation avec pagination
+  const { data: linksData, isLoading: linksLoading } = useQuery({
+    queryKey: ['store-affiliate-links', storeId, linksPage, linksPageSize],
     queryFn: async () => {
+      // Compter le total
+      const { count, error: countError } = await supabase
+        .from('affiliate_links')
+        .select('*', { count: 'exact', head: true })
+        .eq('store_id', storeId);
+
+      if (countError) throw countError;
+
+      // Requête principale avec pagination
+      const from = (linksPage - 1) * linksPageSize;
+      const to = from + linksPageSize - 1;
+
       const { data, error: fetchError } = await supabase
         .from('affiliate_links')
         .select(`
@@ -190,11 +227,12 @@ export const useStoreAffiliates = (storeId: string) => {
           )
         `)
         .eq('store_id', storeId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (fetchError) throw fetchError;
 
-      return (data || []).map((link: any) => ({
+      const links = (data || []).map((link: any) => ({
         id: link.id,
         affiliate_id: link.affiliate_id,
         product_id: link.product_id,
@@ -217,14 +255,44 @@ export const useStoreAffiliates = (storeId: string) => {
           display_name: link.affiliates.display_name,
         } : undefined,
       })) as StoreAffiliateLink[];
+
+      const total = count || 0;
+      const totalPages = Math.ceil(total / linksPageSize);
+
+      return {
+        links,
+        pagination: {
+          page: linksPage,
+          pageSize: linksPageSize,
+          total,
+          totalPages,
+          hasNextPage: linksPage < totalPages,
+          hasPreviousPage: linksPage > 1,
+        },
+      };
     },
     enabled: !!storeId,
   });
 
-  // Récupérer les commissions
-  const { data: commissions = [] } = useQuery({
-    queryKey: ['store-affiliate-commissions', storeId],
+  const links = linksData?.links || [];
+  const linksPagination = linksData?.pagination;
+
+  // Récupérer les commissions avec pagination
+  const { data: commissionsData, isLoading: commissionsLoading } = useQuery({
+    queryKey: ['store-affiliate-commissions', storeId, commissionsPage, commissionsPageSize],
     queryFn: async () => {
+      // Compter le total
+      const { count, error: countError } = await supabase
+        .from('affiliate_commissions')
+        .select('*', { count: 'exact', head: true })
+        .eq('store_id', storeId);
+
+      if (countError) throw countError;
+
+      // Requête principale avec pagination
+      const from = (commissionsPage - 1) * commissionsPageSize;
+      const to = from + commissionsPageSize - 1;
+
       const { data, error: fetchError } = await supabase
         .from('affiliate_commissions')
         .select(`
@@ -243,11 +311,11 @@ export const useStoreAffiliates = (storeId: string) => {
         `)
         .eq('store_id', storeId)
         .order('created_at', { ascending: false })
-        .limit(100);
+        .range(from, to);
 
       if (fetchError) throw fetchError;
 
-      return (data || []).map((commission: any) => ({
+      const commissions = (data || []).map((commission: any) => ({
         id: commission.id,
         affiliate_id: commission.affiliate_id,
         affiliate_link_id: commission.affiliate_link_id,
@@ -272,9 +340,27 @@ export const useStoreAffiliates = (storeId: string) => {
           order_number: commission.orders.order_number,
         } : undefined,
       })) as StoreAffiliateCommission[];
+
+      const total = count || 0;
+      const totalPages = Math.ceil(total / commissionsPageSize);
+
+      return {
+        commissions,
+        pagination: {
+          page: commissionsPage,
+          pageSize: commissionsPageSize,
+          total,
+          totalPages,
+          hasNextPage: commissionsPage < totalPages,
+          hasPreviousPage: commissionsPage > 1,
+        },
+      };
     },
     enabled: !!storeId,
   });
+
+  const commissions = commissionsData?.commissions || [];
+  const commissionsPagination = commissionsData?.pagination;
 
   // Approuver un affilié
   const approveAffiliate = useMutation({
@@ -491,8 +577,12 @@ export const useStoreAffiliates = (storeId: string) => {
     affiliates,
     stats,
     links,
+    linksPagination,
+    linksLoading,
     commissions,
-    isLoading,
+    commissionsPagination,
+    commissionsLoading,
+    isLoading: isLoading || linksLoading || commissionsLoading,
     error,
     approveAffiliate,
     rejectAffiliate,
