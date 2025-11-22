@@ -4,7 +4,7 @@
  * Date: 25/10/2025
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,15 +54,15 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 
 const AffiliateDashboard = () => {
-  const { affiliate, loading: affiliateLoading, isAffiliate } = useCurrentAffiliate();
+  const { affiliate, loading: affiliateLoading, isAffiliate, refetch: refetchAffiliate } = useCurrentAffiliate();
   
-  // États de pagination pour les liens
-  const [linksPage, setLinksPage] = useState(1);
+  // États de pagination pour les liens - optimisés (utilisés uniquement pour l'initialisation)
   const [linksPageSize, setLinksPageSize] = useState(20);
+  const [linksPage, setLinksPage] = useState(1);
   
-  // États de pagination pour les commissions
-  const [commissionsPage, setCommissionsPage] = useState(1);
+  // États de pagination pour les commissions - optimisés (utilisés uniquement pour l'initialisation)
   const [commissionsPageSize, setCommissionsPageSize] = useState(20);
+  const [commissionsPage, setCommissionsPage] = useState(1);
   
   const { 
     links, 
@@ -90,6 +90,36 @@ const AffiliateDashboard = () => {
   } = useAffiliateCommissions(
     { affiliate_id: affiliate?.id },
     { page: commissionsPage, pageSize: commissionsPageSize }
+  );
+  
+  // Synchroniser les pages uniquement quand elles changent dans le hook (évite les re-renders inutiles)
+  // Utilisation d'une condition stricte pour éviter les boucles infinies
+  useEffect(() => {
+    if (linksPagination?.page !== undefined && linksPagination.page !== linksPage) {
+      setLinksPage(linksPagination.page);
+    }
+  }, [linksPagination?.page]); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  useEffect(() => {
+    if (commissionsPagination?.page !== undefined && commissionsPagination.page !== commissionsPage) {
+      setCommissionsPage(commissionsPagination.page);
+    }
+  }, [commissionsPagination?.page]); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  // Memoization des calculs pour améliorer les performances
+  const pendingCommissions = useMemo(
+    () => commissions.filter(c => c.status === 'pending'),
+    [commissions]
+  );
+  
+  const linksWithConversionRates = useMemo(
+    () => links.map(link => ({
+      ...link,
+      conversionRate: link.total_clicks > 0 
+        ? ((link.total_sales / link.total_clicks) * 100).toFixed(1) 
+        : '0'
+    })),
+    [links]
   );
   
   const { balance, loading: balanceLoading } = useAffiliateBalance(affiliate?.id);
@@ -154,7 +184,15 @@ const AffiliateDashboard = () => {
     }
   };
 
-  const handleRegister = async () => {
+  // Protection contre les soumissions multiples
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleRegister = useCallback(async () => {
+    // Protection contre les soumissions multiples
+    if (isSubmitting || isRegistering) {
+      return;
+    }
+
     // Validation
     if (!validateRegistration(registrationData)) {
       toast({
@@ -166,6 +204,7 @@ const AffiliateDashboard = () => {
     }
 
     setIsRegistering(true);
+    setIsSubmitting(true);
     setRegistrationErrors({});
 
     try {
@@ -183,8 +222,8 @@ const AffiliateDashboard = () => {
           display_name: '',
         });
         setShowRegisterDialog(false);
-        // Recharger la page pour afficher le dashboard
-        window.location.reload();
+        // Recharger les données de l'affilié au lieu de recharger toute la page
+        await refetchAffiliate();
       }
     } catch (error: any) {
       toast({
@@ -194,8 +233,10 @@ const AffiliateDashboard = () => {
       });
     } finally {
       setIsRegistering(false);
+      // Délai avant de permettre une nouvelle soumission
+      setTimeout(() => setIsSubmitting(false), 1000);
     }
-  };
+  }, [registrationData, isSubmitting, isRegistering, refetchAffiliate, toast, validateRegistration]);
 
   const handleInputChange = (field: keyof typeof registrationData, value: string) => {
     setRegistrationData(prev => ({ ...prev, [field]: value }));
@@ -222,18 +263,30 @@ const AffiliateDashboard = () => {
     }
   }, [showRegisterDialog]);
 
-  // Synchroniser les états de pagination avec les hooks
-  useEffect(() => {
-    if (linksPagination) {
-      setLinksPage(linksPagination.page);
-    }
-  }, [linksPagination?.page]);
-
-  useEffect(() => {
-    if (commissionsPagination) {
-      setCommissionsPage(commissionsPagination.page);
-    }
-  }, [commissionsPagination?.page]);
+  // Handlers de pagination optimisés avec useCallback
+  const handleLinksPageChange = useCallback((page: number) => {
+    setLinksPage(page);
+    goToLinksPage(page);
+  }, [goToLinksPage]);
+  
+  const handleLinksPageSizeChange = useCallback((size: number) => {
+    setLinksPageSize(size);
+    setLinksPageSizeFromHook(size);
+    setLinksPage(1);
+    goToLinksPage(1); // Retour à la première page
+  }, [setLinksPageSizeFromHook, goToLinksPage]);
+  
+  const handleCommissionsPageChange = useCallback((page: number) => {
+    setCommissionsPage(page);
+    goToCommissionsPage(page);
+  }, [goToCommissionsPage]);
+  
+  const handleCommissionsPageSizeChange = useCallback((size: number) => {
+    setCommissionsPageSize(size);
+    setCommissionsPageSizeFromHook(size);
+    setCommissionsPage(1);
+    goToCommissionsPage(1); // Retour à la première page
+  }, [setCommissionsPageSizeFromHook, goToCommissionsPage]);
 
   // Registration Dialog Component
   const RegistrationDialog = () => (
@@ -673,9 +726,9 @@ const AffiliateDashboard = () => {
                     <DollarSign className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="hidden xs:inline">Commissions</span>
                     <span className="xs:hidden">Com.</span>
-                    {commissions.filter(c => c.status === 'pending').length > 0 && (
+                    {pendingCommissions.length > 0 && (
                       <Badge variant="secondary" className="ml-1.5 sm:ml-2 text-xs px-1.5 py-0">
-                        {commissions.filter(c => c.status === 'pending').length}
+                        {pendingCommissions.length}
                       </Badge>
                     )}
                   </TabsTrigger>
@@ -736,11 +789,7 @@ const AffiliateDashboard = () => {
                   ) : (
                     <>
                       <div className="space-y-3 sm:space-y-4">
-                        {links.map((link, index) => {
-                        const conversionRate = link.total_clicks > 0 
-                          ? ((link.total_sales / link.total_clicks) * 100).toFixed(1) 
-                          : '0';
-                        
+                        {linksWithConversionRates.map((link, index) => {
                         return (
                           <Card 
                             key={link.id} 
@@ -813,8 +862,8 @@ const AffiliateDashboard = () => {
                                   </div>
                                   <div className="col-span-2 sm:col-span-1">
                                     <p className="text-xs text-muted-foreground">Conversion</p>
-                                    <Badge variant={parseFloat(conversionRate) > 2 ? 'default' : 'outline'} className="text-xs">
-                                      {conversionRate}%
+                                    <Badge variant={parseFloat(link.conversionRate) > 2 ? 'default' : 'outline'} className="text-xs">
+                                      {link.conversionRate}%
                                     </Badge>
                                   </div>
                                 </div>
@@ -830,15 +879,8 @@ const AffiliateDashboard = () => {
                         <div className="mt-4 sm:mt-6 pt-4 border-t">
                           <PaginationControls
                             {...linksPagination}
-                            onPageChange={(page) => {
-                              setLinksPage(page);
-                              goToLinksPage(page);
-                            }}
-                            onPageSizeChange={(size) => {
-                              setLinksPageSize(size);
-                              setLinksPageSizeFromHook(size);
-                              setLinksPage(1);
-                            }}
+                            onPageChange={handleLinksPageChange}
+                            onPageSizeChange={handleLinksPageSizeChange}
                           />
                         </div>
                       )}
@@ -936,15 +978,8 @@ const AffiliateDashboard = () => {
                             <div className="mt-4 sm:mt-6 pt-4 border-t px-3 sm:px-4 pb-3 sm:pb-4">
                               <PaginationControls
                                 {...commissionsPagination}
-                                onPageChange={(page) => {
-                                  setCommissionsPage(page);
-                                  goToCommissionsPage(page);
-                                }}
-                                onPageSizeChange={(size) => {
-                                  setCommissionsPageSize(size);
-                                  setCommissionsPageSizeFromHook(size);
-                                  setCommissionsPage(1);
-                                }}
+                                onPageChange={handleCommissionsPageChange}
+                                onPageSizeChange={handleCommissionsPageSizeChange}
                               />
                             </div>
                           )}
