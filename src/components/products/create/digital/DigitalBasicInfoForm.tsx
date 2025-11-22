@@ -424,6 +424,7 @@ export const DigitalBasicInfoForm = ({
               src={formData.image_url}
               alt="Preview"
               className="h-32 w-32 object-cover rounded-lg border"
+              loading="lazy"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
