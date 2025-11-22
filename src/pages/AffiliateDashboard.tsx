@@ -501,8 +501,9 @@ const AffiliateDashboard = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {links.map((link) => {
+                    <>
+                      <div className="space-y-4">
+                        {links.map((link) => {
                         const conversionRate = link.total_clicks > 0 
                           ? ((link.total_sales / link.total_clicks) * 100).toFixed(1) 
                           : '0';
@@ -583,7 +584,7 @@ const AffiliateDashboard = () => {
                             </CardContent>
                           </Card>
                         );
-                      })}
+                        })}
                       </div>
                       
                       {/* Pagination pour les liens */}
