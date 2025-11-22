@@ -46,13 +46,15 @@ export const usePrefetchRoutes = () => {
     ];
 
     // Prefetch les routes au chargement de la page
+    // Note: React Router gère automatiquement le prefetch via lazy loading
+    // On peut aussi utiliser link prefetch pour les routes fréquentes
     frequentRoutes.forEach(route => {
       if (route !== location.pathname) {
-        // Prefetch le chunk de la route
-        import(`@/pages${route === '/dashboard' ? '/Dashboard' : route.replace('/dashboard', '/Dashboard')}`)
-          .catch(() => {
-            // Ignorer les erreurs silencieusement
-          });
+        // Créer un lien invisible pour prefetch
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = route;
+        document.head.appendChild(link);
       }
     });
   }, [location.pathname]);

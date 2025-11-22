@@ -22,7 +22,7 @@ import {
   Loader2,
   AlertCircle,
   Zap,
-} from 'lucide-react';
+} from '@/components/icons';
 import { useShippingCarriers, useCalculateCarrierRates } from '@/hooks/physical/useShippingCarriers';
 import { useStore } from '@/hooks/useStore';
 import { cn } from '@/lib/utils';

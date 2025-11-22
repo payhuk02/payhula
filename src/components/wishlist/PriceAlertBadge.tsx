@@ -4,7 +4,7 @@
  */
 
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, TrendingDown } from 'lucide-react';
+import { AlertCircle, TrendingDown } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
 interface PriceAlertBadgeProps {

@@ -37,7 +37,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, CheckCircle2, Package, X, Search, RefreshCw, TrendingDown, AlertCircle, Clock } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Package, X, Search, RefreshCw, TrendingDown, AlertCircle, Clock } from '@/components/icons';
 import { useStockAlerts, useResolveStockAlert } from '@/hooks/physical/useAdvancedInventory';
 import { useStore } from '@/hooks/use-store';
 import { StockAlert } from '@/hooks/physical/useAdvancedInventory';

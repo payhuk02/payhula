@@ -21,7 +21,7 @@ import {
   FileCategory,
 } from '@/hooks/digital/useAdvancedFileManagement';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/icons';
 import { supabase } from '@/integrations/supabase/client';
 
 interface FileCategoryFormProps {

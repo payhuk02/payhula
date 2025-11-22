@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useSerialTraceability, useSerialNumber } from '@/hooks/physical/useSerialTracking';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { RefreshCw, Package, Truck, User, AlertCircle } from 'lucide-react';
+import { RefreshCw, Package, Truck, User, AlertCircle } from '@/components/icons';
 
 interface SerialTraceabilityViewProps {
   serialNumberId: string;

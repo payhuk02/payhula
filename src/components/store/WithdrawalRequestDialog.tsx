@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from '@/components/icons';
 import { StoreWithdrawalRequestForm, MobileMoneyDetails, BankCardDetails, BankTransferDetails, MobileMoneyOperator } from '@/types/store-withdrawals';
 import { formatCurrency } from '@/lib/utils';
 import { useStorePaymentMethods } from '@/hooks/useStorePaymentMethods';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2, Shield, CheckCircle2 } from 'lucide-react';
+import { Download, Loader2, Shield, CheckCircle2 } from '@/components/icons';
 import { useGenerateDownloadToken, useLogDownload } from '@/hooks/digital/useSecureDownload';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';

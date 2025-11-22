@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Truck, Package, Info } from 'lucide-react';
+import { Truck, Package, Info } from '@/components/icons';
 import type { PhysicalProductFormData } from '@/types/physical-product';
 
 interface PhysicalShippingConfigProps {

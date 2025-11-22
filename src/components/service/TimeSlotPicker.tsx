@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Clock, Users, CheckCircle2, Loader2 } from 'lucide-react';
+import { Clock, Users, CheckCircle2, Loader2 } from '@/components/icons';
 import { useAvailableTimeSlots } from '@/hooks/service';
 
 interface TimeSlotPickerProps {

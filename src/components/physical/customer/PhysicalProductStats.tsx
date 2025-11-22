@@ -13,7 +13,7 @@ import {
   DollarSign,
   ShoppingCart,
   TrendingUp,
-} from 'lucide-react';
+} from '@/components/icons';
 
 export const PhysicalProductStats = () => {
   const { data: stats, isLoading, error } = useQuery({

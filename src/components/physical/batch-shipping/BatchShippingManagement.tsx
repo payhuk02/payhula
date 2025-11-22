@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBatchShipments, useCreateBatchShipment, useProcessBatchShipment, BatchShipment } from '@/hooks/physical/useBatchShipping';
 import { useStore } from '@/hooks/useStore';
-import { Package, Plus, RefreshCw, Download, Search, X } from 'lucide-react';
+import { Package, Plus, RefreshCw, Download, Search, X } from '@/components/icons';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';

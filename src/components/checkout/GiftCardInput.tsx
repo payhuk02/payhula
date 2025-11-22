@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useValidateGiftCard } from '@/hooks/giftCards/useGiftCards';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Gift, X, Loader2 } from 'lucide-react';
+import { Gift, X, Loader2 } from '@/components/icons';
 import { formatCurrency } from '@/lib/utils';
 
 interface GiftCardInputProps {

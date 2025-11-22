@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Order } from "@/hooks/useOrders";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart } from '@/components/icons';
 
 interface RecentOrdersProps {
   orders: Order[];

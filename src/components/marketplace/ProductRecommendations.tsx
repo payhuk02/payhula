@@ -4,7 +4,7 @@ import ProductCardModern from './ProductCardModern';
 import { ProductGrid } from '@/components/ui/ProductGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, ShoppingBag, TrendingUp } from 'lucide-react';
+import { Sparkles, ShoppingBag, TrendingUp } from '@/components/icons';
 
 interface ProductRecommendationsProps {
   productId: string;

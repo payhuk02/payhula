@@ -16,7 +16,7 @@ import {
   Settings,
   Save,
   Loader2,
-} from 'lucide-react';
+} from '@/components/icons';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';

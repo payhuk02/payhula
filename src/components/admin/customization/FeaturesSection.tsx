@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Zap, Search, Users, Gift, Star, ShoppingCart, GraduationCap, CreditCard, Globe, Shield, Bell, TrendingUp, FileText, MessageSquare } from 'lucide-react';
+import { Zap, Search, Users, Gift, Star, ShoppingCart, GraduationCap, CreditCard, Globe, Shield, Bell, TrendingUp, FileText, MessageSquare } from '@/components/icons';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 
 interface FeaturesSectionProps {

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2 } from '@/components/icons';
 import { exportReviewsToCSV } from '@/utils/exportReviewsCSV';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Order } from "@/hooks/useOrders";
-import { Package } from "lucide-react";
+import { Package } from '@/components/icons';
 
 interface TopProductsProps {
   orders: Order[];

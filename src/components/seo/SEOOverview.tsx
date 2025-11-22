@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle2, AlertTriangle, TrendingUp } from "lucide-react";
+import { CheckCircle2, AlertTriangle, TrendingUp } from '@/components/icons';
 import { useAverageSEOScore } from "@/hooks/useSEOAnalysis";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 

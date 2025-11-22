@@ -16,7 +16,7 @@ import {
   Calendar,
   Package,
   Sparkles,
-} from 'lucide-react';
+} from '@/components/icons';
 import { supabase } from '@/integrations/supabase/client';
 import { DigitalProductUpdate } from '@/hooks/digital/useProductUpdates';
 

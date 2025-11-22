@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Camera, X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Camera, X, CheckCircle2, AlertCircle, Loader2 } from '@/components/icons';
 import { BarcodeScanResult } from '@/hooks/physical/useBarcodeScanner';
 import { logger } from '@/lib/logger';
 

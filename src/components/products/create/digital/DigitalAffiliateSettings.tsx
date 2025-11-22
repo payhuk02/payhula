@@ -23,7 +23,7 @@ import {
   Info,
   CheckCircle2,
   Sparkles
-} from 'lucide-react';
+} from '@/components/icons';
 import {
   Alert,
   AlertDescription,

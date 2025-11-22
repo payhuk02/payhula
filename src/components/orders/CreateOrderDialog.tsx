@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useProductsOptimized } from "@/hooks/useProductsOptimized";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from '@/components/icons';
 import { Card } from "@/components/ui/card";
 
 interface CreateOrderDialogProps {

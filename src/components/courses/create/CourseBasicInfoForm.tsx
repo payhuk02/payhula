@@ -7,7 +7,7 @@ import { AIContentGenerator } from "@/components/products/AIContentGenerator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CurrencySelect } from "@/components/ui/currency-select";
-import { Info, Gift } from "lucide-react";
+import { Info, Gift } from '@/components/icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CourseBasicInfoFormProps {

@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, Settings, Check } from 'lucide-react';
+import { X, Settings, Check } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

@@ -13,7 +13,7 @@ import {
   BarChart3,
   ShoppingCart,
   DollarSign,
-} from 'lucide-react';
+} from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 

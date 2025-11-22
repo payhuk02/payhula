@@ -18,7 +18,7 @@ import {
   Clock,
   TrendingUp,
   Eye,
-} from 'lucide-react';
+} from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { LazyImage } from '@/components/ui/LazyImage';

@@ -5,7 +5,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw, X } from 'lucide-react';
+import { AlertCircle, RefreshCw, X } from '@/components/icons';
 import { normalizeError, ErrorSeverity, ErrorType } from '@/lib/error-handling';
 
 interface ErrorDisplayProps {

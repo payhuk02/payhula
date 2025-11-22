@@ -15,7 +15,7 @@ import {
   Activity,
   Target,
   Zap
-} from "lucide-react";
+} from '@/components/icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { useMemo } from "react";
 

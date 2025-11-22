@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import ProductSlugEditor from "./ProductSlugEditor";
 import ImageUpload from "./ImageUpload";
-import { Info } from "lucide-react";
+import { Info } from '@/components/icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useProductManagement } from "@/hooks/useProductManagement";
 import { Product } from "@/hooks/useProducts";

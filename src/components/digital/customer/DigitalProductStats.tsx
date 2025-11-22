@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useCustomerPurchasedProducts } from '@/hooks/digital/useCustomerPurchasedProducts';
 import { useUserDownloads } from '@/hooks/digital/useDownloads';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Package, Download, Key, TrendingUp, DollarSign, Calendar } from 'lucide-react';
+import { Package, Download, Key, TrendingUp, DollarSign, Calendar } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, subDays, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';

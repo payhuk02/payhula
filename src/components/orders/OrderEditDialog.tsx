@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useProducts } from "@/hooks/useProducts";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from '@/components/icons';
 import { Card } from "@/components/ui/card";
 import { Order } from "@/hooks/useOrders";
 

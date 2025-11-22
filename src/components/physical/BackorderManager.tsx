@@ -38,7 +38,7 @@ import {
   Users,
   Bell,
   RefreshCw,
-} from 'lucide-react';
+} from '@/components/icons';
 import { format, formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';

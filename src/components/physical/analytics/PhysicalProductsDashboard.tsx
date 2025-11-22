@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { usePhysicalProductsKPIs, usePhysicalProductsTrends, useTopPhysicalProducts } from '@/hooks/physical/usePhysicalAnalytics';
 import { useStore } from '@/hooks/useStore';
-import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package, RefreshCw, AlertTriangle, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package, RefreshCw, AlertTriangle, BarChart3 } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

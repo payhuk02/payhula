@@ -9,6 +9,7 @@ import { ScrollToTop } from "@/components/navigation/ScrollToTop";
 import { LoadingBar } from "@/components/navigation/LoadingBar";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { usePrefetch } from "@/hooks/usePrefetch";
 import { PerformanceOptimizer } from "@/components/optimization/PerformanceOptimizer";
 import { useGlobalKeyboardShortcuts } from "@/hooks/useKeyboardNavigation";
 import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
@@ -323,6 +324,19 @@ const OldProductRouteRedirect = () => {
 const AppContent = () => {
   useScrollRestoration();
   useDarkMode(); // Active le mode sombre globalement
+  
+  // Prefetching intelligent des routes et données fréquentes
+  usePrefetch({
+    routes: [
+      '/dashboard',
+      '/dashboard/products',
+      '/dashboard/orders',
+      '/dashboard/analytics',
+      '/marketplace',
+      '/cart',
+    ],
+    delay: 100, // Délai de 100ms avant prefetch au hover
+  });
 
   // Initialiser Sentry, Web Vitals et Performance Monitoring au montage
   useEffect(() => {

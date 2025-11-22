@@ -18,7 +18,7 @@ import { useCreatePriceAlert } from '@/hooks/physical/usePhysicalNotifications';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/icons';
 
 interface PriceAlertFormProps {
   productId?: string;

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { FileText } from 'lucide-react';
+import { FileText } from '@/components/icons';
 import { useStudentAssignments } from '@/hooks/courses/useAssignments';
 import { AssignmentCard } from './AssignmentCard';
 import { Skeleton } from '@/components/ui/skeleton';

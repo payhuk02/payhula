@@ -13,7 +13,7 @@ import {
   DollarSign,
   TrendingUp,
   ShoppingBag,
-} from 'lucide-react';
+} from '@/components/icons';
 import { useCustomerPhysicalOrders } from '@/hooks/physical/useCustomerPhysicalOrders';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

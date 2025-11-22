@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Calendar, CheckCircle2, Package, Clock, TrendingDown } from 'lucide-react';
+import { AlertTriangle, Calendar, CheckCircle2, Package, Clock, TrendingDown } from '@/components/icons';
 import { useExpirationAlerts, useResolveExpirationAlert } from '@/hooks/physical/useLotsExpiration';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

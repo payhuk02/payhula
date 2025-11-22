@@ -32,7 +32,7 @@ import {
   MoreVertical,
   Trash2,
   Eye,
-} from 'lucide-react';
+} from '@/components/icons';
 import { useRecurringSeries, useCancelRecurringSeries, useRecurringBookingsBySeries, type RecurringBookingSeries } from '@/hooks/services/useRecurringBookings';
 import { useStore } from '@/hooks/useStore';
 import { format } from 'date-fns';

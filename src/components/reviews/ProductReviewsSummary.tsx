@@ -13,7 +13,7 @@ import { ExportReviewsButton } from './ExportReviewsButton';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Star, AlertCircle } from 'lucide-react';
+import { Star, AlertCircle } from '@/components/icons';
 import {
   useProductReviewStats,
   useCanReview,

@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
-import { Search } from "lucide-react";
+import { Search } from '@/components/icons';
 import { DateRange } from "react-day-picker";
 
 interface OrderFiltersProps {

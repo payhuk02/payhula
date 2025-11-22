@@ -9,7 +9,7 @@ import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { IMAGE_FORMATS, IMAGE_FILE_LIMITS } from '@/config/image-formats';
-import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Info } from '@/components/icons';
 
 // ============================================================================
 // IMAGE REQUIREMENTS DISPLAY

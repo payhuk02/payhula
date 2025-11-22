@@ -8,7 +8,7 @@ import React, { useState, useCallback } from 'react';
 import { ReviewCard } from './ReviewCard';
 import { ReviewFilter } from './ReviewFilter';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/icons';
 import { useProductReviews, useVoteReview } from '@/hooks/useReviews';
 import type { ReviewFilters } from '@/types/review';
 import { ReviewsListSkeleton } from './ReviewSkeleton';

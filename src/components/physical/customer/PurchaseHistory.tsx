@@ -21,7 +21,7 @@ import {
   Package,
   Search,
   Filter,
-} from 'lucide-react';
+} from '@/components/icons';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';

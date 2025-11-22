@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Bell, Check, Settings, Eye } from 'lucide-react';
+import { Bell, Check, Settings, Eye } from '@/components/icons';
 import {
   useNotifications,
   useMarkAsRead,

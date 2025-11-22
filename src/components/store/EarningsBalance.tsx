@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Wallet, DollarSign, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { Wallet, DollarSign, TrendingUp, CheckCircle2 } from '@/components/icons';
 import { StoreEarnings } from '@/types/store-withdrawals';
 import { formatCurrency } from '@/lib/utils';
 

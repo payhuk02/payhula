@@ -25,7 +25,7 @@ import {
   WEBHOOK_EVENTS,
 } from '@/hooks/digital/useWebhooks';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 

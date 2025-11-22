@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateSlug } from "@/lib/store-utils";
 import { logger } from "@/lib/logger";
-import { Loader2, Check, X } from "lucide-react";
+import { Loader2, Check, X } from '@/components/icons';
 
 interface StoreFormProps {
   onSuccess: () => void;

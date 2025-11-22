@@ -1,5 +1,5 @@
 import { Store } from "@/hooks/use-store";
-import { Users } from "lucide-react";
+import { Users } from '@/components/icons';
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 interface StoreHeaderProps {

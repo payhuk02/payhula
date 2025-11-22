@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, ShoppingBag, TrendingDown, Star } from 'lucide-react';
+import { Package, ShoppingBag, TrendingDown, Star } from '@/components/icons';
 import { useCart } from '@/hooks/cart/useCart';
 import { useToast } from '@/hooks/use-toast';
 import type { DigitalProductBundle } from '@/hooks/digital/useDigitalBundles';

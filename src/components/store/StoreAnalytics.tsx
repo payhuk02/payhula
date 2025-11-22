@@ -13,7 +13,7 @@ import {
   Calendar,
   Download,
   RefreshCw
-} from "lucide-react";
+} from '@/components/icons';
 import { useStore } from "@/hooks/useStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";

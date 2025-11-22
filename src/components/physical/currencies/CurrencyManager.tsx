@@ -32,7 +32,7 @@ import {
   Loader2,
   TrendingUp,
   Globe,
-} from 'lucide-react';
+} from '@/components/icons';
 import {
   useCurrencies,
   useExchangeRates,

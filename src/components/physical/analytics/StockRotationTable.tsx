@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useStockRotationReports } from '@/hooks/physical/usePhysicalAnalytics';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { RefreshCw, TrendingUp, TrendingDown, AlertCircle } from '@/components/icons';
 
 interface StockRotationTableProps {
   storeId: string;

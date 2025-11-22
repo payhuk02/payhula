@@ -27,7 +27,7 @@ import {
   MessageSquare,
   Heart,
   Share2
-} from "lucide-react";
+} from '@/components/icons';
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 

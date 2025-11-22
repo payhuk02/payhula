@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { DollarSign, Wallet, Users, Info, CreditCard, ShoppingCart } from 'lucide-react';
+import { DollarSign, Wallet, Users, Info, CreditCard, ShoppingCart } from '@/components/icons';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 import { usePlatformSettingsDirect } from '@/hooks/usePlatformSettingsDirect';
 
