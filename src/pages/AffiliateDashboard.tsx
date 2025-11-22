@@ -200,7 +200,7 @@ const AffiliateDashboard = () => {
         <div className="flex h-screen w-full overflow-x-hidden bg-background">
           <AppSidebar />
           <main className="flex-1 overflow-auto">
-            <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+            <div className="w-full p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
               <Skeleton className="h-8 sm:h-10 lg:h-12 w-full sm:w-64 mb-4 sm:mb-6" />
               <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
                 {[...Array(5)].map((_, i) => (
@@ -221,8 +221,8 @@ const AffiliateDashboard = () => {
         <div className="flex h-screen w-full overflow-x-hidden bg-background">
           <AppSidebar />
           <main className="flex-1 overflow-auto">
-            <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
-              <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="w-full p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+              <Card className="w-full border-2 border-primary/20 bg-card/50 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-700">
                   <CardHeader className="text-center p-4 sm:p-6">
                     <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 backdrop-blur-sm border border-purple-500/20 flex items-center justify-center mb-3 sm:mb-4 animate-in zoom-in duration-500">
                       <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 dark:text-purple-400" />
@@ -333,7 +333,7 @@ const AffiliateDashboard = () => {
       <div className="flex h-screen w-full overflow-x-hidden bg-background">
         <AppSidebar />
         <main className="flex-1 overflow-auto">
-          <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+          <div className="w-full p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
             {/* Header - Responsive & Animated */}
             <div 
               ref={headerRef}
