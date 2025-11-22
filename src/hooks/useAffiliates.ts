@@ -11,23 +11,67 @@ import {
   Affiliate, 
   AffiliateFilters, 
   AffiliateRegistrationForm,
-  AffiliateStats 
+  AffiliateStats,
+  PaginationParams,
+  PaginatedResponse
 } from '@/types/affiliate';
 import { logger } from '@/lib/logger';
+import { AffiliateError, handleSupabaseError, AffiliateErrors } from '@/lib/affiliate-errors';
 
-export const useAffiliates = (filters?: AffiliateFilters) => {
+export const useAffiliates = (filters?: AffiliateFilters, pagination?: PaginationParams) => {
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(pagination?.page || 1);
+  const [pageSize, setPageSize] = useState(pagination?.pageSize || 20);
   const { toast } = useToast();
 
-  const fetchAffiliates = async () => {
+  const fetchAffiliates = async (currentPage: number = page) => {
     try {
       setLoading(true);
       
+      // Compter le total pour la pagination
+      let countQuery = supabase
+        .from('affiliates')
+        .select('*', { count: 'exact', head: true });
+
+      if (filters?.status) {
+        countQuery = countQuery.eq('status', filters.status);
+      }
+
+      if (filters?.search) {
+        countQuery = countQuery.or(`email.ilike.%${filters.search}%,display_name.ilike.%${filters.search}%,affiliate_code.ilike.%${filters.search}%,first_name.ilike.%${filters.search}%,last_name.ilike.%${filters.search}%`);
+      }
+
+      if (filters?.date_from) {
+        countQuery = countQuery.gte('created_at', filters.date_from);
+      }
+
+      if (filters?.date_to) {
+        countQuery = countQuery.lte('created_at', filters.date_to);
+      }
+
+      if (filters?.min_sales !== undefined) {
+        countQuery = countQuery.gte('total_sales', filters.min_sales);
+      }
+
+      if (filters?.min_revenue !== undefined) {
+        countQuery = countQuery.gte('total_revenue', filters.min_revenue);
+      }
+
+      const { count, error: countError } = await countQuery;
+      if (countError) throw countError;
+      setTotal(count || 0);
+
+      // Requête principale avec pagination
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+
       let query = supabase
         .from('affiliates')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (filters?.status) {
         query = query.eq('status', filters.status);
@@ -55,14 +99,19 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        const affiliateError = handleSupabaseError(error);
+        throw affiliateError;
+      }
 
       setAffiliates(data || []);
-    } catch (error: any) {
-      logger.error('Error fetching affiliates:', error);
+      setPage(currentPage);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error fetching affiliates:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
     } finally {
@@ -72,6 +121,11 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
   const registerAffiliate = async (formData: AffiliateRegistrationForm): Promise<Affiliate | null> => {
     try {
+      // Validation
+      if (!formData.email) {
+        throw AffiliateErrors.validationError('email', 'L\'email est requis');
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
 
       // Générer code affilié
@@ -80,7 +134,9 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
         p_last_name: formData.last_name,
       });
 
-      if (codeError) throw codeError;
+      if (codeError) {
+        throw handleSupabaseError(codeError);
+      }
 
       const { data, error } = await supabase
         .from('affiliates')
@@ -98,7 +154,9 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({
         title: 'Inscription réussie ! 🎉',
@@ -107,11 +165,12 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
       await fetchAffiliates();
       return data;
-    } catch (error: any) {
-      logger.error('Error registering affiliate:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error registering affiliate:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return null;
@@ -120,25 +179,32 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
   const updateAffiliate = async (affiliateId: string, updates: Partial<Affiliate>): Promise<boolean> => {
     try {
+      if (!affiliateId) {
+        throw AffiliateErrors.affiliateNotFound();
+      }
+
       const { error } = await supabase
         .from('affiliates')
         .update(updates)
         .eq('id', affiliateId);
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({
         title: 'Succès',
         description: 'Affilié mis à jour',
       });
 
-      await fetchAffiliates();
+      await fetchAffiliates(page);
       return true;
-    } catch (error: any) {
-      logger.error('Error updating affiliate:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error updating affiliate:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return false;
@@ -147,6 +213,14 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
   const suspendAffiliate = async (affiliateId: string, reason: string): Promise<boolean> => {
     try {
+      if (!affiliateId) {
+        throw AffiliateErrors.affiliateNotFound();
+      }
+
+      if (!reason || reason.trim().length === 0) {
+        throw AffiliateErrors.validationError('reason', 'La raison de suspension est requise');
+      }
+
       const { error } = await supabase
         .from('affiliates')
         .update({
@@ -156,20 +230,23 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
         })
         .eq('id', affiliateId);
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({
         title: 'Succès',
         description: 'Affilié suspendu',
       });
 
-      await fetchAffiliates();
+      await fetchAffiliates(page);
       return true;
-    } catch (error: any) {
-      logger.error('Error suspending affiliate:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error suspending affiliate:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return false;
@@ -178,6 +255,10 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
   const activateAffiliate = async (affiliateId: string): Promise<boolean> => {
     try {
+      if (!affiliateId) {
+        throw AffiliateErrors.affiliateNotFound();
+      }
+
       const { error } = await supabase
         .from('affiliates')
         .update({
@@ -187,20 +268,23 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
         })
         .eq('id', affiliateId);
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({
         title: 'Succès',
         description: 'Affilié réactivé',
       });
 
-      await fetchAffiliates();
+      await fetchAffiliates(page);
       return true;
-    } catch (error: any) {
-      logger.error('Error activating affiliate:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error activating affiliate:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return false;
@@ -209,13 +293,23 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
 
   const getAffiliateStats = async (affiliateId: string): Promise<AffiliateStats | null> => {
     try {
+      if (!affiliateId) {
+        throw AffiliateErrors.affiliateNotFound();
+      }
+
       const { data: affiliate, error } = await supabase
         .from('affiliates')
         .select('*')
         .eq('id', affiliateId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
+
+      if (!affiliate) {
+        throw AffiliateErrors.affiliateNotFound(affiliateId);
+      }
 
       const conversionRate = affiliate.total_clicks > 0 
         ? (affiliate.total_sales / affiliate.total_clicks) * 100 
@@ -243,25 +337,68 @@ export const useAffiliates = (filters?: AffiliateFilters) => {
       };
 
       return stats;
-    } catch (error: any) {
-      logger.error('Error getting affiliate stats:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error getting affiliate stats:', affiliateError);
+      toast({
+        title: 'Erreur',
+        description: affiliateError.getUserMessage(),
+        variant: 'destructive',
+      });
       return null;
     }
   };
 
   useEffect(() => {
-    fetchAffiliates();
-  }, [JSON.stringify(filters)]);
+    fetchAffiliates(page);
+  }, [JSON.stringify(filters), page, pageSize]);
+
+  const totalPages = Math.ceil(total / pageSize);
+  const hasNextPage = page < totalPages;
+  const hasPreviousPage = page > 1;
+
+  const goToPage = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchAffiliates(newPage);
+    }
+  };
+
+  const nextPage = () => {
+    if (hasNextPage) {
+      goToPage(page + 1);
+    }
+  };
+
+  const previousPage = () => {
+    if (hasPreviousPage) {
+      goToPage(page - 1);
+    }
+  };
 
   return {
     affiliates,
     loading,
+    // Pagination
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages,
+      hasNextPage,
+      hasPreviousPage,
+    },
+    // Navigation
+    goToPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    // CRUD
     registerAffiliate,
     updateAffiliate,
     suspendAffiliate,
     activateAffiliate,
     getAffiliateStats,
-    refetch: fetchAffiliates,
+    refetch: () => fetchAffiliates(page),
   };
 };
 

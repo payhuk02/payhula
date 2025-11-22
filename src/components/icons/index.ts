@@ -116,4 +116,6 @@ export {
   TrendingDown,
   Accessibility,
   Info,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react';

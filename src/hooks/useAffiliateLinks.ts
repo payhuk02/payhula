@@ -10,18 +10,60 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   AffiliateLink, 
   CreateAffiliateLinkForm,
-  LinkFilters 
+  LinkFilters,
+  PaginationParams
 } from '@/types/affiliate';
 import { logger } from '@/lib/logger';
+import { handleSupabaseError, AffiliateErrors } from '@/lib/affiliate-errors';
 
-export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) => {
+export const useAffiliateLinks = (
+  affiliateId?: string, 
+  filters?: LinkFilters,
+  pagination?: PaginationParams
+) => {
   const [links, setLinks] = useState<AffiliateLink[]>([]);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(pagination?.page || 1);
+  const [pageSize, setPageSize] = useState(pagination?.pageSize || 20);
   const { toast } = useToast();
 
-  const fetchLinks = async () => {
+  const fetchLinks = async (currentPage: number = page) => {
     try {
       setLoading(true);
+
+      // Compter le total
+      let countQuery = supabase
+        .from('affiliate_links')
+        .select('*', { count: 'exact', head: true });
+
+      if (affiliateId) {
+        countQuery = countQuery.eq('affiliate_id', affiliateId);
+      }
+
+      if (filters?.status) {
+        countQuery = countQuery.eq('status', filters.status);
+      }
+
+      if (filters?.product_id) {
+        countQuery = countQuery.eq('product_id', filters.product_id);
+      }
+
+      if (filters?.store_id) {
+        countQuery = countQuery.eq('store_id', filters.store_id);
+      }
+
+      if (filters?.search) {
+        countQuery = countQuery.or(`link_code.ilike.%${filters.search}%,full_url.ilike.%${filters.search}%`);
+      }
+
+      const { count, error: countError } = await countQuery;
+      if (countError) throw countError;
+      setTotal(count || 0);
+
+      // Requête principale avec pagination
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
 
       let query = supabase
         .from('affiliate_links')
@@ -37,7 +79,8 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
           ),
           affiliate:affiliates!inner(display_name, affiliate_code)
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (affiliateId) {
         query = query.eq('affiliate_id', affiliateId);
@@ -61,14 +104,19 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        const affiliateError = handleSupabaseError(error);
+        throw affiliateError;
+      }
 
       setLinks(data || []);
-    } catch (error: any) {
-      logger.error('Error fetching affiliate links:', error);
+      setPage(currentPage);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error fetching affiliate links:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
     } finally {
@@ -92,7 +140,9 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         .eq('affiliate_enabled', true)
         .single();
 
-      if (settingsError) throw new Error('Ce produit n\'accepte pas l\'affiliation');
+      if (settingsError || !settingsData) {
+        throw AffiliateErrors.productAffiliateDisabled(formData.product_id);
+      }
 
       // Récupérer le code de l'affilié
       const { data: affiliateData, error: affiliateError } = await supabase
@@ -101,7 +151,9 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         .eq('id', affiliateId)
         .single();
 
-      if (affiliateError) throw affiliateError;
+      if (affiliateError || !affiliateData) {
+        throw AffiliateErrors.affiliateNotFound(affiliateId);
+      }
 
       // Générer le code du lien
       const { data: codeData, error: codeError } = await supabase.rpc('generate_affiliate_link_code', {
@@ -109,7 +161,9 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         p_product_slug: settingsData.product.slug,
       });
 
-      if (codeError) throw codeError;
+      if (codeError) {
+        throw handleSupabaseError(codeError);
+      }
 
       // Générer l'URL complète
       const baseUrl = window.location.origin;
@@ -137,20 +191,23 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         `)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({
         title: 'Lien créé ! 🔗',
         description: `Lien pour "${settingsData.product.name}"`,
       });
 
-      await fetchLinks();
+      await fetchLinks(page);
       return data;
-    } catch (error: any) {
-      logger.error('Error creating affiliate link:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error creating affiliate link:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return null;
@@ -164,20 +221,23 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         .update({ status: 'paused' })
         .eq('id', linkId);
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({ 
         title: 'Lien mis en pause',
         description: 'Les clics ne seront plus comptabilisés' 
       });
       
-      await fetchLinks();
+      await fetchLinks(page);
       return true;
-    } catch (error: any) {
-      logger.error('Error pausing link:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error pausing link:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return false;
@@ -191,20 +251,23 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         .update({ status: 'active' })
         .eq('id', linkId);
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({ 
         title: 'Lien activé ✅',
         description: 'Le lien est à nouveau opérationnel' 
       });
       
-      await fetchLinks();
+      await fetchLinks(page);
       return true;
-    } catch (error: any) {
-      logger.error('Error activating link:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error activating link:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return false;
@@ -218,20 +281,23 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
         .update({ status: 'deleted' })
         .eq('id', linkId);
 
-      if (error) throw error;
+      if (error) {
+        throw handleSupabaseError(error);
+      }
 
       toast({ 
         title: 'Lien supprimé',
         description: 'Le lien a été désactivé' 
       });
       
-      await fetchLinks();
+      await fetchLinks(page);
       return true;
-    } catch (error: any) {
-      logger.error('Error deleting link:', error);
+    } catch (error: unknown) {
+      const affiliateError = handleSupabaseError(error);
+      logger.error('Error deleting link:', affiliateError);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: affiliateError.getUserMessage(),
         variant: 'destructive',
       });
       return false;
@@ -260,19 +326,56 @@ export const useAffiliateLinks = (affiliateId?: string, filters?: LinkFilters) =
 
   useEffect(() => {
     if (affiliateId || filters) {
-      fetchLinks();
+      fetchLinks(page);
     }
-  }, [affiliateId, JSON.stringify(filters)]);
+  }, [affiliateId, JSON.stringify(filters), page, pageSize]);
+
+  const totalPages = Math.ceil(total / pageSize);
+  const hasNextPage = page < totalPages;
+  const hasPreviousPage = page > 1;
+
+  const goToPage = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchLinks(newPage);
+    }
+  };
+
+  const nextPage = () => {
+    if (hasNextPage) {
+      goToPage(page + 1);
+    }
+  };
+
+  const previousPage = () => {
+    if (hasPreviousPage) {
+      goToPage(page - 1);
+    }
+  };
 
   return {
     links,
     loading,
+    // Pagination
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages,
+      hasNextPage,
+      hasPreviousPage,
+    },
+    // Navigation
+    goToPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    // CRUD
     createLink,
     pauseLink,
     activateLink,
     deleteLink,
     copyLink,
-    refetch: fetchLinks,
+    refetch: () => fetchLinks(page),
   };
 };
 
