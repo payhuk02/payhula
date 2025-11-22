@@ -43,12 +43,15 @@ import {
   Clock,
   UserPlus,
   BarChart3,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
 
 const AffiliateDashboard = () => {
   const { affiliate, loading: affiliateLoading, isAffiliate } = useCurrentAffiliate();
@@ -94,21 +97,130 @@ const AffiliateDashboard = () => {
     affiliate_id: affiliate?.id 
   });
   const { registerAffiliate } = useAffiliates();
+  const { toast } = useToast();
 
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [registrationData, setRegistrationData] = useState({
     email: '',
     first_name: '',
     last_name: '',
     display_name: '',
   });
+  const [registrationErrors, setRegistrationErrors] = useState<Record<string, string>>({});
 
-  const handleRegister = async () => {
-    const result = await registerAffiliate(registrationData);
-    if (result) {
-      setShowRegisterDialog(false);
+  // Schéma de validation Zod pour l'inscription
+  const registrationSchema = z.object({
+    email: z.string()
+      .min(1, 'L\'email est requis')
+      .email('L\'email doit être valide'),
+    first_name: z.union([
+      z.string().length(0), // Chaîne vide autorisée
+      z.string()
+        .min(2, 'Le prénom doit contenir au moins 2 caractères')
+        .max(50, 'Le prénom ne peut pas dépasser 50 caractères')
+        .regex(/^[a-zA-ZàâäéèêëïîôùûüÿñçÀÂÄÉÈÊËÏÎÔÙÛÜŸÑÇ\s'-]+$/, 'Le prénom ne peut contenir que des lettres')
+    ]),
+    last_name: z.union([
+      z.string().length(0), // Chaîne vide autorisée
+      z.string()
+        .min(2, 'Le nom doit contenir au moins 2 caractères')
+        .max(50, 'Le nom ne peut pas dépasser 50 caractères')
+        .regex(/^[a-zA-ZàâäéèêëïîôùûüÿñçÀÂÄÉÈÊËÏÎÔÙÛÜŸÑÇ\s'-]+$/, 'Le nom ne peut contenir que des lettres')
+    ]),
+    display_name: z.union([
+      z.string().length(0), // Chaîne vide autorisée
+      z.string().max(50, 'Le nom d\'affichage ne peut pas dépasser 50 caractères')
+    ]),
+  });
+
+  const validateRegistration = (data: typeof registrationData): boolean => {
+    try {
+      registrationSchema.parse(data);
+      setRegistrationErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const path = err.path[0] as string;
+          if (path) {
+            errors[path] = err.message;
+          }
+        });
+        setRegistrationErrors(errors);
+      }
+      return false;
     }
   };
+
+  const handleRegister = async () => {
+    // Validation
+    if (!validateRegistration(registrationData)) {
+      toast({
+        title: 'Erreur de validation',
+        description: 'Veuillez corriger les erreurs dans le formulaire',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsRegistering(true);
+    setRegistrationErrors({});
+
+    try {
+      const result = await registerAffiliate(registrationData);
+      if (result) {
+        toast({
+          title: 'Inscription réussie !',
+          description: 'Vous êtes maintenant inscrit au programme d\'affiliation',
+        });
+        // Réinitialiser le formulaire
+        setRegistrationData({
+          email: '',
+          first_name: '',
+          last_name: '',
+          display_name: '',
+        });
+        setShowRegisterDialog(false);
+        // Recharger la page pour afficher le dashboard
+        window.location.reload();
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Erreur d\'inscription',
+        description: error?.message || 'Une erreur est survenue lors de l\'inscription',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const handleInputChange = (field: keyof typeof registrationData, value: string) => {
+    setRegistrationData(prev => ({ ...prev, [field]: value }));
+    // Effacer l'erreur du champ modifié
+    if (registrationErrors[field]) {
+      setRegistrationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  // Réinitialiser les erreurs et le formulaire quand le dialog se ferme
+  useEffect(() => {
+    if (!showRegisterDialog) {
+      setRegistrationErrors({});
+      setRegistrationData({
+        email: '',
+        first_name: '',
+        last_name: '',
+        display_name: '',
+      });
+    }
+  }, [showRegisterDialog]);
 
   // Synchroniser les états de pagination avec les hooks
   useEffect(() => {
@@ -127,63 +239,138 @@ const AffiliateDashboard = () => {
   const RegistrationDialog = () => (
     <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
       <DialogTrigger asChild>
-        <Button size="lg" className="gap-2">
+        <Button 
+          size="lg" 
+          className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+        >
           <UserPlus className="h-5 w-5" />
           Devenir affilié
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Inscription au programme d'affiliation</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl sm:text-2xl">Inscription au programme d'affiliation</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">
             Rejoignez notre programme et commencez à gagner des commissions dès aujourd'hui
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleRegister();
+          }}
+          className="space-y-4"
+        >
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
               placeholder="votre@email.com"
               value={registrationData.email}
-              onChange={(e) => setRegistrationData({ ...registrationData, email: e.target.value })}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              disabled={isRegistering}
+              className={registrationErrors.email ? 'border-destructive' : ''}
+              aria-invalid={!!registrationErrors.email}
+              aria-describedby={registrationErrors.email ? 'email-error' : undefined}
             />
+            {registrationErrors.email && (
+              <p id="email-error" className="text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {registrationErrors.email}
+              </p>
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first_name">Prénom</Label>
+              <Label htmlFor="first_name" className="text-sm font-medium">Prénom</Label>
               <Input
                 id="first_name"
                 placeholder="Jean"
                 value={registrationData.first_name}
-                onChange={(e) => setRegistrationData({ ...registrationData, first_name: e.target.value })}
+                onChange={(e) => handleInputChange('first_name', e.target.value)}
+                disabled={isRegistering}
+                className={registrationErrors.first_name ? 'border-destructive' : ''}
+                aria-invalid={!!registrationErrors.first_name}
+                aria-describedby={registrationErrors.first_name ? 'first_name-error' : undefined}
               />
+              {registrationErrors.first_name && (
+                <p id="first_name-error" className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {registrationErrors.first_name}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="last_name">Nom</Label>
+              <Label htmlFor="last_name" className="text-sm font-medium">Nom</Label>
               <Input
                 id="last_name"
                 placeholder="Dupont"
                 value={registrationData.last_name}
-                onChange={(e) => setRegistrationData({ ...registrationData, last_name: e.target.value })}
+                onChange={(e) => handleInputChange('last_name', e.target.value)}
+                disabled={isRegistering}
+                className={registrationErrors.last_name ? 'border-destructive' : ''}
+                aria-invalid={!!registrationErrors.last_name}
+                aria-describedby={registrationErrors.last_name ? 'last_name-error' : undefined}
               />
+              {registrationErrors.last_name && (
+                <p id="last_name-error" className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {registrationErrors.last_name}
+                </p>
+              )}
             </div>
           </div>
+          
           <div className="space-y-2">
-            <Label htmlFor="display_name">Nom d'affichage (optionnel)</Label>
+            <Label htmlFor="display_name" className="text-sm font-medium">
+              Nom d'affichage <span className="text-muted-foreground text-xs">(optionnel)</span>
+            </Label>
             <Input
               id="display_name"
               placeholder="JeanD"
               value={registrationData.display_name}
-              onChange={(e) => setRegistrationData({ ...registrationData, display_name: e.target.value })}
+              onChange={(e) => handleInputChange('display_name', e.target.value)}
+              disabled={isRegistering}
+              className={registrationErrors.display_name ? 'border-destructive' : ''}
+              aria-invalid={!!registrationErrors.display_name}
+              aria-describedby={registrationErrors.display_name ? 'display_name-error' : undefined}
             />
+            {registrationErrors.display_name && (
+              <p id="display_name-error" className="text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {registrationErrors.display_name}
+              </p>
+            )}
           </div>
-          <Button onClick={handleRegister} className="w-full gap-2">
-            <UserPlus className="h-4 w-4" />
-            S'inscrire
-          </Button>
-        </div>
+          
+          <div className="pt-2">
+            <Button 
+              type="submit"
+              disabled={isRegistering}
+              className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              {isRegistering ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Inscription en cours...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4" />
+                  S'inscrire
+                </>
+              )}
+            </Button>
+          </div>
+          
+          <p className="text-xs text-center text-muted-foreground pt-2">
+            Aucun frais • Aucun engagement • Commencez immédiatement
+          </p>
+        </form>
       </DialogContent>
     </Dialog>
   );
