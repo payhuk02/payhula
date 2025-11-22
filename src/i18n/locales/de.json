@@ -1210,6 +1210,13 @@
       "videoUploadFailed": "Fehler beim Hochladen des Videos",
       "quizSubmissionFailed": "Fehler beim Einreichen des Quiz",
       "certificateGenerationFailed": "Fehler bei der Zertifikatsgenerierung"
+    },
+    "create": {
+      "title": "Neuen Kurs erstellen",
+      "description": "Folgen Sie den Schritten, um in wenigen Minuten einen professionellen Kurs zu erstellen",
+      "backToProducts": "Zurück zu Produkten",
+      "useTemplate": "Vorlage verwenden",
+      "useTemplateShort": "Vorlage"
     }
   },
   "admin": {
@@ -1256,5 +1263,41 @@
       "title": "SQL-Migration erforderlich:",
       "description": "Um das Auszahlungssystem zu aktivieren, führen Sie bitte die SQL-Migration {{fileName}} in Ihrer Supabase-Datenbank aus."
     }
+  },
+  "store": {
+    "title": "Geschäft",
+    "loading": "Laden Ihrer Geschäfte...",
+    "viewStore": "Mein Geschäft ansehen",
+    "viewStoreShort": "Ansehen",
+    "viewStoreAriaLabel": "Geschäft {{name}} in einem neuen Tab öffnen",
+    "tabs": {
+      "ariaLabel": "Geschäftsnavigation",
+      "manage": "Meine Geschäfte verwalten",
+      "manageShort": "Verwalten",
+      "create": "Mein Geschäft erstellen",
+      "createShort": "Erstellen"
+    },
+    "create": {
+      "title": "Neues Geschäft erstellen",
+      "description": "Konfigurieren Sie Ihr neues Geschäft in den Einstellungen.",
+      "descriptionExisting": "Sie haben bereits ein Geschäft. Pro Benutzer ist nur ein Geschäftskonto erlaubt. Löschen Sie Ihr bestehendes Geschäft, wenn Sie ein neues erstellen möchten."
+    },
+    "existing": {
+      "title": "Bestehendes Geschäft",
+      "description": "Sie haben bereits ein Geschäft. Pro Benutzer ist nur ein Geschäftskonto erlaubt. Um ein neues Geschäft zu erstellen, müssen Sie zuerst Ihr bestehendes Geschäft löschen.",
+      "currentStore": "Ihr aktuelles Geschäft:"
+    },
+    "empty": {
+      "title": "Erstellen Sie Ihr erstes Geschäft",
+      "description": "Richten Sie Ihr Geschäft ein, um mit dem Verkauf Ihrer digitalen Produkte und Dienstleistungen in Afrika zu beginnen"
+    },
+    "whatIs": {
+      "title": "Was ist ein Payhula-Geschäft?",
+      "feature1": "Ein eindeutiger und anpassbarer Link für Ihr Unternehmen",
+      "feature2": "Verkaufen Sie mehrere Produkte und Dienstleistungen",
+      "feature3": "Akzeptieren Sie Zahlungen in FCFA und anderen Währungen",
+      "feature4": "Verwalten Sie alles von Ihrem Dashboard aus"
+    },
+    "goToSettings": "Zu den Einstellungen gehen"
   }
 }

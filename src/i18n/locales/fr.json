@@ -1255,6 +1255,13 @@
       "videoUploadFailed": "Erreur lors du téléchargement de la vidéo",
       "quizSubmissionFailed": "Erreur lors de la soumission du quiz",
       "certificateGenerationFailed": "Erreur lors de la génération du certificat"
+    },
+    "create": {
+      "title": "Créer un nouveau cours",
+      "description": "Suivez les étapes pour créer un cours professionnel en quelques minutes",
+      "backToProducts": "Retour aux produits",
+      "useTemplate": "Utiliser un template",
+      "useTemplateShort": "Template"
     }
   },
   "admin": {
@@ -1301,6 +1308,42 @@
       "title": "Migration SQL requise :",
       "description": "Pour activer le système de retraits, veuillez exécuter la migration SQL {{fileName}} dans votre base de données Supabase."
     }
+  },
+  "store": {
+    "title": "Boutique",
+    "loading": "Chargement de vos boutiques...",
+    "viewStore": "Voir ma boutique",
+    "viewStoreShort": "Voir",
+    "viewStoreAriaLabel": "Ouvrir la boutique {{name}} dans un nouvel onglet",
+    "tabs": {
+      "ariaLabel": "Navigation des boutiques",
+      "manage": "Gérer mes boutiques",
+      "manageShort": "Gérer",
+      "create": "Créer ma boutique",
+      "createShort": "Créer"
+    },
+    "create": {
+      "title": "Créer une nouvelle boutique",
+      "description": "Configurez votre nouvelle boutique dans les paramètres.",
+      "descriptionExisting": "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Supprimez votre boutique existante si vous souhaitez en créer une nouvelle."
+    },
+    "existing": {
+      "title": "Boutique existante",
+      "description": "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Pour créer une nouvelle boutique, vous devez d'abord supprimer votre boutique existante.",
+      "currentStore": "Votre boutique actuelle :"
+    },
+    "empty": {
+      "title": "Créez votre première boutique",
+      "description": "Configurez votre boutique pour commencer à vendre vos produits digitaux et services en Afrique"
+    },
+    "whatIs": {
+      "title": "Qu'est-ce qu'une boutique Payhula ?",
+      "feature1": "Un lien unique et personnalisable pour votre activité",
+      "feature2": "Vendez plusieurs produits et services",
+      "feature3": "Acceptez les paiements en FCFA et autres devises",
+      "feature4": "Gérez tout depuis votre tableau de bord"
+    },
+    "goToSettings": "Aller aux paramètres"
   }
 }
 

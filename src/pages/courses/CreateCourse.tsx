@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { CreateCourseWizard } from "@/components/courses/create/CreateCourseWizard";
@@ -8,6 +9,7 @@ import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const CreateCourse = () => {
+  const { t } = useTranslation();
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -30,8 +32,8 @@ const CreateCourse = () => {
                 >
                   <Link to="/dashboard/products">
                     <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                    <span className="hidden sm:inline">Retour aux produits</span>
-                    <span className="sm:hidden">Retour</span>
+                    <span className="hidden sm:inline">{t('courses.create.backToProducts')}</span>
+                    <span className="sm:hidden">{t('common.back')}</span>
                   </Link>
                 </Button>
                 
@@ -42,11 +44,11 @@ const CreateCourse = () => {
                       <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-500 dark:text-purple-400" aria-hidden="true" />
                     </div>
                     <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                      Créer un nouveau cours
+                      {t('courses.create.title')}
                     </span>
                   </h1>
                   <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
-                    Suivez les étapes pour créer un cours professionnel en quelques minutes
+                    {t('courses.create.description')}
                   </p>
                 </div>
               </div>
@@ -57,11 +59,11 @@ const CreateCourse = () => {
                   onClick={() => setShowTemplateSelector(true)}
                   className="h-9 sm:h-10 transition-all hover:scale-105 border-2 border-purple-500/20 hover:border-purple-500 hover:bg-purple-500/5 text-xs sm:text-sm"
                   size="sm"
-                  aria-label="Utiliser un template"
+                  aria-label={t('courses.create.useTemplate')}
                 >
                   <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-purple-500" />
-                  <span className="hidden sm:inline">Utiliser un template</span>
-                  <span className="sm:hidden">Template</span>
+                  <span className="hidden sm:inline">{t('courses.create.useTemplate')}</span>
+                  <span className="sm:hidden">{t('courses.create.useTemplateShort')}</span>
                 </Button>
               </div>
             </div>

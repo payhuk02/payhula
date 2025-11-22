@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Store = () => {
+  const { t } = useTranslation();
   const { stores, loading } = useStores();
   const navigate = useNavigate();
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -34,7 +36,7 @@ const Store = () => {
                   <StoreIcon className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold truncate bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Boutique
+                  {t('store.title')}
                 </h1>
               </div>
               {!loading && stores.length > 0 && (
@@ -43,11 +45,11 @@ const Store = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="touch-manipulation min-h-[44px] whitespace-nowrap text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0 inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-                  aria-label={`Ouvrir la boutique ${stores[0].name} dans un nouvel onglet`}
+                  aria-label={t('store.viewStoreAriaLabel', { name: stores[0].name })}
                 >
                   <ExternalLink className="h-3 w-3 mr-1 sm:mr-2" aria-hidden="true" />
-                  <span className="hidden sm:inline">Voir ma boutique</span>
-                  <span className="sm:hidden">Voir</span>
+                  <span className="hidden sm:inline">{t('store.viewStore')}</span>
+                  <span className="sm:hidden">{t('store.viewStoreShort')}</span>
                 </Link>
               )}
             </div>
@@ -61,28 +63,28 @@ const Store = () => {
                   <CardContent className="py-12 sm:py-16 lg:py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
                       <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                      <p className="text-sm sm:text-base text-muted-foreground">Chargement de vos boutiques...</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">{t('store.loading')}</p>
                     </div>
                   </CardContent>
                 </Card>
               ) : stores.length > 0 ? (
                 <Tabs defaultValue="manage" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto" role="tablist" aria-label="Navigation des boutiques">
-                    <TabsTrigger value="manage" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm touch-manipulation min-h-[44px]" role="tab" aria-label="Gérer mes boutiques">
+                  <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto" role="tablist" aria-label={t('store.tabs.ariaLabel')}>
+                    <TabsTrigger value="manage" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm touch-manipulation min-h-[44px]" role="tab" aria-label={t('store.tabs.manage')}>
                       <StoreIcon className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
-                      <span className="hidden sm:inline">Gérer mes boutiques</span>
-                      <span className="sm:hidden">Gérer</span>
+                      <span className="hidden sm:inline">{t('store.tabs.manage')}</span>
+                      <span className="sm:hidden">{t('store.tabs.manageShort')}</span>
                     </TabsTrigger>
                     <TabsTrigger 
                       value="create" 
                       className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm touch-manipulation min-h-[44px]"
                       onClick={handleCreateStoreRedirect}
                       role="tab"
-                      aria-label="Créer une nouvelle boutique"
+                      aria-label={t('store.tabs.create')}
                     >
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
-                      <span className="hidden sm:inline">Créer ma boutique</span>
-                      <span className="sm:hidden">Créer</span>
+                      <span className="hidden sm:inline">{t('store.tabs.create')}</span>
+                      <span className="sm:hidden">{t('store.tabs.createShort')}</span>
                     </TabsTrigger>
                   </TabsList>
 
@@ -100,11 +102,11 @@ const Store = () => {
                             <Plus className="h-10 w-10 sm:h-12 sm:w-12 text-purple-600 dark:text-purple-400" />
                           </div>
                         </div>
-                        <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">Créer une nouvelle boutique</CardTitle>
+                        <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">{t('store.create.title')}</CardTitle>
                         <CardDescription className="mt-4 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed text-muted-foreground">
                           {stores.length === 0
-                            ? "Configurez votre nouvelle boutique dans les paramètres."
-                            : "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Supprimez votre boutique existante si vous souhaitez en créer une nouvelle."
+                            ? t('store.create.description')
+                            : t('store.create.descriptionExisting')
                           }
                         </CardDescription>
                       </CardHeader>
@@ -116,17 +118,16 @@ const Store = () => {
                               className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 touch-manipulation text-xs sm:text-sm px-6 sm:px-8 py-2 sm:py-3 transition-all duration-300 hover:scale-105"
                             >
                               <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                              Aller aux paramètres
+                              {t('store.goToSettings')}
                             </Button>
                           ) : (
                             <div className="p-4 sm:p-6 lg:p-8 bg-muted/30 rounded-xl text-left max-w-2xl mx-auto border border-border/50">
-                              <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6 text-destructive">Boutique existante</p>
+                              <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6 text-destructive">{t('store.existing.title')}</p>
                               <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mb-3 sm:mb-4">
-                                Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. 
-                                Pour créer une nouvelle boutique, vous devez d'abord supprimer votre boutique existante.
+                                {t('store.existing.description')}
                               </p>
                               <div className="text-xs sm:text-sm text-muted-foreground">
-                                <p className="font-medium mb-2">Votre boutique actuelle :</p>
+                                <p className="font-medium mb-2">{t('store.existing.currentStore')}</p>
                                 <ul className="space-y-1">
                                   {stores.map((store) => (
                                     <li key={store.id} className="flex items-center gap-2">
@@ -151,9 +152,9 @@ const Store = () => {
                         <StoreIcon className="h-10 w-10 sm:h-12 sm:w-12 text-purple-600 dark:text-purple-400" />
                       </div>
                     </div>
-                    <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">Créez votre première boutique</CardTitle>
+                    <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">{t('store.empty.title')}</CardTitle>
                     <CardDescription className="mt-4 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed text-muted-foreground">
-                      Configurez votre boutique pour commencer à vendre vos produits digitaux et services en Afrique
+                      {t('store.empty.description')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="text-center pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6">
@@ -163,26 +164,26 @@ const Store = () => {
                         className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 touch-manipulation text-xs sm:text-sm px-6 sm:px-8 py-2 sm:py-3 transition-all duration-300 hover:scale-105"
                       >
                         <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                        Aller aux paramètres
+                        {t('store.goToSettings')}
                       </Button>
                       <div className="mt-6 sm:mt-8 p-4 sm:p-6 lg:p-8 bg-muted/30 rounded-xl text-left max-w-2xl mx-auto border border-border/50">
-                        <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6">Qu'est-ce qu'une boutique Payhula ?</p>
+                        <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6">{t('store.whatIs.title')}</p>
                         <ul className="text-xs sm:text-sm lg:text-base text-muted-foreground space-y-2 sm:space-y-3 lg:space-y-4">
                           <li className="flex items-start gap-2 sm:gap-3">
                             <span className="text-primary font-bold text-base sm:text-lg">✓</span>
-                            <span>Un lien unique et personnalisable pour votre activité</span>
+                            <span>{t('store.whatIs.feature1')}</span>
                           </li>
                           <li className="flex items-start gap-2 sm:gap-3">
                             <span className="text-primary font-bold text-base sm:text-lg">✓</span>
-                            <span>Vendez plusieurs produits et services</span>
+                            <span>{t('store.whatIs.feature2')}</span>
                           </li>
                           <li className="flex items-start gap-2 sm:gap-3">
                             <span className="text-primary font-bold text-base sm:text-lg">✓</span>
-                            <span>Acceptez les paiements en FCFA et autres devises</span>
+                            <span>{t('store.whatIs.feature3')}</span>
                           </li>
                           <li className="flex items-start gap-2 sm:gap-3">
                             <span className="text-primary font-bold text-base sm:text-lg">✓</span>
-                            <span>Gérez tout depuis votre tableau de bord</span>
+                            <span>{t('store.whatIs.feature4')}</span>
                           </li>
                         </ul>
                       </div>

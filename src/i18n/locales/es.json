@@ -1210,6 +1210,13 @@
       "videoUploadFailed": "Error al subir el video",
       "quizSubmissionFailed": "Error al enviar el cuestionario",
       "certificateGenerationFailed": "Error al generar el certificado"
+    },
+    "create": {
+      "title": "Crear un nuevo curso",
+      "description": "Siga los pasos para crear un curso profesional en unos minutos",
+      "backToProducts": "Volver a productos",
+      "useTemplate": "Usar una plantilla",
+      "useTemplateShort": "Plantilla"
     }
   },
   "admin": {
@@ -1256,5 +1263,41 @@
       "title": "Migración SQL requerida:",
       "description": "Para activar el sistema de retiros, por favor ejecute la migración SQL {{fileName}} en su base de datos Supabase."
     }
+  },
+  "store": {
+    "title": "Tienda",
+    "loading": "Cargando sus tiendas...",
+    "viewStore": "Ver mi tienda",
+    "viewStoreShort": "Ver",
+    "viewStoreAriaLabel": "Abrir la tienda {{name}} en una nueva pestaña",
+    "tabs": {
+      "ariaLabel": "Navegación de tiendas",
+      "manage": "Gestionar mis tiendas",
+      "manageShort": "Gestionar",
+      "create": "Crear mi tienda",
+      "createShort": "Crear"
+    },
+    "create": {
+      "title": "Crear una nueva tienda",
+      "description": "Configure su nueva tienda en la configuración.",
+      "descriptionExisting": "Ya tiene una tienda. Solo se permite una cuenta de tienda por usuario. Elimine su tienda existente si desea crear una nueva."
+    },
+    "existing": {
+      "title": "Tienda existente",
+      "description": "Ya tiene una tienda. Solo se permite una cuenta de tienda por usuario. Para crear una nueva tienda, primero debe eliminar su tienda existente.",
+      "currentStore": "Su tienda actual:"
+    },
+    "empty": {
+      "title": "Cree su primera tienda",
+      "description": "Configure su tienda para comenzar a vender sus productos digitales y servicios en África"
+    },
+    "whatIs": {
+      "title": "¿Qué es una tienda Payhula?",
+      "feature1": "Un enlace único y personalizable para su negocio",
+      "feature2": "Venda múltiples productos y servicios",
+      "feature3": "Acepte pagos en FCFA y otras monedas",
+      "feature4": "Gestione todo desde su panel de control"
+    },
+    "goToSettings": "Ir a configuración"
   }
 }

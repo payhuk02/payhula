@@ -1210,6 +1210,13 @@
       "videoUploadFailed": "Video upload failed",
       "quizSubmissionFailed": "Quiz submission failed",
       "certificateGenerationFailed": "Certificate generation failed"
+    },
+    "create": {
+      "title": "Create a new course",
+      "description": "Follow the steps to create a professional course in a few minutes",
+      "backToProducts": "Back to products",
+      "useTemplate": "Use a template",
+      "useTemplateShort": "Template"
     }
   },
   "admin": {
@@ -1256,5 +1263,41 @@
       "title": "SQL migration required:",
       "description": "To enable the withdrawal system, please run the SQL migration {{fileName}} in your Supabase database."
     }
+  },
+  "store": {
+    "title": "Store",
+    "loading": "Loading your stores...",
+    "viewStore": "View my store",
+    "viewStoreShort": "View",
+    "viewStoreAriaLabel": "Open store {{name}} in a new tab",
+    "tabs": {
+      "ariaLabel": "Store navigation",
+      "manage": "Manage my stores",
+      "manageShort": "Manage",
+      "create": "Create my store",
+      "createShort": "Create"
+    },
+    "create": {
+      "title": "Create a new store",
+      "description": "Configure your new store in settings.",
+      "descriptionExisting": "You already have a store. Only one store account is allowed per user. Delete your existing store if you want to create a new one."
+    },
+    "existing": {
+      "title": "Existing store",
+      "description": "You already have a store. Only one store account is allowed per user. To create a new store, you must first delete your existing store.",
+      "currentStore": "Your current store:"
+    },
+    "empty": {
+      "title": "Create your first store",
+      "description": "Set up your store to start selling your digital products and services in Africa"
+    },
+    "whatIs": {
+      "title": "What is a Payhula store?",
+      "feature1": "A unique and customizable link for your business",
+      "feature2": "Sell multiple products and services",
+      "feature3": "Accept payments in FCFA and other currencies",
+      "feature4": "Manage everything from your dashboard"
+    },
+    "goToSettings": "Go to settings"
   }
 }

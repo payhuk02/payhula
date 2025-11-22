@@ -1146,6 +1146,13 @@
       "videoUploadFailed": "Erro ao enviar o vídeo",
       "quizSubmissionFailed": "Erro ao enviar o questionário",
       "certificateGenerationFailed": "Erro ao gerar o certificado"
+    },
+    "create": {
+      "title": "Criar um novo curso",
+      "description": "Siga as etapas para criar um curso profissional em alguns minutos",
+      "backToProducts": "Voltar para produtos",
+      "useTemplate": "Usar um modelo",
+      "useTemplateShort": "Modelo"
     }
   },
   "admin": {
@@ -1192,5 +1199,41 @@
       "title": "Migração SQL necessária:",
       "description": "Para ativar o sistema de saques, execute a migração SQL {{fileName}} em seu banco de dados Supabase."
     }
+  },
+  "store": {
+    "title": "Loja",
+    "loading": "Carregando suas lojas...",
+    "viewStore": "Ver minha loja",
+    "viewStoreShort": "Ver",
+    "viewStoreAriaLabel": "Abrir a loja {{name}} em uma nova aba",
+    "tabs": {
+      "ariaLabel": "Navegação de lojas",
+      "manage": "Gerenciar minhas lojas",
+      "manageShort": "Gerenciar",
+      "create": "Criar minha loja",
+      "createShort": "Criar"
+    },
+    "create": {
+      "title": "Criar uma nova loja",
+      "description": "Configure sua nova loja nas configurações.",
+      "descriptionExisting": "Você já tem uma loja. Apenas uma conta de loja é permitida por usuário. Exclua sua loja existente se quiser criar uma nova."
+    },
+    "existing": {
+      "title": "Loja existente",
+      "description": "Você já tem uma loja. Apenas uma conta de loja é permitida por usuário. Para criar uma nova loja, você deve primeiro excluir sua loja existente.",
+      "currentStore": "Sua loja atual:"
+    },
+    "empty": {
+      "title": "Crie sua primeira loja",
+      "description": "Configure sua loja para começar a vender seus produtos digitais e serviços na África"
+    },
+    "whatIs": {
+      "title": "O que é uma loja Payhula?",
+      "feature1": "Um link único e personalizável para seu negócio",
+      "feature2": "Venda vários produtos e serviços",
+      "feature3": "Aceite pagamentos em FCFA e outras moedas",
+      "feature4": "Gerencie tudo do seu painel"
+    },
+    "goToSettings": "Ir para configurações"
   }
 }
