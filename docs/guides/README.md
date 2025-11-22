@@ -120,6 +120,8 @@ Voir aussi [../deployment/](../deployment/) pour plus de guides de déploiement.
 - **[Guide de Gestion des Erreurs](./error-handling-guide.md)** - Stratégies et bonnes pratiques
 - **[Guide d'Optimisation du Bundle](./bundle-optimization-guide.md)** - Optimisation des performances
 - **[Guide des Tests](./testing-guide.md)** - Stratégie de tests et couverture
+- **[Guide de Migration](./migration-guide.md)** - Comment migrer vers les nouvelles pratiques ⭐ **Nouveau**
+- **[Bonnes Pratiques de Performance](./performance-best-practices.md)** - Optimisations et métriques ⭐ **Nouveau**
 
 ---
 
