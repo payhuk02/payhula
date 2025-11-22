@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Save, MoreVertical, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Eye, Save, MoreVertical, Loader2, CheckCircle2, AlertCircle } from "@/components/icons";
 import { generateSlug } from "@/lib/store-utils";
 import { logger } from "@/lib/logger";
 import "@/styles/product-creation.css";

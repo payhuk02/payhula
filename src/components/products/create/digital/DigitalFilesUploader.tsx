@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, CheckCircle2, AlertCircle, Link2, Plus } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Link2, Plus } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
 
 interface DigitalFilesUploaderProps {

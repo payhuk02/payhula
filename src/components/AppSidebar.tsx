@@ -56,9 +56,9 @@ import {
   AlertTriangle,
   Phone,
   Wallet,
+  Scale,
+  Headphones,
 } from "@/components/icons";
-// Imports spécifiques non dans l'index
-import { Scale, Headphones, DollarSign as DollarSignIcon } from "lucide-react";
 import payhukLogo from "@/assets/payhuk-logo.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
@@ -850,7 +850,8 @@ export function AppSidebar() {
             <img 
               src={payhukLogo} 
               alt="Payhuk" 
-              className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain" 
+              className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain"
+              loading="eager" 
             />
             {!isCollapsed && (
               <span className="text-base sm:text-lg font-bold !text-black truncate">

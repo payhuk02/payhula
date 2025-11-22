@@ -7,7 +7,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trash2, Plus, Minus } from 'lucide-react';
+import { Trash2, Plus, Minus } from '@/components/icons';
 import type { CartItem as CartItemType } from '@/types/cart';
 
 interface CartItemProps {

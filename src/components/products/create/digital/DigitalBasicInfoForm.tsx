@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Check, X, Gift, Info } from 'lucide-react';
+import { RefreshCw, Check, X, Gift, Info } from '@/components/icons';
 import { generateSlug } from '@/lib/store-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';

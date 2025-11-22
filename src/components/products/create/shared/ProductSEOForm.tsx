@@ -345,6 +345,7 @@ export const ProductSEOForm = ({
                       src={data.og_image} 
                       alt="Preview" 
                       className="w-full h-full object-cover"
+                      loading="lazy"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
