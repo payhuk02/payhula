@@ -46,6 +46,7 @@ import { ServicePreview } from './ServicePreview';
 import { PaymentOptionsForm } from '../shared/PaymentOptionsForm';
 import { useToast } from '@/hooks/use-toast';
 import { useStore } from '@/hooks/useStore';
+import { useWizardServerValidation } from '@/hooks/useWizardServerValidation';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
