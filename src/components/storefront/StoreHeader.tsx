@@ -10,15 +10,36 @@ interface StoreHeaderProps {
     active_clients?: number;
     is_verified?: boolean;
     info_message?: string | null;
+    info_message_color?: string | null;
+    info_message_font?: string | null;
   };
   /** Message informatif optionnel à afficher au-dessus de la bannière (prioritaire sur store.info_message) */
   infoMessage?: React.ReactNode;
 }
 
 const StoreHeader = ({ store, infoMessage }: StoreHeaderProps) => {
-  // Utiliser infoMessage en priorité, sinon utiliser store.info_message
-  const displayMessage = infoMessage || (store.info_message ? (
-    <div className="bg-primary/10 dark:bg-primary/20 border-b border-primary/20 dark:border-primary/30 px-4 py-3 text-center text-sm text-primary-foreground">
+  // Debug: Vérifier les données du store
+  if (process.env.NODE_ENV === 'development' && store) {
+    console.log('[StoreHeader] Store data:', {
+      hasInfoMessage: !!store.info_message,
+      infoMessage: store.info_message,
+      infoMessageColor: store.info_message_color,
+      infoMessageFont: store.info_message_font,
+      storeKeys: Object.keys(store),
+    });
+  }
+
+  // Utiliser infoMessage en priorité, sinon utiliser store.info_message avec styles personnalisés
+  const displayMessage = infoMessage || (store?.info_message ? (
+    <div 
+      className="border-b px-4 py-3 text-center text-sm"
+      style={{
+        backgroundColor: store.info_message_color ? `${store.info_message_color}15` : 'rgba(59, 130, 246, 0.1)',
+        borderColor: store.info_message_color ? `${store.info_message_color}40` : 'rgba(59, 130, 246, 0.2)',
+        color: store.info_message_color || '#3b82f6',
+        fontFamily: store.info_message_font || 'Inter, sans-serif',
+      }}
+    >
       {store.info_message}
     </div>
   ) : null);

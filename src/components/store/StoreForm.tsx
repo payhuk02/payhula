@@ -12,7 +12,7 @@ import { generateSlug } from "@/lib/store-utils";
 import { logger } from "@/lib/logger";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { Loader2, Check, X, Globe, Phone, Info } from '@/components/icons';
-import { Image as ImageIcon, Mail, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Image as ImageIcon, Mail, Facebook, Instagram, Twitter, Linkedin, Palette } from 'lucide-react';
 import StoreImageUpload from "./StoreImageUpload";
 
 interface StoreFormProps {
@@ -33,6 +33,8 @@ interface StoreFormProps {
     twitter_url?: string | null;
     linkedin_url?: string | null;
     info_message?: string | null;
+    info_message_color?: string | null;
+    info_message_font?: string | null;
   };
 }
 
@@ -51,6 +53,8 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
   const [twitterUrl, setTwitterUrl] = useState(initialData?.twitter_url || "");
   const [linkedinUrl, setLinkedinUrl] = useState(initialData?.linkedin_url || "");
   const [infoMessage, setInfoMessage] = useState(initialData?.info_message || "");
+  const [infoMessageColor, setInfoMessageColor] = useState(initialData?.info_message_color || "#3b82f6");
+  const [infoMessageFont, setInfoMessageFont] = useState(initialData?.info_message_font || "Inter");
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,6 +150,8 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
             twitter_url: twitterUrl || null,
             linkedin_url: linkedinUrl || null,
             info_message: infoMessage || null,
+            info_message_color: infoMessageColor || "#3b82f6",
+            info_message_font: infoMessageFont || "Inter",
           })
           .eq('id', initialData.id);
 
@@ -194,6 +200,8 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
             twitter_url: twitterUrl || null,
             linkedin_url: linkedinUrl || null,
             info_message: infoMessage || null,
+            info_message_color: infoMessageColor || "#3b82f6",
+            info_message_font: infoMessageFont || "Inter",
           });
 
         if (error) {
@@ -338,24 +346,110 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="info_message">Message informatif (optionnel)</Label>
-                <Textarea
-                  id="info_message"
-                  value={infoMessage}
-                  onChange={(e) => setInfoMessage(e.target.value)}
-                  placeholder="Ex: 🎉 Promotion spéciale : -20% sur tous les produits jusqu'au 31 janvier !"
-                  rows={3}
-                  maxLength={500}
-                />
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
-                    Message qui s'affichera en haut de votre boutique (promotions, alertes, annonces, etc.)
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {infoMessage.length}/500
-                  </span>
+              <div className="space-y-4 border-t pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="info_message">Message informatif (optionnel)</Label>
+                  <Textarea
+                    id="info_message"
+                    value={infoMessage}
+                    onChange={(e) => setInfoMessage(e.target.value)}
+                    placeholder="Ex: 🎉 Promotion spéciale : -20% sur tous les produits jusqu'au 31 janvier !"
+                    rows={3}
+                    maxLength={500}
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Message qui s'affichera en haut de votre boutique (promotions, alertes, annonces, etc.)
+                    </p>
+                    <span className="text-xs text-muted-foreground">
+                      {infoMessage.length}/500
+                    </span>
+                  </div>
                 </div>
+
+                {infoMessage && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="info_message_color" className="flex items-center gap-2">
+                          <Palette className="h-4 w-4" />
+                          Couleur du message
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="info_message_color"
+                            type="color"
+                            value={infoMessageColor}
+                            onChange={(e) => setInfoMessageColor(e.target.value)}
+                            className="h-10 w-20 cursor-pointer"
+                          />
+                          <Input
+                            type="text"
+                            value={infoMessageColor}
+                            onChange={(e) => setInfoMessageColor(e.target.value)}
+                            placeholder="#3b82f6"
+                            pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                            className="flex-1 font-mono text-sm"
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Format hexadécimal (ex: #3b82f6)
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="info_message_font">Police du message</Label>
+                        <Select
+                          value={infoMessageFont}
+                          onValueChange={setInfoMessageFont}
+                        >
+                          <SelectTrigger id="info_message_font">
+                            <SelectValue placeholder="Choisir une police" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Inter">Inter (par défaut)</SelectItem>
+                            <SelectItem value="Roboto">Roboto</SelectItem>
+                            <SelectItem value="Open Sans">Open Sans</SelectItem>
+                            <SelectItem value="Lato">Lato</SelectItem>
+                            <SelectItem value="Montserrat">Montserrat</SelectItem>
+                            <SelectItem value="Poppins">Poppins</SelectItem>
+                            <SelectItem value="Raleway">Raleway</SelectItem>
+                            <SelectItem value="Ubuntu">Ubuntu</SelectItem>
+                            <SelectItem value="Nunito">Nunito</SelectItem>
+                            <SelectItem value="Playfair Display">Playfair Display</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Police utilisée pour afficher le message
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Aperçu du message</Label>
+                      <div 
+                        className="p-4 rounded-lg border-2 border-dashed"
+                        style={{
+                          backgroundColor: `${infoMessageColor}15`,
+                          borderColor: `${infoMessageColor}40`,
+                        }}
+                      >
+                        <p
+                          className="text-sm text-center"
+                          style={{
+                            color: infoMessageColor,
+                            fontFamily: infoMessageFont,
+                          }}
+                        >
+                          {infoMessage || "Votre message apparaîtra ici..."}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Aperçu de l'apparence du message sur votre boutique
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="space-y-2">

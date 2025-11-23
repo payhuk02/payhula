@@ -67,8 +67,20 @@ const Storefront = () => {
       if (fetchError) throw fetchError;
       
       if (data && data.length > 0) {
-        setStore(data[0]);
-        logger.info(`Boutique chargée: ${data[0].name} (${slug})`);
+        const storeData = data[0];
+        // Debug: Vérifier les champs récupérés
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Storefront] Store data loaded:', {
+            name: storeData.name,
+            hasInfoMessage: !!storeData.info_message,
+            infoMessage: storeData.info_message,
+            infoMessageColor: storeData.info_message_color,
+            infoMessageFont: storeData.info_message_font,
+            allFields: Object.keys(storeData),
+          });
+        }
+        setStore(storeData);
+        logger.info(`Boutique chargée: ${storeData.name} (${slug})`);
         setHasLoadedOnce(true); // Marquer qu'on a chargé au moins une fois
       } else {
         setStore(null);
@@ -291,14 +303,7 @@ const Storefront = () => {
       )}
 
       <div className="min-h-screen flex flex-col overflow-x-hidden">
-        <StoreHeader 
-          store={store} 
-          infoMessage={store?.info_message ? (
-            <div className="bg-primary/10 dark:bg-primary/20 border-b border-primary/20 dark:border-primary/30 px-4 py-3 text-center text-sm text-primary-foreground">
-              {store.info_message}
-            </div>
-          ) : undefined}
-        />
+        <StoreHeader store={store} />
 
         <main ref={headerRef} className="flex-1 bg-background overflow-x-hidden">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">

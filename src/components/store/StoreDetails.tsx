@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Copy, ExternalLink, Save, X, BarChart3, Settings, Palette, Globe, AlertCircle } from "lucide-react";
 import { useStore, Store } from "@/hooks/useStore";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +22,9 @@ interface ExtendedStore extends Store {
   instagram_url?: string | null;
   twitter_url?: string | null;
   linkedin_url?: string | null;
+  info_message?: string | null;
+  info_message_color?: string | null;
+  info_message_font?: string | null;
 }
 
 interface StoreDetailsProps {
@@ -40,6 +44,9 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
   const [instagramUrl, setInstagramUrl] = useState(store.instagram_url || "");
   const [twitterUrl, setTwitterUrl] = useState(store.twitter_url || "");
   const [linkedinUrl, setLinkedinUrl] = useState(store.linkedin_url || "");
+  const [infoMessage, setInfoMessage] = useState(store.info_message || "");
+  const [infoMessageColor, setInfoMessageColor] = useState(store.info_message_color || "#3b82f6");
+  const [infoMessageFont, setInfoMessageFont] = useState(store.info_message_font || "Inter");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { updateStore, getStoreUrl, checkSlugAvailability } = useStore();
@@ -122,6 +129,9 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
     setLogoUrl(store.logo_url || "");
     setBannerUrl(store.banner_url || "");
     setAbout(store.about || "");
+    setInfoMessage(store.info_message || "");
+    setInfoMessageColor(store.info_message_color || "#3b82f6");
+    setInfoMessageFont(store.info_message_font || "Inter");
     setContactEmail(store.contact_email || "");
     setContactPhone(store.contact_phone || "");
     setFacebookUrl(store.facebook_url || "");
@@ -338,6 +348,116 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
                     <p className="text-xs text-muted-foreground">
                       Ce texte apparaîtra dans l'onglet "À propos" de votre boutique
                     </p>
+                  </div>
+
+                  <div className="space-y-4 border-t pt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="info_message">Message informatif (optionnel)</Label>
+                      <Textarea
+                        id="info_message"
+                        value={infoMessage}
+                        onChange={(e) => setInfoMessage(e.target.value)}
+                        placeholder="Ex: 🎉 Promotion spéciale : -20% sur tous les produits jusqu'au 31 janvier !"
+                        rows={3}
+                        maxLength={500}
+                        disabled={isSubmitting}
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">
+                          Message qui s'affichera en haut de votre boutique (promotions, alertes, annonces, etc.)
+                        </p>
+                        <span className="text-xs text-muted-foreground">
+                          {infoMessage.length}/500
+                        </span>
+                      </div>
+                    </div>
+
+                    {infoMessage && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="info_message_color" className="flex items-center gap-2">
+                            <Palette className="h-4 w-4" />
+                            Couleur du message
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="info_message_color"
+                              type="color"
+                              value={infoMessageColor}
+                              onChange={(e) => setInfoMessageColor(e.target.value)}
+                              className="h-10 w-20 cursor-pointer"
+                              disabled={isSubmitting}
+                            />
+                            <Input
+                              type="text"
+                              value={infoMessageColor}
+                              onChange={(e) => setInfoMessageColor(e.target.value)}
+                              placeholder="#3b82f6"
+                              pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                              className="flex-1 font-mono text-sm"
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Format hexadécimal (ex: #3b82f6)
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="info_message_font">Police du message</Label>
+                          <Select
+                            value={infoMessageFont}
+                            onValueChange={setInfoMessageFont}
+                            disabled={isSubmitting}
+                          >
+                            <SelectTrigger id="info_message_font">
+                              <SelectValue placeholder="Choisir une police" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Inter">Inter (par défaut)</SelectItem>
+                              <SelectItem value="Roboto">Roboto</SelectItem>
+                              <SelectItem value="Open Sans">Open Sans</SelectItem>
+                              <SelectItem value="Lato">Lato</SelectItem>
+                              <SelectItem value="Montserrat">Montserrat</SelectItem>
+                              <SelectItem value="Poppins">Poppins</SelectItem>
+                              <SelectItem value="Raleway">Raleway</SelectItem>
+                              <SelectItem value="Ubuntu">Ubuntu</SelectItem>
+                              <SelectItem value="Nunito">Nunito</SelectItem>
+                              <SelectItem value="Playfair Display">Playfair Display</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground">
+                            Police utilisée pour afficher le message
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {infoMessage && (
+                      <div className="space-y-2">
+                        <Label>Aperçu du message</Label>
+                        <div 
+                          className="p-4 rounded-lg border-2 border-dashed"
+                          style={{
+                            backgroundColor: `${infoMessageColor}15`,
+                            borderColor: `${infoMessageColor}40`,
+                          }}
+                        >
+                          <p
+                            className="text-sm text-center"
+                            style={{
+                              color: infoMessageColor,
+                              fontFamily: infoMessageFont,
+                            }}
+                          >
+                            {infoMessage || "Votre message apparaîtra ici..."}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Aperçu de l'apparence du message sur votre boutique
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
