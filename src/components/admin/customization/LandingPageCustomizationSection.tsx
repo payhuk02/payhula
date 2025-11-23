@@ -39,6 +39,7 @@ import { useToast } from '@/hooks/use-toast';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { logger } from '@/lib/logger';
 
 interface LandingPageCustomizationSectionProps {
   onChange?: () => void;
@@ -301,7 +302,7 @@ export const LandingPageCustomizationSection = ({ onChange }: LandingPageCustomi
   // Debounce pour éviter trop de sauvegardes
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  const handleElementChange = useCallback((elementKey: string, value: any) => {
+  const handleElementChange = useCallback((elementKey: string, value: string | number | boolean | null) => {
     setPageValues(prev => {
       const updated = {
         ...prev,
@@ -318,7 +319,9 @@ export const LandingPageCustomizationSection = ({ onChange }: LandingPageCustomi
         await save('pages', {
           ...currentData,
           landing: updated,
-        }).catch(console.error);
+        }).catch((error) => {
+          logger.error('Error saving landing page customization', { error, elementKey: key, value });
+        });
       }, 500);
       
       if (onChange) onChange();
@@ -351,10 +354,11 @@ export const LandingPageCustomizationSection = ({ onChange }: LandingPageCustomi
         title: 'Image uploadée',
         description: 'L\'image a été uploadée avec succès.',
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Impossible d\'uploader l\'image.';
       toast({
         title: 'Erreur',
-        description: error.message || 'Impossible d\'uploader l\'image.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -379,10 +383,11 @@ export const LandingPageCustomizationSection = ({ onChange }: LandingPageCustomi
         title: 'Image supprimée',
         description: 'L\'image a été supprimée avec succès.',
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Impossible de supprimer l\'image.';
       toast({
         title: 'Erreur',
-        description: error.message || 'Impossible de supprimer l\'image.',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

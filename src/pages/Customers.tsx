@@ -111,11 +111,28 @@ const Customers = () => {
             <div className="container mx-auto p-3 sm:p-4 lg:p-6">
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Boutique non configurée</CardTitle>
-                  <CardDescription>
-                    Veuillez d'abord créer votre boutique pour gérer vos clients.
+                  <CardTitle className="text-xl sm:text-2xl font-bold">Aucune boutique sélectionnée</CardTitle>
+                  <CardDescription className="text-sm sm:text-base mt-2">
+                    Veuillez sélectionner une boutique ou créer une nouvelle boutique pour gérer vos clients.
                   </CardDescription>
                 </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      onClick={() => navigate("/dashboard/store")} 
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Créer une boutique
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => navigate("/dashboard")} 
+                    >
+                      Retour au tableau de bord
+                    </Button>
+                  </div>
+                </CardContent>
               </Card>
             </div>
           </main>

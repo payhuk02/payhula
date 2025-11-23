@@ -190,7 +190,9 @@ export const ContentManagementSection = ({ onChange }: ContentManagementSectionP
       save('content', {
         ...customizationData?.content,
         texts: updated,
-      }).catch(console.error);
+      }).catch((error) => {
+        logger.error('Error saving text customization', { error, key, value });
+      });
       return updated;
     });
     if (onChange) onChange();
@@ -221,7 +223,7 @@ export const ContentManagementSection = ({ onChange }: ContentManagementSectionP
       
       return updated;
     } catch (error) {
-      console.error('Error updating template:', error);
+      logger.error('Error updating template', { error, templateId: updatedTemplate.id });
       throw error;
     }
   };
@@ -233,7 +235,9 @@ export const ContentManagementSection = ({ onChange }: ContentManagementSectionP
       save('content', {
         ...customizationData?.content,
         texts: newTexts,
-      }).catch(console.error);
+      }).catch((error) => {
+        logger.error('Error resetting text customization', { error, key });
+      });
       return newTexts;
     });
   }, [customizationData, save]);

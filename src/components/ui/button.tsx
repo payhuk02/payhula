@@ -37,9 +37,23 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+    
+    // Ajouter aria-label automatiquement si non fourni et children est une string
+    // Cela améliore l'accessibilité pour les lecteurs d'écran
+    const ariaLabel = props['aria-label'] || (typeof children === 'string' ? children : undefined);
+    
+    return (
+      <Comp 
+        className={cn(buttonVariants({ variant, size, className }))} 
+        ref={ref} 
+        {...props}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </Comp>
+    );
   },
 );
 Button.displayName = "Button";

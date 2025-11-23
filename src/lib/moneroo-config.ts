@@ -3,6 +3,7 @@
  */
 
 import { MonerooConfig } from './moneroo-types';
+import { logger } from './logger';
 
 /**
  * Configuration Moneroo avec valeurs par défaut
@@ -39,7 +40,10 @@ export function validateMonerooConfig(): void {
 try {
   validateMonerooConfig();
 } catch (error) {
-  console.error('[MonerooConfig] Invalid configuration:', error);
+  logger.error('Invalid Moneroo configuration', { 
+    error, 
+    config: MONEROO_CONFIG 
+  });
 }
 
 

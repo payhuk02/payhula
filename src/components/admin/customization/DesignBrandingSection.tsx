@@ -15,6 +15,7 @@ import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization
 import { designTokens } from '@/lib/design-system';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -126,7 +127,9 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
         ...localColors,
         [colorKey]: value,
       },
-    }).catch(console.error);
+    }).catch((error) => {
+      logger.error('Error saving color customization', { error, colorKey, value });
+    });
   };
 
   const applyColorInRealTime = (colorKey: string, value: string) => {
@@ -197,7 +200,9 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
     save('design', {
       ...customizationData?.design,
       typography: updatedTypography,
-    }).catch(console.error);
+    }).catch((error) => {
+      logger.error('Error saving typography customization', { error, key, value });
+    });
   };
 
   const handleLogoUpload = async (type: 'light' | 'dark' | 'favicon', file: File) => {
@@ -260,11 +265,12 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
       });
 
       if (onChange) onChange();
-    } catch (error: any) {
-      console.error('Error uploading logo:', error);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Impossible de télécharger le logo';
+      logger.error('Error uploading logo', { error, type, fileName: file.name });
       toast({
         title: '❌ Erreur',
-        description: error.message || 'Impossible de télécharger le logo',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -437,7 +443,9 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                       save('design', {
                         ...customizationData?.design,
                         theme: theme,
-                      }).catch(console.error);
+                      }).catch((error) => {
+                        logger.error('Error saving theme customization', { error, theme });
+                      });
                       if (onChange) onChange();
                     }}
                     className={`
@@ -712,7 +720,9 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                         // Application en temps réel
                         document.documentElement.style.setProperty('--radius', value);
                         // Sauvegarder automatiquement
-                        save('design', updated.design).catch(console.error);
+                        save('design', updated.design).catch((error) => {
+                          logger.error('Error saving border radius customization', { error, value });
+                        });
                         if (onChange) onChange();
                       }}
                       className={`p-4 rounded-lg border-2 transition-all ${
@@ -769,7 +779,9 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                         // Application en temps réel
                         document.documentElement.style.setProperty('--shadow-default', shadowValue);
                         // Sauvegarder automatiquement
-                        save('design', updated.design).catch(console.error);
+                        save('design', updated.design).catch((error) => {
+                          logger.error('Error saving shadow customization', { error, shadowKey: key });
+                        });
                         if (onChange) onChange();
                       }}
                       className={`p-4 rounded-lg border-2 transition-all text-left ${
@@ -831,7 +843,9 @@ export const DesignBrandingSection = ({ onChange }: DesignBrandingSectionProps) 
                         // Application en temps réel
                         document.documentElement.style.setProperty('--spacing-base', spacingValue);
                         // Sauvegarder automatiquement
-                        save('design', updated.design).catch(console.error);
+                        save('design', updated.design).catch((error) => {
+                          logger.error('Error saving spacing customization', { error, spacingKey: key });
+                        });
                         if (onChange) onChange();
                       }}
                       className={`p-4 rounded-lg border-2 transition-all ${

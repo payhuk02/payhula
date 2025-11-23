@@ -1324,12 +1324,12 @@
     "create": {
       "title": "Crear una nueva tienda",
       "description": "Configure su nueva tienda en la configuración.",
-      "descriptionExisting": "Ya tiene una tienda. Solo se permite una cuenta de tienda por usuario. Elimine su tienda existente si desea crear una nueva."
+      "descriptionExisting": "Puede crear hasta 3 tiendas. Si ha alcanzado el límite, elimine una tienda existente antes de crear una nueva."
     },
     "existing": {
-      "title": "Tienda existente",
-      "description": "Ya tiene una tienda. Solo se permite una cuenta de tienda por usuario. Para crear una nueva tienda, primero debe eliminar su tienda existente.",
-      "currentStore": "Su tienda actual:"
+      "title": "Tiendas existentes",
+      "description": "Puede crear hasta 3 tiendas por usuario. Para crear una nueva tienda, primero debe eliminar una tienda existente si ha alcanzado el límite.",
+      "currentStore": "Sus tiendas actuales:"
     },
     "empty": {
       "title": "Cree su primera tienda",

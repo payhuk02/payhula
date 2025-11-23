@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { useStoreContext } from '@/contexts/StoreContext';
 
 /**
  * Produit digital complet
@@ -70,9 +71,12 @@ export const useDigitalProducts = (
   paginationOptions?: DigitalProductsPaginationOptions
 ) => {
   const { page = 1, itemsPerPage = 12, sortBy = 'recent', sortOrder = 'desc' } = paginationOptions || {};
+  // Utiliser le contexte pour obtenir la boutique sélectionnée si storeId n'est pas fourni
+  const { selectedStoreId } = useStoreContext();
+  const effectiveStoreId = storeId || selectedStoreId;
 
   return useQuery({
-    queryKey: ['digitalProducts', storeId, page, itemsPerPage, sortBy, sortOrder],
+    queryKey: ['digitalProducts', effectiveStoreId, page, itemsPerPage, sortBy, sortOrder],
     queryFn: async () => {
       try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -90,64 +94,34 @@ export const useDigitalProducts = (
         // Étape 1: Obtenir les product_ids pertinents
         let productIds: string[] = [];
 
-        if (storeId) {
-          // Si storeId est fourni, obtenir tous les products de ce store
+        if (effectiveStoreId) {
+          // Si storeId est fourni (explicitement ou via contexte), obtenir tous les products de ce store
           const { data: products, error: productsError } = await supabase
             .from('products')
             .select('id')
-            .eq('store_id', storeId);
+            .eq('store_id', effectiveStoreId);
 
           if (productsError) {
             logger.error('Erreur lors de la récupération des products', {
               error: productsError.message,
               code: productsError.code,
-              storeId,
+              storeId: effectiveStoreId,
             });
             throw new Error('Erreur lors de la récupération des produits: ' + productsError.message);
           }
           productIds = products?.map(p => p.id) || [];
         } else {
-          // Sinon, obtenir tous les stores de l'utilisateur, puis leurs products
-          const { data: stores, error: storesError } = await supabase
-            .from('stores')
-            .select('id')
-            .eq('user_id', user.id);
-
-          if (storesError) {
-            logger.error('Erreur lors de la récupération des stores', {
-              error: storesError.message,
-              code: storesError.code,
-              userId: user.id,
-            });
-            throw new Error('Erreur lors de la récupération des boutiques: ' + storesError.message);
-          }
-
-          if (stores && stores.length > 0) {
-            const storeIds = stores.map(s => s.id);
-            const { data: products, error: productsError } = await supabase
-              .from('products')
-              .select('id')
-              .in('store_id', storeIds);
-
-            if (productsError) {
-              logger.error('Erreur lors de la récupération des products pour les stores', {
-                error: productsError.message,
-                code: productsError.code,
-                storeIds: storeIds.length,
-              });
-              throw new Error('Erreur lors de la récupération des produits: ' + productsError.message);
-            }
-            productIds = products?.map(p => p.id) || [];
-          } else {
-            // Pas de stores, retourner structure paginée vide
-            logger.debug('Aucune boutique trouvée pour l\'utilisateur', {
-              userId: user.id,
-            });
-            return {
-              data: [],
-              total: 0,
-              page,
-              itemsPerPage,
+          // Pas de boutique sélectionnée, retourner structure paginée vide
+          logger.debug('Aucune boutique sélectionnée', {
+            userId: user.id,
+            providedStoreId: storeId,
+            selectedStoreId,
+          });
+          return {
+            data: [],
+            total: 0,
+            page,
+            itemsPerPage,
               totalPages: 0,
             };
           }

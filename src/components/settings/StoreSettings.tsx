@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStores } from "@/hooks/useStores";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,8 @@ import {
 } from "lucide-react";
 
 export const StoreSettings = ({ action }: { action?: string | null }) => {
-  const { stores, loading: storesLoading, createStore, updateStore, deleteStore, refetch } = useStores();
+  const { stores, loading: storesLoading, createStore, updateStore, deleteStore, refetch, canCreateStore, getRemainingStores } = useStores();
+  const { refreshStores } = useStoreContext();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("list");
@@ -73,6 +75,9 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
         description: newStoreData.description.trim() || null,
         slug: slug
       });
+
+      // Rafraîchir le contexte pour mettre à jour la liste
+      await refreshStores();
 
       setNewStoreData({ name: "", description: "", slug: "" });
       setIsCreating(false);
@@ -200,10 +205,14 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
 
       {/* Onglets */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={stores.length > 0 ? "grid w-full grid-cols-1" : "grid w-full grid-cols-2"}>
-          <TabsTrigger value="list">{stores.length > 0 ? "Ma boutique" : "Liste"}</TabsTrigger>
-          {stores.length === 0 && (
-            <TabsTrigger value="create">Créer</TabsTrigger>
+        <TabsList className={canCreateStore() ? "grid w-full grid-cols-2" : "grid w-full grid-cols-1"}>
+          <TabsTrigger value="list">
+            {stores.length === 1 ? "Ma boutique" : stores.length > 1 ? `Mes boutiques (${stores.length})` : "Liste"}
+          </TabsTrigger>
+          {canCreateStore() && (
+            <TabsTrigger value="create">
+              Créer {getRemainingStores() > 0 && `(${getRemainingStores()} restante${getRemainingStores() > 1 ? 's' : ''})`}
+            </TabsTrigger>
           )}
         </TabsList>
 
@@ -290,11 +299,11 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
 
         {/* Création de boutique */}
         <TabsContent value="create" className="space-y-4">
-          {stores.length > 0 ? (
+          {!canCreateStore() ? (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Supprimez votre boutique existante si vous souhaitez en créer une nouvelle.
+                Limite de 3 boutiques par utilisateur atteinte. Vous devez supprimer une boutique existante avant d'en créer une nouvelle.
               </AlertDescription>
             </Alert>
           ) : (
@@ -302,7 +311,10 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
           <CardHeader>
                 <CardTitle>Créer votre boutique</CardTitle>
             <CardDescription>
-                  Configurez votre boutique pour commencer à vendre vos produits
+                  {stores.length > 0 
+                    ? `Vous avez ${stores.length} boutique${stores.length > 1 ? 's' : ''}. Vous pouvez créer jusqu'à ${getRemainingStores()} boutique${getRemainingStores() > 1 ? 's' : ''} supplémentaire${getRemainingStores() > 1 ? 's' : ''}.`
+                    : "Configurez votre boutique pour commencer à vendre vos produits"
+                  }
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

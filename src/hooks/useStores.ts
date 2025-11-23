@@ -33,6 +33,8 @@ export interface Store {
   dns_records?: any[];
 }
 
+const MAX_STORES_PER_USER = 3;
+
 export const useStores = () => {
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +76,14 @@ export const useStores = () => {
     }
   };
 
+  const canCreateStore = () => {
+    return stores.length < MAX_STORES_PER_USER;
+  };
+
+  const getRemainingStores = () => {
+    return Math.max(0, MAX_STORES_PER_USER - stores.length);
+  };
+
   const createStore = async (storeData: Partial<Store>) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -82,19 +92,9 @@ export const useStores = () => {
         throw new Error('Utilisateur non authentifié');
       }
 
-      // Vérifier si l'utilisateur a déjà une boutique
-      const { data: existingStores, error: checkError } = await supabase
-        .from('stores')
-        .select('id')
-        .eq('user_id', user.id)
-        .limit(1);
-
-      if (checkError) {
-        throw checkError;
-      }
-
-      if (existingStores && existingStores.length > 0) {
-        throw new Error('Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.');
+      // Vérifier la limite de 3 boutiques
+      if (!canCreateStore()) {
+        throw new Error(`Limite de ${MAX_STORES_PER_USER} boutiques par utilisateur atteinte. Vous devez supprimer une boutique existante avant d'en créer une nouvelle.`);
       }
 
       const { data, error } = await supabase
@@ -204,6 +204,8 @@ export const useStores = () => {
     createStore,
     updateStore,
     deleteStore,
-    refetch: fetchStores
+    refetch: fetchStores,
+    canCreateStore,
+    getRemainingStores
   };
 };

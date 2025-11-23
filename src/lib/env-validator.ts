@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from './logger';
 
 /**
  * Schéma de validation pour les variables d'environnement
@@ -125,7 +126,9 @@ if (import.meta.env.DEV) {
   } catch (error) {
     // En développement, on peut continuer avec des variables manquantes (optionnelles)
     // mais on affiche un avertissement
-    console.warn('⚠️ Variables d\'environnement:', error instanceof Error ? error.message : error);
+    logger.warn('Variables d\'environnement manquantes ou invalides', { 
+      error: error instanceof Error ? error.message : String(error) 
+    });
   }
 } else {
   // En production, la validation doit être stricte

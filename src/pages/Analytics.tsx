@@ -1,13 +1,15 @@
 import { useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useStore } from "@/hooks/use-store";
 import { useOrders } from "@/hooks/useOrders";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useProductsOptimized } from "@/hooks/useProductsOptimized";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, DollarSign, ShoppingCart, Users, Package, BarChart3 } from "lucide-react";
+import { TrendingUp, DollarSign, ShoppingCart, Users, Package, BarChart3, Plus } from "lucide-react";
 import { SalesChart } from "@/components/analytics/SalesChart";
 import { TopProducts } from "@/components/analytics/TopProducts";
 import { RecentOrders } from "@/components/analytics/RecentOrders";
@@ -15,6 +17,7 @@ import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const Analytics = () => {
+  const navigate = useNavigate();
   const { store, loading: storeLoading } = useStore();
   const { orders, loading: ordersLoading } = useOrders(store?.id);
   // Utiliser avec limite pour stats (pas besoin de tous les clients/produits)
@@ -73,11 +76,28 @@ const Analytics = () => {
             <div className="container mx-auto p-3 sm:p-4 lg:p-6">
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Boutique non configurée</CardTitle>
-                  <CardDescription>
-                    Veuillez d'abord créer votre boutique pour voir vos statistiques.
+                  <CardTitle className="text-xl sm:text-2xl font-bold">Aucune boutique sélectionnée</CardTitle>
+                  <CardDescription className="text-sm sm:text-base mt-2">
+                    Veuillez sélectionner une boutique ou créer une nouvelle boutique pour voir vos statistiques.
                   </CardDescription>
                 </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      onClick={() => navigate("/dashboard/store")} 
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Créer une boutique
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => navigate("/dashboard")} 
+                    >
+                      Retour au tableau de bord
+                    </Button>
+                  </div>
+                </CardContent>
               </Card>
             </div>
           </main>

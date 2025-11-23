@@ -1260,12 +1260,12 @@
     "create": {
       "title": "Criar uma nova loja",
       "description": "Configure sua nova loja nas configurações.",
-      "descriptionExisting": "Você já tem uma loja. Apenas uma conta de loja é permitida por usuário. Exclua sua loja existente se quiser criar uma nova."
+      "descriptionExisting": "Você pode criar até 3 lojas. Se você atingiu o limite, exclua uma loja existente antes de criar uma nova."
     },
     "existing": {
-      "title": "Loja existente",
-      "description": "Você já tem uma loja. Apenas uma conta de loja é permitida por usuário. Para criar uma nova loja, você deve primeiro excluir sua loja existente.",
-      "currentStore": "Sua loja atual:"
+      "title": "Lojas existentes",
+      "description": "Você pode criar até 3 lojas por usuário. Para criar uma nova loja, você deve primeiro excluir uma loja existente se você atingiu o limite.",
+      "currentStore": "Suas lojas atuais:"
     },
     "empty": {
       "title": "Crie sua primeira loja",

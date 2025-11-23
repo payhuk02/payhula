@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { logger } from '@/lib/logger';
 
 export interface Store {
@@ -26,6 +27,7 @@ export const useStore = () => {
   const [store, setStore] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
+  const { selectedStoreId, selectedStore: contextStore, loading: contextLoading } = useStoreContext();
   const { toast } = useToast();
 
   const generateSlug = (name: string): string => {
@@ -93,11 +95,17 @@ export const useStore = () => {
 
   const fetchStore = useCallback(async () => {
     try {
-      logger.info('🔍 [useStore] fetchStore appelé', { authLoading, userId: user?.id });
+      logger.info('🔍 [useStore] fetchStore appelé', { 
+        authLoading, 
+        contextLoading,
+        userId: user?.id,
+        selectedStoreId,
+        contextStoreId: contextStore?.id
+      });
       
-      // Attendre que l'authentification soit chargée
-      if (authLoading) {
-        logger.info('⏳ [useStore] En attente de l\'auth...');
+      // Attendre que l'authentification et le contexte soient chargés
+      if (authLoading || contextLoading) {
+        logger.info('⏳ [useStore] En attente de l\'auth ou du contexte...');
         return;
       }
 
@@ -111,26 +119,38 @@ export const useStore = () => {
         return;
       }
 
-      // Récupérer la première boutique de l'utilisateur
-      logger.info('📡 [useStore] Récupération de la première boutique pour user:', user.id);
-      const { data, error } = await supabase
-        .from('stores')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true })
-        .limit(1);
-
-      if (error) {
-        logger.error('❌ [useStore] Erreur:', error);
-        setStore(null);
+      // Utiliser la boutique du contexte si disponible
+      if (contextStore) {
+        logger.info('✅ [useStore] Utilisation de la boutique du contexte:', contextStore.id, contextStore.name);
+        setStore(contextStore);
         setLoading(false);
         return;
       }
-      
-      // Prendre le premier résultat s'il y en a un
-      const storeData = data && data.length > 0 ? data[0] : null;
-      logger.info('✅ [useStore] Première boutique récupérée:', storeData?.id || 'null', storeData?.name);
-      setStore(storeData);
+
+      // Si pas de boutique sélectionnée mais un ID, récupérer depuis la base
+      if (selectedStoreId) {
+        logger.info('📡 [useStore] Récupération de la boutique sélectionnée:', selectedStoreId);
+        const { data, error } = await supabase
+          .from('stores')
+          .select('*')
+          .eq('id', selectedStoreId)
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          logger.error('❌ [useStore] Erreur lors de la récupération:', error);
+          setStore(null);
+          setLoading(false);
+          return;
+        }
+
+        logger.info('✅ [useStore] Boutique récupérée:', data?.id || 'null', data?.name);
+        setStore(data);
+      } else {
+        // Aucune boutique sélectionnée
+        logger.info('⚠️ [useStore] Aucune boutique sélectionnée');
+        setStore(null);
+      }
     } catch (error) {
       logger.error('💥 [useStore] Exception:', error);
       toast({
@@ -142,28 +162,28 @@ export const useStore = () => {
       setLoading(false);
       logger.info('✅ [useStore] setLoading(false)');
     }
-  }, [user, authLoading, toast]);
+  }, [user, authLoading, contextLoading, selectedStoreId, contextStore, toast]);
 
   const createStore = async (name: string, description?: string) => {
     try {
       if (!user) throw new Error("Non authentifié");
 
-      // Vérifier si l'utilisateur a déjà une boutique
+      // Vérifier la limite de 3 boutiques
       const { data: existingStores, error: checkError } = await supabase
         .from('stores')
         .select('id')
-        .eq('user_id', user.id)
-        .limit(1);
+        .eq('user_id', user.id);
 
       if (checkError) {
         logger.error('Error checking existing stores:', checkError);
         throw checkError;
       }
 
-      if (existingStores && existingStores.length > 0) {
+      const storeCount = existingStores?.length || 0;
+      if (storeCount >= 3) {
         toast({
-          title: "Boutique existante",
-          description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+          title: "Limite atteinte",
+          description: "Limite de 3 boutiques par utilisateur atteinte. Vous devez supprimer une boutique existante avant d'en créer une nouvelle.",
           variant: "destructive"
         });
         return false;
@@ -207,10 +227,10 @@ export const useStore = () => {
       // Gérer l'erreur spécifique de limite de la base de données
       if (error && typeof error === 'object' && 'message' in error) {
         const errorMessage = (error as any).message;
-        if (errorMessage && (errorMessage.includes('Limite de 3 boutiques') || errorMessage.includes('déjà une boutique'))) {
+        if (errorMessage && errorMessage.includes('Limite de 3 boutiques')) {
           toast({
-            title: "Boutique existante",
-            description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+            title: "Limite atteinte",
+            description: "Limite de 3 boutiques par utilisateur atteinte. Vous devez supprimer une boutique existante avant d'en créer une nouvelle.",
             variant: "destructive"
           });
           return false;
@@ -276,15 +296,15 @@ export const useStore = () => {
   };
 
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading && !contextLoading) {
       fetchStore();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, user?.id]); // ✅ Utiliser user?.id (primitive) au lieu de user (objet) pour éviter re-renders
+  }, [authLoading, contextLoading, user?.id, selectedStoreId, contextStore?.id]); // ✅ Réagir aux changements de boutique sélectionnée
 
   return {
     store,
-    loading: loading || authLoading, // Attendre que l'auth ET le store soient chargés
+    loading: loading || authLoading || contextLoading, // Attendre que l'auth, le contexte ET le store soient chargés
     createStore,
     updateStore,
     refreshStore: fetchStore,

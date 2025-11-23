@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateSlug } from "@/lib/store-utils";
 import { logger } from "@/lib/logger";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { Loader2, Check, X } from '@/components/icons';
 
 interface StoreFormProps {
@@ -31,6 +32,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { refreshStores } = useStoreContext();
 
   const checkSlugAvailability = useCallback(async (slugToCheck: string) => {
     if (!slugToCheck) {
@@ -42,7 +44,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
     try {
       const { data, error } = await supabase.rpc('is_store_slug_available', {
         check_slug: slugToCheck,
-        exclude_store_id: initialData?.id || null,
+        exclude_store_id: initialData?.id ?? undefined,
       });
 
       if (error) throw error;
@@ -121,21 +123,21 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
           description: "Votre boutique a été mise à jour avec succès",
         });
       } else {
-        // Create new store - Vérifier si l'utilisateur a déjà une boutique
+        // Create new store - Vérifier la limite de 3 boutiques
         const { data: existingStores, error: checkError } = await supabase
           .from('stores')
           .select('id')
-          .eq('user_id', user.id)
-          .limit(1);
+          .eq('user_id', user.id);
 
         if (checkError) {
           throw checkError;
         }
 
-        if (existingStores && existingStores.length > 0) {
+        const storeCount = existingStores?.length || 0;
+        if (storeCount >= 3) {
           toast({
-            title: "Boutique existante",
-            description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+            title: "Limite atteinte",
+            description: "Limite de 3 boutiques par utilisateur atteinte. Vous devez supprimer une boutique existante avant d'en créer une nouvelle.",
             variant: "destructive",
           });
           return;
@@ -153,10 +155,10 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
 
         if (error) {
           // Gérer l'erreur spécifique de limite de la base de données
-          if (error.message && (error.message.includes('Limite de 3 boutiques') || error.message.includes('déjà une boutique'))) {
+          if (error.message && error.message.includes('Limite de 3 boutiques')) {
             toast({
-              title: "Boutique existante",
-              description: "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur.",
+              title: "Limite atteinte",
+              description: "Limite de 3 boutiques par utilisateur atteinte. Vous devez supprimer une boutique existante avant d'en créer une nouvelle.",
               variant: "destructive",
             });
             return;
@@ -168,6 +170,10 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
           title: "Boutique créée",
           description: "Votre boutique a été créée avec succès",
         });
+
+        // Rafraîchir la liste des boutiques et sélectionner la nouvelle
+        await refreshStores();
+        // La nouvelle boutique sera automatiquement sélectionnée par le contexte
       }
 
       onSuccess();

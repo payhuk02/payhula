@@ -174,11 +174,17 @@ export default defineConfig(({ mode }) => {
             return undefined; // Garder dans le chunk principal avec React
           }
           
-          // Composants lourds - Charts - Garder dans le chunk principal (utilise React.createContext)
-          // Note: recharts sera géré dans la liste des dépendances React plus bas
+          // Composants lourds - Charts - Séparer en chunk dédié (peut être lazy-loaded)
+          // Recharts est lourd (350KB) et peut être chargé à la demande pour les pages analytics
+          if (id.includes('node_modules/recharts')) {
+            return 'charts';
+          }
           
-          // Composants lourds - Calendrier - Garder dans le chunk principal (utilise React)
-          // Note: react-big-calendar sera géré dans la liste des dépendances React plus bas
+          // Composants lourds - Calendrier - Séparer en chunk dédié (peut être lazy-loaded)
+          // react-big-calendar est lourd et peut être chargé à la demande
+          if (id.includes('node_modules/react-big-calendar')) {
+            return 'calendar';
+          }
           
           // Éditeurs de texte riches - Garder dans le chunk principal (utilise React.useLayoutEffect)
           // TipTap utilise React hooks et doit être chargé avec React
@@ -276,16 +282,28 @@ export default defineConfig(({ mode }) => {
               return undefined; // Garder dans le chunk principal avec React
             }
             
-            // CRITIQUE: Toutes les dépendances qui utilisent React doivent rester dans le chunk principal
-            // Vérifier les dépendances React communes (utilisent useLayoutEffect, createContext, etc.)
-            // Note: Certaines peuvent être lazy-loaded mais doivent être chargées avec React
-            const reactDependencies = [
+            // Dépendances React qui peuvent être séparées (lazy-loaded)
+            // Ces dépendances sont lourdes et utilisées seulement sur certaines pages
+            const lazyLoadableReactDeps = [
+              'react-big-calendar', // Calendrier - séparé en chunk 'calendar'
+              'recharts', // Graphiques - séparé en chunk 'charts'
+            ];
+            
+            // Vérifier si c'est une dépendance qui peut être lazy-loaded
+            for (const dep of lazyLoadableReactDeps) {
+              if (id.includes(`node_modules/${dep}`)) {
+                // Déjà géré plus haut, continuer
+                continue;
+              }
+            }
+            
+            // Dépendances React critiques qui doivent rester dans le chunk principal
+            // (utilisées partout et nécessaires au démarrage)
+            const criticalReactDependencies = [
               'react-helmet',
               'react-i18next',
               'react-day-picker',
               'react-resizable-panels',
-              'react-big-calendar', // Peut être lazy-loaded mais gardé pour compatibilité
-              'recharts', // Utilise React Context - peut être lazy-loaded pour les graphiques
               'embla-carousel-react', // Utilise React
               'cmdk', // Utilise React
               'vaul', // Utilise React
@@ -295,7 +313,7 @@ export default defineConfig(({ mode }) => {
               '@tiptap/extension', // Extensions TipTap
             ];
             
-            for (const dep of reactDependencies) {
+            for (const dep of criticalReactDependencies) {
               if (id.includes(`node_modules/${dep}`)) {
                 return undefined; // Garder dans le chunk principal
               }

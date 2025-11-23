@@ -78,7 +78,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { logger } from "@/lib/logger";
+import { ChevronRight, Check, Plus } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 // Menu organisé par sections
 const menuSections = [
@@ -820,6 +827,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { toast } = useToast();
   const { isAdmin } = useAdmin();
+  const { stores, selectedStoreId, switchStore, canCreateStore, loading: storesLoading } = useStoreContext();
   const isCollapsed = state === "collapsed";
   // Détecte si on est sur une page admin
   const isOnAdminPage = location.pathname.startsWith('/admin');
@@ -879,6 +887,78 @@ export function AppSidebar() {
                   if (!IconComponent) {
                     logger.warn(`Menu item missing icon: ${item.title}`);
                     return null;
+                  }
+                  
+                  // Menu spécial pour "Tableau de bord" avec sous-menu des boutiques
+                  if (item.title === "Tableau de bord" && !storesLoading && stores.length > 0) {
+                    const isDashboardActive = location.pathname === "/dashboard";
+                    return (
+                      <Collapsible key={item.title} asChild defaultOpen={!isCollapsed}>
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
+                              className={`transition-all duration-300 group relative flex items-center justify-between w-full [&_*]:!text-black ${
+                                isDashboardActive
+                                  ? "bg-primary/20 text-primary font-semibold border-l-2 border-primary [&_*]:!text-primary"
+                                  : "!text-black hover:bg-muted hover:translate-x-1"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <IconComponent 
+                                  className="h-4 w-4 !text-black flex-shrink-0"
+                                />
+                                {!isCollapsed && (
+                                  <span className="flex-1 font-medium !text-black">{item.title}</span>
+                                )}
+                              </div>
+                              {!isCollapsed && (
+                                <ChevronRight className="h-4 w-4 !text-black transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                              )}
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="ml-4 mt-1 space-y-1">
+                              {stores.map((store) => (
+                                <Button
+                                  key={store.id}
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    switchStore(store.id);
+                                    navigate("/dashboard");
+                                    toast({
+                                      title: "Boutique changée",
+                                      description: `Vous consultez maintenant les données de "${store.name}"`,
+                                    });
+                                  }}
+                                  className={`w-full justify-start !text-black [&_*]:!text-black ${
+                                    selectedStoreId === store.id
+                                      ? "bg-primary/20 text-primary font-semibold [&_*]:!text-primary"
+                                      : "hover:bg-muted"
+                                  }`}
+                                >
+                                  {selectedStoreId === store.id && (
+                                    <Check className="h-3 w-3 mr-2" />
+                                  )}
+                                  <span className="truncate">{store.name}</span>
+                                </Button>
+                              ))}
+                              {canCreateStore() && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => navigate("/dashboard/store")}
+                                  className="w-full justify-start !text-black [&_*]:!text-black hover:bg-muted"
+                                >
+                                  <Plus className="h-3 w-3 mr-2" />
+                                  <span>Créer une boutique</span>
+                                </Button>
+                              )}
+                            </div>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    );
                   }
                   
                   // Menu items normaux

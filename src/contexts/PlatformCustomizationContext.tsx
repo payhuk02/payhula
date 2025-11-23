@@ -5,9 +5,25 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
+import { logger } from '@/lib/logger';
+import type { PlatformCustomizationSchemaType } from '@/lib/schemas/platform-customization';
+
+interface DesignCustomization {
+  colors?: Record<string, string>;
+  tokens?: {
+    borderRadius?: string;
+    shadow?: string;
+    spacing?: string;
+  };
+  typography?: {
+    fontFamily?: string;
+    fontSize?: Record<string, string>;
+  };
+  theme?: 'light' | 'dark' | 'auto';
+}
 
 interface PlatformCustomizationContextType {
-  customizationData: any;
+  customizationData: PlatformCustomizationSchemaType | null;
   applyCustomization: () => void;
   previewMode: boolean;
 }
@@ -24,7 +40,7 @@ export const PlatformCustomizationProvider = ({ children }: { children: ReactNod
       try {
         await load();
       } catch (error) {
-        console.error('Error loading customization:', error);
+        logger.error('Error loading customization', { error });
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +73,7 @@ export const PlatformCustomizationProvider = ({ children }: { children: ReactNod
     };
   }, []);
 
-  const applyDesignCustomization = (design: any) => {
+  const applyDesignCustomization = (design: DesignCustomization) => {
     if (!design) return;
 
     const root = document.documentElement;

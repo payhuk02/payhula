@@ -1360,12 +1360,12 @@
     "create": {
       "title": "Créer une nouvelle boutique",
       "description": "Configurez votre nouvelle boutique dans les paramètres.",
-      "descriptionExisting": "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Supprimez votre boutique existante si vous souhaitez en créer une nouvelle."
+      "descriptionExisting": "Vous pouvez créer jusqu'à 3 boutiques. Si vous avez atteint la limite, supprimez une boutique existante avant d'en créer une nouvelle."
     },
     "existing": {
-      "title": "Boutique existante",
-      "description": "Vous avez déjà une boutique. Un seul compte boutique est autorisé par utilisateur. Pour créer une nouvelle boutique, vous devez d'abord supprimer votre boutique existante.",
-      "currentStore": "Votre boutique actuelle :"
+      "title": "Boutiques existantes",
+      "description": "Vous pouvez créer jusqu'à 3 boutiques par utilisateur. Pour créer une nouvelle boutique, vous devez d'abord supprimer une boutique existante si vous avez atteint la limite.",
+      "currentStore": "Vos boutiques actuelles :"
     },
     "empty": {
       "title": "Créez votre première boutique",

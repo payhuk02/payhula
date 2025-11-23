@@ -1324,12 +1324,12 @@
     "create": {
       "title": "Neues Geschäft erstellen",
       "description": "Konfigurieren Sie Ihr neues Geschäft in den Einstellungen.",
-      "descriptionExisting": "Sie haben bereits ein Geschäft. Pro Benutzer ist nur ein Geschäftskonto erlaubt. Löschen Sie Ihr bestehendes Geschäft, wenn Sie ein neues erstellen möchten."
+      "descriptionExisting": "Sie können bis zu 3 Geschäfte erstellen. Wenn Sie das Limit erreicht haben, löschen Sie ein bestehendes Geschäft, bevor Sie ein neues erstellen."
     },
     "existing": {
-      "title": "Bestehendes Geschäft",
-      "description": "Sie haben bereits ein Geschäft. Pro Benutzer ist nur ein Geschäftskonto erlaubt. Um ein neues Geschäft zu erstellen, müssen Sie zuerst Ihr bestehendes Geschäft löschen.",
-      "currentStore": "Ihr aktuelles Geschäft:"
+      "title": "Bestehende Geschäfte",
+      "description": "Sie können bis zu 3 Geschäfte pro Benutzer erstellen. Um ein neues Geschäft zu erstellen, müssen Sie zuerst ein bestehendes Geschäft löschen, wenn Sie das Limit erreicht haben.",
+      "currentStore": "Ihre aktuellen Geschäfte:"
     },
     "empty": {
       "title": "Erstellen Sie Ihr erstes Geschäft",

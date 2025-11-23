@@ -26,3 +26,4 @@ if ($coverageMatch) {
 
 Write-Host "`n[INFO] Rapport détaillé disponible dans coverage/" -ForegroundColor Cyan
 
+

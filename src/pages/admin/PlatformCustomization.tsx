@@ -410,14 +410,14 @@ export const PlatformCustomization = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-3 sm:mb-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2 sm:gap-3 flex-wrap">
-                      {activeSectionConfig && (
-                        <>
-                          <activeSectionConfig.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary shrink-0" />
-                          <span className="truncate">{activeSectionConfig.label}</span>
-                        </>
-                      )}
-                    </h1>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2 sm:gap-3 flex-wrap">
+                    {activeSectionConfig && (
+                      <>
+                        <activeSectionConfig.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary shrink-0" />
+                        <span className="truncate">{activeSectionConfig.label}</span>
+                      </>
+                    )}
+                  </h1>
                     {hasUnsavedChanges && !previewMode && (
                       <Badge variant="outline" className="text-xs sm:text-sm bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center gap-1">
                         <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />

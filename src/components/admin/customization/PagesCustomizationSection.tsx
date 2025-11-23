@@ -36,6 +36,7 @@ import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { logger } from '@/lib/logger';
 
 interface PagesCustomizationSectionProps {
   onChange?: () => void;
@@ -401,7 +402,9 @@ export const PagesCustomizationSection = ({ onChange }: PagesCustomizationSectio
           ...prev[pageId],
           [elementKey]: value,
         },
-      }).catch(console.error);
+      }).catch((error) => {
+        logger.error('Error saving page customization', { error, pageId, elementKey });
+      });
       
       return updated;
     });

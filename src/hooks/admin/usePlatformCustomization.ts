@@ -9,8 +9,48 @@ import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { logger } from '@/lib/logger';
 import { validateSection, validateCustomizationData } from '@/lib/schemas/platform-customization';
+import type { PlatformCustomizationSchemaType } from '@/lib/schemas/platform-customization';
 
-export interface PlatformCustomizationData {
+// Types pour les structures flexibles (emails, notifications, etc.)
+export interface EmailTemplateData {
+  subject?: string;
+  html_content?: string;
+  text_content?: string;
+  variables?: Record<string, string>;
+}
+
+export interface NotificationTemplateData {
+  title?: string;
+  message?: string;
+  action_url?: string;
+  variables?: Record<string, string>;
+}
+
+export interface IntegrationConfig {
+  enabled?: boolean;
+  api_key?: string;
+  api_secret?: string;
+  webhook_url?: string;
+  [key: string]: unknown;
+}
+
+export interface PermissionConfig {
+  roles?: string[];
+  permissions?: string[];
+  [key: string]: unknown;
+}
+
+export interface ChannelConfig {
+  enabled?: boolean;
+  api_key?: string;
+  [key: string]: unknown;
+}
+
+// Type principal basé sur le schéma Zod
+export type PlatformCustomizationData = PlatformCustomizationSchemaType;
+
+// Interface legacy pour compatibilité (dépréciée, utiliser PlatformCustomizationData)
+export interface PlatformCustomizationDataLegacy {
   design?: {
     colors?: {
       primary?: string;
@@ -52,17 +92,17 @@ export interface PlatformCustomizationData {
   };
   content?: {
     texts?: Record<string, string>;
-    emails?: Record<string, any>;
-    notifications?: Record<string, any>;
+    emails?: Record<string, EmailTemplateData>;
+    notifications?: Record<string, NotificationTemplateData>;
   };
   integrations?: {
-    payment?: Record<string, any>;
-    shipping?: Record<string, any>;
-    analytics?: Record<string, any>;
+    payment?: Record<string, IntegrationConfig>;
+    shipping?: Record<string, IntegrationConfig>;
+    analytics?: Record<string, IntegrationConfig>;
   };
   security?: {
     requireAAL2?: string[];
-    permissions?: Record<string, any>;
+    permissions?: Record<string, PermissionConfig>;
   };
   features?: {
     enabled?: string[];
@@ -72,9 +112,9 @@ export interface PlatformCustomizationData {
     email?: boolean;
     sms?: boolean;
     push?: boolean;
-    channels?: Record<string, any>;
+    channels?: Record<string, ChannelConfig>;
   };
-  pages?: Record<string, Record<string, any>>;
+  pages?: Record<string, Record<string, string | number | boolean | null>>;
 }
 
 const PREVIEW_STORAGE_KEY = 'platform-customization-preview';
@@ -165,7 +205,7 @@ export const usePlatformCustomization = () => {
           if (validation.data) {
             setCustomizationData(validation.data);
           } else {
-            setCustomizationData(data.settings as PlatformCustomizationData);
+        setCustomizationData(data.settings as PlatformCustomizationData);
           }
         } else {
           setCustomizationData(validation.data || data.settings as PlatformCustomizationData);

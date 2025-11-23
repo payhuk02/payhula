@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Zap, Search, Users, Gift, Star, ShoppingCart, GraduationCap, CreditCard, Globe, Shield, Bell, TrendingUp, FileText, MessageSquare } from '@/components/icons';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
+import { logger } from '@/lib/logger';
 
 interface FeaturesSectionProps {
   onChange?: () => void;
@@ -449,7 +450,9 @@ export const FeaturesSection = ({ onChange }: FeaturesSectionProps) => {
       save('features', {
         enabled: enabledFeatures,
         disabled: disabledFeatures,
-      }).catch(console.error);
+      }).catch((error) => {
+        logger.error('Error saving feature customization', { error, featureId, enabled });
+      });
 
       return updated;
     });
