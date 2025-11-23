@@ -15,6 +15,7 @@ export interface Store {
   domain_verification_token: string | null;
   domain_verified_at: string | null;
   domain_error_message: string | null;
+  info_message?: string | null;
   created_at: string;
   updated_at: string;
 }

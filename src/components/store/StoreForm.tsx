@@ -32,6 +32,7 @@ interface StoreFormProps {
     instagram_url?: string | null;
     twitter_url?: string | null;
     linkedin_url?: string | null;
+    info_message?: string | null;
   };
 }
 
@@ -49,6 +50,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
   const [instagramUrl, setInstagramUrl] = useState(initialData?.instagram_url || "");
   const [twitterUrl, setTwitterUrl] = useState(initialData?.twitter_url || "");
   const [linkedinUrl, setLinkedinUrl] = useState(initialData?.linkedin_url || "");
+  const [infoMessage, setInfoMessage] = useState(initialData?.info_message || "");
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -143,6 +145,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
             instagram_url: instagramUrl || null,
             twitter_url: twitterUrl || null,
             linkedin_url: linkedinUrl || null,
+            info_message: infoMessage || null,
           })
           .eq('id', initialData.id);
 
@@ -190,6 +193,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
             instagram_url: instagramUrl || null,
             twitter_url: twitterUrl || null,
             linkedin_url: linkedinUrl || null,
+            info_message: infoMessage || null,
           });
 
         if (error) {
@@ -225,7 +229,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [name, slug, slugAvailable, defaultCurrency, description, initialData, onSuccess]); // Note: toast est stable
+  }, [name, slug, slugAvailable, defaultCurrency, description, logoUrl, bannerUrl, about, contactEmail, contactPhone, facebookUrl, instagramUrl, twitterUrl, linkedinUrl, initialData, onSuccess, refreshStores, toast]);
 
   return (
     <Card>
@@ -332,6 +336,26 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                 <p className="text-xs text-muted-foreground">
                   Texte détaillé qui apparaîtra dans l'onglet "À propos" de votre boutique
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="info_message">Message informatif (optionnel)</Label>
+                <Textarea
+                  id="info_message"
+                  value={infoMessage}
+                  onChange={(e) => setInfoMessage(e.target.value)}
+                  placeholder="Ex: 🎉 Promotion spéciale : -20% sur tous les produits jusqu'au 31 janvier !"
+                  rows={3}
+                  maxLength={500}
+                />
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Message qui s'affichera en haut de votre boutique (promotions, alertes, annonces, etc.)
+                  </p>
+                  <span className="text-xs text-muted-foreground">
+                    {infoMessage.length}/500
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-2">

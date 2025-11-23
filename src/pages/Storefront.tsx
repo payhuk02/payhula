@@ -291,7 +291,14 @@ const Storefront = () => {
       )}
 
       <div className="min-h-screen flex flex-col overflow-x-hidden">
-        <StoreHeader store={store} />
+        <StoreHeader 
+          store={store} 
+          infoMessage={store?.info_message ? (
+            <div className="bg-primary/10 dark:bg-primary/20 border-b border-primary/20 dark:border-primary/30 px-4 py-3 text-center text-sm text-primary-foreground">
+              {store.info_message}
+            </div>
+          ) : undefined}
+        />
 
         <main ref={headerRef} className="flex-1 bg-background overflow-x-hidden">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">

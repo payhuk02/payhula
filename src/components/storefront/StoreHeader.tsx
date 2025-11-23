@@ -9,23 +9,31 @@ interface StoreHeaderProps {
     banner_url?: string;
     active_clients?: number;
     is_verified?: boolean;
+    info_message?: string | null;
   };
-  /** Message informatif optionnel à afficher au-dessus de la bannière */
+  /** Message informatif optionnel à afficher au-dessus de la bannière (prioritaire sur store.info_message) */
   infoMessage?: React.ReactNode;
 }
 
 const StoreHeader = ({ store, infoMessage }: StoreHeaderProps) => {
+  // Utiliser infoMessage en priorité, sinon utiliser store.info_message
+  const displayMessage = infoMessage || (store.info_message ? (
+    <div className="bg-primary/10 dark:bg-primary/20 border-b border-primary/20 dark:border-primary/30 px-4 py-3 text-center text-sm text-primary-foreground">
+      {store.info_message}
+    </div>
+  ) : null);
+
   return (
     <div className="relative">
       {/* Espace pour message informatif en haut */}
-      {infoMessage && (
+      {displayMessage && (
         <div className="w-full bg-transparent relative z-30">
-          {infoMessage}
+          {displayMessage}
         </div>
       )}
       
       {/* Espace réservé même sans message (pour cohérence visuelle) */}
-      {!infoMessage && (
+      {!displayMessage && (
         <div className="h-4 sm:h-6 w-full bg-transparent" aria-hidden="true" />
       )}
 
