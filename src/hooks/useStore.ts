@@ -19,6 +19,9 @@ export interface Store {
   domain_error_message: string | null;
   logo_url?: string | null;
   banner_url?: string | null;
+  info_message?: string | null;
+  info_message_color?: string | null;
+  info_message_font?: string | null;
   created_at: string;
   updated_at: string;
 }
