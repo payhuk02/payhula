@@ -122,9 +122,8 @@ export const useDigitalProducts = (
             total: 0,
             page,
             itemsPerPage,
-              totalPages: 0,
-            };
-          }
+            totalPages: 0,
+          };
         }
 
         // Si aucun product_id trouvé, retourner structure paginée vide
