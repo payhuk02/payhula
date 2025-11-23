@@ -21,7 +21,7 @@ const StoreHeader = ({ store }: StoreHeaderProps) => {
       </div>
 
       {/* Banner - Hauteur agrandie pour affichage professionnel */}
-      <div className="h-64 sm:h-80 md:h-96 lg:h-[28rem] w-full overflow-hidden bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 relative">
+      <div className="h-64 sm:h-80 md:h-96 lg:h-[28rem] w-full overflow-visible bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 relative">
         {store.banner_url ? (
           <>
             <img
@@ -42,40 +42,43 @@ const StoreHeader = ({ store }: StoreHeaderProps) => {
             </div>
           </div>
         )}
+
+        {/* Logo positionné sur la bannière (en bas à gauche) */}
+        <div className="absolute bottom-0 left-3 sm:left-4 md:left-6 lg:left-8 transform translate-y-1/2 z-20">
+          {store.logo_url ? (
+            <div className="relative group">
+              {/* Ombre portée professionnelle */}
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl scale-110 opacity-50 group-hover:opacity-75 transition-opacity" />
+              {/* Logo avec bordure et ombre améliorées */}
+              <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 rounded-full overflow-hidden border-4 border-background shadow-2xl bg-card ring-4 ring-background/50">
+                <img
+                  src={store.logo_url}
+                  alt={`Logo de ${store.name}`}
+                  className="h-full w-full object-cover"
+                  loading="eager"
+                />
+              </div>
+              {/* Badge de vérification optionnel (pour futures fonctionnalités) */}
+              {store.is_verified && (
+                <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1.5 border-2 border-background shadow-lg">
+                  <Check className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 rounded-full border-4 border-background shadow-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center ring-4 ring-background/50">
+              <Users className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 text-primary/60" />
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Store Info Card */}
       <div className="bg-card border-b shadow-soft overflow-hidden relative">
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 py-6 sm:py-8">
-            {/* Logo - Taille agrandie et positionnement amélioré */}
-            <div className="flex-shrink-0 -mt-16 sm:-mt-20 md:-mt-24 relative z-10">
-              {store.logo_url ? (
-                <div className="relative group">
-                  {/* Ombre portée professionnelle */}
-                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl scale-110 opacity-50 group-hover:opacity-75 transition-opacity" />
-                  {/* Logo avec bordure et ombre améliorées */}
-                  <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 rounded-full overflow-hidden border-4 border-background shadow-2xl bg-card ring-4 ring-background/50">
-                    <img
-                      src={store.logo_url}
-                      alt={`Logo de ${store.name}`}
-                      className="h-full w-full object-cover"
-                      loading="eager"
-                    />
-                  </div>
-                  {/* Badge de vérification optionnel (pour futures fonctionnalités) */}
-                  {store.is_verified && (
-                    <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1.5 border-2 border-background shadow-lg">
-                      <Check className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 rounded-full border-4 border-background shadow-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center ring-4 ring-background/50">
-                  <Users className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 text-primary/60" />
-                </div>
-              )}
-            </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 py-6 sm:py-8 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
+            {/* Espace réservé pour le logo (maintenant sur la bannière) */}
+            <div className="flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36"></div>
             
             {/* Store Details */}
             <div className="flex-1 min-w-0 w-full">
