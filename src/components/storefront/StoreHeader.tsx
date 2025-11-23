@@ -29,8 +29,11 @@ const StoreHeader = ({ store, infoMessage }: StoreHeaderProps) => {
     });
   }
 
+  // Vérifier si le message existe et n'est pas vide
+  const hasInfoMessage = store?.info_message && store.info_message.trim().length > 0;
+
   // Utiliser infoMessage en priorité, sinon utiliser store.info_message avec styles personnalisés
-  const displayMessage = infoMessage || (store?.info_message ? (
+  const displayMessage = infoMessage || (hasInfoMessage ? (
     <div 
       className="border-b px-4 py-3 text-center text-sm"
       style={{
