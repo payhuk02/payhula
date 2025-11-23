@@ -18,19 +18,8 @@ interface StoreHeaderProps {
 }
 
 const StoreHeader = ({ store, infoMessage }: StoreHeaderProps) => {
-  // Debug: Vérifier les données du store
-  if (process.env.NODE_ENV === 'development' && store) {
-    console.log('[StoreHeader] Store data:', {
-      hasInfoMessage: !!store.info_message,
-      infoMessage: store.info_message,
-      infoMessageColor: store.info_message_color,
-      infoMessageFont: store.info_message_font,
-      storeKeys: Object.keys(store),
-    });
-  }
-
   // Vérifier si le message existe et n'est pas vide
-  const hasInfoMessage = store?.info_message && store.info_message.trim().length > 0;
+  const hasInfoMessage = store?.info_message && typeof store.info_message === 'string' && store.info_message.trim().length > 0;
 
   // Utiliser infoMessage en priorité, sinon utiliser store.info_message avec styles personnalisés
   const displayMessage = infoMessage || (hasInfoMessage ? (
