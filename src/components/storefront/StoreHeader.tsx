@@ -10,13 +10,27 @@ interface StoreHeaderProps {
     active_clients?: number;
     is_verified?: boolean;
   };
+  /** Message informatif optionnel à afficher au-dessus de la bannière */
+  infoMessage?: React.ReactNode;
 }
 
-const StoreHeader = ({ store }: StoreHeaderProps) => {
+const StoreHeader = ({ store, infoMessage }: StoreHeaderProps) => {
   return (
     <div className="relative">
+      {/* Espace pour message informatif en haut */}
+      {infoMessage && (
+        <div className="w-full bg-transparent relative z-30">
+          {infoMessage}
+        </div>
+      )}
+      
+      {/* Espace réservé même sans message (pour cohérence visuelle) */}
+      {!infoMessage && (
+        <div className="h-4 sm:h-6 w-full bg-transparent" aria-hidden="true" />
+      )}
+
       {/* Language Switcher - Top Right */}
-      <div className="absolute top-4 right-4 z-50">
+      <div className={`absolute ${infoMessage ? 'top-20 sm:top-24 md:top-28' : 'top-4'} right-4 z-50`}>
         <LanguageSwitcher variant="outline" showLabel={false} />
       </div>
 
