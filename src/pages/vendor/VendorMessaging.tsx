@@ -142,7 +142,7 @@ export default function VendorMessaging() {
       setUploadingFiles(true);
 
       // Upload files if any
-      let fileUrls: string[] = [];
+      const fileUrls: string[] = [];
       if (selectedFiles.length > 0) {
         for (const file of selectedFiles) {
           const fileExt = file.name.split('.').pop();

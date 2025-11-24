@@ -174,7 +174,7 @@ export const BulkServiceUpdate: React.FC<BulkServiceUpdateProps> = ({
   const calculateChanges = () => {
     return Array.from(selectedIds).map((id) => {
       const service = services.find((s) => s.id === id)!;
-      let changes: Partial<BulkServiceItem> = {};
+      const changes: Partial<BulkServiceItem> = {};
 
       switch (updateField) {
         case 'price':

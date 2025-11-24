@@ -79,6 +79,20 @@ export default function StoreAffiliateManagement() {
     commissions: { page: commissionsPage, pageSize: commissionsPageSize },
   });
 
+  // Synchroniser les états de pagination avec les hooks
+  // Ces hooks doivent être appelés AVANT les early returns
+  useEffect(() => {
+    if (linksPagination) {
+      setLinksPage(linksPagination.page);
+    }
+  }, [linksPagination?.page]);
+
+  useEffect(() => {
+    if (commissionsPagination) {
+      setCommissionsPage(commissionsPagination.page);
+    }
+  }, [commissionsPagination?.page]);
+
   if (storeLoading) {
     return (
       <SidebarProvider>
@@ -108,19 +122,6 @@ export default function StoreAffiliateManagement() {
       </SidebarProvider>
     );
   }
-
-  // Synchroniser les états de pagination avec les hooks
-  useEffect(() => {
-    if (linksPagination) {
-      setLinksPage(linksPagination.page);
-    }
-  }, [linksPagination?.page]);
-
-  useEffect(() => {
-    if (commissionsPagination) {
-      setCommissionsPage(commissionsPagination.page);
-    }
-  }, [commissionsPagination?.page]);
 
   // Filtrer les commissions (filtrage côté client pour le statut)
   const filteredCommissions = commissions.filter((commission) => {

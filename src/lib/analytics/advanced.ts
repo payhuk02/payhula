@@ -72,6 +72,7 @@ export class AdvancedAnalytics {
       };
     } catch (error) {
       logger.error('AdvancedAnalytics.getDashboard error', { error, storeId, period });
+      // Re-throw to allow caller to handle the error
       throw error;
     }
   }

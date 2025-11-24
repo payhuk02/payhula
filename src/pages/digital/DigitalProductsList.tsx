@@ -130,7 +130,7 @@ export const DigitalProductsList = () => {
 
     // Si on a une réponse paginée, les produits sont déjà filtrés côté serveur
     // On applique seulement les filtres locaux (recherche, type, statut)
-    let filtered = products.filter((p) => {
+    const filtered = products.filter((p) => {
       const product = 'product' in p ? p.product : p;
       
       // Search filter

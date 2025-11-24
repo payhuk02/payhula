@@ -264,6 +264,7 @@ export async function validateFileSecurity(
     }
     
     // Caractères suspects dans le nom
+    // eslint-disable-next-line no-control-regex
     if (/[<>:"|?*\x00-\x1F]/.test(file.name)) {
       return {
         isValid: false,

@@ -253,7 +253,7 @@ export const useStore = () => {
     if (!store) return false;
 
     try {
-      let updateData: Partial<Store> = { ...updates };
+      const updateData: Partial<Store> = { ...updates };
 
       // Si le nom change, regénérer le slug
       if (updates.name && updates.name !== store.name) {
