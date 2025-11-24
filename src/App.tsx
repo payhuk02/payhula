@@ -277,8 +277,8 @@ const NotificationSettings = lazy(() => import("./pages/settings/NotificationSet
 // Pages Produits Digitaux - Lazy loading
 const DigitalProductsList = lazy(() => import("./pages/digital/DigitalProductsList"));
 const DigitalProductDetail = lazy(() => import("./pages/digital/DigitalProductDetail"));
-const DigitalProductsSearch = lazy(() => import("./pages/digital/DigitalProductsSearch").then((m: { DigitalProductsSearch: React.ComponentType<any> }) => ({ default: m.DigitalProductsSearch })));
-const DigitalProductsCompare = lazy(() => import("./pages/digital/DigitalProductsCompare").then((m: { DigitalProductsCompare: React.ComponentType<any> }) => ({ default: m.DigitalProductsCompare })));
+const DigitalProductsSearch = lazy(() => import("./pages/digital/DigitalProductsSearch").then((m: { DigitalProductsSearch: React.ComponentType<Record<string, unknown>> }) => ({ default: m.DigitalProductsSearch })));
+const DigitalProductsCompare = lazy(() => import("./pages/digital/DigitalProductsCompare").then((m: { DigitalProductsCompare: React.ComponentType<Record<string, unknown>> }) => ({ default: m.DigitalProductsCompare })));
 const SharedWishlist = lazy(() => import("./pages/customer/SharedWishlist"));
 const MyDownloads = lazy(() => import("./pages/digital/MyDownloads"));
 const CreateBundle = lazy(() => import("./pages/digital/CreateBundle"));
@@ -613,13 +613,18 @@ const queryClient = new QueryClient({
       // Retry avec exponential backoff pour les mutations
       // Note: Les hooks utilisant useMutationWithRetry auront leur propre config
       retry: (failureCount, error) => {
-        // Importer dynamiquement pour éviter dépendance circulaire
-        const { shouldRetryError } = require('@/lib/error-handling');
-        return shouldRetryError(error, failureCount) && failureCount < 2; // Max 2 retries par défaut
+        // Retry simple sans dépendance circulaire
+        if (failureCount >= 2) return false; // Max 2 retries
+        // Ne pas retry sur les erreurs 4xx (erreurs client)
+        if (error && typeof error === 'object' && 'status' in error) {
+          const status = (error as { status: number }).status;
+          if (status >= 400 && status < 500) return false;
+        }
+        return true;
       },
       retryDelay: (attemptIndex) => {
-        const { getRetryDelay } = require('@/lib/error-handling');
-        return getRetryDelay(attemptIndex, 1000, 30000);
+        // Délai exponentiel : 1s, 2s, 4s...
+        return Math.min(1000 * Math.pow(2, attemptIndex), 30000);
       },
       // Optimistic UI updates
       onMutate: async () => {

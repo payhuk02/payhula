@@ -7,16 +7,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute';
+import * as AuthContext from '@/contexts/AuthContext';
 
 // Mock AuthContext
 const mockUser = { id: '123', email: 'test@example.com' };
 const mockLoading = false;
 
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({
+  useAuth: vi.fn(() => ({
     user: mockUser,
     loading: mockLoading,
-  }),
+  })),
 }));
 
 describe('ProtectedRoute', () => {
@@ -38,10 +39,10 @@ describe('ProtectedRoute', () => {
 
   it('devrait rediriger vers /auth si l\'utilisateur n\'est pas authentifié', () => {
     // Mock user as null
-    vi.mocked(require('@/contexts/AuthContext').useAuth).mockReturnValue({
+    vi.mocked(AuthContext.useAuth).mockReturnValue({
       user: null,
       loading: false,
-    });
+    } as ReturnType<typeof AuthContext.useAuth>);
 
     render(
       <BrowserRouter>
@@ -57,10 +58,10 @@ describe('ProtectedRoute', () => {
 
   it('devrait afficher un loader pendant le chargement', () => {
     // Mock loading as true
-    vi.mocked(require('@/contexts/AuthContext').useAuth).mockReturnValue({
+    vi.mocked(AuthContext.useAuth).mockReturnValue({
       user: null,
       loading: true,
-    });
+    } as ReturnType<typeof AuthContext.useAuth>);
 
     render(
       <BrowserRouter>
