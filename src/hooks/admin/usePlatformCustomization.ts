@@ -221,17 +221,18 @@ export const usePlatformCustomization = () => {
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Logger dans Sentry pour les erreurs inattendues
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Error loading customization', {
-        error: error.message || String(error),
+        error: errorMessage,
         level: 'section',
         extra: { error },
       });
     }
   }, []);
 
-  const save = useCallback(async (section: string, data: any) => {
+  const save = useCallback(async (section: string, data: unknown) => {
     try {
       setIsSaving(true);
       
@@ -339,9 +340,10 @@ export const usePlatformCustomization = () => {
 
       setIsSaving(false);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Error saving customization', {
-        error: error.message || String(error),
+        error: errorMessage,
         section,
         level: 'section',
         extra: { error },
@@ -455,9 +457,10 @@ export const usePlatformCustomization = () => {
       }));
 
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Error saving all customization', {
-        error: error.message || String(error),
+        error: errorMessage,
         level: 'section',
         extra: { error },
       });

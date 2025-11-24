@@ -332,10 +332,11 @@ export const useCreateReview = () => {
         description: 'Votre avis a été publié avec succès.',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -378,10 +379,11 @@ export const useUpdateReview = () => {
         description: 'Votre avis a été modifié avec succès.',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -429,10 +431,11 @@ export const useDeleteReview = () => {
         description: 'Votre avis a été supprimé.',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -528,10 +531,11 @@ export const useReplyToReview = () => {
         description: 'Votre réponse a été publiée.',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     },

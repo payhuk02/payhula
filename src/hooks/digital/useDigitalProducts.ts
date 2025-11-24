@@ -62,6 +62,41 @@ export interface DigitalProductsPaginationOptions {
 }
 
 /**
+ * Structure du produit associé depuis la jointure Supabase
+ */
+interface ProductFromJoin {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  price: number;
+  currency?: string | null;
+  is_active: boolean;
+  image_url?: string | null;
+  store_id: string;
+}
+
+/**
+ * Structure d'un item digital_products avec jointure products
+ */
+interface DigitalProductWithJoin {
+  id: string;
+  product_id: string;
+  [key: string]: unknown;
+  products: ProductFromJoin | ProductFromJoin[] | null;
+}
+
+/**
+ * Structure mappée finale avec product non-null
+ */
+interface MappedDigitalProduct {
+  id: string;
+  product_id: string;
+  product: ProductFromJoin;
+  [key: string]: unknown;
+}
+
+/**
  * useDigitalProducts - Hook pour lister les produits digitaux
  * Avec jointure sur products pour avoir toutes les infos
  * Support pagination côté serveur pour performance optimale
@@ -240,9 +275,9 @@ export const useDigitalProducts = (
           }
           
           // Utiliser les données de la requête alternative
-          const mappedAltData = (altData || []).map((item: any) => {
+          const mappedAltData = (altData || []).map((item: DigitalProductWithJoin): MappedDigitalProduct | null => {
             const productData = item.products;
-            let product = null;
+            let product: ProductFromJoin | null = null;
             
             if (productData) {
               if (Array.isArray(productData)) {
@@ -274,8 +309,8 @@ export const useDigitalProducts = (
             return {
               ...item,
               product: product,
-            };
-          }).filter((item: any) => item !== null && item.product !== null);
+            } as MappedDigitalProduct;
+          }).filter((item): item is MappedDigitalProduct => item !== null && item.product !== null);
           
           // Tri côté client pour prix et nom
           if (sortBy === 'price-asc' || sortBy === 'price-desc' || sortBy === 'name') {
@@ -295,7 +330,7 @@ export const useDigitalProducts = (
           }
           
           return {
-            data: mappedAltData as any[],
+            data: mappedAltData,
             total: totalCount || 0,
             page,
             itemsPerPage,
@@ -316,7 +351,7 @@ export const useDigitalProducts = (
         }
 
         // Mapper les données pour avoir la structure attendue avec `product`
-        const mappedData = (data || []).map((item: any) => {
+        const mappedData = (data || []).map((item: DigitalProductWithJoin): MappedDigitalProduct | null => {
           // S'assurer que products n'est pas null
           const productData = item.products;
           let product = null;
@@ -351,8 +386,8 @@ export const useDigitalProducts = (
           return {
             ...item,
             product: product,
-          };
-        }).filter((item: any) => item !== null && item.product !== null); // Filtrer les items sans produit associé
+          } as MappedDigitalProduct;
+        }).filter((item): item is MappedDigitalProduct => item !== null && item.product !== null); // Filtrer les items sans produit associé
 
         // Tri côté client pour prix et nom (car les données sont dans products)
         if (sortBy === 'price-asc' || sortBy === 'price-desc' || sortBy === 'name') {
@@ -373,7 +408,7 @@ export const useDigitalProducts = (
 
         // Retourner avec métadonnées de pagination
         return {
-          data: mappedData as any[],
+          data: mappedData,
           total: totalCount || 0,
           page,
           itemsPerPage,
@@ -843,7 +878,7 @@ export const useHasDownloadAccess = (digitalProductId: string | undefined) => {
 
         if (!metadataError && allOrderItems) {
           // Filtrer côté client pour trouver ceux avec user_id dans metadata
-          const matchingItems = allOrderItems.filter((item: any) => {
+          const matchingItems = allOrderItems.filter((item: { item_metadata?: { user_id?: string } }) => {
             const metadata = item.item_metadata;
             return metadata && typeof metadata === 'object' && metadata.user_id === user.id;
           });

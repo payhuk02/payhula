@@ -108,6 +108,50 @@ export interface PaginationInfo {
   hasPreviousPage: boolean;
 }
 
+// Types pour les données brutes de Supabase
+interface AffiliateFromDB {
+  id: string;
+  user_id: string;
+  affiliate_code: string;
+  status: 'pending' | 'active' | 'suspended' | 'rejected';
+  total_clicks: number | null;
+  total_sales: number | null;
+  total_revenue: number | null;
+  total_commission_earned: number | null;
+  pending_commission: number | null;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    email: string;
+    full_name: string | null;
+    display_name: string | null;
+  } | null;
+}
+
+interface AffiliateLinkFromDB {
+  id: string;
+  affiliate_id: string;
+  product_id: string;
+  link_code: string;
+  full_url: string;
+  total_clicks: number | null;
+  total_sales: number | null;
+  total_revenue: number | null;
+  total_commission: number | null;
+  status: 'active' | 'paused' | 'archived';
+  products?: {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    image_url: string | null;
+  } | null;
+  affiliates?: {
+    email: string;
+    display_name: string | null;
+  } | null;
+}
+
 /**
  * Récupère tous les affiliés d'un store
  */
@@ -145,7 +189,7 @@ export const useStoreAffiliates = (
 
       if (fetchError) throw fetchError;
 
-      return (data || []).map((affiliate: any) => ({
+      return (data || []).map((affiliate: AffiliateFromDB) => ({
         id: affiliate.id,
         affiliate_id: affiliate.id,
         user_id: affiliate.user_id,
@@ -232,7 +276,7 @@ export const useStoreAffiliates = (
 
       if (fetchError) throw fetchError;
 
-      const links = (data || []).map((link: any) => ({
+      const links = (data || []).map((link: AffiliateLinkFromDB) => ({
         id: link.id,
         affiliate_id: link.affiliate_id,
         product_id: link.product_id,

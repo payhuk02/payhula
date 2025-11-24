@@ -70,7 +70,7 @@ const Storefront = () => {
         const storeData = data[0];
         // Debug: Vérifier les champs récupérés
         if (process.env.NODE_ENV === 'development') {
-          console.log('[Storefront] Store data loaded:', {
+          logger.debug('[Storefront] Store data loaded', {
             name: storeData.name,
             hasInfoMessage: !!storeData.info_message,
             infoMessage: storeData.info_message,

@@ -51,7 +51,36 @@ import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
-import type { ServiceProductFormData } from '@/types/service-product';
+import type { ServiceProductFormData, ServiceStaffMember, ServiceAvailabilitySlot } from '@/types/service-product';
+
+/**
+ * Type pour les ressources de service
+ */
+interface ServiceResource {
+  name: string;
+  description?: string;
+  type?: string;
+  quantity_available?: number;
+  is_required?: boolean;
+}
+
+/**
+ * Type pour les données d'affiliation
+ */
+interface AffiliateData {
+  enabled?: boolean;
+  commission_rate?: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Type pour les options de paiement
+ */
+interface PaymentData {
+  payment_type?: 'full' | 'deposit' | 'escrow';
+  deposit_amount?: number;
+  [key: string]: unknown;
+}
 
 
 const STEPS = [
@@ -232,7 +261,7 @@ export const CreateServiceWizard = ({
   /**
    * Update form data with auto-save
    */
-  const handleUpdateFormData = useCallback((data: any) => {
+  const handleUpdateFormData = useCallback((data: Partial<ServiceProductFormData> & Record<string, unknown>) => {
     setFormData(prev => {
       const newData = { ...prev, ...data };
       
@@ -252,7 +281,7 @@ export const CreateServiceWizard = ({
   /**
    * Auto-save draft
    */
-  const handleAutoSave = useCallback(async (data?: any) => {
+  const handleAutoSave = useCallback(async (data?: ServiceProductFormData) => {
     const dataToSave = data || formData;
     
     // Ne pas auto-save si pas de nom
@@ -623,7 +652,7 @@ export const CreateServiceWizard = ({
 
     // 4. Create staff members
     if (formData.staff_members && formData.staff_members.length > 0) {
-      const staffData = formData.staff_members.map((member: any) => ({
+      const staffData = formData.staff_members.map((member) => ({
         service_product_id: serviceProduct.id,
         store_id: store.id,
         name: member.name,
@@ -644,7 +673,7 @@ export const CreateServiceWizard = ({
 
     // 5. Create availability slots
     if (formData.availability_slots && formData.availability_slots.length > 0) {
-      const slotsData = formData.availability_slots.map((slot: any) => ({
+      const slotsData = formData.availability_slots.map((slot: ServiceAvailabilitySlot & { day_of_week?: number; staff_member_id?: string | null; is_available?: boolean }) => ({
         service_product_id: serviceProduct.id,
         day_of_week: slot.day_of_week,
         start_time: slot.start_time,
@@ -662,7 +691,7 @@ export const CreateServiceWizard = ({
 
     // 6. Create resources
     if (formData.resources && formData.resources.length > 0) {
-      const resourcesData = formData.resources.map((resource: any) => ({
+      const resourcesData = (formData.resources as ServiceResource[]).map((resource) => ({
         service_product_id: serviceProduct.id,
         name: resource.name,
         description: resource.description,
@@ -719,8 +748,9 @@ export const CreateServiceWizard = ({
         } else {
           logger.info('Free preview service created', { previewServiceId });
         }
-      } catch (error: any) {
-        logger.error('Exception creating preview service', { error: error.message });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error('Exception creating preview service', { error: errorMessage });
         // Ne pas faire échouer la création du service principal
       }
     }
@@ -830,7 +860,7 @@ export const CreateServiceWizard = ({
           productPrice: formData.price || 0,
           productName: formData.name || t('services.service', 'Service'),
           data: formData.affiliate || {},
-          onUpdate: (affiliateData: any) => handleUpdateFormData({ affiliate: affiliateData }),
+          onUpdate: (affiliateData: AffiliateData) => handleUpdateFormData({ affiliate: affiliateData }),
         };
       
       case 6: // SEO & FAQs
@@ -850,7 +880,7 @@ export const CreateServiceWizard = ({
           productPrice: formData.price || 0,
           productType: 'service' as const,
           data: formData.payment || {},
-          onUpdate: (paymentData: any) => handleUpdateFormData({ payment: paymentData }),
+          onUpdate: (paymentData: PaymentData) => handleUpdateFormData({ payment: paymentData }),
         };
       
       default:

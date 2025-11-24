@@ -59,7 +59,7 @@ export interface ValidationResult {
  * if (result.isValid) {
  *   window.location.href = url;
  * } else {
- *   console.error(result.error);
+ *   logger.error('Invalid redirect URL', { error: result.error });
  * }
  * ```
  */

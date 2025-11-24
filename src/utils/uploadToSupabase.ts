@@ -136,7 +136,7 @@ export async function uploadToSupabaseStorage(
   } = options;
 
   try {
-    // 1. VALIDATION DE SÉCURITÉ RENFORCÉE (Magic bytes, signatures, extensions dangereuses)
+    // 1. VALIDATION DE SÉCURITÉ CÔTÉ CLIENT (Magic bytes, signatures, extensions dangereuses)
     const securityValidation = await validateFileSecurity(file, allowedTypes);
     
     if (!securityValidation.isValid) {
@@ -146,6 +146,46 @@ export async function uploadToSupabaseStorage(
     // Avertissements de sécurité (logs mais n'arrête pas l'upload)
     if (securityValidation.warnings && securityValidation.warnings.length > 0) {
       logger.warn('File security warnings', { warnings: securityValidation.warnings, fileName: file.name });
+    }
+
+    // 2. VALIDATION BACKEND (Edge Function) - Double vérification
+    try {
+      // Lire les premiers 16 bytes pour la validation backend
+      const firstBytes = await file.slice(0, 16).arrayBuffer();
+      const base64Content = btoa(
+        String.fromCharCode(...new Uint8Array(firstBytes))
+      );
+
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+        'validate-file-upload',
+        {
+          body: {
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+            fileContent: base64Content,
+            allowedTypes,
+            maxSizeBytes,
+          },
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+        }
+      );
+
+      if (validationError) {
+        logger.warn('Backend validation error (continuing with client validation)', { error: validationError });
+        // Continuer avec la validation côté client si le backend échoue
+      } else if (validationResult && !validationResult.isValid) {
+        throw new Error(validationResult.error || 'Validation backend échouée');
+      }
+    } catch (backendError) {
+      // Si la validation backend échoue (Edge Function non disponible, etc.), 
+      // on continue avec la validation côté client uniquement
+      logger.warn('Backend validation unavailable, using client validation only', { 
+        error: backendError instanceof Error ? backendError.message : String(backendError) 
+      });
     }
 
     // 2. Validation de la taille
