@@ -76,7 +76,7 @@ export const VideoUploader = ({ onVideoUploaded, onCancel, currentVideo }: Video
   // Extraire l'ID Google Drive et convertir en URL embed
   const convertGoogleDriveUrl = (url: string): string => {
     // Format 1: https://drive.google.com/file/d/{FILE_ID}/view
-    let match = url.match(/\/file\/d\/([^\/]+)/);
+    let match = url.match(/\/file\/d\/([^/]+)/);
     if (match) {
       return `https://drive.google.com/file/d/${match[1]}/preview`;
     }
