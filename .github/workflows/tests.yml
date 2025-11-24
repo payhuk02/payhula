@@ -65,7 +65,7 @@ jobs:
         run: npm ci
 
       - name: Run linter
-        run: npm run lint
+        run: npm run lint -- --max-warnings=1000
 
   build:
     name: Build

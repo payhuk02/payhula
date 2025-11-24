@@ -128,10 +128,11 @@ export default function RecurringBookingsManagement() {
     switch (pattern.recurrence_type) {
       case 'daily':
         return 'Quotidien';
-      case 'weekly':
+      case 'weekly': {
         const days = pattern.days_of_week || [];
         const dayLabels = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
         return `Hebdomadaire (${days.map((d: number) => dayLabels[d]).join(', ')})`;
+      }
       case 'biweekly':
         return 'Bi-hebdomadaire';
       case 'monthly':

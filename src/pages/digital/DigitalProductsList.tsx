@@ -159,10 +159,11 @@ export const DigitalProductsList = () => {
       const productB = 'product' in b ? b.product : b;
       
       switch (sortBy) {
-        case 'recent':
+        case 'recent': {
           const dateA = new Date(a.created_at || a.createdAt || 0).getTime();
           const dateB = new Date(b.created_at || b.createdAt || 0).getTime();
           return dateB - dateA;
+        }
         case 'downloads':
           return (b.total_downloads || b.totalDownloads || 0) - (a.total_downloads || a.totalDownloads || 0);
         case 'price-desc':

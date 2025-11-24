@@ -90,11 +90,12 @@ export const RichTextEditor = ({
           e.preventDefault();
           execCommand('underline');
           break;
-        case 'k':
+        case 'k': {
           e.preventDefault();
           const url = prompt('Entrez l\'URL:');
           if (url) execCommand('createLink', url);
           break;
+        }
         case 'z':
           if (e.shiftKey) {
             e.preventDefault();

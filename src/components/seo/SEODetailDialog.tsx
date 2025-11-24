@@ -24,6 +24,16 @@ interface SEODetailDialogProps {
 const SEODetailDialogComponent = ({ page, open, onOpenChange }: SEODetailDialogProps) => {
   const navigate = useNavigate();
 
+  const handleEdit = useCallback(() => {
+    if (!page) return;
+    onOpenChange(false);
+    if (page.type === 'product') {
+      navigate(`/dashboard/products/edit/${page.id}`);
+    } else {
+      navigate('/dashboard/store');
+    }
+  }, [page, onOpenChange, navigate]);
+
   if (!page) return null;
 
   const getPriorityIcon = (priority: string) => {
@@ -36,15 +46,6 @@ const SEODetailDialogComponent = ({ page, open, onOpenChange }: SEODetailDialogP
         return <CheckCircle2 className="h-4 w-4 text-blue-600" />;
     }
   };
-
-  const handleEdit = useCallback(() => {
-    onOpenChange(false);
-    if (page.type === 'product') {
-      navigate(`/dashboard/products/edit/${page.id}`);
-    } else {
-      navigate('/dashboard/store');
-    }
-  }, [page, onOpenChange, navigate]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

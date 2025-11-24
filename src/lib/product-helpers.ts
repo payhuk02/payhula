@@ -285,7 +285,7 @@ export function getProductTypeBadge(product: UnifiedProduct): {
   icon?: React.ComponentType<{ className?: string }>;
 } {
   switch (product.type) {
-    case 'digital':
+    case 'digital': {
       const digitalTypes: Record<string, string> = {
         software: 'Logiciel',
         ebook: 'E-book',
@@ -305,6 +305,7 @@ export function getProductTypeBadge(product: UnifiedProduct): {
         color: 'bg-blue-500',
         icon: Download,
       };
+    }
 
     case 'physical':
       return {
@@ -313,7 +314,7 @@ export function getProductTypeBadge(product: UnifiedProduct): {
         icon: Package,
       };
 
-    case 'service':
+    case 'service': {
       const serviceTypes: Record<string, string> = {
         appointment: 'Rendez-vous',
         class: 'Cours',
@@ -326,6 +327,7 @@ export function getProductTypeBadge(product: UnifiedProduct): {
         color: 'bg-purple-500',
         icon: Calendar,
       };
+    }
 
     case 'course':
       return {

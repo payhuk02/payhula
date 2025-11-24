@@ -55,6 +55,7 @@ import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
 import type { PhysicalProductFormData } from '@/types/physical-product';
+import { validateWithZod, formatValidators, getFieldError, physicalProductSchema } from '@/lib/wizard-validation';
 
 
 const STEPS = [
@@ -310,8 +311,6 @@ export const CreatePhysicalProductWizard = ({
    * Validate current step avec validation améliorée (client + serveur)
    */
   const validateStep = useCallback(async (step: number): Promise<boolean> => {
-    const { validateWithZod, formatValidators, getFieldError } = require('@/lib/wizard-validation');
-    const { physicalProductSchema } = require('@/lib/wizard-validation');
     const errors: string[] = [];
 
     // Réinitialiser les erreurs serveur

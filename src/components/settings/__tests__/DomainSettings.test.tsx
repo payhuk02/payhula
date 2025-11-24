@@ -212,6 +212,7 @@ describe('DomainSettings - Validation formulaire', () => {
 
 describe('DomainSettings - Helpers (domainUtils)', () => {
   it('validateDomain accepte les domaines valides', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { validateDomain } = require('@/lib/domainUtils');
     
     expect(validateDomain('example.com')).toBe(true);
@@ -220,6 +221,7 @@ describe('DomainSettings - Helpers (domainUtils)', () => {
   });
 
   it('validateDomain rejette les domaines invalides', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { validateDomain } = require('@/lib/domainUtils');
     
     expect(validateDomain('invalid')).toBe(false);
@@ -229,6 +231,7 @@ describe('DomainSettings - Helpers (domainUtils)', () => {
   });
 
   it('generateVerificationToken crée un token unique', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { generateVerificationToken } = require('@/lib/domainUtils');
     
     const token1 = generateVerificationToken();
@@ -240,6 +243,7 @@ describe('DomainSettings - Helpers (domainUtils)', () => {
   });
 
   it('getDNSInstructions retourne les bonnes instructions', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { getDNSInstructions } = require('@/lib/domainUtils');
     
     const instructions = getDNSInstructions('example.com', 'payhula-verify-test123');

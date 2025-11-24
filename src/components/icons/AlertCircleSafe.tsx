@@ -13,6 +13,7 @@ let AlertCircle: React.ComponentType<any> | null = null;
 
 try {
   // Import dynamique pour éviter les problèmes de bundling
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const lucideReact = require('lucide-react');
   if (lucideReact && lucideReact.AlertCircle) {
     AlertCircle = lucideReact.AlertCircle;

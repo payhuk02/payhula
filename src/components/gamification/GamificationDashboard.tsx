@@ -42,6 +42,12 @@ export const GamificationDashboard = () => {
   const { data: achievements = [], isLoading: isLoadingAchievements } = useUserAchievements(userId);
   const { data: pointsHistory = [], isLoading: isLoadingPoints } = usePointsHistory(userId, 10);
 
+  // Hooks pour les animations (doivent être appelés avant tout early return)
+  const statsRef = useScrollAnimation<HTMLDivElement>();
+  const progressRef = useScrollAnimation<HTMLDivElement>();
+  const tabsRef = useScrollAnimation<HTMLDivElement>();
+  const historyRef = useScrollAnimation<HTMLDivElement>();
+
   // Si l'utilisateur n'est pas encore chargé, afficher un skeleton
   // Cette vérification doit être faite APRÈS tous les appels de hooks
   if (authLoading || !user || !userId) {
@@ -55,11 +61,6 @@ export const GamificationDashboard = () => {
 
   // Combiner tous les états de chargement
   const isLoading = isLoadingGamification || isLoadingBadges || isLoadingAchievements || isLoadingLeaderboard || isLoadingPoints;
-
-  const statsRef = useScrollAnimation<HTMLDivElement>();
-  const progressRef = useScrollAnimation<HTMLDivElement>();
-  const tabsRef = useScrollAnimation<HTMLDivElement>();
-  const historyRef = useScrollAnimation<HTMLDivElement>();
 
   // Afficher le skeleton pendant le chargement
   if (isLoading) {

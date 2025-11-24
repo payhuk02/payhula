@@ -131,7 +131,7 @@ export function BackordersManager() {
     if (!backorders) return [];
     const sorted = [...backorders];
     switch (sortBy) {
-      case 'priority':
+      case 'priority': {
         const priorityOrder: Record<BackorderPriority, number> = {
           urgent: 0,
           high: 1,
@@ -140,6 +140,7 @@ export function BackordersManager() {
         };
         sorted.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
         break;
+      }
       case 'date':
         sorted.sort((a, b) => new Date(b.first_request_date).getTime() - new Date(a.first_request_date).getTime());
         break;

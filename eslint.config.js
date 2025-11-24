@@ -58,4 +58,11 @@ export default tseslint.config(
       "no-console": "off", // Console.* nécessaire dans ce fichier
     },
   },
+  // Exception pour les fixtures Playwright qui utilisent le pattern 'use' mais ne sont pas des React Hooks
+  {
+    files: ["tests/**/*.ts", "tests/**/*.tsx"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off", // Playwright fixtures ne sont pas des React Hooks
+    },
+  },
 );

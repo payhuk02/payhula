@@ -49,14 +49,14 @@ export const VideoPlayer = ({
   const { data: progress } = useLessonProgress(enrollmentId, lessonId);
   const updatePosition = useUpdateVideoPosition();
   
-  // Hooks pour le tracking avancé
-  const videoTracking = productId ? useVideoTracking({
-    productId,
+  // Hooks pour le tracking avancé (toujours appelé, désactivé si pas de productId)
+  const videoTracking = useVideoTracking({
+    productId: productId || '',
     lessonId,
     userId: user?.id,
     sessionId: getSessionId(),
-    enabled: true,
-  }) : null;
+    enabled: !!productId,
+  });
   
   const watchTime = useWatchTime(enrollmentId, lessonId);
 

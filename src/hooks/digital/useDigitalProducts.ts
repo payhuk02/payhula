@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useStoreContext } from '@/contexts/StoreContext';
+import { shouldRetryError, getRetryDelay } from '@/lib/error-handling';
 
 /**
  * Produit digital complet
@@ -430,12 +431,9 @@ export const useDigitalProducts = (
     },
     enabled: true,
     retry: (failureCount, error) => {
-      // Importer dynamiquement pour éviter dépendance circulaire
-      const { shouldRetryError } = require('@/lib/error-handling');
       return shouldRetryError(error, failureCount);
     },
     retryDelay: (attemptIndex) => {
-      const { getRetryDelay } = require('@/lib/error-handling');
       return getRetryDelay(attemptIndex);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

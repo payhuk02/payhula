@@ -122,7 +122,7 @@ export const ProductDescriptionTab = ({ formData, updateFormData }: ProductDescr
    */
   const computeReadability = (text: string) => {
     if (!text) return null;
-    const sentences = Math.max(1, (text.match(/[\.\!\?]+/g) || []).length);
+    const sentences = Math.max(1, (text.match(/[.!?]+/g) || []).length);
     const wordsArr = text.split(/\s+/).filter(Boolean);
     const words = Math.max(1, wordsArr.length);
     const syllables = wordsArr.reduce((acc, w) => acc + countSyllablesFr(w), 0);
@@ -374,7 +374,7 @@ export const ProductDescriptionTab = ({ formData, updateFormData }: ProductDescr
     for (const [pattern, repl] of replacements) {
       text = text.replace(pattern, repl);
     }
-    text = text.replace(/\s+/g, " ").replace(/([\.!?])+/g, "$1").trim();
+    text = text.replace(/\s+/g, " ").replace(/([.!?])+/g, "$1").trim();
     handleShortDescriptionChange(text);
   };
 

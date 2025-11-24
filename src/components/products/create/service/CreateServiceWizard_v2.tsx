@@ -48,6 +48,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useStore } from '@/hooks/useStore';
 import { useWizardServerValidation } from '@/hooks/useWizardServerValidation';
 import { supabase } from '@/integrations/supabase/client';
+import { validateWithZod, formatValidators, getFieldError, serviceSchema } from '@/lib/wizard-validation';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
@@ -322,8 +323,6 @@ export const CreateServiceWizard = ({
    * Validate current step avec validation améliorée (client + serveur)
    */
   const validateStep = useCallback(async (step: number): Promise<boolean> => {
-    const { validateWithZod, formatValidators, getFieldError } = require('@/lib/wizard-validation');
-    const { serviceSchema } = require('@/lib/wizard-validation');
     const errors: string[] = [];
 
     // Réinitialiser les erreurs serveur

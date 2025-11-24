@@ -45,7 +45,9 @@ const ProductFilters = ({
   const clearFilters = () => {
     onCategoryChange("all");
     onProductTypeChange("all");
-    onLicensingTypeChange && onLicensingTypeChange('all');
+    if (onLicensingTypeChange) {
+      onLicensingTypeChange('all');
+    }
   };
 
   return (
