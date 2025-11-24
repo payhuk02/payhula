@@ -414,7 +414,7 @@ export class AdvancedAnalytics {
       const uniqueOrderUsers = new Set(orders?.map(o => o.customer_id).filter(Boolean) || []).size;
 
       // Source 2: Nombre d'utilisateurs ayant ajouté au panier
-      let cartQuery = supabase
+      const cartQuery = supabase
         .from('cart_items')
         .select('user_id, session_id, added_at')
         .gte('added_at', periodStart)
@@ -450,7 +450,7 @@ export class AdvancedAnalytics {
       ).size;
 
       // Source 4: Nombre de nouveaux utilisateurs inscrits (proxy pour le traffic)
-      let newUsersQuery = supabase
+      const newUsersQuery = supabase
         .from('profiles')
         .select('id, created_at')
         .gte('created_at', periodStart)
@@ -497,7 +497,7 @@ export class AdvancedAnalytics {
       const { data: previousOrders } = await previousOrdersQuery;
       const previousUniqueOrderUsers = new Set(previousOrders?.map(o => o.customer_id).filter(Boolean) || []).size;
 
-      let previousCartQuery = supabase
+      const previousCartQuery = supabase
         .from('cart_items')
         .select('user_id, session_id')
         .gte('added_at', previousPeriodStart)
@@ -508,7 +508,7 @@ export class AdvancedAnalytics {
         previousCartItems?.map(item => item.user_id || item.session_id).filter(Boolean) || []
       ).size;
 
-      let previousUsersQuery = supabase
+      const previousUsersQuery = supabase
         .from('profiles')
         .select('id')
         .gte('created_at', previousPeriodStart)

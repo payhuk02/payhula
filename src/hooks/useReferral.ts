@@ -241,7 +241,7 @@ export const useReferral = () => {
         ? referredProfilesData.map((p: { user_id: string }) => p.user_id)
         : referralsData.map((r: { referred_id: string }) => r.referred_id);
 
-      let emailsMap = new Map<string, string>();
+      const emailsMap = new Map<string, string>();
       
       if (referredIds.length > 0) {
         try {
@@ -479,7 +479,7 @@ export const useReferral = () => {
         .map((comm: { order_id?: string | null }) => comm.order_id)
         .filter((id: string | null | undefined): id is string => id !== null && id !== undefined);
 
-      let ordersMap = new Map<string, { id: string; order_number?: string }>();
+      const ordersMap = new Map<string, { id: string; order_number?: string }>();
       if (orderIds.length > 0) {
         try {
           const { data: ordersData, error: ordersError } = await supabase
@@ -506,7 +506,7 @@ export const useReferral = () => {
         .map((comm: { referred_id?: string | null }) => comm.referred_id)
         .filter((id: string | null | undefined): id is string => id !== null && id !== undefined);
 
-      let emailsMap = new Map<string, string>();
+      const emailsMap = new Map<string, string>();
       if (referredIds.length > 0) {
         try {
           const { data: emailsData, error: emailsError } = await supabase

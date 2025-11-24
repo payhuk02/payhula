@@ -284,8 +284,8 @@ export const useCalculateForecast = () => {
 
       // Calculer période
       const forecastDateObj = new Date(forecastDate);
-      let periodStart = new Date(forecastDateObj);
-      let periodEnd = new Date(forecastDateObj);
+      const periodStart = new Date(forecastDateObj);
+      const periodEnd = new Date(forecastDateObj);
 
       if (forecastType === 'daily') {
         periodEnd.setDate(periodEnd.getDate() + 1);

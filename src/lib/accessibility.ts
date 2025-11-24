@@ -118,8 +118,8 @@ export function checkColorContrast(foreground: string, background: string): {
   passesAAA: boolean;
 } {
   // Utiliser la fonction améliorée si disponible
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { checkColorContrast: enhancedCheck } = require('./accessibility-enhanced');
     return enhancedCheck(foreground, background);
   } catch {
@@ -255,8 +255,8 @@ export function initAccessibility(): void {
   });
   
   // Initialiser les raccourcis clavier améliorés
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { setupKeyboardShortcuts } = require('./accessibility-enhanced');
     setupKeyboardShortcuts();
   } catch {

@@ -291,7 +291,7 @@ export class RecommendationEngine {
     limit: number
   ): Promise<ProductRecommendation[]> {
     try {
-      let recommendations: ProductRecommendation[] = [];
+      const recommendations: ProductRecommendation[] = [];
 
       // 1. Produits tendance (basés sur les vues et ventes récentes)
       const { data: trendingProducts, error: trendingError } = await supabase
