@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { uploadToSupabaseStorage } from '@/utils/uploadToSupabase';
 import type { ServiceProductFormData } from '@/types/service-product';
 import { logger } from '@/lib/logger';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 interface ServiceBasicInfoFormProps {
   data: Partial<ServiceProductFormData>;
@@ -36,6 +37,7 @@ export const ServiceBasicInfoForm = ({ data, onUpdate }: ServiceBasicInfoFormPro
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -138,6 +140,7 @@ export const ServiceBasicInfoForm = ({ data, onUpdate }: ServiceBasicInfoFormPro
           placeholder="Ex: Consultation juridique 1h"
           value={data.name || ''}
           onChange={(e) => onUpdate({ name: e.target.value })}
+          onKeyDown={handleSpaceKeyDown}
         />
       </div>
 
@@ -324,6 +327,7 @@ export const ServiceBasicInfoForm = ({ data, onUpdate }: ServiceBasicInfoFormPro
                     placeholder="Ex: Consultation gratuite de 15 minutes pour discuter de vos besoins. Le service complet dure 60 minutes."
                     value={data.preview_content_description || ''}
                     onChange={(e) => onUpdate({ preview_content_description: e.target.value })}
+                    onKeyDown={handleSpaceKeyDown}
                     rows={3}
                     maxLength={500}
                   />

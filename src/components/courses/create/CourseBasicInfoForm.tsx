@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { Info, Gift } from '@/components/icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 
 interface CourseBasicInfoFormProps {
   formData: {
@@ -60,6 +61,8 @@ const CATEGORIES = [
 ];
 
 export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseBasicInfoFormProps) => {
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
+  
   // Générer le slug automatiquement à partir du titre
   const generateSlug = (title: string) => {
     return title
@@ -98,6 +101,7 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
               placeholder="Ex: Maîtriser React et TypeScript en 2025"
               value={formData.title}
               onChange={(e) => handleTitleChange(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               className={errors.title ? 'border-red-500' : ''}
             />
             {errors.title && (
@@ -149,6 +153,7 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
               placeholder="Résumé en une phrase de votre cours..."
               value={formData.short_description}
               onChange={(e) => onChange('short_description', e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               className={errors.short_description ? 'border-red-500' : ''}
               rows={2}
             />
@@ -256,6 +261,7 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
               placeholder="Détails supplémentaires sur les conditions d'utilisation, restrictions, permissions..."
               value={formData.license_terms || ''}
               onChange={(e) => onChange('license_terms', e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               rows={4}
               maxLength={1000}
             />
@@ -521,6 +527,7 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
                     placeholder="Ex: Contient les 2 premiers chapitres sur 10 du cours complet. Inclut les bases et une introduction aux concepts avancés."
                     value={formData.preview_content_description || ''}
                     onChange={(e) => onChange('preview_content_description', e.target.value)}
+                    onKeyDown={handleSpaceKeyDown}
                     rows={3}
                     maxLength={500}
                   />

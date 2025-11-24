@@ -3,7 +3,7 @@
  * Date: 27 octobre 2025
  */
 
-import { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,9 +15,9 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Check, X, Gift, Info } from '@/components/icons';
 import { generateSlug } from '@/lib/store-utils';
 import { supabase } from '@/integrations/supabase/client';
-import { useState } from 'react';
 import { AIContentGenerator } from '@/components/products/AIContentGenerator';
 import { logger } from '@/lib/logger';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 interface DigitalBasicInfoFormProps {
   formData: any;
@@ -45,16 +45,39 @@ export const DigitalBasicInfoForm = ({
 }: DigitalBasicInfoFormProps) => {
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  
+  // Ref pour stocker la valeur réelle du champ (source de vérité)
+  const inputRef = useRef<HTMLInputElement>(null);
+  const nameValueRef = useRef<string>(formData.name || '');
+  const isUpdatingFromFormDataRef = useRef(false);
+  
+  // Hook pour corriger le problème d'espacement
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
+
+  // Synchroniser la valeur de l'input avec formData.name seulement si elle change de l'extérieur
+  useEffect(() => {
+    if (!isUpdatingFromFormDataRef.current && inputRef.current && formData.name !== inputRef.current.value) {
+      // La valeur a changé de l'extérieur, synchroniser
+      inputRef.current.value = formData.name || '';
+      nameValueRef.current = formData.name || '';
+    }
+    isUpdatingFromFormDataRef.current = false;
+  }, [formData.name]);
 
   /**
-   * Auto-generate slug from name
+   * Auto-generate slug from name (only when name changes and slug is empty)
+   * TEMPORAIREMENT DÉSACTIVÉ pour diagnostiquer le problème d'espacement
+   * Le slug sera généré uniquement via le bouton de régénération
    */
-  useEffect(() => {
-    if (formData.name && !formData.slug) {
-      const newSlug = generateSlug(formData.name);
-      updateFormData({ slug: newSlug });
-    }
-  }, [formData.name]);
+  // const prevNameRef = useRef<string>('');
+  // useEffect(() => {
+  //   // Only generate slug if name changed and slug is empty
+  //   if (formData.name && !formData.slug && formData.name !== prevNameRef.current) {
+  //     const newSlug = generateSlug(formData.name);
+  //     updateFormData({ slug: newSlug });
+  //     prevNameRef.current = formData.name;
+  //   }
+  // }, [formData.name, formData.slug, updateFormData]);
 
   /**
    * Check slug availability
@@ -98,12 +121,39 @@ export const DigitalBasicInfoForm = ({
         <Label htmlFor="name">
           Nom du produit <span className="text-destructive">*</span>
         </Label>
-        <Input
+        <input
+          ref={inputRef}
           id="name"
+          type="text"
           placeholder="Ex: Ebook - Guide complet du Marketing Digital"
           value={formData.name || ''}
-          onChange={(e) => updateFormData({ name: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value;
+            nameValueRef.current = value;
+            isUpdatingFromFormDataRef.current = true;
+            logger.info('Name onChange - BEFORE updateFormData', { 
+              value, 
+              hasSpaces: value.includes(' '),
+              length: value.length,
+              charCodes: value.split('').map(c => c.charCodeAt(0))
+            });
+            updateFormData({ name: value });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === ' ') {
+              handleSpaceKeyDown(e);
+              // Mettre à jour formData après l'insertion de l'espace
+              const target = e.target as HTMLInputElement;
+              const newValue = target.value;
+              nameValueRef.current = newValue;
+              isUpdatingFromFormDataRef.current = true;
+              updateFormData({ name: newValue });
+            }
+          }}
           required
+          autoComplete="off"
+          spellCheck="false"
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-xs sm:file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <p className="text-sm text-muted-foreground">
           Donnez un nom clair et descriptif à votre produit
@@ -189,6 +239,7 @@ export const DigitalBasicInfoForm = ({
           placeholder="Une brève description de votre produit (1-2 phrases)"
           value={formData.short_description || ''}
           onChange={(e) => updateFormData({ short_description: e.target.value })}
+          onKeyDown={handleSpaceKeyDown}
           rows={2}
           maxLength={160}
         />

@@ -13,6 +13,7 @@ import StoreSlugEditor from "./StoreSlugEditor";
 import StoreImageUpload from "./StoreImageUpload";
 import StoreAnalytics from "./StoreAnalytics";
 import { validateStoreForm } from "@/lib/validation-utils";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 
 interface ExtendedStore extends Store {
   about?: string | null;
@@ -48,6 +49,7 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
   const [infoMessageColor, setInfoMessageColor] = useState(store.info_message_color || "#3b82f6");
   const [infoMessageFont, setInfoMessageFont] = useState(store.info_message_font || "Inter");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { updateStore, getStoreUrl, checkSlugAvailability } = useStore();
   const { toast } = useToast();
@@ -277,6 +279,7 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
                       id="edit-name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      onKeyDown={handleSpaceKeyDown}
                       required
                       disabled={isSubmitting}
                     />
@@ -293,6 +296,7 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
                       id="edit-description"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
+                      onKeyDown={handleSpaceKeyDown}
                       rows={3}
                       placeholder="Une brève description de votre boutique"
                       disabled={isSubmitting}
@@ -344,6 +348,7 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
                       id="about"
                       value={about}
                       onChange={(e) => setAbout(e.target.value)}
+                      onKeyDown={handleSpaceKeyDown}
                       rows={8}
                       placeholder="Racontez l'histoire de votre boutique, vos valeurs, votre mission..."
                       disabled={isSubmitting}
@@ -360,6 +365,7 @@ const StoreDetails = ({ store }: StoreDetailsProps) => {
                         id="info_message"
                         value={infoMessage}
                         onChange={(e) => setInfoMessage(e.target.value)}
+                        onKeyDown={handleSpaceKeyDown}
                         placeholder="Ex: 🎉 Promotion spéciale : -20% sur tous les produits jusqu'au 31 janvier !"
                         rows={3}
                         maxLength={500}

@@ -26,6 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { logger } from '@/lib/logger';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 import {
   User,
   Mail,
@@ -69,6 +70,7 @@ export default function MyProfile() {
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [error, setError] = useState<string | null>(null);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   // Animations au scroll
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -387,6 +389,7 @@ export default function MyProfile() {
                             id="full_name"
                             value={profileData.full_name}
                             onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
+                            onKeyDown={handleSpaceKeyDown}
                             placeholder="Jean Dupont"
                             className="h-10 sm:h-11 text-sm sm:text-base"
                           />
@@ -401,6 +404,7 @@ export default function MyProfile() {
                               type="tel"
                               value={profileData.phone}
                               onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                              onKeyDown={handleSpaceKeyDown}
                               placeholder="+226 70 12 34 56"
                               className="pl-10 sm:pl-12 h-10 sm:h-11 text-sm sm:text-base"
                             />
@@ -452,6 +456,7 @@ export default function MyProfile() {
                               id="addr_full_name"
                               value={addressForm.full_name}
                               onChange={(e) => setAddressForm({ ...addressForm, full_name: e.target.value })}
+                              onKeyDown={handleSpaceKeyDown}
                               placeholder="Jean Dupont"
                               className="h-10 sm:h-11 text-sm sm:text-base"
                             />
@@ -463,6 +468,7 @@ export default function MyProfile() {
                               id="addr_phone"
                               value={addressForm.phone}
                               onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
+                              onKeyDown={handleSpaceKeyDown}
                               placeholder="+226 70 12 34 56"
                               className="h-10 sm:h-11 text-sm sm:text-base"
                             />
@@ -474,6 +480,7 @@ export default function MyProfile() {
                               id="addr_line1"
                               value={addressForm.address_line1}
                               onChange={(e) => setAddressForm({ ...addressForm, address_line1: e.target.value })}
+                              onKeyDown={handleSpaceKeyDown}
                               placeholder="123 Rue principale"
                               className="h-10 sm:h-11 text-sm sm:text-base"
                             />
@@ -496,6 +503,7 @@ export default function MyProfile() {
                               id="addr_city"
                               value={addressForm.city}
                               onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                              onKeyDown={handleSpaceKeyDown}
                               placeholder="Ouagadougou"
                               className="h-10 sm:h-11 text-sm sm:text-base"
                             />

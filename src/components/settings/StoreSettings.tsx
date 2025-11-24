@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DeleteStoreDialog } from "@/components/store/DeleteStoreDialog";
 import { deleteStoreWithDependencies, archiveStore } from "@/lib/store-delete-protection";
 import { logger } from "@/lib/logger";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 import { 
   Store, 
   Settings, 
@@ -41,6 +42,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
     description: "",
     slug: ""
   });
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   // Sélectionner la première boutique par défaut
   useEffect(() => {
@@ -330,6 +332,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
                         slug: prev.slug || generateSlug(e.target.value)
                       }));
                     }}
+                    onKeyDown={handleSpaceKeyDown}
                     placeholder="Ex: Ma Boutique Digitale"
                   />
                 </div>
@@ -353,6 +356,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
                     id="description"
                     value={newStoreData.description}
                     onChange={(e) => setNewStoreData(prev => ({ ...prev, description: e.target.value }))}
+                    onKeyDown={handleSpaceKeyDown}
                     placeholder="Décrivez votre boutique..."
                     rows={3}
                   />

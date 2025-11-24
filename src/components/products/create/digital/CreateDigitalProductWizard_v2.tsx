@@ -241,6 +241,16 @@ export const CreateDigitalProductWizard = ({
    * Update form data with auto-save
    */
   const updateFormData = useCallback((updates: any) => {
+    // Log pour diagnostiquer le problème d'espacement
+    if (updates.name !== undefined) {
+      logger.info('updateFormData - name update', {
+        newName: updates.name,
+        hasSpaces: updates.name.includes(' '),
+        length: updates.name.length,
+        charCodes: updates.name.split('').map((c: string) => c.charCodeAt(0))
+      });
+    }
+    
     setFormData((prev: any) => {
       const newData = {
         ...prev,

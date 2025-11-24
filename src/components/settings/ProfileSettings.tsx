@@ -30,6 +30,7 @@ export const ProfileSettings = () => {
   const [location, setLocation] = useState("");
   const [website, setWebsite] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   useEffect(() => {
     if (user?.email) {
@@ -306,6 +307,7 @@ export const ProfileSettings = () => {
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
+                    onKeyDown={handleSpaceKeyDown}
                     placeholder="Votre prénom"
                     disabled={!isEditing}
                   />
@@ -318,6 +320,7 @@ export const ProfileSettings = () => {
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
+                    onKeyDown={handleSpaceKeyDown}
                     placeholder="Votre nom"
                     disabled={!isEditing}
                   />
@@ -331,6 +334,7 @@ export const ProfileSettings = () => {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Votre nom d'affichage"
                   disabled={!isEditing}
                 />
@@ -345,6 +349,7 @@ export const ProfileSettings = () => {
                   id="bio"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Parlez-nous de vous..."
                   disabled={!isEditing}
                   rows={3}
@@ -385,6 +390,7 @@ export const ProfileSettings = () => {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="+33 1 23 45 67 89"
                   disabled={!isEditing}
                 />
@@ -397,6 +403,7 @@ export const ProfileSettings = () => {
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Ville, Pays"
                   disabled={!isEditing}
                 />

@@ -17,6 +17,7 @@ import { uploadToSupabaseStorage } from '@/utils/uploadToSupabase';
 import type { PhysicalProductFormData } from '@/types/physical-product';
 import { AIContentGenerator } from '@/components/products/AIContentGenerator';
 import { logger } from '@/lib/logger';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 interface PhysicalBasicInfoFormProps {
   data: Partial<PhysicalProductFormData>;
@@ -27,6 +28,7 @@ export const PhysicalBasicInfoForm = ({ data, onUpdate }: PhysicalBasicInfoFormP
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -106,6 +108,7 @@ export const PhysicalBasicInfoForm = ({ data, onUpdate }: PhysicalBasicInfoFormP
           placeholder="Ex: T-shirt coton bio"
           value={data.name || ''}
           onChange={(e) => onUpdate({ name: e.target.value })}
+          onKeyDown={handleSpaceKeyDown}
         />
       </div>
 

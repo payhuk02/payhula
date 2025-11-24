@@ -15,6 +15,7 @@ import { useStoreContext } from "@/contexts/StoreContext";
 import { Loader2, Check, X, Globe, Phone, Info } from '@/components/icons';
 import { Image as ImageIcon, Mail, Facebook, Instagram, Twitter, Linkedin, Palette } from 'lucide-react';
 import StoreImageUpload from "./StoreImageUpload";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 
 interface StoreFormProps {
   onSuccess: () => void;
@@ -61,6 +62,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { refreshStores } = useStoreContext();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   const checkSlugAvailability = useCallback(async (slugToCheck: string) => {
     if (!slugToCheck) {
@@ -281,6 +283,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                   id="name"
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Ma Boutique Pro"
                   required
                 />
@@ -325,6 +328,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Décrivez votre boutique en quelques mots..."
                   rows={3}
                 />
@@ -339,6 +343,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                   id="about"
                   value={about}
                   onChange={(e) => setAbout(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Racontez l'histoire de votre boutique, vos valeurs, votre mission..."
                   rows={5}
                 />
@@ -354,6 +359,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                     id="info_message"
                     value={infoMessage}
                     onChange={(e) => setInfoMessage(e.target.value)}
+                    onKeyDown={handleSpaceKeyDown}
                     placeholder="Ex: 🎉 Promotion spéciale : -20% sur tous les produits jusqu'au 31 janvier !"
                     rows={3}
                     maxLength={500}
