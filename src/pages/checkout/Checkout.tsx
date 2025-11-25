@@ -409,7 +409,7 @@ const Checkout = () => {
       logger.error("Payment initiation error:", errorObj);
       
       // Extraire le message d'erreur de manière plus lisible
-      let errorMessage = errorObj.message || "Impossible d'initialiser le paiement. Veuillez réessayer.";
+      const errorMessage = errorObj.message || "Impossible d'initialiser le paiement. Veuillez réessayer.";
       
       // Si le message contient des sauts de ligne, prendre seulement la première ligne pour le toast
       const firstLine = errorMessage.split('\n')[0];

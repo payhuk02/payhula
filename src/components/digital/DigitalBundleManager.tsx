@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -137,6 +138,7 @@ export const DigitalBundleManager: React.FC<DigitalBundleManagerProps> = ({
   mode = 'create',
   className,
 }) => {
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   // États du formulaire
   const [name, setName] = useState(bundle?.name || '');
   const [description, setDescription] = useState(bundle?.description || '');
@@ -279,6 +281,7 @@ export const DigitalBundleManager: React.FC<DigitalBundleManagerProps> = ({
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Ex: Pack Formation Complète React"
                   className={cn(
                     'h-9 sm:h-10 text-xs sm:text-sm',
@@ -297,6 +300,7 @@ export const DigitalBundleManager: React.FC<DigitalBundleManagerProps> = ({
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="Décrivez ce que contient ce bundle..."
                   rows={3}
                   className="text-xs sm:text-sm resize-none"
@@ -311,6 +315,7 @@ export const DigitalBundleManager: React.FC<DigitalBundleManagerProps> = ({
                     id="tags"
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
+                    onKeyDown={handleSpaceKeyDown}
                     placeholder="Ajouter un tag"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     className="h-9 sm:h-10 text-xs sm:text-sm"

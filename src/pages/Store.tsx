@@ -18,7 +18,7 @@ const Store = () => {
   const headerRef = useScrollAnimation<HTMLDivElement>();
 
   const handleCreateStoreRedirect = useCallback(() => {
-    navigate('/dashboard/settings?tab=boutique&action=create');
+    navigate('/dashboard/settings?tab=store&action=create');
   }, [navigate]);
 
   return (
@@ -75,9 +75,9 @@ const Store = () => {
                       <span className="hidden sm:inline">{t('store.tabs.manage')}</span>
                       <span className="sm:hidden">{t('store.tabs.manageShort')}</span>
                     </TabsTrigger>
-                    <TabsTrigger 
-                      value="create" 
-                      className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm touch-manipulation min-h-[44px]"
+                    <Button
+                      variant="ghost"
+                      className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm touch-manipulation min-h-[44px] data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-sm px-3 py-1.5 font-medium"
                       onClick={handleCreateStoreRedirect}
                       role="tab"
                       aria-label={t('store.tabs.create')}
@@ -85,63 +85,13 @@ const Store = () => {
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
                       <span className="hidden sm:inline">{t('store.tabs.create')}</span>
                       <span className="sm:hidden">{t('store.tabs.createShort')}</span>
-                    </TabsTrigger>
+                    </Button>
                   </TabsList>
 
                   <TabsContent value="manage" className="space-y-4 sm:space-y-6">
                     {stores.map((store) => (
                       <StoreDetails key={store.id} store={store} />
                     ))}
-                  </TabsContent>
-
-                  <TabsContent value="create" className="space-y-4 sm:space-y-6">
-                    <Card className="shadow-sm border border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
-                      <CardHeader className="text-center py-8 sm:py-12 lg:py-16 px-4 sm:px-6">
-                        <div className="flex justify-center mb-6 sm:mb-8">
-                          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/10 border border-purple-500/30 flex items-center justify-center">
-                            <Plus className="h-10 w-10 sm:h-12 sm:w-12 text-purple-600 dark:text-purple-400" />
-                          </div>
-                        </div>
-                        <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">{t('store.create.title')}</CardTitle>
-                        <CardDescription className="mt-4 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed text-muted-foreground">
-                          {stores.length === 0
-                            ? t('store.create.description')
-                            : t('store.create.descriptionExisting')
-                          }
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="text-center pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6">
-                        <div className="space-y-6 sm:space-y-8">
-                          {stores.length === 0 ? (
-                            <Button
-                              onClick={handleCreateStoreRedirect}
-                              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 touch-manipulation text-xs sm:text-sm px-6 sm:px-8 py-2 sm:py-3 transition-all duration-300 hover:scale-105"
-                            >
-                              <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                              {t('store.goToSettings')}
-                            </Button>
-                          ) : (
-                            <div className="p-4 sm:p-6 lg:p-8 bg-muted/30 rounded-xl text-left max-w-2xl mx-auto border border-border/50">
-                              <p className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 lg:mb-6 text-destructive">{t('store.existing.title')}</p>
-                              <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mb-3 sm:mb-4">
-                                {t('store.existing.description')}
-                              </p>
-                              <div className="text-xs sm:text-sm text-muted-foreground">
-                                <p className="font-medium mb-2">{t('store.existing.currentStore')}</p>
-                                <ul className="space-y-1">
-                                  {stores.map((store) => (
-                                    <li key={store.id} className="flex items-center gap-2">
-                                      <span className="text-primary">•</span>
-                                      <span>{store.name}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
                   </TabsContent>
                 </Tabs>
               ) : (

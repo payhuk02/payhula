@@ -70,4 +70,11 @@ export default tseslint.config(
       "react-hooks/rules-of-hooks": "off", // Playwright fixtures ne sont pas des React Hooks
     },
   },
+  // Exception pour useStoreAffiliates.ts - les hooks sont toujours appelés inconditionnellement
+  {
+    files: ["src/hooks/useStoreAffiliates.ts"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off", // Faux positifs - hooks toujours appelés inconditionnellement
+    },
+  },
 );

@@ -16,6 +16,7 @@ interface CreateCustomerDialogProps {
 
 const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: CreateCustomerDialogProps) => {
   const { toast } = useToast();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -89,6 +90,7 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onKeyDown={handleSpaceKeyDown}
               required
             />
           </div>
@@ -121,6 +123,7 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
               id="address"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onKeyDown={handleSpaceKeyDown}
             />
           </div>
 
@@ -131,6 +134,7 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
                 id="city"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                onKeyDown={handleSpaceKeyDown}
               />
             </div>
 
@@ -140,6 +144,7 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
                 id="country"
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                onKeyDown={handleSpaceKeyDown}
               />
             </div>
           </div>
@@ -150,6 +155,7 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Notes sur le client..."
             />
           </div>

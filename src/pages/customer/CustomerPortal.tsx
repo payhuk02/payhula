@@ -117,7 +117,7 @@ export default function CustomerPortal() {
       // Get order IDs for product type counting
       const orderIds = allOrders?.map(o => o.id) || [];
 
-      let typeCounts = {
+      const typeCounts = {
         digital: 0,
         physical: 0,
         service: 0,

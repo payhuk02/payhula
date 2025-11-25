@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { UserPlus, AlertCircle, Loader2 } from '@/components/icons';
 import { z } from 'zod';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 interface RegistrationDialogProps {
   open: boolean;
@@ -65,6 +66,7 @@ export const RegistrationDialog = memo(({
   onRegister, 
   isRegistering = false 
 }: RegistrationDialogProps) => {
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const [registrationData, setRegistrationData] = useState<RegistrationData>({
     email: '',
     first_name: '',
@@ -216,6 +218,7 @@ export const RegistrationDialog = memo(({
                 placeholder="Jean"
                 value={registrationData.first_name}
                 onChange={(e) => handleInputChange('first_name', e.target.value)}
+                onKeyDown={handleSpaceKeyDown}
                 disabled={isRegistering}
                 className={registrationErrors.first_name ? 'border-destructive' : ''}
                 aria-invalid={!!registrationErrors.first_name}
@@ -235,6 +238,7 @@ export const RegistrationDialog = memo(({
                 placeholder="Dupont"
                 value={registrationData.last_name}
                 onChange={(e) => handleInputChange('last_name', e.target.value)}
+                onKeyDown={handleSpaceKeyDown}
                 disabled={isRegistering}
                 className={registrationErrors.last_name ? 'border-destructive' : ''}
                 aria-invalid={!!registrationErrors.last_name}
@@ -258,6 +262,7 @@ export const RegistrationDialog = memo(({
               placeholder="JeanD"
               value={registrationData.display_name}
               onChange={(e) => handleInputChange('display_name', e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               disabled={isRegistering}
             />
           </div>

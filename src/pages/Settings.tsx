@@ -35,7 +35,7 @@ const Settings = () => {
     }
     
     // Si on vient de la page Boutique avec action=create, on passe l'info au composant StoreSettings
-    if (tab === 'boutique' && action === 'create') {
+    if (tab === 'store' && action === 'create') {
       // L'action sera gérée par le composant StoreSettings
     }
   }, [searchParams]);

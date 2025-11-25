@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import type { ProductType } from '@/types/product';
 import type { CreateReviewPayload } from '@/types/review';
 import { getDetailedRatingFields, getDetailedRatingLabel } from '@/types/review';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 interface ReviewFormProps {
   productId: string;
@@ -37,6 +38,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   isLoading,
 }) => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<any>();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
 
@@ -150,6 +152,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
             <Input
               id="title"
               placeholder="Résumez votre expérience..."
+              onKeyDown={handleSpaceKeyDown}
               {...register('title')}
             />
           </div>
@@ -163,6 +166,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
               id="content"
               placeholder="Partagez votre expérience avec ce produit..."
               rows={5}
+              onKeyDown={handleSpaceKeyDown}
               {...register('content', { required: true })}
             />
             {errors.content && (

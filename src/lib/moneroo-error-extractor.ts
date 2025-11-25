@@ -50,7 +50,7 @@ export async function extractErrorDetails(
   errorMessage: string
 ): Promise<ExtractedErrorDetails> {
   const supabaseError = error as SupabaseError;
-  let errorBody = await extractErrorBody(error);
+  const errorBody = await extractErrorBody(error);
   let errorDetails: ExtractedErrorDetails = {
     message: errorMessage,
   };

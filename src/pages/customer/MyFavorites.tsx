@@ -137,7 +137,7 @@ export default function MyFavorites() {
       if (error) throw error;
 
       // Sort products
-      let sorted = (data as FavoriteProduct[]) || [];
+      const sorted = (data as FavoriteProduct[]) || [];
 
       if (sortOption === 'date') {
         sorted.sort((a, b) => 

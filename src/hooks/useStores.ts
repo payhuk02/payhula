@@ -3,6 +3,67 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 
+// Types pour les horaires d'ouverture
+export interface StoreOpeningHours {
+  monday: { open: string; close: string; closed: boolean };
+  tuesday: { open: string; close: string; closed: boolean };
+  wednesday: { open: string; close: string; closed: boolean };
+  thursday: { open: string; close: string; closed: boolean };
+  friday: { open: string; close: string; closed: boolean };
+  saturday: { open: string; close: string; closed: boolean };
+  sunday: { open: string; close: string; closed: boolean };
+  timezone: string;
+  special_hours?: Array<{
+    date: string;
+    open: string;
+    close: string;
+    closed: boolean;
+    reason: string;
+  }>;
+}
+
+// Types pour les pages légales
+export interface StoreLegalPages {
+  terms_of_service?: string;
+  privacy_policy?: string;
+  return_policy?: string;
+  shipping_policy?: string;
+  refund_policy?: string;
+  cookie_policy?: string;
+  disclaimer?: string;
+  faq_content?: string;
+}
+
+// Types pour le contenu marketing
+export interface StoreMarketingContent {
+  welcome_message?: string;
+  mission_statement?: string;
+  vision_statement?: string;
+  values?: string[];
+  story?: string;
+  team_section?: Array<{
+    name: string;
+    role: string;
+    bio: string;
+    photo_url: string;
+    social_links?: Record<string, string>;
+  }>;
+  testimonials?: Array<{
+    author: string;
+    content: string;
+    rating: number;
+    photo_url?: string;
+    company?: string;
+  }>;
+  certifications?: Array<{
+    name: string;
+    issuer: string;
+    image_url: string;
+    verification_url: string;
+    expiry_date?: string;
+  }>;
+}
+
 export interface Store {
   id: string;
   name: string;
@@ -31,6 +92,80 @@ export interface Store {
   redirect_www?: boolean;
   redirect_https?: boolean;
   dns_records?: any[];
+  // Phase 1: Thème et couleurs
+  primary_color?: string | null;
+  secondary_color?: string | null;
+  accent_color?: string | null;
+  background_color?: string | null;
+  text_color?: string | null;
+  text_secondary_color?: string | null;
+  button_primary_color?: string | null;
+  button_primary_text?: string | null;
+  button_secondary_color?: string | null;
+  button_secondary_text?: string | null;
+  link_color?: string | null;
+  link_hover_color?: string | null;
+  border_radius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full' | null;
+  shadow_intensity?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | null;
+  // Typographie
+  heading_font?: string | null;
+  body_font?: string | null;
+  font_size_base?: string | null;
+  heading_size_h1?: string | null;
+  heading_size_h2?: string | null;
+  heading_size_h3?: string | null;
+  line_height?: string | null;
+  letter_spacing?: string | null;
+  // Layout
+  header_style?: 'minimal' | 'standard' | 'extended' | null;
+  footer_style?: 'minimal' | 'standard' | 'extended' | null;
+  sidebar_enabled?: boolean | null;
+  sidebar_position?: 'left' | 'right' | null;
+  product_grid_columns?: number | null;
+  product_card_style?: 'minimal' | 'standard' | 'detailed' | null;
+  navigation_style?: 'horizontal' | 'vertical' | 'mega' | null;
+  // Images et médias
+  favicon_url?: string | null;
+  apple_touch_icon_url?: string | null;
+  watermark_url?: string | null;
+  placeholder_image_url?: string | null;
+  // Localisation
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  state_province?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  timezone?: string | null;
+  opening_hours?: StoreOpeningHours | null;
+  // Contacts supplémentaires
+  support_email?: string | null;
+  sales_email?: string | null;
+  press_email?: string | null;
+  partnership_email?: string | null;
+  support_phone?: string | null;
+  sales_phone?: string | null;
+  whatsapp_number?: string | null;
+  telegram_username?: string | null;
+  youtube_url?: string | null;
+  tiktok_url?: string | null;
+  pinterest_url?: string | null;
+  snapchat_url?: string | null;
+  discord_url?: string | null;
+  twitch_url?: string | null;
+  // Pages légales (JSONB)
+  legal_pages?: StoreLegalPages | null;
+  // Contenu marketing (JSONB)
+  marketing_content?: StoreMarketingContent | null;
+  // SEO (champs existants mais non utilisés)
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
+  og_image?: string | null;
+  seo_score?: number | null;
+  theme_color?: string | null;
 }
 
 const MAX_STORES_PER_USER = 3;

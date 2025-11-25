@@ -25,6 +25,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { formatCurrency } from '@/lib/utils';
 import { z } from 'zod';
 import { Card, CardContent } from '@/components/ui/card';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 interface CreateAffiliateLinkDialogProps {
   open: boolean;
@@ -47,6 +48,7 @@ export const CreateAffiliateLinkDialog = memo(({
   affiliateId,
   onSuccess,
 }: CreateAffiliateLinkDialogProps) => {
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [utmSource, setUtmSource] = useState('');
@@ -157,6 +159,7 @@ export const CreateAffiliateLinkDialog = memo(({
                 placeholder="Rechercher par nom ou slug..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSpaceKeyDown}
                 className="pl-10"
                 disabled={isCreating}
               />
@@ -267,6 +270,7 @@ export const CreateAffiliateLinkDialog = memo(({
                   placeholder="ex: facebook"
                   value={utmSource}
                   onChange={(e) => setUtmSource(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   disabled={isCreating}
                   className="text-sm"
                 />
@@ -278,6 +282,7 @@ export const CreateAffiliateLinkDialog = memo(({
                   placeholder="ex: social"
                   value={utmMedium}
                   onChange={(e) => setUtmMedium(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   disabled={isCreating}
                   className="text-sm"
                 />
@@ -289,6 +294,7 @@ export const CreateAffiliateLinkDialog = memo(({
                   placeholder="ex: promo2025"
                   value={utmCampaign}
                   onChange={(e) => setUtmCampaign(e.target.value)}
+                  onKeyDown={handleSpaceKeyDown}
                   disabled={isCreating}
                   className="text-sm"
                 />

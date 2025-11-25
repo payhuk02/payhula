@@ -24,13 +24,16 @@ import {
   Trash2,
   ExternalLink,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  Palette
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const StoreSettings = ({ action }: { action?: string | null }) => {
   const { stores, loading: storesLoading, createStore, updateStore, deleteStore, refetch, canCreateStore, getRemainingStores } = useStores();
   const { refreshStores } = useStoreContext();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("list");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
@@ -269,9 +272,20 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
             </div>
                       <div className="flex items-center gap-2">
                         <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => navigate('/dashboard/store')}
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                          title="Personnalisation avancée"
+                        >
+                          <Palette className="h-4 w-4 mr-1.5" />
+                          <span className="hidden sm:inline">Personnalisation</span>
+                        </Button>
+                        <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open(`/stores/${store.slug}`, '_blank')}
+                          title="Voir la boutique"
                         >
                           <ExternalLink className="h-4 w-4" />
                         </Button>
@@ -279,6 +293,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
                           variant="outline"
                           size="sm"
                           onClick={() => copyStoreUrl(store.slug)}
+                          title="Copier le lien"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -287,6 +302,7 @@ export const StoreSettings = ({ action }: { action?: string | null }) => {
                           size="sm"
                           onClick={() => handleDeleteStore(store.id, store.name)}
                           disabled={saving}
+                          title="Supprimer la boutique"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

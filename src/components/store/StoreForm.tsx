@@ -13,9 +13,14 @@ import { generateSlug } from "@/lib/store-utils";
 import { logger } from "@/lib/logger";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { Loader2, Check, X, Globe, Phone, Info } from '@/components/icons';
-import { Image as ImageIcon, Mail, Facebook, Instagram, Twitter, Linkedin, Palette } from 'lucide-react';
+import { Image as ImageIcon, Mail, Facebook, Instagram, Twitter, Linkedin, Palette, Search, MapPin, FileText } from 'lucide-react';
 import StoreImageUpload from "./StoreImageUpload";
 import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
+import { StoreThemeSettings } from "./StoreThemeSettings";
+import { StoreSEOSettings } from "./StoreSEOSettings";
+import { StoreLocationSettings } from "./StoreLocationSettings";
+import { StoreLegalPagesComponent } from "./StoreLegalPages";
+import type { StoreOpeningHours, StoreLegalPages } from "@/hooks/useStores";
 
 interface StoreFormProps {
   onSuccess: () => void;
@@ -37,6 +42,53 @@ interface StoreFormProps {
     info_message?: string | null;
     info_message_color?: string | null;
     info_message_font?: string | null;
+    // Phase 1 - Nouveaux champs
+    primary_color?: string | null;
+    secondary_color?: string | null;
+    accent_color?: string | null;
+    background_color?: string | null;
+    text_color?: string | null;
+    text_secondary_color?: string | null;
+    button_primary_color?: string | null;
+    button_primary_text?: string | null;
+    button_secondary_color?: string | null;
+    button_secondary_text?: string | null;
+    link_color?: string | null;
+    link_hover_color?: string | null;
+    border_radius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full' | null;
+    shadow_intensity?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | null;
+    heading_font?: string | null;
+    body_font?: string | null;
+    font_size_base?: string | null;
+    heading_size_h1?: string | null;
+    heading_size_h2?: string | null;
+    heading_size_h3?: string | null;
+    line_height?: string | null;
+    letter_spacing?: string | null;
+    header_style?: 'minimal' | 'standard' | 'extended' | null;
+    footer_style?: 'minimal' | 'standard' | 'extended' | null;
+    sidebar_enabled?: boolean | null;
+    sidebar_position?: 'left' | 'right' | null;
+    product_grid_columns?: number | null;
+    product_card_style?: 'minimal' | 'standard' | 'detailed' | null;
+    navigation_style?: 'horizontal' | 'vertical' | 'mega' | null;
+    meta_title?: string | null;
+    meta_description?: string | null;
+    meta_keywords?: string | null;
+    og_title?: string | null;
+    og_description?: string | null;
+    og_image?: string | null;
+    address_line1?: string | null;
+    address_line2?: string | null;
+    city?: string | null;
+    state_province?: string | null;
+    postal_code?: string | null;
+    country?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    timezone?: string | null;
+    opening_hours?: StoreOpeningHours | null;
+    legal_pages?: StoreLegalPages | null;
   };
 }
 
@@ -57,6 +109,65 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
   const [infoMessage, setInfoMessage] = useState(initialData?.info_message || "");
   const [infoMessageColor, setInfoMessageColor] = useState(initialData?.info_message_color || "#3b82f6");
   const [infoMessageFont, setInfoMessageFont] = useState(initialData?.info_message_font || "Inter");
+  
+  // Phase 1 - Thème et couleurs
+  const [primaryColor, setPrimaryColor] = useState(initialData?.primary_color || "#3b82f6");
+  const [secondaryColor, setSecondaryColor] = useState(initialData?.secondary_color || "#8b5cf6");
+  const [accentColor, setAccentColor] = useState(initialData?.accent_color || "#f59e0b");
+  const [backgroundColor, setBackgroundColor] = useState(initialData?.background_color || "#ffffff");
+  const [textColor, setTextColor] = useState(initialData?.text_color || "#1f2937");
+  const [textSecondaryColor, setTextSecondaryColor] = useState(initialData?.text_secondary_color || "#6b7280");
+  const [buttonPrimaryColor, setButtonPrimaryColor] = useState(initialData?.button_primary_color || "#3b82f6");
+  const [buttonPrimaryText, setButtonPrimaryText] = useState(initialData?.button_primary_text || "#ffffff");
+  const [buttonSecondaryColor, setButtonSecondaryColor] = useState(initialData?.button_secondary_color || "#e5e7eb");
+  const [buttonSecondaryText, setButtonSecondaryText] = useState(initialData?.button_secondary_text || "#1f2937");
+  const [linkColor, setLinkColor] = useState(initialData?.link_color || "#3b82f6");
+  const [linkHoverColor, setLinkHoverColor] = useState(initialData?.link_hover_color || "#2563eb");
+  const [borderRadius, setBorderRadius] = useState<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'>(initialData?.border_radius || 'md');
+  const [shadowIntensity, setShadowIntensity] = useState<'none' | 'sm' | 'md' | 'lg' | 'xl'>(initialData?.shadow_intensity || 'md');
+  
+  // Typographie
+  const [headingFont, setHeadingFont] = useState(initialData?.heading_font || "Inter");
+  const [bodyFont, setBodyFont] = useState(initialData?.body_font || "Inter");
+  const [fontSizeBase, setFontSizeBase] = useState(initialData?.font_size_base || "16px");
+  const [headingSizeH1, setHeadingSizeH1] = useState(initialData?.heading_size_h1 || "2.5rem");
+  const [headingSizeH2, setHeadingSizeH2] = useState(initialData?.heading_size_h2 || "2rem");
+  const [headingSizeH3, setHeadingSizeH3] = useState(initialData?.heading_size_h3 || "1.5rem");
+  const [lineHeight, setLineHeight] = useState(initialData?.line_height || "1.6");
+  const [letterSpacing, setLetterSpacing] = useState(initialData?.letter_spacing || "normal");
+  
+  // Layout
+  const [headerStyle, setHeaderStyle] = useState<'minimal' | 'standard' | 'extended'>(initialData?.header_style || 'standard');
+  const [footerStyle, setFooterStyle] = useState<'minimal' | 'standard' | 'extended'>(initialData?.footer_style || 'standard');
+  const [sidebarEnabled, setSidebarEnabled] = useState(initialData?.sidebar_enabled || false);
+  const [sidebarPosition, setSidebarPosition] = useState<'left' | 'right'>(initialData?.sidebar_position || 'left');
+  const [productGridColumns, setProductGridColumns] = useState(initialData?.product_grid_columns || 3);
+  const [productCardStyle, setProductCardStyle] = useState<'minimal' | 'standard' | 'detailed'>(initialData?.product_card_style || 'standard');
+  const [navigationStyle, setNavigationStyle] = useState<'horizontal' | 'vertical' | 'mega'>(initialData?.navigation_style || 'horizontal');
+  
+  // SEO
+  const [metaTitle, setMetaTitle] = useState(initialData?.meta_title || "");
+  const [metaDescription, setMetaDescription] = useState(initialData?.meta_description || "");
+  const [metaKeywords, setMetaKeywords] = useState(initialData?.meta_keywords || "");
+  const [ogTitle, setOgTitle] = useState(initialData?.og_title || "");
+  const [ogDescription, setOgDescription] = useState(initialData?.og_description || "");
+  const [ogImageUrl, setOgImageUrl] = useState(initialData?.og_image || "");
+  
+  // Localisation
+  const [addressLine1, setAddressLine1] = useState(initialData?.address_line1 || "");
+  const [addressLine2, setAddressLine2] = useState(initialData?.address_line2 || "");
+  const [city, setCity] = useState(initialData?.city || "");
+  const [stateProvince, setStateProvince] = useState(initialData?.state_province || "");
+  const [postalCode, setPostalCode] = useState(initialData?.postal_code || "");
+  const [country, setCountry] = useState(initialData?.country || "");
+  const [latitude, setLatitude] = useState<number | null>(initialData?.latitude || null);
+  const [longitude, setLongitude] = useState<number | null>(initialData?.longitude || null);
+  const [timezone, setTimezone] = useState(initialData?.timezone || "Africa/Ouagadougou");
+  const [openingHours, setOpeningHours] = useState<StoreOpeningHours | null>(initialData?.opening_hours || null);
+  
+  // Pages légales
+  const [legalPages, setLegalPages] = useState<StoreLegalPages | null>(initialData?.legal_pages || null);
+  
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -136,26 +247,80 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
 
       if (initialData) {
         // Update existing store
+        const updateData: any = {
+          name,
+          slug,
+          description: description || null,
+          default_currency: defaultCurrency,
+          logo_url: logoUrl || null,
+          banner_url: bannerUrl || null,
+          about: about || null,
+          contact_email: contactEmail || null,
+          contact_phone: contactPhone || null,
+          facebook_url: facebookUrl || null,
+          instagram_url: instagramUrl || null,
+          twitter_url: twitterUrl || null,
+          linkedin_url: linkedinUrl || null,
+          info_message: infoMessage || null,
+          info_message_color: infoMessageColor || "#3b82f6",
+          info_message_font: infoMessageFont || "Inter",
+          // Phase 1 - Thème et couleurs
+          primary_color: primaryColor || null,
+          secondary_color: secondaryColor || null,
+          accent_color: accentColor || null,
+          background_color: backgroundColor || null,
+          text_color: textColor || null,
+          text_secondary_color: textSecondaryColor || null,
+          button_primary_color: buttonPrimaryColor || null,
+          button_primary_text: buttonPrimaryText || null,
+          button_secondary_color: buttonSecondaryColor || null,
+          button_secondary_text: buttonSecondaryText || null,
+          link_color: linkColor || null,
+          link_hover_color: linkHoverColor || null,
+          border_radius: borderRadius,
+          shadow_intensity: shadowIntensity,
+          // Typographie
+          heading_font: headingFont || null,
+          body_font: bodyFont || null,
+          font_size_base: fontSizeBase || null,
+          heading_size_h1: headingSizeH1 || null,
+          heading_size_h2: headingSizeH2 || null,
+          heading_size_h3: headingSizeH3 || null,
+          line_height: lineHeight || null,
+          letter_spacing: letterSpacing || null,
+          // Layout
+          header_style: headerStyle,
+          footer_style: footerStyle,
+          sidebar_enabled: sidebarEnabled,
+          sidebar_position: sidebarPosition,
+          product_grid_columns: productGridColumns,
+          product_card_style: productCardStyle,
+          navigation_style: navigationStyle,
+          // SEO
+          meta_title: metaTitle || null,
+          meta_description: metaDescription || null,
+          meta_keywords: metaKeywords || null,
+          og_title: ogTitle || null,
+          og_description: ogDescription || null,
+          og_image: ogImageUrl || null,
+          // Localisation
+          address_line1: addressLine1 || null,
+          address_line2: addressLine2 || null,
+          city: city || null,
+          state_province: stateProvince || null,
+          postal_code: postalCode || null,
+          country: country || null,
+          latitude: latitude,
+          longitude: longitude,
+          timezone: timezone || null,
+          opening_hours: openingHours || null,
+          // Pages légales
+          legal_pages: legalPages || null,
+        };
+
         const { error } = await supabase
           .from('stores')
-          .update({
-            name,
-            slug,
-            description: description || null,
-            default_currency: defaultCurrency,
-            logo_url: logoUrl || null,
-            banner_url: bannerUrl || null,
-            about: about || null,
-            contact_email: contactEmail || null,
-            contact_phone: contactPhone || null,
-            facebook_url: facebookUrl || null,
-            instagram_url: instagramUrl || null,
-            twitter_url: twitterUrl || null,
-            linkedin_url: linkedinUrl || null,
-            info_message: infoMessage || null,
-            info_message_color: infoMessageColor || "#3b82f6",
-            info_message_font: infoMessageFont || "Inter",
-          })
+          .update(updateData)
           .eq('id', initialData.id);
 
         if (error) throw error;
@@ -185,27 +350,81 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
           return;
         }
 
+        const insertData: any = {
+          user_id: user.id,
+          name,
+          slug,
+          description: description || null,
+          default_currency: defaultCurrency,
+          logo_url: logoUrl || null,
+          banner_url: bannerUrl || null,
+          about: about || null,
+          contact_email: contactEmail || null,
+          contact_phone: contactPhone || null,
+          facebook_url: facebookUrl || null,
+          instagram_url: instagramUrl || null,
+          twitter_url: twitterUrl || null,
+          linkedin_url: linkedinUrl || null,
+          info_message: infoMessage || null,
+          info_message_color: infoMessageColor || "#3b82f6",
+          info_message_font: infoMessageFont || "Inter",
+          // Phase 1 - Thème et couleurs
+          primary_color: primaryColor || null,
+          secondary_color: secondaryColor || null,
+          accent_color: accentColor || null,
+          background_color: backgroundColor || null,
+          text_color: textColor || null,
+          text_secondary_color: textSecondaryColor || null,
+          button_primary_color: buttonPrimaryColor || null,
+          button_primary_text: buttonPrimaryText || null,
+          button_secondary_color: buttonSecondaryColor || null,
+          button_secondary_text: buttonSecondaryText || null,
+          link_color: linkColor || null,
+          link_hover_color: linkHoverColor || null,
+          border_radius: borderRadius,
+          shadow_intensity: shadowIntensity,
+          // Typographie
+          heading_font: headingFont || null,
+          body_font: bodyFont || null,
+          font_size_base: fontSizeBase || null,
+          heading_size_h1: headingSizeH1 || null,
+          heading_size_h2: headingSizeH2 || null,
+          heading_size_h3: headingSizeH3 || null,
+          line_height: lineHeight || null,
+          letter_spacing: letterSpacing || null,
+          // Layout
+          header_style: headerStyle,
+          footer_style: footerStyle,
+          sidebar_enabled: sidebarEnabled,
+          sidebar_position: sidebarPosition,
+          product_grid_columns: productGridColumns,
+          product_card_style: productCardStyle,
+          navigation_style: navigationStyle,
+          // SEO
+          meta_title: metaTitle || null,
+          meta_description: metaDescription || null,
+          meta_keywords: metaKeywords || null,
+          og_title: ogTitle || null,
+          og_description: ogDescription || null,
+          og_image: ogImageUrl || null,
+          // Localisation
+          address_line1: addressLine1 || null,
+          address_line2: addressLine2 || null,
+          city: city || null,
+          state_province: stateProvince || null,
+          postal_code: postalCode || null,
+          country: country || null,
+          latitude: latitude,
+          longitude: longitude,
+          timezone: timezone || null,
+          opening_hours: openingHours || null,
+          // Pages légales
+          legal_pages: legalPages || null,
+        };
+
         const { error } = await supabase
           .from('stores')
-          .insert({
-            user_id: user.id,
-            name,
-            slug,
-            description: description || null,
-            default_currency: defaultCurrency,
-            logo_url: logoUrl || null,
-            banner_url: bannerUrl || null,
-            about: about || null,
-            contact_email: contactEmail || null,
-            contact_phone: contactPhone || null,
-            facebook_url: facebookUrl || null,
-            instagram_url: instagramUrl || null,
-            twitter_url: twitterUrl || null,
-            linkedin_url: linkedinUrl || null,
-            info_message: infoMessage || null,
-            info_message_color: infoMessageColor || "#3b82f6",
-            info_message_font: infoMessageFont || "Inter",
-          });
+          .insert(insertData);
 
         if (error) {
           // Gérer l'erreur spécifique de limite de la base de données
@@ -240,7 +459,24 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [name, slug, slugAvailable, defaultCurrency, description, logoUrl, bannerUrl, about, contactEmail, contactPhone, facebookUrl, instagramUrl, twitterUrl, linkedinUrl, initialData, onSuccess, refreshStores, toast]);
+  }, [
+    name, slug, slugAvailable, defaultCurrency, description, logoUrl, bannerUrl, about,
+    contactEmail, contactPhone, facebookUrl, instagramUrl, twitterUrl, linkedinUrl,
+    infoMessage, infoMessageColor, infoMessageFont,
+    // Phase 1
+    primaryColor, secondaryColor, accentColor, backgroundColor, textColor, textSecondaryColor,
+    buttonPrimaryColor, buttonPrimaryText, buttonSecondaryColor, buttonSecondaryText,
+    linkColor, linkHoverColor, borderRadius, shadowIntensity,
+    headingFont, bodyFont, fontSizeBase, headingSizeH1, headingSizeH2, headingSizeH3,
+    lineHeight, letterSpacing,
+    headerStyle, footerStyle, sidebarEnabled, sidebarPosition, productGridColumns,
+    productCardStyle, navigationStyle,
+    metaTitle, metaDescription, metaKeywords, ogTitle, ogDescription, ogImageUrl,
+    addressLine1, addressLine2, city, stateProvince, postalCode, country,
+    latitude, longitude, timezone, openingHours,
+    legalPages,
+    initialData, onSuccess, refreshStores, toast
+  ]);
 
   return (
     <Card>
@@ -257,7 +493,7 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 gap-1 overflow-x-auto">
               <TabsTrigger value="basic" className="flex items-center gap-2">
                 <Info className="h-4 w-4" />
                 <span className="hidden sm:inline">Informations</span>
@@ -272,6 +508,26 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                 <Globe className="h-4 w-4" />
                 <span className="hidden sm:inline">Contact & Réseaux</span>
                 <span className="sm:hidden">Contact</span>
+              </TabsTrigger>
+              <TabsTrigger value="theme" className="flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                <span className="hidden lg:inline">Thème</span>
+                <span className="lg:hidden">Thème</span>
+              </TabsTrigger>
+              <TabsTrigger value="seo" className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                <span className="hidden lg:inline">SEO</span>
+                <span className="lg:hidden">SEO</span>
+              </TabsTrigger>
+              <TabsTrigger value="location" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden lg:inline">Localisation</span>
+                <span className="lg:hidden">Local.</span>
+              </TabsTrigger>
+              <TabsTrigger value="legal" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden lg:inline">Pages Légales</span>
+                <span className="lg:hidden">Légal</span>
               </TabsTrigger>
             </TabsList>
 
@@ -625,6 +881,154 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                   </div>
                 </div>
               </div>
+            </TabsContent>
+
+            {/* Onglet Thème */}
+            <TabsContent value="theme" className="mt-4">
+              <StoreThemeSettings
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                accentColor={accentColor}
+                backgroundColor={backgroundColor}
+                textColor={textColor}
+                textSecondaryColor={textSecondaryColor}
+                buttonPrimaryColor={buttonPrimaryColor}
+                buttonPrimaryText={buttonPrimaryText}
+                buttonSecondaryColor={buttonSecondaryColor}
+                buttonSecondaryText={buttonSecondaryText}
+                linkColor={linkColor}
+                linkHoverColor={linkHoverColor}
+                borderRadius={borderRadius}
+                shadowIntensity={shadowIntensity}
+                headingFont={headingFont}
+                bodyFont={bodyFont}
+                fontSizeBase={fontSizeBase}
+                headingSizeH1={headingSizeH1}
+                headingSizeH2={headingSizeH2}
+                headingSizeH3={headingSizeH3}
+                lineHeight={lineHeight}
+                letterSpacing={letterSpacing}
+                headerStyle={headerStyle}
+                footerStyle={footerStyle}
+                sidebarEnabled={sidebarEnabled}
+                sidebarPosition={sidebarPosition}
+                productGridColumns={productGridColumns}
+                productCardStyle={productCardStyle}
+                navigationStyle={navigationStyle}
+                onColorChange={(field, value) => {
+                  const setters: Record<string, (v: string) => void> = {
+                    primary_color: setPrimaryColor,
+                    secondary_color: setSecondaryColor,
+                    accent_color: setAccentColor,
+                    background_color: setBackgroundColor,
+                    text_color: setTextColor,
+                    text_secondary_color: setTextSecondaryColor,
+                    button_primary_color: setButtonPrimaryColor,
+                    button_primary_text: setButtonPrimaryText,
+                    button_secondary_color: setButtonSecondaryColor,
+                    button_secondary_text: setButtonSecondaryText,
+                    link_color: setLinkColor,
+                    link_hover_color: setLinkHoverColor,
+                    border_radius: (v) => setBorderRadius(v as any),
+                    shadow_intensity: (v) => setShadowIntensity(v as any),
+                  };
+                  setters[field]?.(value);
+                }}
+                onTypographyChange={(field, value) => {
+                  const setters: Record<string, (v: string) => void> = {
+                    heading_font: setHeadingFont,
+                    body_font: setBodyFont,
+                    font_size_base: setFontSizeBase,
+                    heading_size_h1: setHeadingSizeH1,
+                    heading_size_h2: setHeadingSizeH2,
+                    heading_size_h3: setHeadingSizeH3,
+                    line_height: setLineHeight,
+                    letter_spacing: setLetterSpacing,
+                  };
+                  setters[field]?.(value);
+                }}
+                onLayoutChange={(field, value) => {
+                  const setters: Record<string, (v: any) => void> = {
+                    header_style: (v) => setHeaderStyle(v as any),
+                    footer_style: (v) => setFooterStyle(v as any),
+                    sidebar_enabled: setSidebarEnabled,
+                    sidebar_position: (v) => setSidebarPosition(v as any),
+                    product_grid_columns: setProductGridColumns,
+                    product_card_style: (v) => setProductCardStyle(v as any),
+                    navigation_style: (v) => setNavigationStyle(v as any),
+                  };
+                  setters[field]?.(value);
+                }}
+              />
+            </TabsContent>
+
+            {/* Onglet SEO */}
+            <TabsContent value="seo" className="mt-4">
+              <StoreSEOSettings
+                metaTitle={metaTitle}
+                metaDescription={metaDescription}
+                metaKeywords={metaKeywords}
+                ogTitle={ogTitle}
+                ogDescription={ogDescription}
+                ogImageUrl={ogImageUrl}
+                onChange={(field, value) => {
+                  const setters: Record<string, (v: string) => void> = {
+                    meta_title: setMetaTitle,
+                    meta_description: setMetaDescription,
+                    meta_keywords: setMetaKeywords,
+                    og_title: setOgTitle,
+                    og_description: setOgDescription,
+                    og_image_url: setOgImageUrl,
+                  };
+                  setters[field]?.(value);
+                }}
+              />
+            </TabsContent>
+
+            {/* Onglet Localisation */}
+            <TabsContent value="location" className="mt-4">
+              <StoreLocationSettings
+                addressLine1={addressLine1}
+                addressLine2={addressLine2}
+                city={city}
+                stateProvince={stateProvince}
+                postalCode={postalCode}
+                country={country}
+                latitude={latitude}
+                longitude={longitude}
+                timezone={timezone}
+                openingHours={openingHours}
+                onAddressChange={(field, value) => {
+                  const setters: Record<string, (v: string) => void> = {
+                    address_line1: setAddressLine1,
+                    address_line2: setAddressLine2,
+                    city: setCity,
+                    state_province: setStateProvince,
+                    postal_code: setPostalCode,
+                    country: setCountry,
+                  };
+                  setters[field]?.(value);
+                }}
+                onLocationChange={(field, value) => {
+                  if (field === 'latitude') setLatitude(value);
+                  if (field === 'longitude') setLongitude(value);
+                }}
+                onTimezoneChange={setTimezone}
+                onOpeningHoursChange={setOpeningHours}
+              />
+            </TabsContent>
+
+            {/* Onglet Pages légales */}
+            <TabsContent value="legal" className="mt-4">
+              <StoreLegalPagesComponent
+                legalPages={legalPages}
+                onChange={(field, value) => {
+                  setLegalPages((prev) => ({
+                    ...prev,
+                    [field]: value,
+                  } as StoreLegalPages));
+                }}
+              />
             </TabsContent>
           </Tabs>
 

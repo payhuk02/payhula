@@ -36,11 +36,13 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProductWarranty } from '@/hooks/physical/useWarranties';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 export default function WarrantiesManagement() {
   const { store } = useStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingWarranty, setEditingWarranty] = useState<ProductWarranty | null>(null);
@@ -391,6 +393,7 @@ export default function WarrantiesManagement() {
                     id="warranty_name"
                     value={formData.warranty_name || ''}
                     onChange={(e) => setFormData({ ...formData, warranty_name: e.target.value })}
+                    onKeyDown={handleSpaceKeyDown}
                     required
                   />
                 </div>
@@ -402,6 +405,7 @@ export default function WarrantiesManagement() {
                   id="description"
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onKeyDown={handleSpaceKeyDown}
                   rows={3}
                 />
               </div>

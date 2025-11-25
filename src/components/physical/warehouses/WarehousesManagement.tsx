@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 
 export default function WarehousesManagement() {
   const { store } = useStore();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const { data: warehouses, isLoading } = useWarehouses(store?.id);
   const createWarehouse = useCreateWarehouse();
   const { toast } = useToast();

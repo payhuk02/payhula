@@ -66,9 +66,11 @@ import {
 import { useStore } from '@/hooks/use-store';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
 
 export const PromotionsManager: React.FC = () => {
   const { store } = useStore();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const { data: promotions = [], isLoading } = usePromotions(store?.id);
   const createMutation = useCreatePromotion();
   const updateMutation = useUpdatePromotion();
@@ -571,6 +573,7 @@ export const PromotionsManager: React.FC = () => {
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onKeyDown={handleSpaceKeyDown}
                   required
                 />
               </div>
@@ -580,6 +583,7 @@ export const PromotionsManager: React.FC = () => {
                   id="code"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                  onKeyDown={handleSpaceKeyDown}
                   placeholder="EXEMPLE2025"
                 />
               </div>
@@ -591,6 +595,7 @@ export const PromotionsManager: React.FC = () => {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onKeyDown={handleSpaceKeyDown}
                 rows={3}
               />
             </div>

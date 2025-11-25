@@ -17,6 +17,7 @@ import ImageUpload from "./ImageUpload";
 import { useProductManagement } from "@/hooks/useProductManagement";
 import { generateSlug } from "@/lib/store-utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 
 interface CreateProductDialogProps {
   storeId: string;
@@ -40,6 +41,7 @@ const CreateProductDialogComponent = ({
 
   const { createProduct, checkSlugAvailability, loading } =
     useProductManagement(storeId);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +92,7 @@ const CreateProductDialogComponent = ({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Formation Excel complète"
               required
             />
@@ -123,6 +126,7 @@ const CreateProductDialogComponent = ({
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Formation"
             />
           </div>
@@ -133,6 +137,7 @@ const CreateProductDialogComponent = ({
               id="productType"
               value={productType}
               onChange={(e) => setProductType(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Produit numérique"
             />
           </div>
@@ -172,6 +177,7 @@ const CreateProductDialogComponent = ({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Décrivez votre produit..."
               rows={4}
             />

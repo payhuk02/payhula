@@ -3,27 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { logger } from '@/lib/logger';
 
-export interface Store {
-  id: string;
-  user_id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  logo_url?: string | null;
-  banner_url?: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  about?: string | null;
-  contact_email?: string | null;
-  contact_phone?: string | null;
-  facebook_url?: string | null;
-  instagram_url?: string | null;
-  twitter_url?: string | null;
-  linkedin_url?: string | null;
-  custom_domain?: string | null;
-  domain_status?: 'not_configured' | 'pending' | 'verified' | 'error' | null;
-  default_currency?: string | null;
+// Import des types depuis useStores pour éviter la duplication
+import type { Store as StoreType, StoreOpeningHours, StoreLegalPages, StoreMarketingContent } from '@/hooks/useStores';
+
+export interface Store extends StoreType {
+  // Tous les champs sont hérités de StoreType qui inclut maintenant tous les nouveaux champs de la Phase 1
 }
 
 interface StoreContextType {

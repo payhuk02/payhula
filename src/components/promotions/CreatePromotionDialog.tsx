@@ -18,6 +18,7 @@ interface CreatePromotionDialogProps {
 
 const CreatePromotionDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: CreatePromotionDialogProps) => {
   const { toast } = useToast();
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     code: "",
@@ -103,6 +104,7 @@ const CreatePromotionDialogComponent = ({ open, onOpenChange, onSuccess, storeId
               id="code"
               value={formData.code}
               onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="PROMO2025"
               required
             />
@@ -114,6 +116,7 @@ const CreatePromotionDialogComponent = ({ open, onOpenChange, onSuccess, storeId
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Description de la promotion..."
             />
           </div>

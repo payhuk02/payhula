@@ -17,6 +17,7 @@ import { Info } from '@/components/icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useProductManagement } from "@/hooks/useProductManagement";
 import { Product } from "@/hooks/useProducts";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 
 interface EditProductDialogProps {
   product: Product;
@@ -44,6 +45,7 @@ const EditProductDialogComponent = ({
 
   const { updateProduct, checkSlugAvailability, loading } =
     useProductManagement(product.store_id);
+  const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   useEffect(() => {
     setName(product.name);
@@ -106,6 +108,7 @@ const EditProductDialogComponent = ({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Formation Excel complète"
               required
             />
@@ -139,6 +142,7 @@ const EditProductDialogComponent = ({
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Formation"
             />
           </div>
@@ -149,6 +153,7 @@ const EditProductDialogComponent = ({
               id="productType"
               value={productType}
               onChange={(e) => setProductType(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Produit numérique"
             />
           </div>
@@ -188,6 +193,7 @@ const EditProductDialogComponent = ({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleSpaceKeyDown}
               placeholder="Décrivez votre produit..."
               rows={4}
             />
