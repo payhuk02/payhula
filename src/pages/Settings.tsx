@@ -9,6 +9,7 @@ import { StoreSettings } from "@/components/settings/StoreSettings";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { NotificationSettings } from "@/components/settings/NotificationSettings";
 import { DomainSettings } from "@/components/settings/DomainSettings";
+import { ImportExportManager } from "@/components/import-export/ImportExportManager";
 import { ProfileDebug } from "@/components/debug/ProfileDebug";
 import { ProfileTest } from "@/components/debug/ProfileTest";
 import { DatabaseMigrationInstructions } from "@/components/debug/DatabaseMigrationInstructions";
@@ -70,7 +71,7 @@ const Settings = () => {
 
             {/* Tabs - Fully Responsive */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 h-auto gap-2 overflow-x-auto">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 h-auto gap-2 overflow-x-auto">
                 <TabsTrigger value="profile" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.profile')}
                 </TabsTrigger>
@@ -82,6 +83,9 @@ const Settings = () => {
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.notifications')}
+                </TabsTrigger>
+                <TabsTrigger value="import-export" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                  Import/Export
                 </TabsTrigger>
                 <TabsTrigger value="security" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.security')}
@@ -139,6 +143,21 @@ const Settings = () => {
                   </CardHeader>
                   <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                     <NotificationSettings />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Import/Export Tab */}
+              <TabsContent value="import-export" className="space-y-3 sm:space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="space-y-1 px-4 py-4 sm:px-6 sm:py-5">
+                    <CardTitle className="text-lg sm:text-xl">Import/Export de données</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      Importez ou exportez vos produits, commandes et clients
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                    <ImportExportManager />
                   </CardContent>
                 </Card>
               </TabsContent>

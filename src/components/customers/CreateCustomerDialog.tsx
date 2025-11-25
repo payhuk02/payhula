@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
 
 interface CreateCustomerDialogProps {
   open: boolean;
@@ -45,14 +46,31 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      const { data: customer, error } = await supabase
         .from('customers')
         .insert({
           store_id: storeId,
           ...formData,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Déclencher webhook customer.created (asynchrone)
+      if (customer) {
+        import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
+          triggerWebhook(storeId, 'customer.created', {
+            customer_id: customer.id,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            created_at: customer.created_at,
+          }).catch((err) => {
+            console.error('Error triggering webhook', err);
+          });
+        });
+      }
 
       toast({
         title: "Succès",

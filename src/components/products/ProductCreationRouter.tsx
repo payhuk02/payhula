@@ -12,9 +12,11 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft } from 'lucide-react';
+import type { ProductTemplate } from '@/lib/products/product-templates';
 import { EnhancedProductTypeSelector } from './EnhancedProductTypeSelector';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import type { ProductTemplate } from '@/lib/products/product-templates';
 
 // Lazy loading des wizards pour optimiser les performances
 const CreateCourseWizard = lazy(() => 
@@ -33,6 +35,15 @@ const CreatePhysicalProductWizard = lazy(() =>
 
 const CreateServiceWizard = lazy(() => 
   import('./create/service/CreateServiceWizard_v2').then(m => ({ default: m.CreateServiceWizard }))
+);
+
+const CreateArtistProductWizard = lazy(() => 
+  import('./create/artist/CreateArtistProductWizard').then(m => ({ default: m.CreateArtistProductWizard }))
+);
+
+// Sélecteur de templates
+const ProductTemplateSelector = lazy(() => 
+  import('./ProductTemplateSelector').then(m => ({ default: m.ProductTemplateSelector }))
 );
 
 // Fallback : formulaire classique (pour compatibilité)
@@ -97,6 +108,8 @@ export const ProductCreationRouter = ({
   const [selectedType, setSelectedType] = useState<string | null>(
     initialProductType || null
   );
+  const [selectedTemplate, setSelectedTemplate] = useState<ProductTemplate | null>(null);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   // Refs for animations
   const headerRef = useScrollAnimation<HTMLDivElement>();
@@ -154,6 +167,30 @@ export const ProductCreationRouter = ({
     );
   }
 
+  // Si type sélectionné mais pas de template, afficher le sélecteur de templates
+  if (selectedType && !selectedTemplate && showTemplateSelector) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <Button
+          variant="ghost"
+          onClick={() => setShowTemplateSelector(false)}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour
+        </Button>
+        <ProductTemplateSelector
+          productType={selectedType as any}
+          onSelect={(template) => {
+            setSelectedTemplate(template);
+            setShowTemplateSelector(false);
+          }}
+          onSkip={() => setShowTemplateSelector(false)}
+        />
+      </div>
+    );
+  }
+
   // Router vers le wizard approprié
   return (
     <Suspense fallback={<LoadingFallback />}>
@@ -192,8 +229,17 @@ export const ProductCreationRouter = ({
         />
       )}
 
+      {selectedType === 'artist' && (
+        <CreateArtistProductWizard
+          storeId={storeId}
+          storeSlug={storeSlug}
+          onSuccess={onSuccess}
+          onBack={handleBack}
+        />
+      )}
+
       {/* Fallback vers formulaire classique pour types non reconnus */}
-      {!['course', 'digital', 'physical', 'service'].includes(selectedType) && (
+      {!['course', 'digital', 'physical', 'service', 'artist'].includes(selectedType) && (
         <div className="container mx-auto px-4 py-8 max-w-5xl">
           <Button
             variant="ghost"

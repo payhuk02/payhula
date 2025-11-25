@@ -254,18 +254,18 @@ export const useCreateOrder = () => {
 
           // Déclencher webhook order.created (asynchrone, ne bloque pas)
           if (order) {
-            import('@/lib/webhooks').then(({ triggerOrderCreatedWebhook }) => {
-              triggerOrderCreatedWebhook(order.id, {
-                store_id: order.store_id,
-                customer_id: order.customer_id,
+            import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
+              triggerWebhook(order.store_id, 'order.created', {
+                order_id: order.id,
                 order_number: order.order_number,
-                status: order.status,
+                customer_id: order.customer_id,
                 total_amount: order.total_amount,
                 currency: order.currency,
+                status: order.status,
                 payment_status: order.payment_status,
                 created_at: order.created_at,
               }).catch((err) => {
-                logger.error('Error in analytics tracking', { error: err, orderId: order.id });
+                logger.error('Error triggering webhook', { error: err, orderId: order.id });
               });
             });
           }

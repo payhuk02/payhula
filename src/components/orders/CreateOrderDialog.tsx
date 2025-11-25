@@ -155,6 +155,24 @@ const CreateOrderDialogComponent = ({ open, onOpenChange, onSuccess, storeId }: 
 
       if (itemsError) throw itemsError;
 
+      // Déclencher webhook order.created (asynchrone)
+      if (order) {
+        import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
+          triggerWebhook(storeId, 'order.created', {
+            order_id: order.id,
+            order_number: order.order_number,
+            customer_id: order.customer_id,
+            total_amount: order.total_amount,
+            currency: order.currency,
+            status: order.status,
+            payment_status: order.payment_status,
+            created_at: order.created_at,
+          }).catch((err) => {
+            logger.error('Error triggering webhook', { error: err, orderId: order.id });
+          });
+        });
+      }
+
       toast({
         title: "Succès",
         description: `Commande ${orderNumber} créée avec succès`,

@@ -70,6 +70,23 @@ export const notifyPaymentSuccess = async (data: PaymentNotificationData): Promi
       });
     }
 
+    // Déclencher webhook payment.completed (asynchrone)
+    if (data.orderId && data.storeId) {
+      import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
+        triggerWebhook(data.storeId, 'payment.completed', {
+          transaction_id: data.transactionId,
+          order_id: data.orderId,
+          order_number: data.orderNumber,
+          amount: data.amount,
+          currency: data.currency,
+          payment_method: data.paymentMethod,
+          customer_id: data.userId,
+        }).catch((err) => {
+          logger.error('Error triggering payment webhook', { error: err, transactionId: data.transactionId });
+        });
+      });
+    }
+
     logger.log('Payment success notification sent:', {
       transactionId: data.transactionId,
       userId: data.userId,

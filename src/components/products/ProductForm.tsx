@@ -502,6 +502,22 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
         
         if (error) throw error;
         result = data && data.length > 0 ? data[0] : null;
+
+        // Déclencher webhook product.updated (asynchrone)
+        if (result) {
+          import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
+            triggerWebhook(storeId, 'product.updated', {
+              product_id: result.id,
+              name: result.name,
+              product_type: result.product_type,
+              price: result.price,
+              currency: result.currency,
+              updated_at: result.updated_at,
+            }).catch((err) => {
+              logger.error('Error triggering webhook', { error: err, productId: result.id });
+            });
+          });
+        }
       } else {
         // Création
         const { data, error } = await supabase

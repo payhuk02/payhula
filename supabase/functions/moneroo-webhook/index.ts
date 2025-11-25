@@ -303,24 +303,36 @@ serve(async (req) => {
           console.error('Error updating order:', orderError);
         } else {
           order = orderData;
+          // Déclencher webhook order.completed via la nouvelle fonction
           await supabase.rpc('trigger_webhook', {
-            p_event_type: 'order.completed',
-            p_event_id: order.id,
-            p_event_data: {
-              order: {
-                id: order.id,
-                store_id: order.store_id,
-                customer_id: order.customer_id,
-                order_number: order.order_number,
-                status: 'confirmed',
-                total_amount: order.total_amount,
-                currency: order.currency,
-                payment_status: 'paid',
-                created_at: order.created_at,
-              },
-            },
             p_store_id: order.store_id,
+            p_event_type: 'order.completed',
+            p_payload: {
+              order_id: order.id,
+              order_number: order.order_number,
+              customer_id: order.customer_id,
+              total_amount: order.total_amount,
+              currency: order.currency,
+              status: 'confirmed',
+              payment_status: 'paid',
+              created_at: order.created_at,
+            },
           }).catch((err) => console.error('Webhook error:', err));
+          
+          // Déclencher aussi payment.completed
+          await supabase.rpc('trigger_webhook', {
+            p_store_id: order.store_id,
+            p_event_type: 'payment.completed',
+            p_payload: {
+              transaction_id: transaction.id,
+              order_id: order.id,
+              order_number: order.order_number,
+              amount: transaction.amount,
+              currency: transaction.currency,
+              payment_method: transaction.payment_method,
+              customer_id: order.customer_id,
+            },
+          }).catch((err) => console.error('Payment webhook error:', err));
 
           // 🆕 Vérifier si toutes les commandes du groupe multi-stores sont payées
           // La fonction SQL check_and_notify_multi_store_group_completion sera appelée

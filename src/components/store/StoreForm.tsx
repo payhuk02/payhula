@@ -351,11 +351,11 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
         }
 
         const insertData: any = {
-          user_id: user.id,
-          name,
-          slug,
-          description: description || null,
-          default_currency: defaultCurrency,
+            user_id: user.id,
+            name,
+            slug,
+            description: description || null,
+            default_currency: defaultCurrency,
           logo_url: logoUrl || null,
           banner_url: bannerUrl || null,
           about: about || null,
@@ -533,57 +533,57 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
 
             {/* Onglet Informations de base */}
             <TabsContent value="basic" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom de la boutique *</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => handleNameChange(e.target.value)}
+          <div className="space-y-2">
+            <Label htmlFor="name">Nom de la boutique *</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
                   onKeyDown={handleSpaceKeyDown}
-                  placeholder="Ma Boutique Pro"
-                  required
-                />
-              </div>
+              placeholder="Ma Boutique Pro"
+              required
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="slug">
-                  Nom d'URL (slug) *
-                  {isCheckingSlug && (
-                    <Loader2 className="inline-block ml-2 h-4 w-4 animate-spin" />
-                  )}
-                  {!isCheckingSlug && slugAvailable === true && (
-                    <Check className="inline-block ml-2 h-4 w-4 text-accent" />
-                  )}
-                  {!isCheckingSlug && slugAvailable === false && (
-                    <X className="inline-block ml-2 h-4 w-4 text-destructive" />
-                  )}
-                </Label>
-                <Input
-                  id="slug"
-                  value={slug}
-                  onChange={(e) => handleSlugChange(e.target.value)}
-                  placeholder="ma-boutique-pro"
-                  required
-                />
-                {slug && (
-                  <p className="text-sm text-muted-foreground">
-                    Votre boutique sera accessible à : 
-                    <span className="font-mono ml-1">https://{slug}.lovableproject.com</span>
-                  </p>
-                )}
-                {slugAvailable === false && (
-                  <p className="text-sm text-destructive">
-                    Ce nom de boutique est déjà pris. Veuillez en choisir un autre.
-                  </p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="slug">
+              Nom d'URL (slug) *
+              {isCheckingSlug && (
+                <Loader2 className="inline-block ml-2 h-4 w-4 animate-spin" />
+              )}
+              {!isCheckingSlug && slugAvailable === true && (
+                <Check className="inline-block ml-2 h-4 w-4 text-accent" />
+              )}
+              {!isCheckingSlug && slugAvailable === false && (
+                <X className="inline-block ml-2 h-4 w-4 text-destructive" />
+              )}
+            </Label>
+            <Input
+              id="slug"
+              value={slug}
+              onChange={(e) => handleSlugChange(e.target.value)}
+              placeholder="ma-boutique-pro"
+              required
+            />
+            {slug && (
+              <p className="text-sm text-muted-foreground">
+                Votre boutique sera accessible à : 
+                <span className="font-mono ml-1">https://{slug}.lovableproject.com</span>
+              </p>
+            )}
+            {slugAvailable === false && (
+              <p className="text-sm text-destructive">
+                Ce nom de boutique est déjà pris. Veuillez en choisir un autre.
+              </p>
+            )}
+          </div>
 
-              <div className="space-y-2">
+          <div className="space-y-2">
                 <Label htmlFor="description">Description courte</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
                   onKeyDown={handleSpaceKeyDown}
                   placeholder="Décrivez votre boutique en quelques mots..."
                   rows={3}
@@ -713,18 +713,18 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
                     </div>
                   </>
                 )}
-              </div>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="currency">Devise par défaut</Label>
-                <CurrencySelect
-                  value={defaultCurrency}
-                  onValueChange={setDefaultCurrency}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Cette devise sera utilisée par défaut pour vos nouveaux produits
-                </p>
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="currency">Devise par défaut</Label>
+            <CurrencySelect
+              value={defaultCurrency}
+              onValueChange={setDefaultCurrency}
+            />
+            <p className="text-sm text-muted-foreground">
+              Cette devise sera utilisée par défaut pour vos nouveaux produits
+            </p>
+          </div>
             </TabsContent>
 
             {/* Onglet Image & Design */}
@@ -1033,23 +1033,23 @@ const StoreForm = ({ onSuccess, initialData }: StoreFormProps) => {
           </Tabs>
 
           <div className="pt-4 border-t">
-            <Button
-              type="submit" 
-              className="w-full"
-              disabled={isSubmitting || slugAvailable === false}
+          <Button
+            type="submit" 
+            className="w-full"
+            disabled={isSubmitting || slugAvailable === false}
               size="lg"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {initialData ? "Mise à jour..." : "Création..."}
-                </>
-              ) : (
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {initialData ? "Mise à jour..." : "Création..."}
+              </>
+            ) : (
                 <>
                   {initialData ? "Mettre à jour la boutique" : "Créer ma boutique"}
                 </>
-              )}
-            </Button>
+            )}
+          </Button>
           </div>
         </form>
       </CardContent>

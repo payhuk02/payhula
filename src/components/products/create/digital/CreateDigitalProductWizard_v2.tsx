@@ -931,6 +931,22 @@ export const CreateDigitalProductWizard = ({
       // Clear draft from localStorage on success
       localStorage.removeItem('digital-product-draft');
 
+      // Déclencher webhook product.created (asynchrone)
+      if (product && !isDraft) {
+        import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
+          triggerWebhook(storeId, 'product.created', {
+            product_id: product.id,
+            name: product.name,
+            product_type: product.product_type,
+            price: product.price,
+            currency: product.currency,
+            created_at: product.created_at,
+          }).catch((err) => {
+            logger.error('Error triggering webhook', { error: err, productId: product.id });
+          });
+        });
+      }
+
       return product;
     } catch (error) {
       logger.error('Erreur lors de la sauvegarde du produit', error);

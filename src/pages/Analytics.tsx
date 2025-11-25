@@ -13,8 +13,10 @@ import { TrendingUp, DollarSign, ShoppingCart, Users, Package, BarChart3, Plus }
 import { SalesChart } from "@/components/analytics/SalesChart";
 import { TopProducts } from "@/components/analytics/TopProducts";
 import { RecentOrders } from "@/components/analytics/RecentOrders";
+import { UnifiedAnalyticsDashboard } from "@/components/analytics/UnifiedAnalyticsDashboard";
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Analytics = () => {
   const navigate = useNavigate();
@@ -231,20 +233,34 @@ const Analytics = () => {
               </Card>
             </div>
 
-            {/* Charts and Tables */}
-            <div
-              ref={chartsRef}
-              className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-700"
-              role="region"
-              aria-label="Graphiques et tableaux"
-            >
-              <SalesChart orders={orders || []} loading={isLoading} />
-              <TopProducts orders={orders || []} loading={isLoading} />
-            </div>
+            {/* Tabs pour basculer entre vue classique et vue unifiée */}
+            <Tabs defaultValue="unified" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="unified">Vue Unifiée</TabsTrigger>
+                <TabsTrigger value="classic">Vue Classique</TabsTrigger>
+              </TabsList>
 
-            <div role="region" aria-label="Commandes récentes" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <RecentOrders orders={orders?.slice(0, 5) || []} loading={isLoading} />
-            </div>
+              <TabsContent value="unified" className="space-y-4">
+                <UnifiedAnalyticsDashboard />
+              </TabsContent>
+
+              <TabsContent value="classic" className="space-y-4">
+                {/* Charts and Tables */}
+                <div
+                  ref={chartsRef}
+                  className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                  role="region"
+                  aria-label="Graphiques et tableaux"
+                >
+                  <SalesChart orders={orders || []} loading={isLoading} />
+                  <TopProducts orders={orders || []} loading={isLoading} />
+                </div>
+
+                <div role="region" aria-label="Commandes récentes" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <RecentOrders orders={orders?.slice(0, 5) || []} loading={isLoading} />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
