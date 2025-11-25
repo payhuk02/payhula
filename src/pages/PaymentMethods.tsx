@@ -10,7 +10,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useStore } from '@/hooks/use-store';
+import { useStore } from '@/hooks/useStore';
 import { useStorePaymentMethods } from '@/hooks/useStorePaymentMethods';
 import { SavedStorePaymentMethod, StorePaymentMethodForm, StorePaymentMethod } from '@/types/store-withdrawals';
 import { COUNTRIES } from '@/lib/countries';

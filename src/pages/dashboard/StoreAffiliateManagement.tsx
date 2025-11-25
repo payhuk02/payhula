@@ -41,7 +41,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useStoreAffiliates } from '@/hooks/useStoreAffiliates';
-import { useStore } from '@/hooks/use-store';
+import { useStore } from '@/hooks/useStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';

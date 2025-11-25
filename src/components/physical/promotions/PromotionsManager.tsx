@@ -63,7 +63,7 @@ import {
   useDeletePromotion,
   ProductPromotion,
 } from '@/hooks/physical/usePromotions';
-import { useStore } from '@/hooks/use-store';
+import { useStore } from '@/hooks/useStore';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Users, ShoppingBag, DollarSign, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
-import { useStore } from "@/hooks/use-store";
+import { useStore } from "@/hooks/useStore";
 import { useCustomers } from "@/hooks/useCustomers";
 import { CreateCustomerDialog } from "@/components/customers/CreateCustomerDialog";
 import { CustomersTable } from "@/components/customers/CustomersTable";

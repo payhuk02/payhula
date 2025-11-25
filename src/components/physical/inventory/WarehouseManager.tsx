@@ -50,7 +50,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, MoreVertical, Edit, Trash2, MapPin, Check, Search, X, RefreshCw, Warehouse as WarehouseIcon, Star, Package } from 'lucide-react';
 import { useWarehouses, useCreateWarehouse, useUpdateWarehouse, useDeleteWarehouse } from '@/hooks/physical/useAdvancedInventory';
-import { useStore } from '@/hooks/use-store';
+import { useStore } from '@/hooks/useStore';
 import { Warehouse } from '@/hooks/physical/useAdvancedInventory';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useDebounce } from '@/hooks/useDebounce';

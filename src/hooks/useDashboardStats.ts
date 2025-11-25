@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useStore } from "./use-store";
+import { useStore } from "./useStore";
 import { logger } from '@/lib/logger';
 
 export interface DashboardStats {
@@ -184,6 +184,17 @@ export const useDashboardStats = () => {
       const customersCount = customersResult.status === 'fulfilled' ? customersResult.value.count || 0 : 0;
       const recentOrders = recentOrdersResult.status === 'fulfilled' ? recentOrdersResult.value.data || [] : [];
       const topProducts = topProductsResult.status === 'fulfilled' ? topProductsResult.value.data || [] : [];
+
+      // Log pour déboguer
+      if (productsResult.status === 'rejected') {
+        logger.error('❌ [useDashboardStats] Erreur lors de la récupération des produits:', productsResult.reason);
+      } else {
+        logger.info('✅ [useDashboardStats] Produits récupérés:', {
+          count: products.length,
+          storeId: store.id,
+          products: products.map(p => ({ id: p.id, name: p.name || 'N/A', is_active: p.is_active }))
+        });
+      }
 
       // Calculer les statistiques de base
       const totalProducts = products.length;

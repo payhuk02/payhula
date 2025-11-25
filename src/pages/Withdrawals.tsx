@@ -10,7 +10,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useStore } from '@/hooks/use-store';
+import { useStore } from '@/hooks/useStore';
 import { useStoreEarnings } from '@/hooks/useStoreEarnings';
 import { useStoreWithdrawals } from '@/hooks/useStoreWithdrawals';
 import { EarningsBalance } from '@/components/store/EarningsBalance';

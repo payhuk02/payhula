@@ -31,7 +31,7 @@ import {
   Clock,
   DollarSign,
 } from "lucide-react";
-import { useStore } from "@/hooks/use-store";
+import { useStore } from "@/hooks/useStore";
 import { useOrders, SortColumn, SortDirection } from "@/hooks/useOrders";
 import { CreateOrderDialog } from "@/components/orders/CreateOrderDialog";
 import { OrdersList } from "@/components/orders/OrdersList";

@@ -39,7 +39,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertTriangle, CheckCircle2, Package, X, Search, RefreshCw, TrendingDown, AlertCircle, Clock } from '@/components/icons';
 import { useStockAlerts, useResolveStockAlert } from '@/hooks/physical/useAdvancedInventory';
-import { useStore } from '@/hooks/use-store';
+import { useStore } from '@/hooks/useStore';
 import { StockAlert } from '@/hooks/physical/useAdvancedInventory';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

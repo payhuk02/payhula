@@ -17,7 +17,7 @@ import {
   Zap
 } from "lucide-react";
 import { useAdvancedDashboardStats } from "@/hooks/useAdvancedDashboardStats";
-import { useStore } from "@/hooks/use-store";
+import { useStore } from "@/hooks/useStore";
 import { AdvancedStatsCard, RevenueChart, OrdersChart, ActivityFeed, PerformanceMetrics } from "@/components/dashboard/AdvancedDashboardComponents";
 import { QuickActions, NotificationCard, GoalProgress, RecentActivity, DashboardControls } from "@/components/dashboard/InteractiveWidgets";
 import { Button } from "@/components/ui/button";

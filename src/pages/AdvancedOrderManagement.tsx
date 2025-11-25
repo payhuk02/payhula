@@ -32,7 +32,8 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
-import { useStore, Store } from "@/hooks/use-store";
+import { useStore } from "@/hooks/useStore";
+import type { Store } from "@/hooks/useStore";
 import { useAdvancedPayments } from "@/hooks/useAdvancedPayments";
 import { useOrders } from "@/hooks/useOrders";
 import AdvancedPaymentsComponent from "@/components/payments/AdvancedPaymentsComponent";

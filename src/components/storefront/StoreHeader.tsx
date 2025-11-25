@@ -1,4 +1,4 @@
-import { Store } from "@/hooks/use-store";
+import type { Store } from "@/hooks/useStore";
 import { Users } from '@/components/icons';
 import { Check } from 'lucide-react';
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
