@@ -46,6 +46,7 @@
     "verify:all": "npm run verify:responsive && npm run audit:responsive",
     "verify:routes": "tsx scripts/verify-routes.ts",
     "analyze:bundle": "npm run build && node scripts/analyze-bundle.js",
+    "analyze:bundle:quick": "node scripts/analyze-bundle.js",
     "setup:husky": "node scripts/setup-husky.js",
     "prepare": "husky install || true",
     "build:analyze": "npm run build -- --mode analyze",

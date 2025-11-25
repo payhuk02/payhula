@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
@@ -12,7 +12,6 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { usePrefetch } from "@/hooks/usePrefetch";
 import { PerformanceOptimizer } from "@/components/optimization/PerformanceOptimizer";
-import { useGlobalKeyboardShortcuts } from "@/hooks/useKeyboardNavigation";
 import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
 import { CrispChat } from "@/components/chat/CrispChat";
 import { Require2FABanner } from "@/components/auth/Require2FABanner";
@@ -25,6 +24,9 @@ import { initWebVitals } from "@/lib/web-vitals";
 import * as Sentry from "@sentry/react";
 import { logger } from "@/lib/logger";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
+import { startAlertMonitoring } from "@/lib/sentry-alerts";
+import { createOptimizedQueryClient, setupCacheCleanup, optimizeLocalStorageCache } from "@/lib/cache-optimization";
+import { updateSEOMetadata } from "@/lib/seo-enhancements";
 
 // Composant de chargement pour le lazy loading
 const LoadingFallback = () => (
@@ -323,6 +325,37 @@ const OldProductRouteRedirect = () => {
   return <Navigate to={`/stores/${slug}/products/${productSlug}`} replace />;
 };
 
+/**
+ * Composant d'initialisation de l'application
+ * Configure les alertes, le cache et le SEO
+ */
+const AppInitializer = ({ queryClient }: { queryClient: ReturnType<typeof createOptimizedQueryClient> }) => {
+  useEffect(() => {
+    // Démarrer le monitoring des alertes Sentry
+    const stopAlertMonitoring = startAlertMonitoring(60000); // Vérifier toutes les minutes
+    
+    // Configurer le nettoyage automatique du cache
+    const stopCacheCleanup = setupCacheCleanup(queryClient, 600000); // Nettoyer toutes les 10 minutes
+    
+    // Optimiser le cache localStorage au démarrage
+    optimizeLocalStorageCache();
+    
+    // Mettre à jour les métadonnées SEO par défaut
+    updateSEOMetadata({
+      title: 'Payhuk - Plateforme E-commerce Multi-boutiques',
+      description: 'Créez et gérez votre boutique en ligne avec Payhuk',
+    });
+    
+    // Cleanup
+    return () => {
+      stopAlertMonitoring();
+      stopCacheCleanup();
+    };
+  }, [queryClient]);
+  
+  return null;
+};
+
 const AppContent = () => {
   useScrollRestoration();
   useDarkMode(); // Active le mode sombre globalement
@@ -591,57 +624,8 @@ const AppContent = () => {
 };
 
 // Configuration optimisée de React Query pour les performances
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // Cache optimisé par type de données
-      staleTime: 5 * 60 * 1000, // 5 minutes par défaut
-      gcTime: 10 * 60 * 1000, // 10 minutes (garbage collection)
-      // Retry automatique en cas d'erreur
-      retry: 2,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      // Refetch intelligent
-      refetchOnWindowFocus: true,
-      refetchOnReconnect: true,
-      refetchOnMount: false, // Ne pas refetch si les données sont fraîches
-      // Performance optimizations
-      structuralSharing: true, // Optimise les re-renders
-      // Optimistic updates
-      networkMode: 'online', // Ne query que si online
-    },
-    mutations: {
-      // Retry avec exponential backoff pour les mutations
-      // Note: Les hooks utilisant useMutationWithRetry auront leur propre config
-      retry: (failureCount, error) => {
-        // Retry simple sans dépendance circulaire
-        if (failureCount >= 2) return false; // Max 2 retries
-        // Ne pas retry sur les erreurs 4xx (erreurs client)
-        if (error && typeof error === 'object' && 'status' in error) {
-          const status = (error as { status: number }).status;
-          if (status >= 400 && status < 500) return false;
-        }
-        return true;
-      },
-      retryDelay: (attemptIndex) => {
-        // Délai exponentiel : 1s, 2s, 4s...
-        return Math.min(1000 * Math.pow(2, attemptIndex), 30000);
-      },
-      // Optimistic UI updates
-      onMutate: async () => {
-        // Cancel outgoing queries
-        await queryClient.cancelQueries();
-      },
-      onError: (error) => {
-        logger.error('Mutation Error', { error });
-        // Rollback optimistic update on error
-      },
-      onSettled: () => {
-        // Refetch after mutation
-        queryClient.invalidateQueries();
-      },
-    },
-  },
-});
+// Utilise la fonction optimisée avec stratégies de cache intelligentes
+const queryClient = createOptimizedQueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -656,6 +640,7 @@ const App = () => (
       >
         <AuthProvider>
           <StoreProvider>
+            <AppInitializer queryClient={queryClient} />
             <AppContent />
           </StoreProvider>
         </AuthProvider>
