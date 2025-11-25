@@ -41,7 +41,7 @@ export interface ErrorLog {
  */
 export function logError(error: Error, context: ErrorLogContext = {}): void {
   // S'assurer que l'erreur a un message valide
-  const errorMessage = error?.message || 'Unknown error';
+  let errorMessage = error?.message || 'Unknown error';
   const errorStack = error?.stack;
   const errorName = error?.name || 'Error';
 

@@ -64,7 +64,7 @@ export default function AdminErrorMonitoring() {
 
   // Filtrer les logs
   useEffect(() => {
-    const filtered = [...errorLogs];
+    let filtered = [...errorLogs];
 
     // Filtre par recherche
     if (searchQuery) {
