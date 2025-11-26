@@ -126,69 +126,96 @@ export const useCustomerPhysicalOrders = () => {
         );
       });
 
-      // Pour chaque commande, récupérer les shipments et returns
-      const ordersWithDetails = await Promise.all(
-        physicalOrders.map(async (order: any) => {
-          // Récupérer les shipments
-          const { data: shipments } = await supabase
-            .from('shipments')
-            .select('id, tracking_number, tracking_url, status, carrier_id, estimated_delivery, actual_delivery')
-            .eq('order_id', order.id);
+      if (physicalOrders.length === 0) {
+        return [];
+      }
 
-          // Récupérer le nom du carrier si disponible
-          const shipmentsWithCarrier = await Promise.all(
-            (shipments || []).map(async (shipment: any) => {
-              if (shipment.carrier_id) {
-                const { data: carrier } = await supabase
-                  .from('shipping_carriers')
-                  .select('name, code')
-                  .eq('id', shipment.carrier_id)
-                  .single();
+      // OPTIMIZED: Fetch all shipments and returns in batch (N+1 fix)
+      const orderIds = physicalOrders.map((order: any) => order.id);
 
-                return {
-                  ...shipment,
-                  carrier_name: carrier?.name || carrier?.code || undefined,
-                };
-              }
-              return shipment;
-            })
-          );
+      // Fetch all shipments for all orders in one query
+      const { data: allShipments } = await supabase
+        .from('shipments')
+        .select('id, order_id, tracking_number, tracking_url, status, carrier_id, estimated_delivery, actual_delivery')
+        .in('order_id', orderIds);
 
-          // Récupérer les returns
-          const { data: returns } = await supabase
-            .from('product_returns')
-            .select('id, return_number, status, return_reason, requested_at')
-            .eq('order_id', order.id)
-            .order('requested_at', { ascending: false });
+      // Fetch all returns for all orders in one query
+      const { data: allReturns } = await supabase
+        .from('product_returns')
+        .select('id, order_id, return_number, status, return_reason, requested_at')
+        .in('order_id', orderIds)
+        .order('requested_at', { ascending: false });
 
-          return {
-            id: order.id,
-            order_number: order.order_number || order.id,
-            store_id: order.store_id,
-            customer_id: order.customer_id,
-            total_amount: order.total_amount,
-            currency: order.currency || 'XOF',
-            payment_status: order.payment_status,
-            status: order.status,
-            shipping_address: order.shipping_address || {},
-            created_at: order.created_at,
-            delivered_at: order.delivered_at,
-            order_items: (order.order_items || []).map((item: any) => ({
-              id: item.id,
-              product_id: item.product_id,
-              product_name: item.products?.name || 'Produit inconnu',
-              product_image_url: item.products?.image_url,
-              variant_id: item.variant_id,
-              variant_name: item.physical_product_variants?.name,
-              quantity: item.quantity,
-              price: item.price,
-              total: item.price * item.quantity,
-            })),
-            shipments: shipmentsWithCarrier,
-            returns: returns || [],
-          } as CustomerPhysicalOrder;
-        })
+      // Get unique carrier IDs
+      const carrierIds = [...new Set((allShipments || [])
+        .map((s: any) => s.carrier_id)
+        .filter(Boolean))];
+
+      // Fetch all carriers in one query (N+1 fix)
+      const { data: allCarriers } = carrierIds.length > 0
+        ? await supabase
+            .from('shipping_carriers')
+            .select('id, name, code')
+            .in('id', carrierIds)
+        : { data: [] };
+
+      // Create a map for quick lookup
+      const carriersMap = new Map(
+        (allCarriers || []).map((c: any) => [c.id, c])
       );
+
+      // Group shipments and returns by order_id
+      const shipmentsByOrder = new Map<string, any[]>();
+      const returnsByOrder = new Map<string, any[]>();
+
+      (allShipments || []).forEach((shipment: any) => {
+        const orderId = shipment.order_id;
+        if (!shipmentsByOrder.has(orderId)) {
+          shipmentsByOrder.set(orderId, []);
+        }
+        shipmentsByOrder.get(orderId)!.push({
+          ...shipment,
+          carrier_name: shipment.carrier_id 
+            ? (carriersMap.get(shipment.carrier_id)?.name || carriersMap.get(shipment.carrier_id)?.code || undefined)
+            : undefined,
+        });
+      });
+
+      (allReturns || []).forEach((returnItem: any) => {
+        const orderId = returnItem.order_id;
+        if (!returnsByOrder.has(orderId)) {
+          returnsByOrder.set(orderId, []);
+        }
+        returnsByOrder.get(orderId)!.push(returnItem);
+      });
+
+      // Map orders with their shipments and returns
+      const ordersWithDetails = physicalOrders.map((order: any) => ({
+        id: order.id,
+        order_number: order.order_number || order.id,
+        store_id: order.store_id,
+        customer_id: order.customer_id,
+        total_amount: order.total_amount,
+        currency: order.currency || 'XOF',
+        payment_status: order.payment_status,
+        status: order.status,
+        shipping_address: order.shipping_address || {},
+        created_at: order.created_at,
+        delivered_at: order.delivered_at,
+        order_items: (order.order_items || []).map((item: any) => ({
+          id: item.id,
+          product_id: item.product_id,
+          product_name: item.products?.name || 'Produit inconnu',
+          product_image_url: item.products?.image_url,
+          variant_id: item.variant_id,
+          variant_name: item.physical_product_variants?.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity,
+        })),
+        shipments: shipmentsByOrder.get(order.id) || [],
+        returns: returnsByOrder.get(order.id) || [],
+      } as CustomerPhysicalOrder));
 
       return ordersWithDetails;
     },

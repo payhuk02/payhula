@@ -70,11 +70,12 @@ export default function PhysicalProductDetail() {
   // Track analytics event
   const { trackView } = useAnalyticsTracking();
 
-  // Fetch product data with store
+  // Fetch product data with store - OPTIMIZED: Single query with all relations
   const { data: product, isLoading } = useQuery({
     queryKey: ['physical-product', productId],
     queryFn: async () => {
-      const { data: productData, error } = await supabase
+      // Fetch product with store in one query
+      const { data: productData, error: productError } = await supabase
         .from('products')
         .select(`
           *,
@@ -88,41 +89,61 @@ export default function PhysicalProductDetail() {
         .eq('id', productId)
         .single();
 
-      if (error) throw error;
+      if (productError) throw productError;
 
-      // Fetch physical product details
-      const { data: physicalData } = await supabase
-        .from('physical_products')
-        .select('*')
-        .eq('product_id', productId)
-        .single();
+      // Fetch all related data in parallel (instead of sequential)
+      const [physicalResult, variantsResult, inventoryResult, sizeChartResult] = await Promise.all([
+        supabase
+          .from('physical_products')
+          .select('*')
+          .eq('product_id', productId)
+          .single(),
+        supabase
+          .from('physical_product_variants')
+          .select('*')
+          .eq('physical_product_id', productData?.id), // Use productData.id if physical_products.id is not available
+        supabase
+          .from('physical_product_inventory')
+          .select('*')
+          .eq('product_id', productId), // Use product_id directly if available
+        supabase
+          .from('product_size_charts')
+          .select('size_chart_id')
+          .eq('product_id', productId)
+          .limit(1)
+          .maybeSingle(), // Use maybeSingle to avoid error if no size chart
+      ]);
 
-      // Fetch variants
-      const { data: variants } = await supabase
-        .from('physical_product_variants')
-        .select('*')
-        .eq('physical_product_id', physicalData?.id);
+      // Get physical product ID for variants and inventory if needed
+      const physicalData = physicalResult.data;
+      const physicalId = physicalData?.id;
 
-      // Fetch inventory
-      const { data: inventory } = await supabase
-        .from('physical_product_inventory')
-        .select('*')
-        .eq('physical_product_id', physicalData?.id);
+      // If variants/inventory need physical_product_id, refetch with correct ID
+      let variants = variantsResult.data || [];
+      let inventory = inventoryResult.data || [];
 
-      // Fetch size chart
-      const { data: sizeChartMapping } = await supabase
-        .from('product_size_charts')
-        .select('size_chart_id')
-        .eq('product_id', productId)
-        .limit(1)
-        .single();
+      if (physicalId && (!variants.length || !inventory.length)) {
+        // Refetch with physical_product_id if initial query didn't work
+        const [variantsRefetch, inventoryRefetch] = await Promise.all([
+          supabase
+            .from('physical_product_variants')
+            .select('*')
+            .eq('physical_product_id', physicalId),
+          supabase
+            .from('physical_product_inventory')
+            .select('*')
+            .eq('physical_product_id', physicalId),
+        ]);
+        variants = variantsRefetch.data || variants;
+        inventory = inventoryRefetch.data || inventory;
+      }
 
       return {
         ...productData,
         physical: physicalData,
-        variants: variants || [],
-        inventory: inventory || [],
-        size_chart_id: sizeChartMapping?.size_chart_id || null,
+        variants,
+        inventory,
+        size_chart_id: sizeChartResult.data?.size_chart_id || null,
         store: productData.stores,
       };
     },

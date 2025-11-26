@@ -127,15 +127,40 @@ export default function MyProfile() {
     fetchUser();
   }, []);
 
-  // Fetch addresses
+  // Fetch addresses from database
   const { data: savedAddresses } = useQuery({
     queryKey: ['customer-addresses', user?.id],
     queryFn: async (): Promise<ShippingAddress[]> => {
       if (!user?.id) return [];
       
-      // TODO: Create addresses table if doesn't exist
-      // For now, return empty array
-      return [];
+      const { data, error } = await supabase
+        .from('customer_addresses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('is_default', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        logger.error('Error fetching addresses:', error);
+        // If table doesn't exist yet, return empty array
+        if (error.code === '42P01') {
+          return [];
+        }
+        throw error;
+      }
+
+      return (data || []).map((addr) => ({
+        id: addr.id,
+        full_name: addr.full_name,
+        phone: addr.phone || '',
+        address_line1: addr.address_line1,
+        address_line2: addr.address_line2 || '',
+        city: addr.city,
+        postal_code: addr.postal_code || '',
+        country: addr.country || 'BF',
+        state: addr.state || '',
+        is_default: addr.is_default || false,
+      }));
     },
     enabled: !!user?.id,
   });
@@ -175,8 +200,114 @@ export default function MyProfile() {
     },
   });
 
+  // Save address mutation
+  const saveAddressMutation = useMutation({
+    mutationFn: async (addressData: ShippingAddress & { user_id: string }) => {
+      if (editingAddress && editingAddress.id) {
+        // Update existing address
+        const { error } = await supabase
+          .from('customer_addresses')
+          .update({
+            full_name: addressData.full_name,
+            phone: addressData.phone || null,
+            address_line1: addressData.address_line1,
+            address_line2: addressData.address_line2 || null,
+            city: addressData.city,
+            postal_code: addressData.postal_code || null,
+            country: addressData.country || 'BF',
+            state: addressData.state || null,
+            is_default: addressData.is_default || false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingAddress.id)
+          .eq('user_id', addressData.user_id);
+
+        if (error) throw error;
+        return { id: editingAddress.id };
+      } else {
+        // Insert new address
+        const { data, error } = await supabase
+          .from('customer_addresses')
+          .insert({
+            user_id: addressData.user_id,
+            full_name: addressData.full_name,
+            phone: addressData.phone || null,
+            address_line1: addressData.address_line1,
+            address_line2: addressData.address_line2 || null,
+            city: addressData.city,
+            postal_code: addressData.postal_code || null,
+            country: addressData.country || 'BF',
+            state: addressData.state || null,
+            is_default: addressData.is_default || false,
+          })
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer-addresses', user?.id] });
+      toast({
+        title: editingAddress ? 'Adresse mise à jour' : 'Adresse ajoutée',
+        description: 'Votre adresse a été sauvegardée avec succès',
+      });
+      logger.info('Address saved successfully');
+    },
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde';
+      logger.error('Error saving address:', error);
+      toast({
+        title: 'Erreur',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete address mutation
+  const deleteAddressMutation = useMutation({
+    mutationFn: async (addressId: string) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      const { error } = await supabase
+        .from('customer_addresses')
+        .delete()
+        .eq('id', addressId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer-addresses', user?.id] });
+      toast({
+        title: 'Adresse supprimée',
+        description: 'L\'adresse a été supprimée avec succès',
+      });
+    },
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la suppression';
+      logger.error('Error deleting address:', error);
+      toast({
+        title: 'Erreur',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Save address
   const handleSaveAddress = useCallback(() => {
+    if (!user?.id) {
+      toast({
+        title: 'Erreur',
+        description: 'Vous devez être connecté pour sauvegarder une adresse',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!addressForm.full_name || !addressForm.address_line1 || !addressForm.city) {
       toast({
         title: 'Formulaire incomplet',
@@ -186,18 +317,10 @@ export default function MyProfile() {
       return;
     }
 
-    if (editingAddress) {
-      // Update existing
-      setAddresses(addresses.map(addr => 
-        addr.id === editingAddress.id ? { ...addressForm, id: editingAddress.id } : addr
-      ));
-      logger.info('Address updated:', editingAddress.id);
-    } else {
-      // Add new
-      const newId = Date.now().toString();
-      setAddresses([...addresses, { ...addressForm, id: newId }]);
-      logger.info('Address added:', newId);
-    }
+    saveAddressMutation.mutate({
+      ...addressForm,
+      user_id: user.id,
+    });
 
     setAddressForm({
       full_name: '',
@@ -219,11 +342,8 @@ export default function MyProfile() {
   }, [addressForm, editingAddress, addresses, toast]);
 
   const handleDeleteAddress = useCallback((id: string) => {
-    setAddresses(addresses.filter(addr => addr.id !== id));
-    toast({
-      title: 'Adresse supprimée',
-      description: 'L\'adresse a été supprimée avec succès',
-    });
+    if (!id) return;
+    deleteAddressMutation.mutate(id);
     logger.info('Address deleted:', id);
   }, [addresses, toast]);
 
