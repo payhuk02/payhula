@@ -383,43 +383,57 @@ const ServiceBookingCalendar = ({
       </CardHeader>
       <CardContent>
         <div className="h-[600px]">
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            view={view}
-            onView={setView}
-            date={date}
-            onNavigate={setDate}
-            messages={messages}
-            culture="fr"
-            eventPropGetter={eventStyleGetter}
-            slotPropGetter={slotStyleGetter}
-            dayPropGetter={dayPropGetter}
-            onSelectSlot={handleSelectSlot}
-            onSelectEvent={handleSelectEvent}
-            onEventDrop={handleEventDrop}
-            onEventResize={handleEventResize}
-            selectable={enableSelection}
-            resizable={enableDragDrop}
-            draggableAccessor={() => enableDragDrop}
-            min={minTime}
-            max={maxTime}
-            step={step}
-            timeslots={timeslots}
-            components={{
-              toolbar: CustomToolbar,
-              event: EventComponent,
+          <LazyCalendarWrapper>
+            {(calendar) => {
+              const localizer = calendar.dateFnsLocalizer({
+                format,
+                parse,
+                startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
+                getDay,
+                locales: { 'fr': fr },
+              });
+
+              return (
+                <calendar.Calendar
+                  localizer={localizer}
+                  events={events}
+                  startAccessor="start"
+                  endAccessor="end"
+                  view={view as any}
+                  onView={setView}
+                  date={date}
+                  onNavigate={setDate}
+                  messages={messages}
+                  culture="fr"
+                  eventPropGetter={eventStyleGetter}
+                  slotPropGetter={slotStyleGetter}
+                  dayPropGetter={dayPropGetter}
+                  onSelectSlot={handleSelectSlot}
+                  onSelectEvent={handleSelectEvent}
+                  onEventDrop={handleEventDrop}
+                  onEventResize={handleEventResize}
+                  selectable={enableSelection}
+                  resizable={enableDragDrop}
+                  draggableAccessor={() => enableDragDrop}
+                  min={minTime}
+                  max={maxTime}
+                  step={step}
+                  timeslots={timeslots}
+                  components={{
+                    toolbar: CustomToolbar,
+                    event: EventComponent,
+                  }}
+                  formats={{
+                    timeGutterFormat: 'HH:mm',
+                    eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
+                      `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`,
+                    agendaTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
+                      `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`,
+                  }}
+                />
+              );
             }}
-            formats={{
-              timeGutterFormat: 'HH:mm',
-              eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
-                `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`,
-              agendaTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
-                `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`,
-            }}
-          />
+          </LazyCalendarWrapper>
         </div>
         
         {showLegend && <Legend />}
