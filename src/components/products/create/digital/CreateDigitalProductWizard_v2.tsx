@@ -41,6 +41,11 @@ import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
 import { useWizardServerValidation } from '@/hooks/useWizardServerValidation';
+import type { 
+  DigitalProductFormData, 
+  DigitalProductFormDataUpdate,
+  DigitalProductDownloadableFile 
+} from '@/types/digital-product-form';
 
 // Step components
 import { DigitalBasicInfoForm } from './DigitalBasicInfoForm';
@@ -129,7 +134,7 @@ const getDefaultFormData = () => ({
   is_active: true,
 });
 
-const mergeFormDataWithDefaults = (data: any) => {
+const mergeFormDataWithDefaults = (data: Partial<DigitalProductFormData> | null | undefined): DigitalProductFormData => {
   const defaults = getDefaultFormData();
   const draft = data || {};
 
@@ -146,7 +151,7 @@ const mergeFormDataWithDefaults = (data: any) => {
     },
     downloadable_files: draft.downloadable_files || [],
     faqs: draft.faqs || [],
-  };
+  } as DigitalProductFormData;
 };
 
 
@@ -236,12 +241,12 @@ export const CreateDigitalProductWizard = ({
   });
   const storeSlug = propsStoreSlug || store?.slug;
 
-  const [formData, setFormData] = useState<any>(() => getDefaultFormData());
+  const [formData, setFormData] = useState<DigitalProductFormData>(() => getDefaultFormData());
 
   /**
    * Update form data with auto-save
    */
-  const updateFormData = useCallback((updates: any) => {
+  const updateFormData = useCallback((updates: DigitalProductFormDataUpdate) => {
     // Log pour diagnostiquer le problème d'espacement
     if (updates.name !== undefined) {
       logger.info('updateFormData - name update', {
@@ -252,7 +257,7 @@ export const CreateDigitalProductWizard = ({
       });
     }
     
-    setFormData((prev: any) => {
+    setFormData((prev: DigitalProductFormData) => {
       const newData = {
         ...prev,
         ...updates,
@@ -298,7 +303,7 @@ export const CreateDigitalProductWizard = ({
   /**
    * Auto-save draft
    */
-  const handleAutoSave = useCallback(async (data?: any) => {
+  const handleAutoSave = useCallback(async (data?: DigitalProductFormData) => {
     const dataToSave = data || formData;
     
     // Ne pas auto-save si pas de nom
@@ -355,7 +360,7 @@ export const CreateDigitalProductWizard = ({
    */
   useEffect(() => {
     if (storeId && !formData.store_id) {
-      setFormData((prev: any) => ({ ...prev, store_id: storeId }));
+      setFormData((prev: DigitalProductFormData) => ({ ...prev, store_id: storeId }));
     }
   }, [storeId, formData.store_id]);
 
@@ -411,7 +416,7 @@ export const CreateDigitalProductWizard = ({
           return false;
         }
         
-        const validationData: any = {
+        const validationData: Partial<DigitalProductFormData> = {
           name: nameValue,
           price: priceValue,
         };
@@ -586,8 +591,9 @@ export const CreateDigitalProductWizard = ({
         // Les étapes 3-6 sont déjà gérées en haut de la fonction
         return true;
       }
-    } catch (error: any) {
-      logger.error('Erreur lors du chargement des modules de validation', { error, step, errorMessage: error?.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Erreur lors du chargement des modules de validation', { error, step, errorMessage });
       toast({
         title: '❌ Erreur',
         description: 'Une erreur est survenue lors de la validation. Veuillez réessayer.',
@@ -630,11 +636,13 @@ export const CreateDigitalProductWizard = ({
         logger.warn('Validation échouée, navigation bloquée', { step: currentStep });
         // Le toast est déjà affiché par validateStep
       }
-    } catch (error: any) {
-      logger.error('Erreur lors de la validation/navigation', { error, step: currentStep, errorMessage: error?.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Erreur lors de la validation/navigation', { error, step: currentStep, errorMessage });
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         title: '❌ Erreur',
-        description: error?.message || 'Une erreur est survenue lors de la validation. Veuillez réessayer.',
+        description: errorMessage || 'Une erreur est survenue lors de la validation. Veuillez réessayer.',
         variant: 'destructive',
       });
     }
@@ -782,7 +790,7 @@ export const CreateDigitalProductWizard = ({
       }
 
       // 2. Calculate file info
-      const totalSizeMB = formData.downloadable_files?.reduce((sum: number, file: any) => {
+      const totalSizeMB = formData.downloadable_files?.reduce((sum: number, file: DigitalProductDownloadableFile) => {
         return sum + (file.size / (1024 * 1024));
       }, 0) || 0;
 
@@ -858,7 +866,7 @@ export const CreateDigitalProductWizard = ({
 
       // 4. Create digital_product_files
       if (formData.downloadable_files && formData.downloadable_files.length > 0) {
-        const filesData = formData.downloadable_files.map((file: any, index: number) => ({
+        const filesData = formData.downloadable_files.map((file: DigitalProductDownloadableFile, index: number) => ({
           digital_product_id: digitalProduct.id,
           name: file.name,
           file_url: file.url,
@@ -923,8 +931,9 @@ export const CreateDigitalProductWizard = ({
           } else {
             logger.info('Free preview product created', { previewProductId });
           }
-        } catch (error: any) {
-          logger.error('Exception creating preview product', { error: error.message });
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          logger.error('Exception creating preview product', { error: errorMessage });
           // Ne pas faire échouer la création du produit principal
         }
       }
@@ -949,8 +958,10 @@ export const CreateDigitalProductWizard = ({
       }
 
       return product;
-    } catch (error) {
-      logger.error('Erreur lors de la sauvegarde du produit', error);
+    } catch (error: unknown) {
+      logger.error('Erreur lors de la sauvegarde du produit', { 
+        error: error instanceof Error ? error.message : String(error) 
+      });
       throw error;
     }
   }, [formData, storeId]);
@@ -981,11 +992,12 @@ export const CreateDigitalProductWizard = ({
         // Fallback vers la liste des produits digitaux si storeSlug n'est pas disponible
         navigate('/dashboard/digital-products', { replace: true });
       }
-    } catch (error: any) {
-      logger.error('Erreur lors de la publication', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Erreur lors de la publication', { error: errorMessage });
       toast({
         title: '❌ Erreur',
-        description: error.message || 'Une erreur est survenue lors de la publication',
+        description: errorMessage || 'Une erreur est survenue lors de la publication',
         variant: 'destructive',
       });
     } finally {
@@ -1015,11 +1027,12 @@ export const CreateDigitalProductWizard = ({
         // Rediriger vers la liste des produits digitaux
         navigate('/dashboard/digital-products', { replace: true });
       }
-    } catch (error: any) {
-      logger.error('Erreur lors de la sauvegarde du brouillon', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Erreur lors de la sauvegarde du brouillon', { error: errorMessage });
       toast({
         title: '❌ Erreur',
-        description: error.message || 'Impossible de sauvegarder le brouillon',
+        description: errorMessage || 'Impossible de sauvegarder le brouillon',
         variant: 'destructive',
       });
     } finally {
