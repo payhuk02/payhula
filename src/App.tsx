@@ -27,6 +27,7 @@ import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { startAlertMonitoring } from "@/lib/sentry-alerts";
 import { createOptimizedQueryClient, setupCacheCleanup, optimizeLocalStorageCache } from "@/lib/cache-optimization";
 import { updateSEOMetadata } from "@/lib/seo-enhancements";
+import { SkipLink } from "@/components/accessibility/SkipLink";
 
 // Composant de chargement pour le lazy loading
 const LoadingFallback = () => (
@@ -393,6 +394,7 @@ const AppContent = () => {
         fallback={<ErrorFallbackComponent />} 
         showDialog
       >
+        <SkipLink />
         <PerformanceOptimizer />
       <LoadingBar />
       <CurrencyRatesInitializer />
