@@ -6,7 +6,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCustomerPurchasedProducts } from '@/hooks/digital/useCustomerPurchasedProducts';
 import { useUserDownloads } from '@/hooks/digital/useDownloads';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LazyRechartsWrapper } from '@/components/charts/LazyRechartsWrapper';
 import { Package, Download, Key, TrendingUp, DollarSign, Calendar } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, subDays, startOfDay } from 'date-fns';
@@ -143,15 +143,19 @@ export const DigitalProductStats = () => {
             <CardDescription>Évolution de vos téléchargements</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={downloadsChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="downloads" fill="#0088FE" />
-              </BarChart>
-            </ResponsiveContainer>
+            <LazyRechartsWrapper>
+              {(recharts) => (
+                <recharts.ResponsiveContainer width="100%" height={300}>
+                  <recharts.BarChart data={downloadsChartData}>
+                    <recharts.CartesianGrid strokeDasharray="3 3" />
+                    <recharts.XAxis dataKey="date" />
+                    <recharts.YAxis />
+                    <recharts.Tooltip />
+                    <recharts.Bar dataKey="downloads" fill="#0088FE" />
+                  </recharts.BarChart>
+                </recharts.ResponsiveContainer>
+              )}
+            </LazyRechartsWrapper>
           </CardContent>
         </Card>
 
@@ -162,25 +166,29 @@ export const DigitalProductStats = () => {
             <CardDescription>Vos produits digitaux par catégorie</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={typeChartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {typeChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <LazyRechartsWrapper>
+              {(recharts) => (
+                <recharts.ResponsiveContainer width="100%" height={300}>
+                  <recharts.PieChart>
+                    <recharts.Pie
+                      data={typeChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }: { name: string; percent: number }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {typeChartData.map((entry, index) => (
+                        <recharts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </recharts.Pie>
+                    <recharts.Tooltip />
+                  </recharts.PieChart>
+                </recharts.ResponsiveContainer>
+              )}
+            </LazyRechartsWrapper>
           </CardContent>
         </Card>
       </div>

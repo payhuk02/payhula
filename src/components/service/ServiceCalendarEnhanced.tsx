@@ -7,10 +7,9 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import { Calendar, dateFnsLocalizer, View, Views } from 'react-big-calendar';
 import { format, parse, startOfWeek, endOfWeek, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { LazyCalendarWrapper } from '@/components/calendar/LazyCalendarWrapper';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,18 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
-// Setup localizer
-const locales = {
-  'fr': fr,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
-  getDay,
-  locales,
-});
+// Localizer will be created inside the component with lazy-loaded calendar
 
 // Messages en français
 const messages = {
@@ -82,7 +70,7 @@ export const ServiceCalendarEnhanced = ({
   maxDate,
   disabledDates = [],
 }: ServiceCalendarEnhancedProps) => {
-  const [view, setView] = useState<View>(Views.MONTH);
+  const [view, setView] = useState<string>('month');
   const [date, setDate] = useState(selectedDate || new Date());
 
   // Fetch service product ID
@@ -294,28 +282,42 @@ export const ServiceCalendarEnhanced = ({
       </CardHeader>
       <CardContent>
         <div className="h-[600px]">
-          <Calendar
-            localizer={localizer}
-            events={calendarEvents || []}
-            startAccessor="start"
-            endAccessor="end"
-            view={view}
-            onView={setView}
-            date={date}
-            onNavigate={setDate}
-            onSelectEvent={handleSelectEvent}
-            onSelectSlot={handleSelectSlot}
-            selectable
-            eventPropGetter={eventStyleGetter}
-            messages={messages}
-            step={30}
-            timeslots={2}
-            min={new Date(0, 0, 0, 8, 0, 0)}
-            max={new Date(0, 0, 0, 20, 0, 0)}
-            defaultDate={new Date()}
-            popup
-            className="rbc-calendar"
-          />
+          <LazyCalendarWrapper>
+            {(calendar) => {
+              const localizer = calendar.dateFnsLocalizer({
+                format,
+                parse,
+                startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
+                getDay,
+                locales: { 'fr': fr },
+              });
+
+              return (
+                <calendar.Calendar
+                  localizer={localizer}
+                  events={calendarEvents || []}
+                  startAccessor="start"
+                  endAccessor="end"
+                  view={view as any}
+                  onView={setView}
+                  date={date}
+                  onNavigate={setDate}
+                  onSelectEvent={handleSelectEvent}
+                  onSelectSlot={handleSelectSlot}
+                  selectable
+                  eventPropGetter={eventStyleGetter}
+                  messages={messages}
+                  step={30}
+                  timeslots={2}
+                  min={new Date(0, 0, 0, 8, 0, 0)}
+                  max={new Date(0, 0, 0, 20, 0, 0)}
+                  defaultDate={new Date()}
+                  popup
+                  className="rbc-calendar"
+                />
+              );
+            }}
+          </LazyCalendarWrapper>
         </div>
 
         {/* Legend */}

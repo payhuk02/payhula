@@ -3,12 +3,9 @@
  * Charge Recharts de manière lazy et expose les composants nécessaires
  */
 
-import { lazy, Suspense, ComponentType, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-
-// Lazy load Recharts
-const RechartsComponents = lazy(() => import('recharts'));
 
 interface LazyRechartsWrapperProps {
   children: (recharts: typeof import('recharts')) => ReactNode;
@@ -42,25 +39,20 @@ const ChartsLoadingFallback = () => (
  * </LazyRechartsWrapper>
  */
 export const LazyRechartsWrapper = ({ children }: LazyRechartsWrapperProps) => {
-  return (
-    <Suspense fallback={<ChartsLoadingFallback />}>
-      <RechartsComponents>
-        {(recharts: typeof import('recharts')) => children(recharts)}
-      </RechartsComponents>
-    </Suspense>
-  );
-};
+  const [recharts, setRecharts] = useState<typeof import('recharts') | null>(null);
+  const [loading, setLoading] = useState(true);
 
-// HOC pour wrapper un composant avec lazy recharts
-export function withLazyRecharts<P extends object>(
-  Component: ComponentType<P & { recharts: typeof import('recharts') }>
-): ComponentType<P> {
-  return function LazyRechartsHOC(props: P) {
-    return (
-      <LazyRechartsWrapper>
-        {(recharts) => <Component {...props} recharts={recharts} />}
-      </LazyRechartsWrapper>
-    );
-  };
-}
+  useEffect(() => {
+    import('recharts').then((module) => {
+      setRecharts(module);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading || !recharts) {
+    return <ChartsLoadingFallback />;
+  }
+
+  return <>{children(recharts)}</>;
+};
 
