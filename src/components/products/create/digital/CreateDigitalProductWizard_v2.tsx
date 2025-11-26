@@ -639,7 +639,6 @@ export const CreateDigitalProductWizard = ({
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Erreur lors de la validation/navigation', { error, step: currentStep, errorMessage });
-      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         title: '❌ Erreur',
         description: errorMessage || 'Une erreur est survenue lors de la validation. Veuillez réessayer.',
