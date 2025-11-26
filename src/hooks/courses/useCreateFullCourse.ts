@@ -32,6 +32,8 @@ interface CreateFullCourseData {
   short_description: string;
   description: string;
   category: string;
+  image_url?: string;
+  images?: string[];
   price: number;
   currency: string;
   promotional_price?: number;
@@ -121,6 +123,8 @@ export const useCreateFullCourse = () => {
             currency: data.currency,
             promotional_price: data.promotional_price || null,
             pricing_model: data.pricing_model || 'one-time',
+            image_url: data.image_url || (data.images && data.images.length > 0 ? data.images[0] : null),
+            images: data.images || (data.image_url ? [data.image_url] : []),
             licensing_type: data.licensing_type || 'standard',
             license_terms: data.license_terms || null,
             is_active: true,

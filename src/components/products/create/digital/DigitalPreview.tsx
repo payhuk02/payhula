@@ -112,13 +112,28 @@ export const DigitalPreview = ({ formData }: DigitalPreviewProps) => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formData.image_url && (
-            <div className="flex justify-center">
-              <img
-                src={formData.image_url}
-                alt={formData.name}
-                className="h-48 w-48 object-cover rounded-lg border"
-              />
+          {((formData.images && formData.images.length > 0) || formData.image_url) && (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Images du produit</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {(formData.images || []).map((imageUrl: string, index: number) => (
+                  <img
+                    key={index}
+                    src={imageUrl}
+                    alt={`${formData.name} - Image ${index + 1}`}
+                    className="h-24 w-full object-cover rounded-lg border"
+                    loading="lazy"
+                  />
+                ))}
+                {formData.image_url && (!formData.images || !formData.images.includes(formData.image_url)) && (
+                  <img
+                    src={formData.image_url}
+                    alt={formData.name}
+                    className="h-24 w-full object-cover rounded-lg border"
+                    loading="lazy"
+                  />
+                )}
+              </div>
             </div>
           )}
 

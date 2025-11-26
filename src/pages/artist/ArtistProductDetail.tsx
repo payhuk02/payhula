@@ -38,7 +38,7 @@ import {
   Award,
   PenTool,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ProductReviewsSummary } from '@/components/reviews/ProductReviewsSummary';
 import { ReviewsList } from '@/components/reviews/ReviewsList';
@@ -52,7 +52,7 @@ import { SEOMeta, ProductSchema } from '@/components/seo';
 import { ArtistCertificateDisplay } from '@/components/artist/ArtistCertificateDisplay';
 import { ShippingInfoDisplay } from '@/components/physical/ShippingInfoDisplay';
 
-export default function ArtistProductDetail() {
+const ArtistProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -306,7 +306,7 @@ export default function ArtistProductDetail() {
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
-          <main className="flex-1 p-8">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
             <div className="space-y-8">
               <Skeleton className="h-10 w-32" />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -325,7 +325,7 @@ export default function ArtistProductDetail() {
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
-          <main className="flex-1 p-8">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
             <Card className="border-destructive">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-2 text-destructive">
@@ -399,7 +399,7 @@ export default function ArtistProductDetail() {
             Retour
           </Button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
             {/* Left: Images */}
             <ProductImages
               images={images}
@@ -426,7 +426,7 @@ export default function ArtistProductDetail() {
                     </Badge>
                   )}
                 </div>
-                <h1 className="text-3xl font-bold mb-2">{product?.name}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2">{product?.name}</h1>
                 {product?.artist?.artwork_title && (
                   <p className="text-lg text-muted-foreground mb-2">
                     {product.artist.artwork_title}
@@ -478,12 +478,12 @@ export default function ArtistProductDetail() {
               )}
 
               {/* Price */}
-              <div className="flex items-center gap-4">
-                <span className="text-3xl font-bold">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                <span className="text-2xl sm:text-3xl font-bold">
                   {product?.price.toLocaleString()} {product?.currency}
                 </span>
                 {product?.promotional_price && (
-                  <span className="text-xl line-through text-gray-500">
+                  <span className="text-lg sm:text-xl line-through text-gray-500">
                     {product.promotional_price.toLocaleString()} {product?.currency}
                   </span>
                 )}
@@ -559,10 +559,10 @@ export default function ArtistProductDetail() {
                   )}
                 </Button>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full min-h-[44px] touch-manipulation"
                     onClick={handleWishlistToggle}
                     disabled={isCheckingWishlist}
                   >
@@ -571,15 +571,17 @@ export default function ArtistProductDetail() {
                     ) : (
                       <Heart className={`h-4 w-4 mr-2 ${isInWishlist ? 'fill-red-500 text-red-500' : ''}`} />
                     )}
-                    {isInWishlist ? 'Retiré' : 'Favori'}
+                    <span className="hidden sm:inline">{isInWishlist ? 'Retiré' : 'Favori'}</span>
+                    <span className="sm:hidden">{isInWishlist ? 'Retiré' : 'Favori'}</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full min-h-[44px] touch-manipulation"
                     onClick={handleShare}
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    Partager
+                    <span className="hidden sm:inline">Partager</span>
+                    <span className="sm:hidden">Partager</span>
                   </Button>
                 </div>
               </div>
@@ -605,8 +607,8 @@ export default function ArtistProductDetail() {
           </div>
 
           {/* Content Tabs */}
-          <Tabs defaultValue="description" className="mt-12 space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+          <Tabs defaultValue="description" className="mt-8 sm:mt-12 space-y-4 sm:space-y-6">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="details">Détails</TabsTrigger>
               <TabsTrigger value="reviews">Avis</TabsTrigger>
@@ -723,5 +725,8 @@ export default function ArtistProductDetail() {
       </div>
     </SidebarProvider>
   );
-}
+};
+
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export default React.memo(ArtistProductDetail);
 

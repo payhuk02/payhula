@@ -138,6 +138,9 @@ export const CreateCourseWizard = ({
     level: '',
     language: 'fr',
     category: '',
+    // Images
+    image_url: '',
+    images: [],
     // Configuration
     price: 0,
     currency: 'XOF',
@@ -419,6 +422,8 @@ export const CreateCourseWizard = ({
       short_description: formData.short_description,
       description: formData.description,
       category: formData.category,
+      image_url: formData.image_url || (formData.images && formData.images.length > 0 ? formData.images[0] : undefined),
+      images: formData.images || (formData.image_url ? [formData.image_url] : []),
       price: formData.price,
       currency: formData.currency,
       promotional_price: formData.promotional_price,

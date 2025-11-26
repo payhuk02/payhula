@@ -3,7 +3,7 @@
  * Date: 28 Janvier 2025
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -21,7 +21,7 @@ interface ArtistAuthenticationConfigProps {
   onUpdate: (data: Partial<ArtistProductFormData>) => void;
 }
 
-export const ArtistAuthenticationConfig = ({ data, onUpdate }: ArtistAuthenticationConfigProps) => {
+const ArtistAuthenticationConfigComponent = ({ data, onUpdate }: ArtistAuthenticationConfigProps) => {
   const { toast } = useToast();
 
   return (
@@ -157,4 +157,7 @@ export const ArtistAuthenticationConfig = ({ data, onUpdate }: ArtistAuthenticat
     </div>
   );
 };
+
+// Optimisation avec React.memo
+export const ArtistAuthenticationConfig = React.memo(ArtistAuthenticationConfigComponent);
 

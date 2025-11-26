@@ -249,36 +249,92 @@ export async function uploadToSupabaseStorage(
     const fileName = generateUniqueFileName(file.name, filePrefix);
     const filePath = path ? `${path}/${fileName}` : fileName;
 
-    // 5. Démarrer l'upload
+    // 5. Démarrer l'upload avec XMLHttpRequest pour contrôler le Content-Type
     if (onProgress) onProgress(10);
 
-    const { data, error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false, // Ne pas écraser les fichiers existants
+    // Obtenir la session pour l'authentification
+    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    if (authError || !session || !session.user) {
+      throw new Error("Non authentifié. Veuillez vous reconnecter.");
+    }
+
+    // Déterminer le Content-Type selon l'extension (plus fiable que file.type)
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    let contentType: string;
+    if (fileExt === 'png') {
+      contentType = 'image/png';
+    } else if (fileExt === 'jpg' || fileExt === 'jpeg') {
+      contentType = 'image/jpeg';
+    } else if (fileExt === 'webp') {
+      contentType = 'image/webp';
+    } else if (fileExt === 'gif') {
+      contentType = 'image/gif';
+    } else if (fileExt === 'svg') {
+      contentType = 'image/svg+xml';
+    } else {
+      // Fallback : utiliser file.type si disponible, sinon image/png par défaut
+      contentType = file.type && file.type.startsWith('image/') ? file.type : 'image/png';
+    }
+
+    const projectUrl = supabase.supabaseUrl;
+    const uploadUrl = `${projectUrl}/storage/v1/object/${bucket}/${filePath}`;
+
+    // Upload via XMLHttpRequest avec Content-Type explicite
+    const uploadData = await new Promise<{ path: string }>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && onProgress) {
+          const progress = 10 + (e.loaded / e.total) * 60; // 10% à 70%
+          onProgress(progress);
+        }
       });
 
-    if (uploadError) {
-      logger.error('Upload error', { error: uploadError, filePath, bucket, fileName: file.name });
-      throw uploadError;
-    }
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            resolve({ path: response.path || filePath });
+          } catch {
+            resolve({ path: filePath });
+          }
+        } else {
+          try {
+            const error = JSON.parse(xhr.responseText);
+            reject(new Error(error.message || error.error || `Erreur upload: ${xhr.statusText} (${xhr.status})`));
+          } catch {
+            reject(new Error(`Erreur upload: ${xhr.statusText} (${xhr.status})`));
+          }
+        }
+      });
 
-    if (!data || !data.path) {
-      logger.error('Upload succeeded but no path returned', { data, filePath, bucket });
-      throw new Error('Upload réussi mais aucun chemin retourné par Supabase');
-    }
+      xhr.addEventListener('error', () => {
+        reject(new Error('Erreur réseau lors de l\'upload'));
+      });
+
+      xhr.addEventListener('abort', () => {
+        reject(new Error('Upload annulé'));
+      });
+
+      xhr.open('POST', uploadUrl);
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+      xhr.setRequestHeader('Content-Type', contentType); // CRITIQUE : Forcer le Content-Type
+      xhr.setRequestHeader('x-upsert', 'false');
+      xhr.setRequestHeader('cache-control', '3600');
+
+      xhr.send(file);
+    });
 
     if (onProgress) onProgress(70);
 
-    // 6. Utiliser le chemin retourné par l'upload (data.path) au lieu de filePath
-    // Cela garantit que nous utilisons le chemin exact où le fichier a été uploadé
-    const actualPath = data.path;
-    logger.info('File uploaded, path returned by Supabase', { 
+    // 6. Utiliser le chemin retourné par l'upload
+    const actualPath = uploadData.path;
+    logger.info('File uploaded via XMLHttpRequest, path returned', { 
       actualPath, 
       filePath, 
       bucket,
-      uploadData: data
+      contentType,
+      fileName: file.name
     });
 
     // 7. Vérifier que le fichier existe vraiment dans le bucket

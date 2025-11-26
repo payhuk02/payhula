@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,9 +8,16 @@ import { AIContentGenerator } from "@/components/products/AIContentGenerator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CurrencySelect } from "@/components/ui/currency-select";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Info, Gift } from '@/components/icons';
+import { Upload, Loader2, Image as ImageIcon, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
+import { uploadToSupabaseStorage } from "@/utils/uploadToSupabase";
+import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
 
 interface CourseBasicInfoFormProps {
   formData: {
@@ -28,6 +36,8 @@ interface CourseBasicInfoFormProps {
     pricing_model?: string;
     create_free_preview?: boolean;
     preview_content_description?: string;
+    image_url?: string;
+    images?: string[];
   };
   onChange: (field: string, value: any) => void;
   errors?: Record<string, string>;
@@ -62,6 +72,9 @@ const CATEGORIES = [
 
 export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseBasicInfoFormProps) => {
   const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
+  const { toast } = useToast();
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   
   // Générer le slug automatiquement à partir du titre
   const generateSlug = (title: string) => {
@@ -78,6 +91,97 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
     if (!formData.slug || formData.slug === generateSlug(formData.title)) {
       onChange('slug', generateSlug(value));
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Validation taille et type pour tous les fichiers
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    const invalidFiles: string[] = [];
+
+    for (const file of Array.from(files)) {
+      if (file.size > maxSize) {
+        invalidFiles.push(`${file.name} (trop volumineux)`);
+        continue;
+      }
+      if (!validTypes.includes(file.type)) {
+        invalidFiles.push(`${file.name} (format non supporté)`);
+        continue;
+      }
+    }
+
+    if (invalidFiles.length > 0) {
+      toast({
+        title: "❌ Fichiers invalides",
+        description: `Les fichiers suivants ne peuvent pas être uploadés : ${invalidFiles.join(', ')}`,
+        variant: "destructive",
+      });
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingImage(true);
+    setUploadProgress(0);
+
+    try {
+      const uploadPromises = Array.from(files).map(async (file, index) => {
+        const { url, error } = await uploadToSupabaseStorage(file, {
+          bucket: 'product-images',
+          path: 'courses',
+          filePrefix: 'course',
+          onProgress: (progress) => {
+            // Calculer la progression globale pour tous les fichiers
+            const fileProgress = (index / files.length) * 100 + (progress / files.length);
+            setUploadProgress(fileProgress);
+          },
+          maxSizeBytes: maxSize,
+          allowedTypes: validTypes,
+        });
+
+        if (error) throw error;
+        return url;
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      const validUrls = uploadedUrls.filter((url): url is string => !!url);
+
+      if (validUrls.length > 0) {
+        const currentImages = formData.images || [];
+        const existingImageUrl = formData.image_url ? [formData.image_url] : [];
+        const allImages = [...existingImageUrl, ...currentImages, ...validUrls].filter((url, index, self) => 
+          self.indexOf(url) === index // Supprimer les doublons
+        );
+        
+        onChange('images', allImages);
+        onChange('image_url', allImages[0] || formData.image_url); // Première image comme image_url
+        
+        toast({
+          title: "✅ Images uploadées",
+          description: `${validUrls.length} image(s) uploadée(s) avec succès`,
+        });
+      }
+    } catch (error) {
+      logger.error('Erreur upload images cours', { error });
+      toast({
+        title: "❌ Erreur d'upload",
+        description: error instanceof Error ? error.message : 'Une erreur est survenue',
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImage(false);
+      setUploadProgress(0);
+      e.target.value = ''; // Reset input
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const currentImages = formData.images || [];
+    const newImages = currentImages.filter((_, i) => i !== index);
+    onChange('images', newImages);
+    onChange('image_url', newImages[0] || ''); // Première image comme image_url
   };
 
   return (
@@ -486,6 +590,146 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
                 Ce cours sera accessible gratuitement par tous les visiteurs
               </p>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Images Upload - Multiple */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Images du cours</CardTitle>
+          <CardDescription>
+            Ajoutez plusieurs images pour présenter votre cours
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="images_upload">Images du cours</Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Ajoutez plusieurs images pour montrer différents aspects de votre cours
+            </p>
+            
+            {/* Grille d'images existantes */}
+            {((formData.images && formData.images.length > 0) || formData.image_url) ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                {/* Afficher les images du tableau images */}
+                {(formData.images || []).map((imageUrl: string, index: number) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={imageUrl}
+                      alt={`Cours ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg border"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => handleRemoveImage(index)}
+                      disabled={uploadingImage}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+                
+                {/* Afficher image_url si elle existe et n'est pas dans images */}
+                {formData.image_url && (!formData.images || !formData.images.includes(formData.image_url)) && (
+                  <div className="relative group">
+                    <img
+                      src={formData.image_url}
+                      alt="Preview cours"
+                      className="w-full h-32 object-cover rounded-lg border"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        onChange('image_url', '');
+                      }}
+                      disabled={uploadingImage}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Zone d'ajout d'image */}
+                <label
+                  htmlFor="images_upload"
+                  className={cn(
+                    "flex flex-col items-center justify-center h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                    uploadingImage ? "bg-muted/70 cursor-not-allowed" : "hover:bg-muted/50",
+                    "border-muted-foreground/25"
+                  )}
+                >
+                  {uploadingImage ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">
+                        {uploadProgress.toFixed(0)}%
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <ImageIcon className="h-6 w-6 text-muted-foreground mb-1" />
+                      <span className="text-xs text-muted-foreground text-center px-2">
+                        Ajouter
+                      </span>
+                    </>
+                  )}
+                </label>
+              </div>
+            ) : (
+              <label
+                htmlFor="images_upload"
+                className={cn(
+                  "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                  uploadingImage ? "bg-muted/70 cursor-not-allowed" : "hover:bg-muted/50",
+                  "border-muted-foreground/25"
+                )}
+              >
+                {uploadingImage ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 text-muted-foreground animate-spin" />
+                    <span className="text-sm text-muted-foreground">
+                      Upload en cours... {uploadProgress.toFixed(0)}%
+                    </span>
+                    <Progress value={uploadProgress} className="w-3/4 h-2 mt-2" />
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                    <span className="text-sm text-muted-foreground">
+                      Cliquez pour uploader des images
+                    </span>
+                    <span className="text-xs text-muted-foreground mt-1">
+                      PNG, JPG, WEBP (max 10MB par image)
+                    </span>
+                  </>
+                )}
+              </label>
+            )}
+            
+            <input
+              id="images_upload"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+              disabled={uploadingImage}
+            />
           </div>
         </CardContent>
       </Card>

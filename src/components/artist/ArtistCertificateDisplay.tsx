@@ -5,6 +5,7 @@
  * Composant pour afficher le certificat d'authenticité sur la page de détail produit
  */
 
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +31,7 @@ interface ArtistCertificateDisplayProps {
   totalEditions?: number | null;
 }
 
-export const ArtistCertificateDisplay = ({
+const ArtistCertificateDisplayComponent = ({
   certificateUrl,
   certificateOfAuthenticity,
   signatureAuthenticated,

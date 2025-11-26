@@ -5,13 +5,13 @@
  * Wizard professionnel pour la création de produits artistes
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useCallback, useEffect, useRef, Suspense, lazy, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Palette,
@@ -27,33 +27,47 @@ import {
   Loader2,
   CreditCard,
   Shield,
+  AlertCircle,
 } from 'lucide-react';
 import { ArtistTypeSelector } from './ArtistTypeSelector';
 import { ArtistBasicInfoForm } from './ArtistBasicInfoForm';
-import { ArtistSpecificForms } from './ArtistSpecificForms';
-import { ArtistShippingConfig } from './ArtistShippingConfig';
-import { ArtistAuthenticationConfig } from './ArtistAuthenticationConfig';
-import { ArtistPreview } from './ArtistPreview';
-import { ProductSEOForm } from '../shared/ProductSEOForm';
-import { ProductFAQForm } from '../shared/ProductFAQForm';
-import { PaymentOptionsForm } from '../shared/PaymentOptionsForm';
+
+// Lazy loading des étapes pour optimiser le bundle size
+const ArtistSpecificForms = lazy(() => import('./ArtistSpecificForms').then(m => ({ default: m.ArtistSpecificForms })));
+const ArtistShippingConfig = lazy(() => import('./ArtistShippingConfig').then(m => ({ default: m.ArtistShippingConfig })));
+const ArtistAuthenticationConfig = lazy(() => import('./ArtistAuthenticationConfig').then(m => ({ default: m.ArtistAuthenticationConfig })));
+const ArtistPreview = lazy(() => import('./ArtistPreview').then(m => ({ default: m.ArtistPreview })));
+const ProductSEOForm = lazy(() => import('../shared/ProductSEOForm').then(m => ({ default: m.ProductSEOForm })));
+const ProductFAQForm = lazy(() => import('../shared/ProductFAQForm').then(m => ({ default: m.ProductFAQForm })));
+const PaymentOptionsForm = lazy(() => import('../shared/PaymentOptionsForm').then(m => ({ default: m.PaymentOptionsForm })));
 import { useToast } from '@/hooks/use-toast';
 import { useStore } from '@/hooks/useStore';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
-import type { ArtistProductFormData, ArtistType } from '@/types/artist-product';
+import type { ArtistProductFormData } from '@/types/artist-product';
 import { generateSlug } from '@/lib/validation-utils';
+
+// Skeleton de chargement pour les étapes lazy-loaded
+const StepSkeleton = () => (
+  <div className="space-y-4">
+    <Skeleton className="h-10 w-full" />
+    <Skeleton className="h-32 w-full" />
+    <Skeleton className="h-24 w-full" />
+    <Skeleton className="h-20 w-3/4" />
+  </div>
+);
 
 const STEPS = [
   { id: 1, title: 'Type d\'Artiste', description: 'Sélectionnez votre type', icon: Palette },
   { id: 2, title: 'Informations de base', description: 'Artiste & Œuvre', icon: Info },
   { id: 3, title: 'Spécificités', description: 'Détails par type', icon: FileText },
-  { id: 4, title: 'Livraison', description: 'Expédition & Assurance', icon: Truck },
-  { id: 5, title: 'Authentification', description: 'Certificats', icon: Shield },
-  { id: 6, title: 'SEO & FAQs', description: 'Référencement', icon: Search },
-  { id: 7, title: 'Paiement', description: 'Options de paiement', icon: CreditCard },
-  { id: 8, title: 'Aperçu', description: 'Validation finale', icon: Eye },
+  { id: 4, title: 'Expédition & Assurance', description: 'Livraison, emballage, assurance', icon: Truck },
+  { id: 5, title: 'Authentification', description: 'Certificats d\'authenticité', icon: Shield },
+  { id: 6, title: 'SEO & FAQs', description: 'Référencement, questions', icon: Search },
+  { id: 7, title: 'Options de Paiement', description: 'Complet, partiel, escrow', icon: CreditCard },
+  { id: 8, title: 'Aperçu & Validation', description: 'Vérifier et publier', icon: Eye },
 ];
 
 interface CreateArtistProductWizardProps {
@@ -63,9 +77,9 @@ interface CreateArtistProductWizardProps {
   onBack?: () => void;
 }
 
-export const CreateArtistProductWizard = ({
+const CreateArtistProductWizardComponent = ({
   storeId: propsStoreId,
-  storeSlug,
+  storeSlug: _storeSlug, // Préfixé avec _ pour indiquer qu'il n'est pas utilisé actuellement
   onSuccess,
   onBack,
 }: CreateArtistProductWizardProps = {}) => {
@@ -77,7 +91,13 @@ export const CreateArtistProductWizard = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  // État pour stocker les erreurs de validation par étape (utilisé dans la grille d'étapes)
+  const [validationErrors] = useState<Record<number, string[]>>({});
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Refs for animations
+  const stepsRef = useScrollAnimation<HTMLDivElement>();
+  const contentRef = useScrollAnimation<HTMLDivElement>();
 
   const [formData, setFormData] = useState<Partial<ArtistProductFormData>>({
     name: '',
@@ -269,7 +289,7 @@ export const CreateArtistProductWizard = ({
           payment_options: formData.payment || { payment_type: 'full', percentage_rate: 30 },
           is_draft: isDraft,
           is_active: !isDraft,
-        })
+        } as any)
         .select()
         .single();
 
@@ -287,7 +307,7 @@ export const CreateArtistProductWizard = ({
       }
 
       // Create artist_product
-      const { error: artistError } = await supabase
+      const { error: artistError } = await (supabase as any)
         .from('artist_products')
         .insert({
           product_id: product.id,
@@ -372,9 +392,33 @@ export const CreateArtistProductWizard = ({
 
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const progress = (currentStep / STEPS.length) * 100;
+  const handleStepClick = useCallback((stepId: number) => {
+    // Permettre de revenir en arrière, mais valider avant d'avancer
+    if (stepId < currentStep) {
+      setCurrentStep(stepId);
+      logger.info('Navigation directe vers étape', { to: stepId });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (stepId === currentStep) {
+      // Déjà sur cette étape, ne rien faire
+      return;
+    } else {
+      // Avancer nécessite une validation
+      const isValid = validateStep(currentStep);
+      if (isValid) {
+        setCurrentStep(stepId);
+        logger.info('Navigation directe vers étape', { to: stepId });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [currentStep]);
+
+  /**
+   * Calculate progress
+   */
+  const progress = useMemo(() => (currentStep / STEPS.length) * 100, [currentStep]);
 
   if (storeLoading) {
     return (
@@ -392,29 +436,124 @@ export const CreateArtistProductWizard = ({
           {onBack && (
             <Button variant="ghost" onClick={onBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
+              {t('common.back', 'Retour')}
             </Button>
           )}
-          {isAutoSaving && (
-            <Badge variant="secondary" className="ml-auto">
-              <Save className="h-3 w-3 mr-1" />
-              Sauvegarde...
-            </Badge>
-          )}
         </div>
-        <h1 className="text-3xl font-bold mb-2">Créer une œuvre d'artiste</h1>
-        <Progress value={progress} className="h-2" />
-        <p className="text-sm text-muted-foreground mt-2">
-          Étape {currentStep} sur {STEPS.length} : {STEPS[currentStep - 1].title}
-        </p>
+        
+        {/* Title */}
+        <div className="mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+            {t('products.createArtist.title', 'Créer une œuvre d\'artiste')}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t('products.createArtist.subtitle', `Créez une œuvre d'artiste professionnelle en ${STEPS.length} étapes`)}
+          </p>
+        </div>
+        
+        {/* Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
+            <span className="font-medium">
+              {t('products.step', 'Étape')} {currentStep} {t('products.of', 'sur')} {STEPS.length}
+            </span>
+            <div className="flex items-center gap-2">
+              {isAutoSaving && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>{t('products.saving', 'Sauvegarde...')}</span>
+                </div>
+              )}
+              <span className="text-muted-foreground">{Math.round(progress)}% {t('products.completed', 'complété')}</span>
+            </div>
+          </div>
+          <Progress 
+            value={progress} 
+            className="h-1.5 sm:h-2 bg-muted"
+          />
+        </div>
       </div>
 
+      {/* Steps Indicator - Responsive */}
+      <Card 
+        ref={stepsRef}
+        className="mb-6 sm:mb-8 border-border/50 bg-card/50 backdrop-blur-sm shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-700"
+      >
+        <CardContent className="p-3 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+            {STEPS.map((step, index) => {
+              const Icon = step.icon;
+              const isActive = currentStep === step.id;
+              const isCompleted = currentStep > step.id;
+              const hasErrors = validationErrors[step.id]?.length > 0;
+
+              return (
+                <button
+                  key={step.id}
+                  onClick={() => handleStepClick(step.id)}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-label={`${t('products.step', 'Étape')} ${step.id}: ${step.title}`}
+                  className={cn(
+                    "relative p-2.5 sm:p-3 rounded-lg border-2 transition-all duration-300 text-left",
+                    "hover:shadow-md hover:scale-[1.02] touch-manipulation",
+                    isActive && 'border-green-500 bg-green-50 dark:bg-green-950/30 shadow-lg scale-[1.02] ring-2 ring-green-500/20',
+                    isCompleted && 'border-green-500 bg-green-50 dark:bg-green-950/30',
+                    !isActive && !isCompleted && !hasErrors && 'border-border hover:border-green-500/50 bg-card/50',
+                    hasErrors && 'border-red-500 bg-red-50 dark:bg-red-950/30',
+                    "animate-in fade-in slide-in-from-bottom-4"
+                  )}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                    <Icon className={cn(
+                      "h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 transition-colors",
+                      isActive ? 'text-green-600 dark:text-green-400' : 
+                      isCompleted ? 'text-green-600 dark:text-green-400' : 
+                      hasErrors ? 'text-red-600 dark:text-red-400' :
+                      'text-muted-foreground'
+                    )} />
+                    {isCompleted && <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400 flex-shrink-0 ml-auto" aria-hidden="true" />}
+                    {hasErrors && !isCompleted && <AlertCircle className="h-3 w-3 text-red-600 dark:text-red-400 flex-shrink-0 ml-auto" aria-hidden="true" />}
+                  </div>
+                  <div className={cn(
+                    "text-[10px] sm:text-xs font-medium truncate",
+                    isActive && "text-green-600 dark:text-green-400 font-semibold",
+                    hasErrors && !isActive && "text-red-600 dark:text-red-400",
+                    !isActive && !hasErrors && "text-muted-foreground"
+                  )}>
+                    {step.title}
+                  </div>
+                  <div className="text-[9px] sm:text-[10px] text-muted-foreground truncate hidden sm:block mt-0.5">
+                    {step.description}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Validation Errors */}
+      {validationErrors[currentStep]?.length > 0 && (
+        <Alert variant="destructive" className="mb-4 sm:mb-6 animate-in fade-in slide-in-from-top-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <ul className="list-disc list-inside text-xs sm:text-sm space-y-1">
+              {validationErrors[currentStep].map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Step Content */}
-      <Card>
-        <CardContent className="p-6">
+      <Card ref={contentRef} className="border-border/50 bg-card/50 backdrop-blur-sm shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <CardContent className="p-4 sm:p-6">
           {currentStep === 1 && (
             <ArtistTypeSelector
-              selectedType={formData.artist_type}
+              selectedType={formData.artist_type || null}
               onSelect={(type) => handleUpdateFormData({ artist_type: type })}
             />
           )}
@@ -427,85 +566,120 @@ export const CreateArtistProductWizard = ({
           )}
 
           {currentStep === 3 && formData.artist_type && (
-            <ArtistSpecificForms
-              artistType={formData.artist_type}
-              data={formData}
-              onUpdate={handleUpdateFormData}
-            />
+            <Suspense fallback={<StepSkeleton />}>
+              <ArtistSpecificForms
+                artistType={formData.artist_type}
+                data={formData}
+                onUpdate={handleUpdateFormData}
+              />
+            </Suspense>
           )}
 
           {currentStep === 4 && (
-            <ArtistShippingConfig
-              data={formData}
-              onUpdate={handleUpdateFormData}
-            />
+            <Suspense fallback={<StepSkeleton />}>
+              <ArtistShippingConfig
+                data={formData}
+                onUpdate={handleUpdateFormData}
+              />
+            </Suspense>
           )}
 
           {currentStep === 5 && (
-            <ArtistAuthenticationConfig
-              data={formData}
-              onUpdate={handleUpdateFormData}
-            />
+            <Suspense fallback={<StepSkeleton />}>
+              <ArtistAuthenticationConfig
+                data={formData}
+                onUpdate={handleUpdateFormData}
+              />
+            </Suspense>
           )}
 
           {currentStep === 6 && (
-            <div className="space-y-4">
-              <ProductSEOForm
-                data={formData.seo || {}}
-                productName={formData.artwork_title || ''}
-                productDescription={formData.description}
-                onUpdate={(seo) => handleUpdateFormData({ seo })}
-              />
-              <ProductFAQForm
-                data={formData.faqs || []}
-                onUpdate={(faqs) => handleUpdateFormData({ faqs })}
-              />
-            </div>
+            <Suspense fallback={<StepSkeleton />}>
+              <div className="space-y-4">
+                <ProductSEOForm
+                  data={formData.seo || {}}
+                  productName={formData.artwork_title || ''}
+                  productDescription={formData.description}
+                  onUpdate={(seo) => handleUpdateFormData({ seo })}
+                />
+                <ProductFAQForm
+                  data={(formData.faqs || []).map((faq: any, index: number) => ({
+                    id: faq.id || `faq-${Date.now()}-${index}`,
+                    question: faq.question || '',
+                    answer: faq.answer || '',
+                    order: faq.order ?? index,
+                  }))}
+                  onUpdate={(faqs) => handleUpdateFormData({ faqs })}
+                />
+              </div>
+            </Suspense>
           )}
 
           {currentStep === 7 && (
-            <PaymentOptionsForm
-              productPrice={formData.price || 0}
-              productType="artist"
-              data={formData.payment || { payment_type: 'full', percentage_rate: 30 }}
-              onUpdate={(payment) => handleUpdateFormData({ payment })}
-            />
+            <Suspense fallback={<StepSkeleton />}>
+              <PaymentOptionsForm
+                productPrice={formData.price || 0}
+                productType="physical"
+                data={{
+                  payment_type: (formData.payment?.payment_type || 'full') as 'full' | 'percentage' | 'delivery_secured',
+                  percentage_rate: (formData.payment?.percentage_rate ?? 30),
+                }}
+                onUpdate={(payment) => handleUpdateFormData({ 
+                  payment: {
+                    payment_type: payment.payment_type,
+                    percentage_rate: payment.percentage_rate ?? 30,
+                  }
+                })}
+              />
+            </Suspense>
           )}
 
           {currentStep === 8 && (
-            <ArtistPreview data={formData} />
+            <Suspense fallback={<StepSkeleton />}>
+              <ArtistPreview data={formData} />
+            </Suspense>
           )}
         </CardContent>
       </Card>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between mt-6">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 mt-4 sm:mt-6">
         <Button
           variant="outline"
           onClick={handlePrevious}
           disabled={currentStep === 1}
+          className="w-full sm:w-auto min-h-[44px] touch-manipulation"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Précédent
         </Button>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             onClick={() => saveArtistProduct(true)}
             disabled={isSaving}
+            className="w-full sm:w-auto min-h-[44px] touch-manipulation"
           >
             <Save className="h-4 w-4 mr-2" />
-            Enregistrer comme brouillon
+            <span className="hidden sm:inline">Enregistrer comme brouillon</span>
+            <span className="sm:hidden">Brouillon</span>
           </Button>
 
           {currentStep < STEPS.length ? (
-            <Button onClick={handleNext}>
+            <Button 
+              onClick={handleNext}
+              className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            >
               Suivant
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={() => saveArtistProduct(false)} disabled={isSaving}>
+            <Button 
+              onClick={() => saveArtistProduct(false)} 
+              disabled={isSaving}
+              className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            >
               {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -524,4 +698,7 @@ export const CreateArtistProductWizard = ({
     </div>
   );
 };
+
+// Optimisation avec React.memo
+export const CreateArtistProductWizard = React.memo(CreateArtistProductWizardComponent);
 

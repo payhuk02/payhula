@@ -3,6 +3,7 @@
  * Date: 28 Janvier 2025
  */
 
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -16,7 +17,7 @@ interface ArtistShippingConfigProps {
   onUpdate: (data: Partial<ArtistProductFormData>) => void;
 }
 
-export const ArtistShippingConfig = ({ data, onUpdate }: ArtistShippingConfigProps) => {
+const ArtistShippingConfigComponent = ({ data, onUpdate }: ArtistShippingConfigProps) => {
   return (
     <div className="space-y-6">
       {/* Requires Shipping */}
@@ -181,4 +182,7 @@ export const ArtistShippingConfig = ({ data, onUpdate }: ArtistShippingConfigPro
     </div>
   );
 };
+
+// Optimisation avec React.memo
+export const ArtistShippingConfig = React.memo(ArtistShippingConfigComponent);
 

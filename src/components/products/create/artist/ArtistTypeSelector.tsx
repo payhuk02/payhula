@@ -3,7 +3,7 @@
  * Date: 28 Janvier 2025
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -91,7 +91,7 @@ interface ArtistTypeSelectorProps {
   onSelect: (type: ArtistType) => void;
 }
 
-export const ArtistTypeSelector = ({ selectedType, onSelect }: ArtistTypeSelectorProps) => {
+const ArtistTypeSelectorComponent = ({ selectedType, onSelect }: ArtistTypeSelectorProps) => {
   return (
     <div className="space-y-6">
       <div>
@@ -143,4 +143,7 @@ export const ArtistTypeSelector = ({ selectedType, onSelect }: ArtistTypeSelecto
     </div>
   );
 };
+
+// Optimisation avec React.memo
+export const ArtistTypeSelector = React.memo(ArtistTypeSelectorComponent);
 

@@ -3,6 +3,7 @@
  * Date: 28 Janvier 2025
  */
 
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,7 +19,7 @@ interface ArtistSpecificFormsProps {
   onUpdate: (data: Partial<ArtistProductFormData>) => void;
 }
 
-export const ArtistSpecificForms = ({ artistType, data, onUpdate }: ArtistSpecificFormsProps) => {
+const ArtistSpecificFormsComponent = ({ artistType, data, onUpdate }: ArtistSpecificFormsProps) => {
   const { handleKeyDown: handleSpaceKeyDown } = useSpaceInputFix();
 
   // Écrivain
@@ -357,4 +358,12 @@ export const ArtistSpecificForms = ({ artistType, data, onUpdate }: ArtistSpecif
 
   return null;
 };
+
+// Optimisation avec React.memo
+export const ArtistSpecificForms = React.memo(ArtistSpecificFormsComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.artistType === nextProps.artistType &&
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  );
+});
 

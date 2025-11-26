@@ -467,39 +467,105 @@ export const DigitalBasicInfoForm = ({
         </Card>
       )}
 
-      {/* Image Upload */}
+      {/* Images Upload - Multiple */}
       <div className="space-y-2">
-        <Label htmlFor="image_upload">Image du produit</Label>
-        {formData.image_url ? (
-          <div className="space-y-2">
-            <div className="relative inline-block">
-              <img
-                src={formData.image_url}
-                alt="Preview produit"
-                className="h-32 w-32 object-cover rounded-lg border"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                onClick={() => updateFormData({ image_url: '' })}
-                disabled={uploadingImage}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Cliquez sur "Changer l'image" pour remplacer
-            </p>
+        <Label htmlFor="images_upload">Images du produit</Label>
+        <p className="text-xs text-muted-foreground mb-2">
+          Ajoutez plusieurs images pour montrer différents angles ou détails du produit
+        </p>
+        
+        {/* Grille d'images existantes */}
+        {(formData.images && formData.images.length > 0) || formData.image_url ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+            {/* Afficher les images du tableau images */}
+            {(formData.images || []).map((imageUrl: string, index: number) => (
+              <div key={index} className="relative group">
+                <img
+                  src={imageUrl}
+                  alt={`Produit ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-lg border"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => {
+                    const currentImages = formData.images || [];
+                    const newImages = currentImages.filter((_: string, i: number) => i !== index);
+                    // Mettre à jour images et image_url (première image)
+                    updateFormData({ 
+                      images: newImages,
+                      image_url: newImages[0] || ''
+                    });
+                  }}
+                  disabled={uploadingImage}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+            
+            {/* Afficher image_url si elle existe et n'est pas dans images */}
+            {formData.image_url && (!formData.images || !formData.images.includes(formData.image_url)) && (
+              <div className="relative group">
+                <img
+                  src={formData.image_url}
+                  alt="Preview produit"
+                  className="w-full h-32 object-cover rounded-lg border"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => {
+                    updateFormData({ image_url: '' });
+                  }}
+                  disabled={uploadingImage}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            
+            {/* Zone d'ajout d'image */}
+            <label
+              htmlFor="images_upload"
+              className={cn(
+                "flex flex-col items-center justify-center h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                uploadingImage ? "bg-muted/70 cursor-not-allowed" : "hover:bg-muted/50",
+                "border-muted-foreground/25"
+              )}
+            >
+              {uploadingImage ? (
+                <div className="flex flex-col items-center gap-1">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
+                    {uploadProgress.toFixed(0)}%
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <ImageIcon className="h-6 w-6 text-muted-foreground mb-1" />
+                  <span className="text-xs text-muted-foreground text-center px-2">
+                    Ajouter
+                  </span>
+                </>
+              )}
+            </label>
           </div>
         ) : (
           <label
-            htmlFor="image_upload"
+            htmlFor="images_upload"
             className={cn(
               "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
               uploadingImage ? "bg-muted/70 cursor-not-allowed" : "hover:bg-muted/50",
@@ -518,100 +584,109 @@ export const DigitalBasicInfoForm = ({
               <>
                 <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                 <span className="text-sm text-muted-foreground">
-                  Cliquez pour uploader une image
+                  Cliquez pour uploader des images
                 </span>
                 <span className="text-xs text-muted-foreground mt-1">
-                  PNG, JPG, WEBP (max 10MB)
+                  PNG, JPG, WEBP (max 10MB par image)
                 </span>
               </>
             )}
-            <input
-              id="image_upload"
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-
-                // Validation taille
-                const maxSize = 10 * 1024 * 1024; // 10MB
-                if (file.size > maxSize) {
-                  toast({
-                    title: "❌ Fichier trop volumineux",
-                    description: "La taille maximale autorisée est de 10MB",
-                    variant: "destructive",
-                  });
-                  e.target.value = '';
-                  return;
-                }
-
-                // Validation type
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-                if (!validTypes.includes(file.type)) {
-                  toast({
-                    title: "❌ Format non supporté",
-                    description: "Veuillez uploader une image (JPG, PNG, WEBP, GIF)",
-                    variant: "destructive",
-                  });
-                  e.target.value = '';
-                  return;
-                }
-
-                setUploadingImage(true);
-                setUploadProgress(0);
-
-                try {
-                  const { url, error } = await uploadToSupabaseStorage(file, {
-                    bucket: 'product-images',
-                    path: 'digital',
-                    filePrefix: 'product',
-                    onProgress: setUploadProgress,
-                    maxSizeBytes: maxSize,
-                    allowedTypes: validTypes,
-                  });
-
-                  if (error) throw error;
-
-                  if (url) {
-                    updateFormData({ image_url: url });
-                    toast({
-                      title: "✅ Image uploadée",
-                      description: "L'image du produit a été uploadée avec succès",
-                    });
-                  }
-                } catch (error) {
-                  logger.error('Erreur upload image produit', { error });
-                  toast({
-                    title: "❌ Erreur d'upload",
-                    description: error instanceof Error ? error.message : 'Une erreur est survenue',
-                    variant: "destructive",
-                  });
-                } finally {
-                  setUploadingImage(false);
-                  setUploadProgress(0);
-                  e.target.value = ''; // Reset input
-                }
-              }}
-              className="hidden"
-              disabled={uploadingImage}
-            />
           </label>
         )}
-        {formData.image_url && !uploadingImage && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              const input = document.getElementById('image_upload') as HTMLInputElement;
-              input?.click();
-            }}
-            className="w-full"
-          >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Changer l'image
-          </Button>
-        )}
+        
+        <input
+          id="images_upload"
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+          multiple
+          onChange={async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            // Validation taille et type pour tous les fichiers
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+            const invalidFiles: string[] = [];
+
+            for (const file of Array.from(files)) {
+              if (file.size > maxSize) {
+                invalidFiles.push(`${file.name} (trop volumineux)`);
+                continue;
+              }
+              if (!validTypes.includes(file.type)) {
+                invalidFiles.push(`${file.name} (format non supporté)`);
+                continue;
+              }
+            }
+
+            if (invalidFiles.length > 0) {
+              toast({
+                title: "❌ Fichiers invalides",
+                description: `Les fichiers suivants ne peuvent pas être uploadés : ${invalidFiles.join(', ')}`,
+                variant: "destructive",
+              });
+              e.target.value = '';
+              return;
+            }
+
+            setUploadingImage(true);
+            setUploadProgress(0);
+
+            try {
+              const uploadPromises = Array.from(files).map(async (file, index) => {
+                const { url, error } = await uploadToSupabaseStorage(file, {
+                  bucket: 'product-images',
+                  path: 'digital',
+                  filePrefix: 'product',
+                  onProgress: (progress) => {
+                    // Calculer la progression globale pour tous les fichiers
+                    const fileProgress = (index / files.length) * 100 + (progress / files.length);
+                    setUploadProgress(fileProgress);
+                  },
+                  maxSizeBytes: maxSize,
+                  allowedTypes: validTypes,
+                });
+
+                if (error) throw error;
+                return url;
+              });
+
+              const uploadedUrls = await Promise.all(uploadPromises);
+              const validUrls = uploadedUrls.filter((url): url is string => !!url);
+
+              if (validUrls.length > 0) {
+                const currentImages = formData.images || [];
+                const existingImageUrl = formData.image_url ? [formData.image_url] : [];
+                const allImages = [...existingImageUrl, ...currentImages, ...validUrls].filter((url, index, self) => 
+                  self.indexOf(url) === index // Supprimer les doublons
+                );
+                
+                updateFormData({ 
+                  images: allImages,
+                  image_url: allImages[0] || formData.image_url // Première image comme image_url
+                });
+                
+                toast({
+                  title: "✅ Images uploadées",
+                  description: `${validUrls.length} image(s) uploadée(s) avec succès`,
+                });
+              }
+            } catch (error) {
+              logger.error('Erreur upload images produit', { error });
+              toast({
+                title: "❌ Erreur d'upload",
+                description: error instanceof Error ? error.message : 'Une erreur est survenue',
+                variant: "destructive",
+              });
+            } finally {
+              setUploadingImage(false);
+              setUploadProgress(0);
+              e.target.value = ''; // Reset input
+            }
+          }}
+          className="hidden"
+          disabled={uploadingImage}
+        />
       </div>
 
       {/* Licensing Type (PLR / Copyright) */}
