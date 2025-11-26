@@ -47,7 +47,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
   // Valider un champ spécifique
   const validateField = useCallback(
-    (fieldName: keyof T, value: any): string | null => {
+    (fieldName: keyof T, value: T[keyof T]): string | null => {
       const fieldRules = rules[fieldName];
       if (!fieldRules || fieldRules.length === 0) return null;
 
@@ -81,7 +81,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
   // Mettre à jour la valeur d'un champ
   const setValue = useCallback(
-    (fieldName: keyof T, value: any) => {
+    (fieldName: keyof T, value: T[keyof T]) => {
       setValues((prev) => ({ ...prev, [fieldName]: value }));
       setDirty((prev) => ({ ...prev, [fieldName]: true }));
 

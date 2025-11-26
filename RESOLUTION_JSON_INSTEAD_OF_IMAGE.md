@@ -189,3 +189,4 @@ Les améliorations suivantes ont été apportées :
 **Prochaine étape** : Vérifiez les logs de la console pour voir le chemin exact et l'URL générée, puis comparez avec le fichier dans Supabase Dashboard.
 
 
+

@@ -169,3 +169,4 @@ LIMIT 5;
    - Vérifier que les images s'affichent sur la page de détail
 
 
+

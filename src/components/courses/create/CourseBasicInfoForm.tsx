@@ -631,8 +631,9 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
                       className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => handleRemoveImage(index)}
                       disabled={uploadingImage}
+                      aria-label={`Supprimer l'image ${index + 1} du cours`}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-3 w-3" aria-hidden="true" />
                     </Button>
                   </div>
                 ))}
@@ -658,8 +659,9 @@ export const CourseBasicInfoForm = ({ formData, onChange, errors = {} }: CourseB
                         onChange('image_url', '');
                       }}
                       disabled={uploadingImage}
+                      aria-label="Supprimer l'image principale du cours"
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-3 w-3" aria-hidden="true" />
                     </Button>
                   </div>
                 )}

@@ -64,7 +64,12 @@ interface CreateFullCourseData {
   og_image?: string;
   
   // FAQs
-  faqs?: any[];
+  faqs?: Array<{
+    id?: string;
+    question: string;
+    answer: string;
+    order?: number;
+  }>;
   
   // Affiliation
   affiliate_enabled?: boolean;
@@ -184,7 +189,15 @@ export const useCreateFullCourse = () => {
 
         // ÉTAPE 3 : Créer les sections
         logger.info('Creating course sections', { courseId: course.id, sectionsCount: data.sections.length });
-        const createdSections: any[] = [];
+        interface CreatedSection {
+          id: string;
+          course_id: string;
+          title: string;
+          description?: string | null;
+          order_index: number;
+          originalSection: Section;
+        }
+        const createdSections: CreatedSection[] = [];
 
         for (const section of data.sections) {
           const { data: createdSection, error: sectionError } = await supabase
@@ -321,8 +334,9 @@ export const useCreateFullCourse = () => {
             } else {
               logger.info('Free preview course created successfully', { previewCourseId, paidProductId: product.id });
             }
-          } catch (error: any) {
-            logger.error('Exception creating free preview course', { error, paidProductId: product.id });
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.error('Exception creating free preview course', { error: errorMessage, paidProductId: product.id });
             // Ne pas faire échouer la création du cours principal
           }
         }
@@ -333,8 +347,9 @@ export const useCreateFullCourse = () => {
           sectionsCount: data.sections.length,
           lessonsCount: totalCreatedLessons,
         };
-      } catch (error: any) {
-        logger.error('Global error creating course', { error, storeId: data.storeId });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error('Global error creating course', { error: errorMessage, storeId: data.storeId });
         throw error;
       }
     },
@@ -350,11 +365,12 @@ export const useCreateFullCourse = () => {
         navigate('/dashboard/products');
       }, 1500);
     },
-    onError: (error: any) => {
-      logger.error('Final error creating course', { error });
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Final error creating course', { error: errorMessage });
       toast({
         title: '❌ Erreur lors de la création du cours',
-        description: error.message || 'Une erreur est survenue. Veuillez réessayer.',
+        description: errorMessage || 'Une erreur est survenue. Veuillez réessayer.',
         variant: 'destructive',
         duration: 7000,
       });

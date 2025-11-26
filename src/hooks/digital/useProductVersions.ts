@@ -204,11 +204,12 @@ export function useCreateVersion() {
         description: `Version ${data.version_number} créée avec succès.`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: 'destructive',
         title: '❌ Erreur',
-        description: error.message || 'Impossible de créer la version.',
+        description: errorMessage || 'Impossible de créer la version.',
       });
     },
   });
@@ -243,11 +244,12 @@ export function useUpdateVersion() {
         description: `Version ${data.version_number} modifiée avec succès.`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: 'destructive',
         title: '❌ Erreur',
-        description: error.message || 'Impossible de mettre à jour la version.',
+        description: errorMessage || 'Impossible de mettre à jour la version.',
       });
     },
   });
@@ -277,11 +279,12 @@ export function useDeleteVersion() {
         description: 'La version a été supprimée avec succès.',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: 'destructive',
         title: '❌ Erreur',
-        description: error.message || 'Impossible de supprimer la version.',
+        description: errorMessage || 'Impossible de supprimer la version.',
       });
     },
   });
@@ -375,8 +378,14 @@ export function useNotifyCustomers() {
         .eq('product_id', productId)
         .eq('product_type', 'digital');
 
+      interface OrderItemWithOrder {
+        order_id: string;
+        orders?: {
+          customer_id: string;
+        } | null;
+      }
       const uniqueCustomers = new Set<string>();
-      orderItems?.forEach((item: any) => {
+      (orderItems as OrderItemWithOrder[] | null)?.forEach((item) => {
         if (item.orders?.customer_id) {
           uniqueCustomers.add(item.orders.customer_id);
         }
@@ -411,11 +420,12 @@ export function useNotifyCustomers() {
         description: 'Les clients seront notifiés de la nouvelle version.',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: 'destructive',
         title: '❌ Erreur',
-        description: error.message || 'Impossible d\'envoyer les notifications.',
+        description: errorMessage || 'Impossible d\'envoyer les notifications.',
       });
     },
   });

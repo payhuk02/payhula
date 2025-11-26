@@ -204,3 +204,4 @@ Si les images ne s'affichent toujours pas après ces corrections :
 - ✅ `src/components/products/create/artist/ArtistPreview.tsx` - Gestion améliorée des erreurs d'images
 
 
+

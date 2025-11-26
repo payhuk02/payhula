@@ -133,3 +133,4 @@ Si le problème persiste après avoir suivi toutes les étapes :
 2. Vérifiez les erreurs réseau dans les DevTools du navigateur (onglet Network)
 3. Contactez le support Supabase si les politiques RLS ne peuvent pas être créées
 
+

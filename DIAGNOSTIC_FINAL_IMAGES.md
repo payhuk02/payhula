@@ -140,3 +140,4 @@ Vous devriez voir exactement 4 politiques :
    - Si les politiques sont correctes mais que l'image ne s'affiche toujours pas, il peut y avoir un problème avec votre projet Supabase
 
 
+

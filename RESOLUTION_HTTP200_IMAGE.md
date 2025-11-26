@@ -185,3 +185,4 @@ Les améliorations suivantes ont été apportées :
 **Prochaine étape** : Testez l'URL de l'image directement dans le navigateur pour identifier le problème exact.
 
 
+

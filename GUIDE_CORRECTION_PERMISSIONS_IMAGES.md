@@ -211,3 +211,4 @@ Après avoir appliqué la correction :
 - ✅ `GUIDE_CORRECTION_PERMISSIONS_IMAGES.md` - Ce guide
 
 
+
