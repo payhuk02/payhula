@@ -5,6 +5,8 @@
  * Utilitaires pour optimiser les imports et réduire le bundle size
  */
 
+import { logger } from '@/lib/logger';
+
 /**
  * Lazy load un module avec gestion d'erreur
  */
@@ -13,7 +15,7 @@ export function lazyLoad<T>(
   fallback?: T
 ): Promise<{ default: T }> {
   return importFn().catch((error) => {
-    console.error('Erreur lors du chargement du module:', error);
+    logger.error('Erreur lors du chargement du module', { error });
     if (fallback) {
       return { default: fallback };
     }
@@ -29,7 +31,7 @@ export function preloadModule<T>(
 ): void {
   // Précharger le module en arrière-plan
   importFn().catch((error) => {
-    console.warn('Erreur lors du préchargement du module:', error);
+    logger.warn('Erreur lors du préchargement du module', { error });
   });
 }
 
@@ -49,7 +51,7 @@ export async function conditionalImport<T>(
     const module = await importFn();
     return module.default;
   } catch (error) {
-    console.error('Erreur lors de l\'import conditionnel:', error);
+    logger.error('Erreur lors de l\'import conditionnel', { error });
     return fallback;
   }
 }
