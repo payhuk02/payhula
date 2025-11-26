@@ -488,3 +488,10 @@ export const ProfileSettings = () => {
     </div>
   );
 };
+            )}
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};

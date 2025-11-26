@@ -92,6 +92,7 @@ export interface ArtistProductFormData {
   artist_name: string;
   artist_bio: string;
   artist_website: string;
+  artist_photo_url?: string; // Photo de l'artiste
   artist_social_links: ArtistSocialLinks;
   
   // Informations œuvre
@@ -99,6 +100,7 @@ export interface ArtistProductFormData {
   artwork_year: number | null;
   artwork_medium: string;
   artwork_dimensions: ArtworkDimensions;
+  artwork_link_url?: string; // Lien vers l'œuvre si non physique
   edition_type: EditionType;
   edition_number: number | null;
   total_editions: number | null;
@@ -166,4 +168,6 @@ export interface ArtistProduct extends ArtistProductFormData {
   store_id: string;
   created_at: string;
   updated_at: string;
+}
+
 }

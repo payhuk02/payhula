@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useCreateDigitalOrder, type CreateDigitalOrderOptions } from './useCreateDigitalOrder';
 import { useCreatePhysicalOrder, type CreatePhysicalOrderOptions } from './useCreatePhysicalOrder';
 import { useCreateServiceOrder, type CreateServiceOrderOptions } from './useCreateServiceOrder';
+import { useCreateCourseOrder, type CreateCourseOrderOptions } from './useCreateCourseOrder';
+import { useCreateArtistOrder, type CreateArtistOrderOptions } from './useCreateArtistOrder';
 import { initiateMonerooPayment } from '@/lib/moneroo-payment';
 import { getAffiliateTrackingCookie } from '@/hooks/useAffiliateTracking';
 import { logger } from '@/lib/logger';
@@ -41,6 +43,8 @@ export interface CreateOrderOptions {
   digitalOptions?: Partial<CreateDigitalOrderOptions>;
   physicalOptions?: Partial<CreatePhysicalOrderOptions>;
   serviceOptions?: Partial<CreateServiceOrderOptions>;
+  courseOptions?: Partial<CreateCourseOrderOptions>;
+  artistOptions?: Partial<CreateArtistOrderOptions>;
 }
 
 /**
@@ -68,6 +72,8 @@ export const useCreateOrder = () => {
   const { mutateAsync: createDigitalOrder } = useCreateDigitalOrder();
   const { mutateAsync: createPhysicalOrder } = useCreatePhysicalOrder();
   const { mutateAsync: createServiceOrder } = useCreateServiceOrder();
+  const { mutateAsync: createCourseOrder } = useCreateCourseOrder();
+  const { mutateAsync: createArtistOrder } = useCreateArtistOrder();
 
   return useMutation({
     mutationFn: async (options: CreateOrderOptions) => {
@@ -81,6 +87,8 @@ export const useCreateOrder = () => {
         digitalOptions,
         physicalOptions,
         serviceOptions,
+        courseOptions,
+        artistOptions,
       } = options;
 
       // 1. Récupérer le produit pour déterminer son type
@@ -185,10 +193,60 @@ export const useCreateOrder = () => {
           });
         }
 
-        case 'course':
+        case 'course': {
+          // Récupérer le course_id
+          const { data: course } = await (supabase as any)
+            .from('courses')
+            .select('id')
+            .eq('product_id', productId)
+            .single();
+
+          if (!course) {
+            throw new Error('Cours non trouvé');
+          }
+
+          return await createCourseOrder({
+            courseId: course.id,
+            productId,
+            storeId,
+            customerEmail,
+            customerName,
+            customerPhone,
+            quantity,
+            giftCardId: courseOptions?.giftCardId,
+            giftCardAmount: courseOptions?.giftCardAmount,
+          });
+        }
+
+        case 'artist': {
+          // Récupérer le artist_product_id
+          const { data: artistProduct } = await (supabase as any)
+            .from('artist_products')
+            .select('id')
+            .eq('product_id', productId)
+            .single();
+
+          if (!artistProduct) {
+            throw new Error('Œuvre d\'artiste non trouvée');
+          }
+
+          return await createArtistOrder({
+            artistProductId: artistProduct.id,
+            productId,
+            storeId,
+            customerEmail,
+            customerName,
+            customerPhone,
+            shippingAddress: artistOptions?.shippingAddress,
+            quantity,
+            giftCardId: artistOptions?.giftCardId,
+            giftCardAmount: artistOptions?.giftCardAmount,
+          });
+        }
+
         case 'generic':
         default: {
-          // Pour les cours et produits génériques, utiliser l'ancien système
+          // Pour les produits génériques, utiliser l'ancien système
           toast({
             title: 'ℹ️ Type de produit',
             description: `Utilisation du flux générique pour ${productType}`,

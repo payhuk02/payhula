@@ -712,3 +712,11 @@ export default function MyProfile() {
     </SidebarProvider>
   );
 }
+              </Tabs>
+            </div>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
+}

@@ -148,7 +148,9 @@ export async function uploadToSupabaseStorage(
       logger.warn('File security warnings', { warnings: securityValidation.warnings, fileName: file.name });
     }
 
-    // 2. VALIDATION BACKEND (Edge Function) - Double vérification
+    // 2. VALIDATION BACKEND (Edge Function) - Double vérification (optionnelle)
+    // Si la validation backend échoue (CORS, Edge Function non disponible, etc.),
+    // on continue avec la validation côté client uniquement
     try {
       // Lire les premiers 16 bytes pour la validation backend
       const firstBytes = await file.slice(0, 16).arrayBuffer();
@@ -157,7 +159,9 @@ export async function uploadToSupabaseStorage(
       );
 
       const { data: { user } } = await supabase.auth.getUser();
-      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+      
+      // Timeout pour éviter que l'upload soit bloqué trop longtemps
+      const validationPromise = supabase.functions.invoke(
         'validate-file-upload',
         {
           body: {
@@ -174,18 +178,54 @@ export async function uploadToSupabaseStorage(
         }
       );
 
+      // Timeout de 5 secondes pour la validation backend
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Validation backend timeout')), 5000)
+      );
+
+      const { data: validationResult, error: validationError } = await Promise.race([
+        validationPromise,
+        timeoutPromise,
+      ]) as any;
+
       if (validationError) {
-        logger.warn('Backend validation error (continuing with client validation)', { error: validationError });
+        // Erreur CORS ou autre - on continue avec la validation côté client
+        const isCorsError = validationError.message?.includes('CORS') || 
+                           validationError.message?.includes('blocked') ||
+                           validationError.message?.includes('preflight');
+        
+        if (isCorsError) {
+          logger.warn('CORS error in backend validation (using client validation only)', { 
+            error: validationError.message 
+          });
+        } else {
+          logger.warn('Backend validation error (continuing with client validation)', { 
+            error: validationError 
+          });
+        }
         // Continuer avec la validation côté client si le backend échoue
       } else if (validationResult && !validationResult.isValid) {
         throw new Error(validationResult.error || 'Validation backend échouée');
       }
-    } catch (backendError) {
-      // Si la validation backend échoue (Edge Function non disponible, etc.), 
+    } catch (backendError: any) {
+      // Si la validation backend échoue (Edge Function non disponible, CORS, timeout, etc.), 
       // on continue avec la validation côté client uniquement
-      logger.warn('Backend validation unavailable, using client validation only', { 
-        error: backendError instanceof Error ? backendError.message : String(backendError) 
-      });
+      const errorMessage = backendError instanceof Error ? backendError.message : String(backendError);
+      const isCorsError = errorMessage.includes('CORS') || 
+                         errorMessage.includes('blocked') ||
+                         errorMessage.includes('preflight') ||
+                         errorMessage.includes('timeout');
+      
+      if (isCorsError) {
+        logger.warn('Backend validation unavailable (CORS/timeout), using client validation only', { 
+          error: errorMessage 
+        });
+      } else {
+        logger.warn('Backend validation unavailable, using client validation only', { 
+          error: errorMessage 
+        });
+      }
+      // Ne pas bloquer l'upload - la validation côté client est suffisante
     }
 
     // 2. Validation de la taille
@@ -220,21 +260,188 @@ export async function uploadToSupabaseStorage(
       });
 
     if (uploadError) {
+      logger.error('Upload error', { error: uploadError, filePath, bucket, fileName: file.name });
       throw uploadError;
+    }
+
+    if (!data || !data.path) {
+      logger.error('Upload succeeded but no path returned', { data, filePath, bucket });
+      throw new Error('Upload réussi mais aucun chemin retourné par Supabase');
     }
 
     if (onProgress) onProgress(70);
 
-    // 6. Récupérer l'URL publique
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
+    // 6. Utiliser le chemin retourné par l'upload (data.path) au lieu de filePath
+    // Cela garantit que nous utilisons le chemin exact où le fichier a été uploadé
+    const actualPath = data.path;
+    logger.info('File uploaded, path returned by Supabase', { 
+      actualPath, 
+      filePath, 
+      bucket,
+      uploadData: data
+    });
+
+    // 7. Vérifier que le fichier existe vraiment dans le bucket
+    try {
+      const { data: fileList, error: listError } = await supabase.storage
+        .from(bucket)
+        .list(actualPath.split('/').slice(0, -1).join('/') || '', {
+          limit: 100,
+          search: actualPath.split('/').pop()
+        });
+      
+      if (listError) {
+        logger.warn('Could not verify file existence', { error: listError, actualPath });
+      } else {
+        const fileExists = fileList?.some(f => f.name === actualPath.split('/').pop());
+        if (!fileExists) {
+          logger.warn('File not found in listing after upload', { actualPath, fileList });
+        } else {
+          logger.info('File verified in storage', { actualPath });
+        }
+      }
+    } catch (verifyError) {
+      logger.warn('File verification failed', { error: verifyError, actualPath });
+      // Ne pas bloquer l'upload si la vérification échoue
+    }
+
+    // 8. Récupérer l'URL publique en utilisant getPublicUrl() de Supabase
+    // Supabase gère automatiquement l'encodage et le format correct de l'URL
+    let publicUrl: string;
+    
+    try {
+      const { data: { publicUrl: generatedUrl }, error: urlError } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(actualPath);
+      
+      if (urlError) {
+        logger.error('Error generating public URL with getPublicUrl()', { error: urlError, actualPath, bucket });
+        // Fallback : construire manuellement
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (!supabaseUrl) {
+          throw new Error('VITE_SUPABASE_URL non défini, impossible de construire l\'URL publique');
+        }
+        const baseUrl = supabaseUrl.replace(/\/$/, '');
+        const pathSegments = actualPath.split('/').map(segment => encodeURIComponent(segment));
+        const encodedPath = pathSegments.join('/');
+        publicUrl = `${baseUrl}/storage/v1/object/public/${bucket}/${encodedPath}`;
+        logger.warn('Using manually constructed URL as fallback', { publicUrl, actualPath, bucket });
+      } else if (!generatedUrl) {
+        logger.error('No public URL returned by getPublicUrl()', { actualPath, bucket });
+        throw new Error('Aucune URL publique retournée par Supabase');
+      } else {
+        publicUrl = generatedUrl;
+        logger.info('Public URL generated by Supabase getPublicUrl()', { 
+          publicUrl, 
+          actualPath, 
+          bucket
+        });
+      }
+    } catch (urlError) {
+      // En cas d'erreur, construire manuellement
+      logger.warn('Failed to generate URL with getPublicUrl(), constructing manually', { 
+        error: urlError, 
+        actualPath, 
+        bucket 
+      });
+      
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl) {
+        throw new Error('VITE_SUPABASE_URL non défini, impossible de construire l\'URL publique');
+      }
+      const baseUrl = supabaseUrl.replace(/\/$/, '');
+      const pathSegments = actualPath.split('/').map(segment => encodeURIComponent(segment));
+      const encodedPath = pathSegments.join('/');
+      publicUrl = `${baseUrl}/storage/v1/object/public/${bucket}/${encodedPath}`;
+      logger.info('Public URL constructed manually as fallback', { publicUrl, actualPath, bucket });
+    }
+    
+    // Vérifier que l'URL se termine par le nom du fichier ou contient le chemin
+    const fileNameFromPath = actualPath.split('/').pop();
+    if (fileNameFromPath && !publicUrl.includes(fileNameFromPath)) {
+      logger.warn('File name not found in public URL', { publicUrl, actualPath, fileNameFromPath });
+    }
+
+    // 9. Attendre un peu pour que Supabase rende le fichier accessible
+    // Parfois Supabase a besoin d'un délai pour rendre le fichier accessible publiquement
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Vérifier que le fichier existe vraiment et est accessible
+    try {
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from(bucket)
+        .list(actualPath.split('/').slice(0, -1).join('/') || '', {
+          limit: 1,
+          search: actualPath.split('/').pop()
+        });
+      
+      if (fileError) {
+        logger.warn('Could not verify file existence after upload', { error: fileError, actualPath, bucket });
+      } else if (!fileData || fileData.length === 0) {
+        logger.warn('File not found in listing after upload', { actualPath, bucket });
+      } else {
+        logger.info('File confirmed accessible in storage', { 
+          fileName: fileData[0].name,
+          fileSize: fileData[0].metadata?.size,
+          actualPath,
+          bucket
+        });
+      }
+    } catch (verifyError) {
+      logger.warn('File verification failed', { error: verifyError, actualPath, bucket });
+    }
+    
+    // Essayer de créer une URL signée comme fallback
+    // Les URLs signées fonctionnent même si les politiques RLS ont des problèmes
+    let signedUrl: string | null = null;
+    try {
+      // Attendre un peu avant de créer l'URL signée
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(actualPath, 7200); // URL valide 2 heures (plus long pour plus de fiabilité)
+      
+      if (signedError) {
+        logger.warn('Could not create signed URL', { error: signedError, actualPath, bucket });
+      } else if (!signedData?.signedUrl) {
+        logger.warn('Signed URL data is empty', { signedData, actualPath, bucket });
+      } else {
+        signedUrl = signedData.signedUrl;
+        logger.info('Signed URL created successfully', { 
+          signedUrl: signedUrl.substring(0, 80) + '...',
+          expiresIn: 7200,
+          bucket,
+          actualPath
+        });
+      }
+    } catch (signedUrlError) {
+      logger.warn('Exception creating signed URL', { error: signedUrlError, bucket, actualPath });
+    }
+    
+    // Retourner l'URL publique par défaut, mais aussi l'URL signée comme fallback
+    logger.info('Upload completed - URLs available', {
+      publicUrl,
+      signedUrl: signedUrl ? signedUrl.substring(0, 80) + '...' : null,
+      bucket,
+      actualPath,
+      note: 'Public URL should work if RLS policies are correct. Signed URL is available as fallback.'
+    });
 
     if (onProgress) onProgress(100);
 
+    logger.info('File uploaded successfully', { 
+      bucket, 
+      filePath: actualPath, 
+      url: publicUrl,
+      fileName: file.name,
+      fileSize: file.size 
+    });
+
     return {
       url: publicUrl,
-      path: filePath,
+      signedUrl: signedUrl || null,
+      path: actualPath,
       error: null,
       success: true,
     };

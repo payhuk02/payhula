@@ -310,6 +310,7 @@ const ResourceConflictManagement = lazy(() => import("./pages/service/ResourceCo
 const PhysicalProductDetail = lazy(() => import("./pages/physical/PhysicalProductDetail"));
 const ServiceDetail = lazy(() => import("./pages/service/ServiceDetail"));
 const BookingsManagement = lazy(() => import("./pages/service/BookingsManagement"));
+const ArtistProductDetail = lazy(() => import("./pages/artist/ArtistProductDetail"));
 
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminErrorMonitoring = lazy(() => import("./pages/admin/AdminErrorMonitoring"));
@@ -556,6 +557,7 @@ const AppContent = () => {
           {/* --- Routes Product Details (Physical, Services) --- */}
           <Route path="/physical/:productId" element={<PhysicalProductDetail />} />
           <Route path="/service/:serviceId" element={<ServiceDetail />} />
+          <Route path="/artist/:productId" element={<ArtistProductDetail />} />
           
           {/* --- Routes Service Management --- */}
           <Route path="/bookings/manage" element={<ProtectedRoute><BookingsManagement /></ProtectedRoute>} />

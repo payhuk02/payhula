@@ -307,8 +307,7 @@ export const CreateDigitalProductWizard = ({
 
     setIsAutoSaving(true);
     try {
-      // Sauvegarder dans localStorage pour l'instant
-      // TODO: Implémenter sauvegarde en base de données
+      // Sauvegarder dans localStorage (brouillon local)
       localStorage.setItem('digital-product-draft', JSON.stringify(dataToSave));
       localStorage.setItem('digital-product-current-step', currentStep.toString());
       logger.info('Brouillon auto-sauvegardé', { step: currentStep });

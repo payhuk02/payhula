@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useStore } from "@/hooks/useStore";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm } from "@/components/products/ProductForm";
@@ -7,6 +7,11 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// Lazy load artist product wizard
+const EditArtistProductWizard = lazy(() => 
+  import("@/components/products/edit/EditArtistProductWizard").then(m => ({ default: m.EditArtistProductWizard }))
+);
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -72,6 +77,31 @@ const EditProduct = () => {
           <h2 className="text-2xl font-bold mb-2">Produit non trouvé</h2>
         </div>
       </div>
+    );
+  }
+
+  // Route to appropriate edit wizard based on product type
+  if (product.product_type === 'artist' && id) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar />
+          <main className="flex-1">
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            }>
+              <EditArtistProductWizard
+                productId={id}
+                storeId={store.id}
+                storeSlug={store.slug}
+                onSuccess={() => window.history.back()}
+              />
+            </Suspense>
+          </main>
+        </div>
+      </SidebarProvider>
     );
   }
 

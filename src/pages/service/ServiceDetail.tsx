@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-import { sanitizeHTML } from '@/lib/html-sanitizer';
+import { sanitizeProductDescription } from '@/lib/html-sanitizer';
 import { safeRedirect } from '@/lib/url-validator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ServiceCalendar } from '@/components/service/ServiceCalendar';
+import { ServiceCalendarEnhanced } from '@/components/service/ServiceCalendarEnhanced';
 import { TimeSlotPicker } from '@/components/service/TimeSlotPicker';
 import { ProductReviewsSummary } from '@/components/reviews/ProductReviewsSummary';
 import { ReviewsList } from '@/components/reviews/ReviewsList';
@@ -889,8 +890,9 @@ export default function ServiceDetail() {
                     <label className="text-sm font-medium mb-2 block">
                       Sélectionnez une date
                     </label>
-                    <ServiceCalendar
+                    <ServiceCalendarEnhanced
                       serviceId={serviceId!}
+                      selectedDate={selectedDate || undefined}
                       onDateSelect={setSelectedDate}
                     />
                   </div>

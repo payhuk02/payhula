@@ -1,163 +1,204 @@
 /**
- * Hook pour améliorer la navigation clavier
- * Fournit des raccourcis clavier et une meilleure gestion du focus
+ * useKeyboardNavigation Hook
+ * Date: 28 Janvier 2025
+ * 
+ * Hook pour améliorer la navigation clavier dans les composants
+ * Support des flèches, Tab, Enter, Escape, etc.
  */
 
 import { useEffect, useCallback, useRef } from 'react';
-import { logger } from '@/lib/logger';
 
-interface KeyboardNavigationOptions {
+export interface KeyboardNavigationOptions {
   /**
-   * Raccourcis clavier personnalisés
-   * Format: { key: 'k', ctrlKey: true, handler: () => {} }
+   * Éléments focusables (sélecteur CSS ou refs)
    */
-  shortcuts?: Array<{
-    key: string;
-    ctrlKey?: boolean;
-    shiftKey?: boolean;
-    altKey?: boolean;
-    handler: () => void;
-    description?: string;
-  }>;
+  focusableSelector?: string;
   /**
-   * Activer la navigation par flèches
+   * Activer la navigation avec les flèches
    */
   arrowNavigation?: boolean;
   /**
-   * Élément à focuser au montage
+   * Activer la navigation circulaire (boucle)
    */
-  initialFocus?: React.RefObject<HTMLElement>;
+  circular?: boolean;
   /**
-   * Activer la navigation par Tab améliorée
+   * Orientation de la navigation (horizontal ou vertical)
    */
-  enhancedTabNavigation?: boolean;
+  orientation?: 'horizontal' | 'vertical' | 'both';
+  /**
+   * Callback quand un élément est sélectionné
+   */
+  onSelect?: (index: number, element: HTMLElement) => void;
+  /**
+   * Index initial
+   */
+  initialIndex?: number;
+  /**
+   * Activer la navigation avec Home/End
+   */
+  homeEndNavigation?: boolean;
 }
 
-/**
- * Hook pour améliorer la navigation clavier
- */
-export const useKeyboardNavigation = (options: KeyboardNavigationOptions = {}) => {
+export function useKeyboardNavigation(
+  containerRef: React.RefObject<HTMLElement>,
+  options: KeyboardNavigationOptions = {}
+) {
   const {
-    shortcuts = [],
-    arrowNavigation = false,
-    initialFocus,
-    enhancedTabNavigation = false,
+    focusableSelector = 'button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    arrowNavigation = true,
+    circular = true,
+    orientation = 'both',
+    onSelect,
+    initialIndex = 0,
+    homeEndNavigation = true,
   } = options;
 
-  const containerRef = useRef<HTMLElement | null>(null);
+  const currentIndexRef = useRef<number>(initialIndex);
+  const elementsRef = useRef<HTMLElement[]>([]);
 
-  // Gestion des raccourcis clavier
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Vérifier les raccourcis personnalisés
-      for (const shortcut of shortcuts) {
-        const matches =
-          e.key.toLowerCase() === shortcut.key.toLowerCase() &&
-          (shortcut.ctrlKey ? e.ctrlKey || e.metaKey : !e.ctrlKey && !e.metaKey) &&
-          (shortcut.shiftKey ? e.shiftKey : !e.shiftKey) &&
-          (shortcut.altKey ? e.altKey : !e.altKey);
+  // Récupérer les éléments focusables
+  const getFocusableElements = useCallback((): HTMLElement[] => {
+    if (!containerRef.current) return [];
 
-        if (matches) {
-          e.preventDefault();
-          shortcut.handler();
-          return;
+    const elements = Array.from(
+      containerRef.current.querySelectorAll<HTMLElement>(focusableSelector)
+    ).filter(
+      (el) =>
+        !el.hasAttribute('disabled') &&
+        el.tabIndex !== -1 &&
+        window.getComputedStyle(el).display !== 'none'
+    );
+
+    elementsRef.current = elements;
+    return elements;
+  }, [containerRef, focusableSelector]);
+
+  // Focuser un élément par index
+  const focusElement = useCallback(
+    (index: number) => {
+      const elements = getFocusableElements();
+      if (elements.length === 0) return;
+
+      let targetIndex = index;
+      if (circular) {
+        targetIndex = ((index % elements.length) + elements.length) % elements.length;
+      } else {
+        targetIndex = Math.max(0, Math.min(index, elements.length - 1));
+      }
+
+      const element = elements[targetIndex];
+      if (element) {
+        element.focus();
+        currentIndexRef.current = targetIndex;
+        onSelect?.(targetIndex, element);
+      }
+    },
+    [getFocusableElements, circular, onSelect]
+  );
+
+  // Navigation avec les flèches
+  const handleArrowNavigation = useCallback(
+    (e: KeyboardEvent, direction: 'up' | 'down' | 'left' | 'right') => {
+      if (!arrowNavigation) return;
+
+      const elements = getFocusableElements();
+      if (elements.length === 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      let newIndex = currentIndexRef.current;
+
+      if (orientation === 'horizontal' || orientation === 'both') {
+        if (direction === 'left') {
+          newIndex = currentIndexRef.current - 1;
+        } else if (direction === 'right') {
+          newIndex = currentIndexRef.current + 1;
         }
       }
 
-      // Navigation par flèches
-      if (arrowNavigation && containerRef.current) {
-        const focusableElements = containerRef.current.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-
-        const currentIndex = Array.from(focusableElements).indexOf(
-          document.activeElement as HTMLElement
-        );
-
-        if (e.key === 'ArrowDown' && currentIndex < focusableElements.length - 1) {
-          e.preventDefault();
-          focusableElements[currentIndex + 1]?.focus();
-        } else if (e.key === 'ArrowUp' && currentIndex > 0) {
-          e.preventDefault();
-          focusableElements[currentIndex - 1]?.focus();
+      if (orientation === 'vertical' || orientation === 'both') {
+        if (direction === 'up') {
+          newIndex = currentIndexRef.current - 1;
+        } else if (direction === 'down') {
+          newIndex = currentIndexRef.current + 1;
         }
       }
-    };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [shortcuts, arrowNavigation]);
+      focusElement(newIndex);
+    },
+    [arrowNavigation, orientation, getFocusableElements, focusElement]
+  );
 
-  // Focus initial
+  // Gestion des touches clavier
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const elements = getFocusableElements();
+      if (elements.length === 0) return;
+
+      // Trouver l'index de l'élément actuellement focusé
+      const currentElement = document.activeElement as HTMLElement;
+      const currentIndex = elements.findIndex((el) => el === currentElement);
+      if (currentIndex !== -1) {
+        currentIndexRef.current = currentIndex;
+      }
+
+      switch (e.key) {
+        case 'ArrowUp':
+          handleArrowNavigation(e, 'up');
+          break;
+        case 'ArrowDown':
+          handleArrowNavigation(e, 'down');
+          break;
+        case 'ArrowLeft':
+          handleArrowNavigation(e, 'left');
+          break;
+        case 'ArrowRight':
+          handleArrowNavigation(e, 'right');
+          break;
+        case 'Home':
+          if (homeEndNavigation) {
+            e.preventDefault();
+            focusElement(0);
+          }
+          break;
+        case 'End':
+          if (homeEndNavigation) {
+            e.preventDefault();
+            focusElement(elements.length - 1);
+          }
+          break;
+        default:
+          break;
+      }
+    },
+    [getFocusableElements, handleArrowNavigation, homeEndNavigation, focusElement]
+  );
+
+  // Initialiser la navigation
   useEffect(() => {
-    if (initialFocus?.current) {
-      initialFocus.current.focus();
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Initialiser avec le premier élément si spécifié
+    if (initialIndex >= 0) {
+      const elements = getFocusableElements();
+      if (elements[initialIndex]) {
+        elements[initialIndex].focus();
+        currentIndexRef.current = initialIndex;
+      }
     }
-  }, [initialFocus]);
 
-  // Navigation Tab améliorée
-  useEffect(() => {
-    if (!enhancedTabNavigation) return;
+    container.addEventListener('keydown', handleKeyDown);
 
-    const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-
-      const focusableElements = document.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
-
-      const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-      // Si on est sur le dernier élément et qu'on appuie sur Tab, aller au premier
-      if (e.shiftKey && document.activeElement === firstElement) {
-        e.preventDefault();
-        lastElement?.focus();
-      } else if (!e.shiftKey && document.activeElement === lastElement) {
-        e.preventDefault();
-        firstElement?.focus();
-      }
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
     };
-
-    document.addEventListener('keydown', handleTabKey);
-    return () => document.removeEventListener('keydown', handleTabKey);
-  }, [enhancedTabNavigation]);
-
-  const setContainerRef = useCallback((node: HTMLElement | null) => {
-    containerRef.current = node;
-  }, []);
+  }, [containerRef, handleKeyDown, initialIndex, getFocusableElements]);
 
   return {
-    containerRef: setContainerRef,
+    focusElement,
+    getFocusableElements,
+    currentIndex: currentIndexRef.current,
   };
-};
-
-/**
- * Raccourcis clavier globaux pour l'application
- */
-export const useGlobalKeyboardShortcuts = () => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + K : Recherche globale
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        // TODO: Ouvrir la recherche globale
-        logger.debug('Recherche globale (à implémenter)');
-      }
-
-      // Escape : Fermer les modales
-      if (e.key === 'Escape') {
-        const modals = document.querySelectorAll('[role="dialog"]');
-        const lastModal = modals[modals.length - 1] as HTMLElement;
-        if (lastModal) {
-          const closeButton = lastModal.querySelector<HTMLElement>('[aria-label*="fermer"], [aria-label*="close"]');
-          closeButton?.click();
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
-};
-
+}

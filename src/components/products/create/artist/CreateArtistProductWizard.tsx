@@ -92,11 +92,13 @@ export const CreateArtistProductWizard = ({
     artist_name: '',
     artist_bio: '',
     artist_website: '',
+    artist_photo_url: undefined,
     artist_social_links: {},
     artwork_title: '',
     artwork_year: null,
     artwork_medium: '',
     artwork_dimensions: { width: null, height: null, depth: null, unit: 'cm' },
+    artwork_link_url: undefined,
     edition_type: 'original',
     edition_number: null,
     total_editions: null,
@@ -172,9 +174,45 @@ export const CreateArtistProductWizard = ({
           toast({ title: 'Erreur', description: 'Veuillez remplir tous les champs obligatoires', variant: 'destructive' });
           return false;
         }
+        if (!formData.description || formData.description.trim().length < 10) {
+          toast({ title: 'Erreur', description: 'Veuillez ajouter une description (minimum 10 caractères)', variant: 'destructive' });
+          return false;
+        }
+        if (!formData.price || formData.price <= 0) {
+          toast({ title: 'Erreur', description: 'Le prix doit être supérieur à 0', variant: 'destructive' });
+          return false;
+        }
         if (!formData.images || formData.images.length === 0) {
           toast({ title: 'Erreur', description: 'Veuillez ajouter au moins une image', variant: 'destructive' });
           return false;
+        }
+        // Validation cohérence requires_shipping / artwork_link_url
+        if (!formData.requires_shipping && !formData.artwork_link_url) {
+          toast({ 
+            title: 'Erreur', 
+            description: 'Pour une œuvre non physique, un lien vers l\'œuvre est requis', 
+            variant: 'destructive' 
+          });
+          return false;
+        }
+        // Validation édition limitée
+        if (formData.edition_type === 'limited_edition') {
+          if (!formData.edition_number || !formData.total_editions) {
+            toast({ 
+              title: 'Erreur', 
+              description: 'Pour une édition limitée, le numéro d\'édition et le total sont requis', 
+              variant: 'destructive' 
+            });
+            return false;
+          }
+          if (formData.edition_number > formData.total_editions) {
+            toast({ 
+              title: 'Erreur', 
+              description: 'Le numéro d\'édition ne peut pas être supérieur au total', 
+              variant: 'destructive' 
+            });
+            return false;
+          }
         }
         return true;
       default:
@@ -214,12 +252,16 @@ export const CreateArtistProductWizard = ({
           name: formData.artwork_title || formData.name,
           slug,
           description: formData.description,
+          short_description: formData.short_description || null,
           price: formData.price || 0,
+          compare_at_price: formData.compare_at_price || null,
+          cost_per_item: formData.cost_per_item || null,
           currency: 'XOF',
           product_type: 'artist',
-          category_id: formData.category_id,
+          category_id: formData.category_id || null,
           image_url: formData.images?.[0] || null,
           images: formData.images || [],
+          tags: formData.tags || [],
           meta_title: formData.seo?.meta_title,
           meta_description: formData.seo?.meta_description,
           og_image: formData.seo?.og_image,
@@ -231,7 +273,18 @@ export const CreateArtistProductWizard = ({
         .select()
         .single();
 
-      if (productError) throw productError;
+      if (productError) {
+        // Gestion améliorée des erreurs de contrainte unique
+        if (productError.code === '23505' || productError.message?.includes('duplicate key')) {
+          const constraintMatch = productError.message?.match(/constraint ['"]([^'"]+)['"]/);
+          const constraintName = constraintMatch ? constraintMatch[1] : 'unknown';
+          
+          if (constraintName.includes('slug')) {
+            throw new Error('Ce slug est déjà utilisé par un autre produit de votre boutique. Veuillez modifier le nom ou l\'URL du produit.');
+          }
+        }
+        throw productError;
+      }
 
       // Create artist_product
       const { error: artistError } = await supabase
@@ -243,11 +296,13 @@ export const CreateArtistProductWizard = ({
           artist_name: formData.artist_name,
           artist_bio: formData.artist_bio,
           artist_website: formData.artist_website,
+          artist_photo_url: formData.artist_photo_url || null,
           artist_social_links: formData.artist_social_links || {},
           artwork_title: formData.artwork_title,
           artwork_year: formData.artwork_year,
           artwork_medium: formData.artwork_medium,
           artwork_dimensions: formData.artwork_dimensions,
+          artwork_link_url: formData.artwork_link_url || null,
           artwork_edition_type: formData.edition_type,
           edition_number: formData.edition_number,
           total_editions: formData.total_editions,
@@ -272,7 +327,7 @@ export const CreateArtistProductWizard = ({
       // Déclencher webhook product.created (asynchrone)
       if (product && !isDraft) {
         import('@/lib/webhooks/webhook-system').then(({ triggerWebhook }) => {
-          triggerWebhook(storeId, 'product.created', {
+          triggerWebhook(store.id, 'product.created', {
             product_id: product.id,
             name: product.name,
             product_type: product.product_type,
@@ -411,7 +466,7 @@ export const CreateArtistProductWizard = ({
           {currentStep === 7 && (
             <PaymentOptionsForm
               productPrice={formData.price || 0}
-              productType="physical"
+              productType="artist"
               data={formData.payment || { payment_type: 'full', percentage_rate: 30 }}
               onUpdate={(payment) => handleUpdateFormData({ payment })}
             />

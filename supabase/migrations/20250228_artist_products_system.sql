@@ -29,7 +29,7 @@ END $$;
 -- 2. Créer la table artist_products (extension pour produits artistes)
 CREATE TABLE IF NOT EXISTS public.artist_products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL UNIQUE REFERENCES public.products(id) ON DELETE CASCADE,
   store_id UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   
   -- Type d'artiste
@@ -103,15 +103,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER artist_products_updated_at
-  BEFORE UPDATE ON public.artist_products
-  FOR EACH ROW
-  EXECUTE FUNCTION update_artist_products_updated_at();
+-- Créer le trigger de manière idempotente
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger 
+    WHERE tgname = 'artist_products_updated_at'
+    AND tgrelid = 'public.artist_products'::regclass
+  ) THEN
+    CREATE TRIGGER artist_products_updated_at
+      BEFORE UPDATE ON public.artist_products
+      FOR EACH ROW
+      EXECUTE FUNCTION update_artist_products_updated_at();
+  END IF;
+END $$;
 
 -- RLS (Row Level Security)
 ALTER TABLE public.artist_products ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Les utilisateurs peuvent voir les produits artistes de leurs boutiques
+DROP POLICY IF EXISTS "Users can view their own store artist products" ON public.artist_products;
 CREATE POLICY "Users can view their own store artist products"
   ON public.artist_products
   FOR SELECT
@@ -124,6 +135,7 @@ CREATE POLICY "Users can view their own store artist products"
   );
 
 -- Policy: Les utilisateurs peuvent créer des produits artistes pour leurs boutiques
+DROP POLICY IF EXISTS "Users can create artist products for their stores" ON public.artist_products;
 CREATE POLICY "Users can create artist products for their stores"
   ON public.artist_products
   FOR INSERT
@@ -136,6 +148,7 @@ CREATE POLICY "Users can create artist products for their stores"
   );
 
 -- Policy: Les utilisateurs peuvent modifier leurs produits artistes
+DROP POLICY IF EXISTS "Users can update their own store artist products" ON public.artist_products;
 CREATE POLICY "Users can update their own store artist products"
   ON public.artist_products
   FOR UPDATE
@@ -148,6 +161,7 @@ CREATE POLICY "Users can update their own store artist products"
   );
 
 -- Policy: Les utilisateurs peuvent supprimer leurs produits artistes
+DROP POLICY IF EXISTS "Users can delete their own store artist products" ON public.artist_products;
 CREATE POLICY "Users can delete their own store artist products"
   ON public.artist_products
   FOR DELETE
@@ -160,6 +174,7 @@ CREATE POLICY "Users can delete their own store artist products"
   );
 
 -- Policy: Les visiteurs peuvent voir les produits artistes actifs
+DROP POLICY IF EXISTS "Public can view active artist products" ON public.artist_products;
 CREATE POLICY "Public can view active artist products"
   ON public.artist_products
   FOR SELECT

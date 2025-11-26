@@ -19,9 +19,12 @@ import {
   Facebook,
   Twitter,
   Youtube,
+  Link as LinkIcon,
+  Image as ImageIcon,
 } from 'lucide-react';
 import type { ArtistProductFormData } from '@/types/artist-product';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 interface ArtistPreviewProps {
   data: Partial<ArtistProductFormData>;
@@ -44,12 +47,27 @@ const EDITION_TYPE_LABELS: Record<string, string> = {
 };
 
 export const ArtistPreview = ({ data }: ArtistPreviewProps) => {
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [artistPhotoError, setArtistPhotoError] = useState(false);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'XOF',
       minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  const handleImageError = (imageUrl: string) => {
+    setImageErrors(prev => new Set(prev).add(imageUrl));
+  };
+
+  const handleArtistPhotoError = () => {
+    setArtistPhotoError(true);
+  };
+
+  const isValidImage = (imageUrl: string) => {
+    return imageUrl && !imageErrors.has(imageUrl);
   };
 
   return (
@@ -65,20 +83,80 @@ export const ArtistPreview = ({ data }: ArtistPreviewProps) => {
       {data.images && data.images.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Galerie d'images</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <ImageIcon className="h-5 w-5" />
+              Galerie d'images
+            </CardTitle>
+            <CardDescription>
+              {data.images.length} image{data.images.length > 1 ? 's' : ''} dans la galerie
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {data.images.map((image, index) => (
-                <div key={index} className="relative aspect-square rounded-lg overflow-hidden border">
+            {/* Image principale - plus grande */}
+            {isValidImage(data.images[0]) ? (
+              <div className="mb-4">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border-2 border-primary/20 bg-muted shadow-sm">
                   <img
-                    src={image}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    src={data.images[0]}
+                    alt="Aperçu principal de l'œuvre"
+                    className="w-full h-full object-contain"
+                    loading="eager"
+                    decoding="async"
+                    style={{
+                      imageRendering: 'high-quality',
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                    }}
+                    onError={() => handleImageError(data.images[0])}
                   />
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="mb-4">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/25 bg-muted flex items-center justify-center">
+                  <div className="text-center">
+                    <ImageIcon className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Image non disponible</p>
+                    <p className="text-xs text-muted-foreground mt-1">L'image n'a pas pu être chargée</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Miniatures de la galerie */}
+            {data.images.length > 1 && (
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                {data.images.slice(1).map((image, index) => (
+                  isValidImage(image) ? (
+                    <div 
+                      key={index + 1} 
+                      className="relative aspect-square rounded-lg overflow-hidden border bg-muted cursor-pointer hover:border-primary transition-colors group"
+                    >
+                      <img
+                        src={image}
+                        alt={`Aperçu ${index + 2}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        loading="lazy"
+                        decoding="async"
+                        style={{
+                          imageRendering: 'high-quality',
+                          backfaceVisibility: 'hidden',
+                          WebkitBackfaceVisibility: 'hidden',
+                        }}
+                        onError={() => handleImageError(image)}
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      key={index + 1} 
+                      className="relative aspect-square rounded-lg overflow-hidden border border-dashed border-muted-foreground/25 bg-muted flex items-center justify-center"
+                    >
+                      <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -137,6 +215,20 @@ export const ArtistPreview = ({ data }: ArtistPreviewProps) => {
             </div>
           )}
 
+          {data.artwork_link_url && !data.requires_shipping && (
+            <div className="flex items-center gap-2">
+              <LinkIcon className="h-4 w-4 text-muted-foreground" />
+              <a
+                href={data.artwork_link_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline break-all"
+              >
+                {data.artwork_link_url}
+              </a>
+            </div>
+          )}
+
           {data.edition_number && data.total_editions && (
             <div>
               <p className="text-sm text-muted-foreground">Édition</p>
@@ -157,9 +249,34 @@ export const ArtistPreview = ({ data }: ArtistPreviewProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <p className="text-sm text-muted-foreground">Nom de l'artiste</p>
-            <p className="text-lg font-semibold">{data.artist_name || 'Non renseigné'}</p>
+          <div className="flex items-start gap-4">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0 bg-muted shadow-md">
+              {data.artist_photo_url && !artistPhotoError ? (
+                <img
+                  src={data.artist_photo_url}
+                  alt="Photo de l'artiste"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  style={{
+                    imageRendering: 'high-quality',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                  }}
+                  onError={handleArtistPhotoError}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
+                  <User className="h-10 w-10 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <div>
+                <p className="text-sm text-muted-foreground">Nom de l'artiste</p>
+                <p className="text-lg font-semibold">{data.artist_name || 'Non renseigné'}</p>
+              </div>
+            </div>
           </div>
 
           {data.artist_bio && (

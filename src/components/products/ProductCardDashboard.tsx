@@ -376,4 +376,13 @@ const ProductCardDashboard = React.memo(ProductCardDashboardComponent, (prevProp
 
 ProductCardDashboard.displayName = 'ProductCardDashboard';
 
-export default ProductCardDashboard;
+// Optimisation avec React.memo pour éviter les re-renders inutiles
+export default React.memo(ProductCardDashboard, (prevProps, nextProps) => {
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.updated_at === nextProps.product.updated_at &&
+    prevProps.product.is_active === nextProps.product.is_active &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.storeId === nextProps.storeId
+  );
+});

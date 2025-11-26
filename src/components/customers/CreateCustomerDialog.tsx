@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSpaceInputFix } from "@/hooks/useSpaceInputFix";
+import { logger } from "@/lib/logger";
 
 interface CreateCustomerDialogProps {
   open: boolean;
@@ -67,7 +68,7 @@ const CreateCustomerDialogComponent = ({ open, onOpenChange, onSuccess, storeId 
             phone: customer.phone,
             created_at: customer.created_at,
           }).catch((err) => {
-            console.error('Error triggering webhook', err);
+            logger.error('Error triggering webhook', { error: err });
           });
         });
       }

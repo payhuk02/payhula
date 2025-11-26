@@ -14,6 +14,7 @@ import { Shield, FileText, PenTool, Upload, X, CheckCircle2, Info } from 'lucide
 import { useToast } from '@/hooks/use-toast';
 import { uploadToSupabaseStorage } from '@/utils/uploadToSupabase';
 import type { ArtistProductFormData } from '@/types/artist-product';
+import { CertificateUploader } from '@/components/artist/CertificateUploader';
 
 interface ArtistAuthenticationConfigProps {
   data: Partial<ArtistProductFormData>;
@@ -22,60 +23,6 @@ interface ArtistAuthenticationConfigProps {
 
 export const ArtistAuthenticationConfig = ({ data, onUpdate }: ArtistAuthenticationConfigProps) => {
   const { toast } = useToast();
-  const [uploading, setUploading] = useState(false);
-
-  const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Vérifier le type de fichier
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: '❌ Format non supporté',
-        description: 'Veuillez uploader un fichier PDF ou une image (JPG, PNG)',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const { url, error } = await uploadToSupabaseStorage(file, {
-        bucket: 'product-files',
-        path: 'certificates',
-        filePrefix: 'certificate',
-      });
-
-      if (error) throw error;
-
-      if (url) {
-        onUpdate({ certificate_file_url: url });
-        toast({
-          title: '✅ Certificat uploadé',
-          description: 'Le certificat d\'authenticité a été uploadé avec succès',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: '❌ Erreur d\'upload',
-        description: error instanceof Error ? error.message : 'Une erreur est survenue',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
-      e.target.value = '';
-    }
-  };
-
-  const handleRemoveCertificate = () => {
-    onUpdate({ certificate_file_url: '' });
-    toast({
-      title: 'Certificat supprimé',
-      description: 'Le certificat a été retiré',
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -99,52 +46,13 @@ export const ArtistAuthenticationConfig = ({ data, onUpdate }: ArtistAuthenticat
           </div>
         </CardHeader>
         {data.certificate_of_authenticity && (
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Uploader le certificat d'authenticité</Label>
-              {data.certificate_file_url ? (
-                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-8 w-8 text-green-500" />
-                    <div>
-                      <p className="font-medium">Certificat uploadé</p>
-                      <p className="text-xs text-muted-foreground">
-                        {data.certificate_file_url.split('/').pop()}
-                      </p>
-                    </div>
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveCertificate}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <span className="text-sm text-muted-foreground">
-                    {uploading ? 'Upload en cours...' : 'Cliquez pour uploader (PDF, JPG, PNG)'}
-                  </span>
-                  <input
-                    type="file"
-                    accept="application/pdf,image/jpeg,image/png,image/jpg"
-                    onChange={handleCertificateUpload}
-                    className="hidden"
-                    disabled={uploading}
-                  />
-                </label>
-              )}
-            </div>
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                Le certificat d'authenticité sera visible par les acheteurs sur la page produit. 
-                Il renforce la confiance et la valeur de l'œuvre.
-              </AlertDescription>
-            </Alert>
+          <CardContent>
+            <CertificateUploader
+              certificateUrl={data.certificate_file_url || null}
+              onCertificateChange={(url) => onUpdate({ certificate_file_url: url || '' })}
+              productId={data.product_id}
+              readOnly={false}
+            />
           </CardContent>
         )}
       </Card>

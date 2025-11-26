@@ -1,11 +1,11 @@
 /**
  * Types unifiés pour tous les produits e-commerce
- * Supporte: Digital, Physical, Service, Course + Affiliation
+ * Supporte: Digital, Physical, Service, Course, Artist + Affiliation
  */
 
 import { Store } from './store';
 
-export type ProductType = 'digital' | 'physical' | 'service' | 'course';
+export type ProductType = 'digital' | 'physical' | 'service' | 'course' | 'artist';
 
 export type ProductStatus = 'active' | 'draft' | 'archived';
 
@@ -125,9 +125,36 @@ export interface CourseProduct extends BaseProduct {
 }
 
 /**
+ * Œuvre d'Artiste
+ */
+export interface ArtistProduct extends BaseProduct {
+  type: 'artist';
+  artist_type?: 'writer' | 'musician' | 'visual_artist' | 'designer' | 'multimedia' | 'other';
+  artist_name?: string;
+  artist_bio?: string;
+  artwork_title?: string;
+  artwork_year?: number;
+  artwork_medium?: string;
+  artwork_dimensions?: {
+    width?: number | null;
+    height?: number | null;
+    depth?: number | null;
+    unit?: 'cm' | 'in';
+  };
+  edition_type?: 'original' | 'limited_edition' | 'print' | 'reproduction';
+  edition_number?: number | null;
+  total_editions?: number | null;
+  requires_shipping?: boolean;
+  shipping_fragile?: boolean;
+  shipping_insurance_required?: boolean;
+  certificate_of_authenticity?: boolean;
+  signature_authenticated?: boolean;
+}
+
+/**
  * Type unifié de produit (discriminated union)
  */
-export type UnifiedProduct = DigitalProduct | PhysicalProduct | ServiceProduct | CourseProduct;
+export type UnifiedProduct = DigitalProduct | PhysicalProduct | ServiceProduct | CourseProduct | ArtistProduct;
 
 /**
  * Props pour UnifiedProductCard
