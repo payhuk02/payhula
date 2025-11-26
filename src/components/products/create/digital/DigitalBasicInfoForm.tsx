@@ -24,9 +24,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
+import type { DigitalProductFormData, DigitalProductFormDataUpdate } from '@/types/digital-product-form';
+
 interface DigitalBasicInfoFormProps {
-  formData: any;
-  updateFormData: (updates: any) => void;
+  formData: DigitalProductFormData;
+  updateFormData: (updates: DigitalProductFormDataUpdate) => void;
   storeSlug: string;
 }
 
@@ -191,8 +193,9 @@ export const DigitalBasicInfoForm = ({
             size="icon"
             onClick={regenerateSlug}
             disabled={!formData.name}
+            aria-label="Régénérer l'URL du produit à partir du nom"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
         <div className="flex items-center gap-2 text-sm">
@@ -504,8 +507,9 @@ export const DigitalBasicInfoForm = ({
                     });
                   }}
                   disabled={uploadingImage}
+                  aria-label={`Supprimer l'image ${index + 1}`}
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </div>
             ))}
@@ -531,8 +535,9 @@ export const DigitalBasicInfoForm = ({
                     updateFormData({ image_url: '' });
                   }}
                   disabled={uploadingImage}
+                  aria-label="Supprimer l'image du produit"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </div>
             )}

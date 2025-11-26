@@ -114,7 +114,7 @@ export const ServiceBasicInfoForm = ({ data, onUpdate }: ServiceBasicInfoFormPro
         <Label htmlFor="service_type">Type de service *</Label>
         <Select
           value={data.service_type}
-          onValueChange={(value) => onUpdate({ service_type: value as any })}
+          onValueChange={(value) => onUpdate({ service_type: value as 'consultation' | 'workshop' | 'maintenance' | 'installation' | 'other' })}
         >
           <SelectTrigger id="service_type">
             <SelectValue placeholder="Sélectionnez un type" />

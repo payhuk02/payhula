@@ -54,7 +54,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
-import type { PhysicalProductFormData } from '@/types/physical-product';
+import type { 
+  PhysicalProductFormData, 
+  PhysicalProductFormDataUpdate,
+  PhysicalProductVariant 
+} from '@/types/physical-product';
 import { validateWithZod, formatValidators, getFieldError, physicalProductSchema } from '@/lib/wizard-validation';
 
 
@@ -170,7 +174,7 @@ export const CreatePhysicalProductWizard = ({
     showToasts: true,
   });
   
-  const [formData, setFormData] = useState<Partial<any>>({
+  const [formData, setFormData] = useState<Partial<PhysicalProductFormData>>({
     // Basic Info (Step 1)
     name: '',
     description: '',
@@ -250,7 +254,7 @@ export const CreatePhysicalProductWizard = ({
   /**
    * Update form data with auto-save
    */
-  const handleUpdateFormData = useCallback((data: any) => {
+  const handleUpdateFormData = useCallback((data: PhysicalProductFormDataUpdate) => {
     setFormData(prev => {
       const newData = { ...prev, ...data };
       
@@ -270,7 +274,7 @@ export const CreatePhysicalProductWizard = ({
   /**
    * Auto-save draft
    */
-  const handleAutoSave = useCallback(async (data?: any) => {
+  const handleAutoSave = useCallback(async (data?: PhysicalProductFormData) => {
     const dataToSave = data || formData;
     
     // Ne pas auto-save si pas de nom
@@ -635,7 +639,7 @@ export const CreatePhysicalProductWizard = ({
 
     // 4. Create variants if any
     if (formData.variants && formData.variants.length > 0) {
-      const variantsData = formData.variants.map((variant: any) => ({
+      const variantsData = formData.variants.map((variant: PhysicalProductVariant) => ({
         physical_product_id: product.id,
         variant_name: variant.variant_name,
         sku: variant.sku,
@@ -826,7 +830,7 @@ export const CreatePhysicalProductWizard = ({
           productPrice: formData.price || 0,
           productName: formData.name || t('products.product', 'Produit'),
           data: formData.affiliate || {},
-          onUpdate: (affiliateData: any) => handleUpdateFormData({ affiliate: affiliateData }),
+          onUpdate: (affiliateData: PhysicalProductFormDataUpdate['affiliate']) => handleUpdateFormData({ affiliate: affiliateData }),
         };
       
       case 6: // SEO & FAQs
@@ -846,7 +850,7 @@ export const CreatePhysicalProductWizard = ({
           productPrice: formData.price || 0,
           productType: 'physical' as const,
           data: formData.payment || {},
-          onUpdate: (paymentData: any) => handleUpdateFormData({ payment: paymentData }),
+          onUpdate: (paymentData: PhysicalProductFormDataUpdate['payment']) => handleUpdateFormData({ payment: paymentData }),
         };
       
       default:

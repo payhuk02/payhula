@@ -46,7 +46,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
-import type { ArtistProductFormData } from '@/types/artist-product';
+import type { ArtistProductFormData, ArtistType } from '@/types/artist-product';
 import { generateSlug } from '@/lib/validation-utils';
 
 // Skeleton de chargement pour les étapes lazy-loaded
@@ -108,7 +108,7 @@ const CreateArtistProductWizardComponent = ({
     images: [],
     category_id: null,
     tags: [],
-    artist_type: null as any,
+    artist_type: null as ArtistType | null,
     artist_name: '',
     artist_bio: '',
     artist_website: '',
@@ -153,7 +153,7 @@ const CreateArtistProductWizardComponent = ({
     });
   }, []);
 
-  const handleAutoSave = useCallback(async (data?: any) => {
+  const handleAutoSave = useCallback(async (data?: ArtistProductFormData) => {
     const dataToSave = data || formData;
     if (!dataToSave.artwork_title || dataToSave.artwork_title.trim() === '') return;
 
@@ -289,7 +289,7 @@ const CreateArtistProductWizardComponent = ({
           payment_options: formData.payment || { payment_type: 'full', percentage_rate: 30 },
           is_draft: isDraft,
           is_active: !isDraft,
-        } as any)
+        })
         .select()
         .single();
 
@@ -307,7 +307,7 @@ const CreateArtistProductWizardComponent = ({
       }
 
       // Create artist_product
-      const { error: artistError } = await (supabase as any)
+      const { error: artistError } = await supabase
         .from('artist_products')
         .insert({
           product_id: product.id,
@@ -603,7 +603,7 @@ const CreateArtistProductWizardComponent = ({
                   onUpdate={(seo) => handleUpdateFormData({ seo })}
                 />
                 <ProductFAQForm
-                  data={(formData.faqs || []).map((faq: any, index: number) => ({
+                  data={(formData.faqs || []).map((faq, index: number) => ({
                     id: faq.id || `faq-${Date.now()}-${index}`,
                     question: faq.question || '',
                     answer: faq.answer || '',

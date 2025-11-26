@@ -209,14 +209,15 @@ const ArtistBasicInfoFormComponent = ({ data, onUpdate }: ArtistBasicInfoFormPro
         title: "✅ Images uploadées",
         description: `${uploadedUrls.length} image(s) uploadée(s) avec succès`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Erreur upload images œuvre', { 
-        error: error.message || error,
+        error: errorMessage,
         errorDetails: error
       });
       toast({
         title: "❌ Erreur d'upload",
-        description: error.message || "Une erreur est survenue lors de l'upload",
+        description: errorMessage || "Une erreur est survenue lors de l'upload",
         variant: "destructive",
       });
     } finally {
@@ -316,11 +317,12 @@ const ArtistBasicInfoFormComponent = ({ data, onUpdate }: ArtistBasicInfoFormPro
         title: "✅ Photo uploadée",
         description: "La photo de l'artiste a été uploadée avec succès",
       });
-    } catch (error: any) {
-      logger.error('Erreur upload photo artiste', { error });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Erreur upload photo artiste', { error: errorMessage });
       toast({
         title: "❌ Erreur d'upload",
-        description: error.message || "Une erreur est survenue",
+        description: errorMessage || "Une erreur est survenue",
         variant: "destructive",
       });
     } finally {

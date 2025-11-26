@@ -41,12 +41,14 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 
 
+import type { CourseSection, CourseLesson, CourseFormData, CourseFormDataUpdate } from '@/types/course-form';
+
 interface Section {
   id: string;
   title: string;
   description?: string;
   order_index: number;
-  lessons: any[];
+  lessons: CourseLesson[];
   isOpen: boolean;
 }
 
@@ -194,7 +196,7 @@ export const CreateCourseWizard = ({
   /**
    * Update form data with auto-save
    */
-  const handleFieldChange = useCallback((field: string, value: any) => {
+  const handleFieldChange = useCallback((field: string, value: CourseFormDataUpdate[keyof CourseFormDataUpdate]) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
       
@@ -223,7 +225,7 @@ export const CreateCourseWizard = ({
   /**
    * Auto-save draft
    */
-  const handleAutoSave = useCallback(async (data?: any) => {
+  const handleAutoSave = useCallback(async (data?: CourseFormData) => {
     const dataToSave = data || formData;
     
     // Ne pas auto-save si pas de titre
