@@ -184,6 +184,7 @@ const PriceStockAlerts = lazy(() => import("./pages/customer/PriceStockAlerts"))
 const NotFound = lazy(() => import("./pages/NotFound"));
 const KYC = lazy(() => import("./pages/KYC"));
 const AdminKYC = lazy(() => import("./pages/AdminKYC"));
+const CommunityPage = lazy(() => import("./pages/community/CommunityPage"));
 const PlatformRevenue = lazy(() => import("./pages/PlatformRevenue"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const SEOAnalyzer = lazy(() => import("./pages/SEOAnalyzer"));
@@ -200,6 +201,7 @@ const AdminSales = lazy(() => import("./pages/admin/AdminSales"));
 const AdminReferrals = lazy(() => import("./pages/admin/AdminReferrals"));
 const AdminActivity = lazy(() => import("./pages/admin/AdminActivity"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminCommunity = lazy(() => import("./pages/admin/AdminCommunity"));
 const AdminCommissionSettings = lazy(() => import("./pages/admin/AdminCommissionSettings"));
 const PlatformCustomization = lazy(() => import("./pages/admin/PlatformCustomization").then(m => ({ default: m.PlatformCustomization })));
 const AdminCommissionPayments = lazy(() => import("./pages/admin/AdminCommissionPayments"));
@@ -408,6 +410,7 @@ const AppContent = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/community" element={<CommunityPage />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           
@@ -615,6 +618,7 @@ const AppContent = () => {
           <Route path="/admin/error-monitoring" element={<ProtectedRoute><AdminErrorMonitoring /></ProtectedRoute>} />
           <Route path="/admin/monitoring" element={<ProtectedRoute><AdminMonitoring /></ProtectedRoute>} />
           <Route path="/admin/accessibility" element={<ProtectedRoute><AdminAccessibilityReport /></ProtectedRoute>} />
+          <Route path="/admin/community" element={<ProtectedRoute><AdminCommunity /></ProtectedRoute>} />
 
           {/* --- Route de fallback --- */}
           <Route path="*" element={<NotFound />} />

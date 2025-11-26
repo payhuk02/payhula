@@ -56,6 +56,8 @@ const menuSections = [
       { icon: LayoutDashboard, label: 'Vue d\'ensemble', path: '/admin' },
       { icon: Users, label: 'Utilisateurs', path: '/admin/users' },
       { icon: Store, label: 'Boutiques', path: '/admin/stores' },
+      { icon: Users, label: 'Communauté', path: '/admin/community' },
+      { icon: Key, label: 'Licences', path: '/dashboard/license-management' },
     ]
   },
   {
@@ -64,7 +66,6 @@ const menuSections = [
       { icon: Package, label: 'Produits', path: '/admin/products' },
       { icon: GraduationCap, label: 'Cours', path: '/admin/courses' },
       { icon: FileText, label: 'Avis', path: '/admin/reviews' },
-      { icon: Key, label: 'Licences', path: '/dashboard/license-management' },
     ]
   },
   {
@@ -88,26 +89,32 @@ const menuSections = [
       { icon: Scale, label: 'Litiges', path: '/admin/disputes' },
       { icon: BarChart3, label: 'Statistiques Moneroo', path: '/admin/moneroo-analytics' },
       { icon: RotateCcw, label: 'Réconciliation Moneroo', path: '/admin/moneroo-reconciliation' },
-      { icon: BarChart3, label: 'Monitoring Transactions', path: '/admin/transaction-monitoring' },
     ]
   },
-    {
-      label: 'Systèmes & Intégrations',
-      items: [
-        { icon: Settings, label: 'Intégrations', path: '/admin/integrations' },
-        { icon: Webhook, label: 'Webhooks', path: '/admin/webhooks' },
-      { icon: Webhook, label: 'Webhooks Produits Digitaux', path: '/dashboard/digital-webhooks' },
-      { icon: Webhook, label: 'Webhooks Produits Physiques', path: '/dashboard/physical-webhooks' },
+  {
+    label: 'Marketing & Engagement',
+    items: [
+      { icon: UserPlus, label: 'Parrainages', path: '/admin/referrals' },
+      { icon: TrendingUp, label: 'Affiliation', path: '/admin/affiliates' },
       { icon: Star, label: 'Programme de Fidélité', path: '/admin/loyalty' },
       { icon: Gift, label: 'Cartes Cadeaux', path: '/admin/gift-cards' },
     ]
   },
   {
-    label: 'Croissance',
+    label: 'Systèmes & Intégrations',
     items: [
-      { icon: UserPlus, label: 'Parrainages', path: '/admin/referrals' },
-      { icon: TrendingUp, label: 'Affiliation', path: '/admin/affiliates' },
+      { icon: Settings, label: 'Intégrations', path: '/admin/integrations' },
+      { icon: Webhook, label: 'Webhooks', path: '/admin/webhooks' },
+      { icon: Webhook, label: 'Webhooks Produits Digitaux', path: '/dashboard/digital-webhooks' },
+      { icon: Webhook, label: 'Webhooks Produits Physiques', path: '/dashboard/physical-webhooks' },
+    ]
+  },
+  {
+    label: 'Analytics & Monitoring',
+    items: [
       { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
+      { icon: BarChart3, label: 'Monitoring Transactions', path: '/admin/transaction-monitoring' },
+      { icon: Activity, label: 'Monitoring', path: '/admin/monitoring' },
     ]
   },
   {
@@ -119,7 +126,6 @@ const menuSections = [
       { icon: FileText, label: 'Audit', path: '/admin/audit' },
       { icon: Headphones, label: 'Support', path: '/admin/support' },
       { icon: Bell, label: 'Notifications', path: '/admin/notifications' },
-      { icon: Activity, label: 'Monitoring', path: '/admin/monitoring' },
       { icon: Accessibility, label: 'Accessibilité', path: '/admin/accessibility' },
     ]
   },

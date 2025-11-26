@@ -263,7 +263,7 @@ const Auth = () => {
   const baseUrl = window.location.origin;
 
   return (
-    <div className="min-h-screen gradient-hero flex items-center justify-center p-4 relative">
+    <div className="min-h-screen gradient-hero flex items-center justify-center p-3 sm:p-4 md:p-6 relative">
       {/* SEO Meta Tags */}
       <SEOMeta
         title={`${t('nav.login')} / ${t('nav.signup')} - Payhuk`}
@@ -277,35 +277,35 @@ const Auth = () => {
       />
 
       {/* Language Switcher - Top Right */}
-      <div className="absolute top-4 right-4 z-50">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50">
         <LanguageSwitcher variant="outline" showLabel={false} />
       </div>
 
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6" aria-label="Retour à l'accueil">
+        <div className="text-center mb-6 sm:mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 mb-4 sm:mb-6" aria-label="Retour à l'accueil">
             <OptimizedImage
               src={payhukLogo}
               alt="Payhuk Logo"
               width={40}
               height={40}
-              className="h-10 w-10"
+              className="h-8 w-8 sm:h-10 sm:w-10"
               priority
             />
-            <span className="text-3xl font-bold">
+            <span className="text-2xl sm:text-3xl font-bold">
               Payhuk
             </span>
           </Link>
         </div>
 
         <Card className="shadow-large" role="main" aria-labelledby="auth-title">
-          <CardHeader>
-            <CardTitle id="auth-title">{getValue('auth.welcome') || t('auth.welcome')}</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle id="auth-title" className="text-xl sm:text-2xl">{getValue('auth.welcome') || t('auth.welcome')}</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               {getValue('auth.welcomeSubtitle') || t('auth.welcomeSubtitle')}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             {error && (
               <Alert variant="destructive" className="mb-4">
                 <AlertCircle className="h-4 w-4" />
@@ -339,6 +339,7 @@ const Auth = () => {
                       autoComplete="email"
                       aria-required="true"
                       aria-invalid={error.includes('email') || error.includes('Email')}
+                      className="min-h-[44px] text-base"
                     />
                   </div>
                   <div className="space-y-2">
@@ -352,7 +353,7 @@ const Auth = () => {
                           setResetError("");
                           setResetEmail("");
                         }}
-                        className="text-xs text-primary hover:underline"
+                        className="text-xs sm:text-sm text-primary hover:underline min-h-[44px] px-2 flex items-center"
                         aria-label="Réinitialiser le mot de passe"
                       >
                         {t('auth.login.forgotPassword', 'Mot de passe oublié ?')}
@@ -369,22 +370,22 @@ const Auth = () => {
                         autoComplete="current-password"
                         aria-required="true"
                         aria-invalid={error.includes('password') || error.includes('mot de passe')}
-                        className="pr-10"
+                        className="pr-12 min-h-[44px] text-base"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword({ ...showPassword, login: !showPassword.login })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                         aria-label={showPassword.login ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                         tabIndex={-1}
                       >
-                        {showPassword.login ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword.login ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
                   </div>
                   <Button
                     type="submit"
-                    className="w-full gradient-primary"
+                    className="w-full gradient-primary min-h-[44px] text-base"
                     disabled={isLoading}
                     aria-busy={isLoading}
                   >
@@ -413,6 +414,7 @@ const Auth = () => {
                       autoComplete="name"
                       aria-required="true"
                       aria-invalid={error.includes('name') || error.includes('nom')}
+                      className="min-h-[44px] text-base"
                     />
                   </div>
                   <div className="space-y-2">
@@ -427,6 +429,7 @@ const Auth = () => {
                       autoComplete="email"
                       aria-required="true"
                       aria-invalid={error.includes('email') || error.includes('Email')}
+                      className="min-h-[44px] text-base"
                     />
                   </div>
                   <div className="space-y-2">
@@ -443,17 +446,17 @@ const Auth = () => {
                         autoComplete="new-password"
                         aria-required="true"
                         aria-invalid={error.includes('password') || error.includes('mot de passe')}
-                        className="pr-10"
+                        className="pr-12 min-h-[44px] text-base"
                         onChange={(e) => handlePasswordChange(e.target.value, 'signup')}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword({ ...showPassword, signup: !showPassword.signup })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                         aria-label={showPassword.signup ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                         tabIndex={-1}
                       >
-                        {showPassword.signup ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword.signup ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
                     {passwordStrength > 0 && (
@@ -489,7 +492,7 @@ const Auth = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full gradient-primary"
+                    className="w-full gradient-primary min-h-[44px] text-base"
                     disabled={isLoading}
                     aria-busy={isLoading}
                   >
@@ -501,14 +504,14 @@ const Auth = () => {
           </CardContent>
         </Card>
 
-        <p className="text-center text-sm text-muted-foreground mt-4">
+        <p className="text-center text-xs sm:text-sm text-muted-foreground mt-4 px-2">
           {t('auth.termsNote')}
         </p>
       </div>
 
       {/* Dialog Réinitialisation du mot de passe */}
       <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{t('auth.forgotPassword.title', 'Réinitialiser le mot de passe')}</DialogTitle>
             <DialogDescription>
@@ -534,7 +537,7 @@ const Auth = () => {
                     setResetSent(false);
                     setResetEmail("");
                   }}
-                  className="w-full"
+                  className="w-full min-h-[44px] text-base"
                 >
                   {t('common.close', 'Fermer')}
                 </Button>
@@ -562,7 +565,7 @@ const Auth = () => {
                     required
                     disabled={isResetLoading}
                     autoComplete="email"
-                    className="pl-10"
+                    className="pl-10 min-h-[44px] text-base"
                     aria-required="true"
                   />
                 </div>
@@ -571,7 +574,7 @@ const Auth = () => {
               <div className="flex flex-col gap-2">
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full min-h-[44px] text-base"
                   disabled={isResetLoading || !resetEmail}
                   aria-busy={isResetLoading}
                 >
@@ -593,6 +596,7 @@ const Auth = () => {
                     setResetError("");
                   }}
                   disabled={isResetLoading}
+                  className="min-h-[44px] text-base"
                 >
                   {t('common.cancel', 'Annuler')}
                 </Button>

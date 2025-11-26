@@ -56,31 +56,40 @@ const Landing = () => {
     Autoplay({ delay: 4000, stopOnInteraction: true })
   );
 
-  // Animated counters for stats
+  // Animated counters for stats - Optimisé avec requestAnimationFrame
   useEffect(() => {
     const targetStats = { users: 2500, sales: 150000, stores: 850 };
     const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
+    const startTime = Date.now();
+    let animationFrameId: number;
 
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing function (ease-out)
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
       
       setAnimatedStats({
-        users: Math.floor(targetStats.users * progress),
-        sales: Math.floor(targetStats.sales * progress),
-        stores: Math.floor(targetStats.stores * progress)
+        users: Math.floor(targetStats.users * easedProgress),
+        sales: Math.floor(targetStats.sales * easedProgress),
+        stores: Math.floor(targetStats.stores * easedProgress)
       });
 
-      if (step >= steps) {
-        clearInterval(timer);
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
         setAnimatedStats(targetStats);
       }
-    }, interval);
+    };
 
-    return () => clearInterval(timer);
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
   const baseUrl = window.location.origin;
@@ -111,7 +120,14 @@ const Landing = () => {
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur-sm shadow-soft" role="banner">
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            <img src={payhukLogo} alt="Payhuk" className="h-6 w-6 sm:h-8 sm:w-8" />
+            <OptimizedImage
+              src={payhukLogo}
+              alt="Payhuk"
+              width={32}
+              height={32}
+              className="h-6 w-6 sm:h-8 sm:w-8"
+              priority={true}
+            />
             <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               Payhuk
             </span>
@@ -160,9 +176,10 @@ const Landing = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 text-foreground hover:text-primary transition-smooth"
+            className="lg:hidden p-2.5 text-foreground hover:text-primary transition-smooth min-h-[44px] min-w-[44px] flex items-center justify-center"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -250,30 +267,33 @@ const Landing = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-card/50 backdrop-blur-sm text-base md:text-lg px-6 md:px-8 py-5 md:py-6 border-border hover:bg-card hover:scale-105 transition-smooth">
-                {getValue('landing.hero.ctaSecondary')}
-              </Button>
+              <Link to="/community" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-card/50 backdrop-blur-sm text-base md:text-lg px-6 md:px-8 py-5 md:py-6 border-border hover:bg-card hover:scale-105 transition-smooth">
+                  <Users className="mr-2 h-5 w-5" />
+                  Rejoindre la communauté
+                </Button>
+              </Link>
             </div>
 
             {/* Stats Counter */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 lg:gap-8 max-w-3xl mx-auto mb-8 sm:mb-12 px-2 sm:px-4">
               <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 border border-border">
-                <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-0.5 sm:mb-1 break-words">
+                <div className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-0.5 sm:mb-1 break-words">
                   {animatedStats.users.toLocaleString()}+
                 </div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{getValue('landing.stats.users')}</div>
+                <div className="text-[11px] sm:text-xs md:text-sm text-muted-foreground leading-tight">{getValue('landing.stats.users')}</div>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 border border-border">
-                <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent mb-0.5 sm:mb-1 break-words">
+                <div className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-bold text-accent mb-0.5 sm:mb-1 break-words">
                   {animatedStats.sales.toLocaleString()}+
                 </div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{getValue('landing.stats.sales')}</div>
+                <div className="text-[11px] sm:text-xs md:text-sm text-muted-foreground leading-tight">{getValue('landing.stats.sales')}</div>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 border border-border">
-                <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-0.5 sm:mb-1 break-words">
+                <div className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-0.5 sm:mb-1 break-words">
                   {animatedStats.stores}+
                 </div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{getValue('landing.stats.stores')}</div>
+                <div className="text-[11px] sm:text-xs md:text-sm text-muted-foreground leading-tight">{getValue('landing.stats.stores')}</div>
               </div>
             </div>
 
@@ -831,11 +851,17 @@ const Landing = () => {
             <p className="text-base md:text-xl text-muted-foreground mb-8 px-4">
               {getValue('landing.finalCta.subtitle')}
             </p>
-            <div className="px-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
               <Link to="/auth">
                 <Button size="lg" className="w-full sm:w-auto gradient-accent text-accent-foreground font-semibold text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-glow hover:opacity-90 hover:scale-105 transition-smooth">
                   {getValue('landing.finalCta.button')}
                   <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/community">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-card/50 backdrop-blur-sm text-base md:text-lg px-6 md:px-8 py-5 md:py-6 border-border hover:bg-card hover:scale-105 transition-smooth">
+                  <Users className="mr-2 h-5 w-5" />
+                  Rejoindre la communauté
                 </Button>
               </Link>
             </div>
@@ -845,11 +871,18 @@ const Landing = () => {
 
       {/* Footer */}
       <footer className="border-t bg-card py-12 md:py-16" role="contentinfo">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-8 mb-12">
-            <div className="col-span-2 md:col-span-1">
+        <div className="container mx-auto px-3 sm:px-4 md:px-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-12">
+            <div className="col-span-1 xs:col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <img src={payhukLogo} alt="Payhuk" className="h-8 w-8" />
+                <OptimizedImage
+                  src={payhukLogo}
+                  alt="Payhuk"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8"
+                  loading="lazy"
+                />
                 <span className="text-lg md:text-xl font-bold text-foreground">Payhuk</span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
@@ -859,28 +892,32 @@ const Landing = () => {
             
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.product')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.features')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.pricing')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.demo')}</Link></li>
+              <ul className="space-y-2.5 text-sm sm:text-base">
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.features')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.pricing')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.demo')}</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.support')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.documentation')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.guides')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.contact')}</Link></li>
+              <ul className="space-y-2.5 text-sm sm:text-base">
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.documentation')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.guides')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.contact')}</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.company')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.about')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.blog')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth">{getValue('landing.footer.links.careers')}</Link></li>
+              <ul className="space-y-2.5 text-sm sm:text-base">
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.about')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.blog')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.careers')}</Link></li>
+                <li><Link to="/community" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth flex items-center gap-1 min-h-[44px]">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Communauté
+                </Link></li>
               </ul>
             </div>
           </div>

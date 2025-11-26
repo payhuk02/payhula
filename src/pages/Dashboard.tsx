@@ -140,7 +140,7 @@ const Dashboard = () => {
                   </p>
                   <Button 
                     onClick={() => navigate("/dashboard/store")} 
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white min-h-[44px] text-sm sm:text-base"
                   >
                     {getValue('dashboard.createStoreButton')}
                   </Button>
@@ -183,7 +183,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
-                  <Badge variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 hidden sm:flex items-center gap-1.5" aria-label={getValue('dashboard.online') || 'En ligne'}>
+                  <Badge variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 hidden sm:flex items-center gap-1.5 min-h-[44px]" aria-label={getValue('dashboard.online') || 'En ligne'}>
                   <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                   {getValue('dashboard.online')}
                 </Badge>
@@ -191,11 +191,11 @@ const Dashboard = () => {
                   variant="ghost" 
                   size="sm" 
                   onClick={handleRefresh}
-                  className="h-9 sm:h-10 w-9 sm:w-10 p-0"
+                  className="min-h-[44px] min-w-[44px] p-0"
                   aria-label={getValue('dashboard.refresh')}
                   title={getValue('dashboard.refresh')}
                 >
-                  <Activity className="h-4 w-4" aria-hidden="true" />
+                  <Activity className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
             </div>
@@ -213,7 +213,7 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     onClick={handleRefresh}
-                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                    className="min-h-[44px] text-xs sm:text-sm"
                     aria-label={t('dashboard.retry')}
                   >
                     {t('dashboard.retry')}
@@ -277,13 +277,13 @@ const Dashboard = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-3 sm:p-4 pt-0">
-                        <div className={`text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1`}>
+                        <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1 break-words`}>
                           {stat.value}
                         </div>
-                        <p className="text-xs text-muted-foreground mb-2">
+                        <p className="text-[11px] sm:text-xs text-muted-foreground mb-2 leading-tight">
                           {stat.description}
                         </p>
-                        <Badge variant="default" className="text-xs px-2 py-0.5">
+                        <Badge variant="default" className="text-[10px] sm:text-xs px-2 py-0.5">
                           {stat.trend}
                         </Badge>
                       </CardContent>
@@ -337,7 +337,7 @@ const Dashboard = () => {
                     return (
                       <Card
                         key={action.title}
-                        className="cursor-pointer border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group touch-manipulation min-h-[120px] sm:min-h-[140px] animate-in fade-in slide-in-from-bottom-4"
+                        className="cursor-pointer border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group touch-manipulation min-h-[100px] sm:min-h-[120px] md:min-h-[140px] animate-in fade-in slide-in-from-bottom-4"
                         style={{ animationDelay: `${index * 100}ms` }}
                         onClick={action.onClick}
                         role="listitem"
@@ -350,17 +350,17 @@ const Dashboard = () => {
                           }
                         }}
                       >
-                        <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-center">
-                          <div className="flex items-start gap-3">
-                            <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color === 'from-green-600 to-emerald-600' ? 'from-green-500/10 to-emerald-500/10' : action.color === 'from-blue-600 to-cyan-600' ? 'from-blue-500/10 to-cyan-500/10' : 'from-purple-500/10 to-pink-500/10'} group-hover:opacity-80 transition-colors shrink-0`}>
+                        <CardContent className="p-3 sm:p-4 md:p-6 h-full flex flex-col justify-center">
+                          <div className="flex items-start gap-2 sm:gap-3">
+                            <div className={`p-2.5 sm:p-3 rounded-xl bg-gradient-to-br ${action.color === 'from-green-600 to-emerald-600' ? 'from-green-500/10 to-emerald-500/10' : action.color === 'from-blue-600 to-cyan-600' ? 'from-blue-500/10 to-cyan-500/10' : 'from-purple-500/10 to-pink-500/10'} group-hover:opacity-80 transition-colors shrink-0`}>
                               <Icon 
                                 className={`h-5 w-5 sm:h-6 sm:w-6 ${action.color === 'from-green-600 to-emerald-600' ? 'text-green-500' : action.color === 'from-blue-600 to-cyan-600' ? 'text-blue-500' : 'text-purple-500'}`} 
                                 aria-hidden="true" 
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm sm:text-base mb-1">{action.title}</h3>
-                              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{action.description}</p>
+                              <h3 className="font-semibold text-sm sm:text-base mb-1 break-words">{action.title}</h3>
+                              <p className="text-[11px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 leading-relaxed">{action.description}</p>
                             </div>
                           </div>
                         </CardContent>
@@ -374,7 +374,7 @@ const Dashboard = () => {
             {/* Bottom Row - Responsive & Animated */}
             <div 
               ref={bottomRef} 
-              className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700" 
+              className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700" 
               role="region" 
               aria-label={t('dashboard.bottomSection.ariaLabel', 'Notifications et activité récente')}
             >
@@ -399,17 +399,23 @@ const Dashboard = () => {
                       notifications.map((notification) => (
                         <div 
                           key={notification.id} 
-                          className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation" 
+                          className="flex items-start gap-3 p-3 sm:p-4 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation min-h-[60px] cursor-pointer" 
                           role="listitem"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                            }
+                          }}
                         >
                           <div className="flex-shrink-0 mt-0.5">
-                            <div className="p-1.5 rounded-full bg-blue-500/10">
-                              <Bell className="h-3 w-3 text-blue-500" aria-hidden="true" />
+                            <div className="p-1.5 sm:p-2 rounded-full bg-blue-500/10">
+                              <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" aria-hidden="true" />
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-xs sm:text-sm font-medium mb-1">{notification.title}</h4>
-                            <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{notification.message}</p>
+                            <p className="text-[11px] sm:text-xs text-muted-foreground mb-2 line-clamp-2 leading-relaxed">{notification.message}</p>
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs text-muted-foreground">
                                 {new Date(notification.timestamp).toLocaleString('fr-FR', {
@@ -455,15 +461,21 @@ const Dashboard = () => {
                       stats.recentActivity.map((activity) => (
                         <div 
                           key={activity.id} 
-                          className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation"
+                          className="flex items-start gap-3 p-3 sm:p-4 rounded-lg hover:bg-muted/50 transition-colors touch-manipulation min-h-[60px] cursor-pointer"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                            }
+                          }}
                         >
                           <div className="flex-shrink-0 mt-0.5">
-                            <div className="p-1.5 rounded-full bg-green-500/10">
-                              <Activity className="h-3 w-3 text-green-500" />
+                            <div className="p-1.5 sm:p-2 rounded-full bg-green-500/10">
+                              <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-xs sm:text-sm font-medium mb-1 line-clamp-2">{activity.message}</h4>
+                            <h4 className="text-xs sm:text-sm font-medium mb-1 line-clamp-2 leading-relaxed">{activity.message}</h4>
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs text-muted-foreground">
                                 {new Date(activity.timestamp).toLocaleString('fr-FR', {
