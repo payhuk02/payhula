@@ -11,10 +11,9 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { Calendar, dateFnsLocalizer, View, Views, ToolbarProps, Event as RBEvent } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, addHours, startOfDay, endOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { LazyCalendarWrapper } from '@/components/calendar/LazyCalendarWrapper';
 import './ServiceBookingCalendar.css'; // Custom styles
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,18 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Setup localizer
-const locales = {
-  'fr': fr,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
-  getDay,
-  locales,
-});
+// Localizer will be created inside the component with lazy-loaded calendar
 
 // Messages en français
 const messages = {
@@ -105,7 +93,7 @@ const ServiceBookingCalendar = ({
   onSelectEvent,
   onEventDrop,
   onEventResize,
-  defaultView = Views.WEEK,
+  defaultView = 'week',
   minTime = new Date(0, 0, 0, 8, 0, 0), // 8:00 AM
   maxTime = new Date(0, 0, 0, 20, 0, 0), // 8:00 PM
   step = 30,
@@ -115,7 +103,7 @@ const ServiceBookingCalendar = ({
   enableDragDrop = false,
   showLegend = true,
 }: ServiceBookingCalendarProps) => {
-  const [view, setView] = useState<View>(defaultView);
+  const [view, setView] = useState<string>(defaultView);
   const [date, setDate] = useState(new Date());
 
   // Event style getter
@@ -273,7 +261,7 @@ const ServiceBookingCalendar = ({
   }, [enableDragDrop, onEventDrop]);
 
   // Handle event resize
-  const handleEventResize = useCallback(({ event, start, end }: { event: RBEvent; start: Date; end: Date }) => {
+  const handleEventResize = useCallback(({ event, start, end }: { event: BookingEvent; start: Date; end: Date }) => {
     if (enableDragDrop && onEventResize) {
       const bookingEvent = event as BookingEvent;
       onEventResize(bookingEvent, start, end);
@@ -281,7 +269,7 @@ const ServiceBookingCalendar = ({
   }, [enableDragDrop, onEventResize]);
 
   // Toolbar customization
-  const CustomToolbar = (toolbar: ToolbarProps) => {
+  const CustomToolbar = (toolbar: any) => {
     const goToBack = () => {
       toolbar.onNavigate('PREV');
     };

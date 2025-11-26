@@ -7,10 +7,9 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { Calendar, dateFnsLocalizer, View, Views } from 'react-big-calendar';
 import { format, parse, startOfWeek, endOfWeek, startOfMonth, endOfMonth, getDay, startOfDay, endOfDay, addDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { LazyCalendarWrapper } from '@/components/calendar/LazyCalendarWrapper';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,18 +47,7 @@ import { useStore } from '@/hooks/useStore';
 import { format as formatDate } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 
-// Setup localizer
-const locales = {
-  'fr': fr,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
-  getDay,
-  locales,
-});
+// Localizer will be created inside the component with lazy-loaded calendar
 
 // Messages en français
 const messages = {
@@ -101,7 +89,7 @@ export default function AdvancedServiceCalendar({
 }: AdvancedServiceCalendarProps) {
   const { store } = useStore();
 
-  const [view, setView] = useState<View>(Views.WEEK);
+  const [view, setView] = useState<string>('week');
   const [date, setDate] = useState(new Date());
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
@@ -112,12 +100,12 @@ export default function AdvancedServiceCalendar({
   // Récupérer les données
   const { data: bookings = [], isLoading: bookingsLoading } = useCalendarBookings(store?.id, {
     dateRange: useMemo(() => {
-      if (view === Views.MONTH) {
+      if (view === 'month') {
         return {
           start: startOfMonth(date),
           end: endOfMonth(date),
         };
-      } else if (view === Views.WEEK) {
+      } else if (view === 'week') {
         return {
           start: startOfWeek(date, { locale: fr }),
           end: endOfWeek(date, { locale: fr }),
@@ -509,31 +497,45 @@ export default function AdvancedServiceCalendar({
                 </Card>
               ) : (
                 <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-auto">
-                  <Calendar
-                    localizer={localizer}
-                    events={filteredBookings}
-                    startAccessor="start"
-                    endAccessor="end"
-                    view={Views.MONTH}
-                    onView={(newView: View) => {
-                      setView(newView);
-                      setTimelineView(false);
+                  <LazyCalendarWrapper>
+                    {(calendar) => {
+                      const localizer = calendar.dateFnsLocalizer({
+                        format,
+                        parse,
+                        startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
+                        getDay,
+                        locales: { 'fr': fr },
+                      });
+
+                      return (
+                        <calendar.Calendar
+                          localizer={localizer}
+                          events={filteredBookings}
+                          startAccessor="start"
+                          endAccessor="end"
+                          view={calendar.Views.MONTH}
+                          onView={(newView: any) => {
+                            setView(newView);
+                            setTimelineView(false);
+                          }}
+                          date={date}
+                          onNavigate={setDate}
+                          onSelectEvent={handleSelectEvent}
+                          onEventDrop={enableDragDrop ? handleEventDrop : undefined}
+                          eventPropGetter={eventStyleGetter}
+                          messages={messages}
+                          step={30}
+                          timeslots={2}
+                          min={new Date(0, 0, 0, 8, 0, 0)}
+                          max={new Date(0, 0, 0, 20, 0, 0)}
+                          defaultDate={new Date()}
+                          draggableAccessor={() => enableDragDrop}
+                          resizable={false}
+                          popup
+                        />
+                      );
                     }}
-                    date={date}
-                    onNavigate={setDate}
-                    onSelectEvent={handleSelectEvent}
-                    onEventDrop={enableDragDrop ? handleEventDrop : undefined}
-                    eventPropGetter={eventStyleGetter}
-                    messages={messages}
-                    step={30}
-                    timeslots={2}
-                    min={new Date(0, 0, 0, 8, 0, 0)}
-                    max={new Date(0, 0, 0, 20, 0, 0)}
-                    defaultDate={new Date()}
-                    draggableAccessor={() => enableDragDrop}
-                    resizable={false}
-                    popup
-                  />
+                  </LazyCalendarWrapper>
                 </div>
               )}
             </TabsContent>
