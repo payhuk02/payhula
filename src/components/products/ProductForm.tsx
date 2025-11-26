@@ -574,7 +574,7 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
                         description: "Les champs ont été remplis automatiquement",
                       });
                     }}
-                    currentType={formData.product_type as any}
+                    currentType={formData.product_type as 'digital' | 'physical' | 'service' | 'course' | 'artist' | string}
                   />
                 </Suspense>
               )}
