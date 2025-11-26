@@ -14,7 +14,8 @@ import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package, RefreshCw,
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useState, useEffect } from 'react';
+import { loadRecharts } from '@/lib/recharts-loader';
 
 interface PhysicalProductsDashboardProps {
   storeId: string;
@@ -190,25 +191,29 @@ export const PhysicalProductsDashboard = ({ storeId }: PhysicalProductsDashboard
               <CardTitle>Évolution des Revenus</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={trends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    tickFormatter={(value) => format(new Date(value), 'dd/MM', { locale: fr })}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#10b981" 
-                    strokeWidth={2}
-                    name="Revenus (XOF)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <LazyRechartsWrapper>
+                {(recharts) => (
+                  <recharts.ResponsiveContainer width="100%" height={300}>
+                    <recharts.LineChart data={trends}>
+                      <recharts.CartesianGrid strokeDasharray="3 3" />
+                      <recharts.XAxis 
+                        dataKey="date" 
+                        tickFormatter={(value) => format(new Date(value), 'dd/MM', { locale: fr })}
+                      />
+                      <recharts.YAxis />
+                      <recharts.Tooltip />
+                      <recharts.Legend />
+                      <recharts.Line 
+                        type="monotone" 
+                        dataKey="revenue" 
+                        stroke="#10b981" 
+                        strokeWidth={2}
+                        name="Revenus (XOF)"
+                      />
+                    </recharts.LineChart>
+                  </recharts.ResponsiveContainer>
+                )}
+              </LazyRechartsWrapper>
             </CardContent>
           </Card>
         </TabsContent>
@@ -219,20 +224,24 @@ export const PhysicalProductsDashboard = ({ storeId }: PhysicalProductsDashboard
               <CardTitle>Évolution des Commandes</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={trends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    tickFormatter={(value) => format(new Date(value), 'dd/MM', { locale: fr })}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="orders" fill="#3b82f6" name="Commandes" />
-                  <Bar dataKey="units_sold" fill="#f59e0b" name="Unités vendues" />
-                </BarChart>
-              </ResponsiveContainer>
+              <LazyRechartsWrapper>
+                {(recharts) => (
+                  <recharts.ResponsiveContainer width="100%" height={300}>
+                    <recharts.BarChart data={trends}>
+                      <recharts.CartesianGrid strokeDasharray="3 3" />
+                      <recharts.XAxis 
+                        dataKey="date" 
+                        tickFormatter={(value) => format(new Date(value), 'dd/MM', { locale: fr })}
+                      />
+                      <recharts.YAxis />
+                      <recharts.Tooltip />
+                      <recharts.Legend />
+                      <recharts.Bar dataKey="orders" fill="#3b82f6" name="Commandes" />
+                      <recharts.Bar dataKey="units_sold" fill="#f59e0b" name="Unités vendues" />
+                    </recharts.BarChart>
+                  </recharts.ResponsiveContainer>
+                )}
+              </LazyRechartsWrapper>
             </CardContent>
           </Card>
         </TabsContent>
