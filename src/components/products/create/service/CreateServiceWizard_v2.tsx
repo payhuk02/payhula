@@ -188,7 +188,7 @@ export const CreateServiceWizard = ({
     showToasts: true,
   });
   
-  const [formData, setFormData] = useState<Partial<any>>({
+  const [formData, setFormData] = useState<Partial<ServiceProductFormData>>({
     // Basic Info (Step 1)
     name: '',
     description: '',

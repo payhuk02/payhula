@@ -11,6 +11,7 @@ import { Eye, Save, MoreVertical, Loader2, CheckCircle2, AlertCircle } from "@/c
 import { generateSlug } from "@/lib/store-utils";
 import { logger } from "@/lib/logger";
 import "@/styles/product-creation.css";
+import type { ProductFormData, ProductFormDataUpdate } from '@/types/product-form';
 
 // 🚀 Lazy loading des onglets pour optimiser les performances (-40% temps de chargement)
 const ProductInfoTab = lazy(() => import("./tabs/ProductInfoTab").then(m => ({ default: m.ProductInfoTab })));
@@ -36,79 +37,18 @@ const CreateCourseWizard = lazy(() => import("../courses/create/CreateCourseWiza
 // 📚 Templates de produits
 const TemplateSelector = lazy(() => import("./TemplateSelector").then(m => ({ default: m.TemplateSelector })));
 
+import type { ProductFormData, ProductFormDataUpdate } from '@/types/product-form';
+
 interface ProductFormProps {
   storeId: string;
   storeSlug: string;
   productId?: string;
-  initialData?: any;
+  initialData?: Partial<ProductFormData>;
   onSuccess?: () => void;
 }
 
 // Types pour les données du formulaire
-interface ProductFormData {
-  // Informations de base
-  name: string;
-  slug: string;
-  category: string;
-  product_type: string;
-  pricing_model: string;
-  price: number;
-  promotional_price: number | null;
-  currency: string;
-  
-  // Description et contenu
-  description: string;
-  short_description: string;
-  features: string[];
-  specifications: any[];
-  
-  // Images et médias
-  image_url: string;
-  images: string[];
-  video_url: string;
-  gallery_images: string[];
-  
-  // Fichiers et téléchargements
-  downloadable_files: any[];
-  file_access_type: string;
-  download_limit: number | null;
-  download_expiry_days: number | null;
-  
-  // Champs personnalisés
-  custom_fields: any[];
-  
-  // FAQ
-  faqs: any[];
-  
-  // SEO et métadonnées
-  meta_title: string;
-  meta_description: string;
-  meta_keywords: string;
-  og_image: string;
-  og_title: string;
-  og_description: string;
-  
-  // Analytics et tracking
-  analytics_enabled: boolean;
-  track_views: boolean;
-  track_clicks: boolean;
-  track_purchases: boolean;
-  track_time_spent: boolean;
-  google_analytics_id: string;
-  facebook_pixel_id: string;
-  google_tag_manager_id: string;
-  tiktok_pixel_id: string;
-  pinterest_pixel_id: string;
-  advanced_tracking: boolean;
-  custom_events: string[];
-  
-  // Pixels et tracking
-  pixels_enabled: boolean;
-  conversion_pixels: any[];
-  retargeting_pixels: any[];
-  
-  // Variantes et attributs
-  variants: any[];
+interface ProductFormDataExtended extends ProductFormData {
   color_variants: boolean;
   size_variants: boolean;
   pattern_variants: boolean;
@@ -195,7 +135,7 @@ const TabLoadingSkeleton = () => (
 );
 
 // Données par défaut vides pour création d'un nouveau produit
-const getEmptyFormData = (): ProductFormData => ({
+const getEmptyFormData = (): ProductFormDataExtended => ({
   // Informations de base
   name: "",
   slug: "",
@@ -344,7 +284,7 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
     return getEmptyFormData();
   });
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: ProductFormDataUpdate[keyof ProductFormDataUpdate]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setIsDirty(true);
     

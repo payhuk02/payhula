@@ -319,7 +319,7 @@ export const RichTextEditorPro = ({
     variant = "ghost"
   }: {
     onClick: () => void;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     title: string;
     isActive?: boolean;
     disabled?: boolean;

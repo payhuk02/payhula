@@ -195,11 +195,12 @@ export const ImageUpload = ({
         duration: 5000,
       });
 
-    } catch (error: any) {
-      logger.error('Upload error', { error, fileCount: fileArray.length });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Upload error', { error: errorMessage, fileCount: fileArray.length });
       toast({
         title: "Erreur de téléchargement",
-        description: error.message || "Une erreur est survenue lors du téléchargement.",
+        description: errorMessage || "Une erreur est survenue lors du téléchargement.",
         variant: "destructive",
       });
     } finally {

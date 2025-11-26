@@ -157,7 +157,7 @@ export const RichTextEditor = ({
     disabled: btnDisabled = false 
   }: {
     onClick: () => void;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     title: string;
     isActive?: boolean;
     disabled?: boolean;

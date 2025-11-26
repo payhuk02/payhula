@@ -24,6 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { WebhookEventType } from '@/types/webhooks';
 
 interface WebhookFormProps {
   webhookId?: string;
@@ -82,21 +83,23 @@ export const WebhookForm = ({ webhookId, storeId, onSuccess, onCancel }: Webhook
       if (webhookId && existingWebhook) {
         await updateWebhook.mutateAsync({
           id: webhookId,
-          event_type: formData.event_type as any,
+          event_type: formData.event_type as WebhookEventType,
           target_url: formData.target_url,
           is_active: formData.is_active,
         });
       } else {
         await createWebhook.mutateAsync({
           store_id: storeId,
-          event_type: formData.event_type as any,
+          event_type: formData.event_type as WebhookEventType,
           target_url: formData.target_url,
           is_active: formData.is_active,
         });
       }
       onSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // L'erreur est déjà gérée par le hook
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Webhook form error', { error: errorMessage });
     }
   };
 
