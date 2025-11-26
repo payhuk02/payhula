@@ -201,8 +201,9 @@ export const PhysicalBasicInfoForm = ({ data, onUpdate }: PhysicalBasicInfoFormP
               <button
                 onClick={() => handleRemoveImage(index)}
                 className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label={`Supprimer l'image ${index + 1}`}
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           ))}
@@ -246,8 +247,9 @@ export const PhysicalBasicInfoForm = ({ data, onUpdate }: PhysicalBasicInfoFormP
               <button
                 onClick={() => handleTagRemove(index)}
                 className="hover:text-destructive"
+                aria-label={`Supprimer le tag "${tag}"`}
               >
-                <X className="h-3 w-3" />
+                <X className="h-3 w-3" aria-hidden="true" />
               </button>
             </Badge>
           ))}
