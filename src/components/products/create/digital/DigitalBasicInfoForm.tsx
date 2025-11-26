@@ -13,11 +13,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Check, X, Gift, Info } from '@/components/icons';
+import { Upload, Loader2, Image as ImageIcon } from 'lucide-react';
 import { generateSlug } from '@/lib/store-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { AIContentGenerator } from '@/components/products/AIContentGenerator';
 import { logger } from '@/lib/logger';
 import { useSpaceInputFix } from '@/hooks/useSpaceInputFix';
+import { uploadToSupabaseStorage } from '@/utils/uploadToSupabase';
+import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 interface DigitalBasicInfoFormProps {
   formData: any;
@@ -45,6 +50,9 @@ export const DigitalBasicInfoForm = ({
 }: DigitalBasicInfoFormProps) => {
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const { toast } = useToast();
   
   // Ref pour stocker la valeur réelle du champ (source de vérité)
   const inputRef = useRef<HTMLInputElement>(null);
@@ -459,28 +467,150 @@ export const DigitalBasicInfoForm = ({
         </Card>
       )}
 
-      {/* Image URL */}
+      {/* Image Upload */}
       <div className="space-y-2">
-        <Label htmlFor="image_url">Image du produit (URL)</Label>
-        <Input
-          id="image_url"
-          type="url"
-          placeholder="https://exemple.com/image.jpg"
-          value={formData.image_url || ''}
-          onChange={(e) => updateFormData({ image_url: e.target.value })}
-        />
-        {formData.image_url && (
-          <div className="mt-2">
-            <img
-              src={formData.image_url}
-              alt="Preview"
-              className="h-32 w-32 object-cover rounded-lg border"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
+        <Label htmlFor="image_upload">Image du produit</Label>
+        {formData.image_url ? (
+          <div className="space-y-2">
+            <div className="relative inline-block">
+              <img
+                src={formData.image_url}
+                alt="Preview produit"
+                className="h-32 w-32 object-cover rounded-lg border"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                onClick={() => updateFormData({ image_url: '' })}
+                disabled={uploadingImage}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Cliquez sur "Changer l'image" pour remplacer
+            </p>
           </div>
+        ) : (
+          <label
+            htmlFor="image_upload"
+            className={cn(
+              "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+              uploadingImage ? "bg-muted/70 cursor-not-allowed" : "hover:bg-muted/50",
+              "border-muted-foreground/25"
+            )}
+          >
+            {uploadingImage ? (
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="h-8 w-8 text-muted-foreground animate-spin" />
+                <span className="text-sm text-muted-foreground">
+                  Upload en cours... {uploadProgress.toFixed(0)}%
+                </span>
+                <Progress value={uploadProgress} className="w-3/4 h-2 mt-2" />
+              </div>
+            ) : (
+              <>
+                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                <span className="text-sm text-muted-foreground">
+                  Cliquez pour uploader une image
+                </span>
+                <span className="text-xs text-muted-foreground mt-1">
+                  PNG, JPG, WEBP (max 10MB)
+                </span>
+              </>
+            )}
+            <input
+              id="image_upload"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                // Validation taille
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                  toast({
+                    title: "❌ Fichier trop volumineux",
+                    description: "La taille maximale autorisée est de 10MB",
+                    variant: "destructive",
+                  });
+                  e.target.value = '';
+                  return;
+                }
+
+                // Validation type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                  toast({
+                    title: "❌ Format non supporté",
+                    description: "Veuillez uploader une image (JPG, PNG, WEBP, GIF)",
+                    variant: "destructive",
+                  });
+                  e.target.value = '';
+                  return;
+                }
+
+                setUploadingImage(true);
+                setUploadProgress(0);
+
+                try {
+                  const { url, error } = await uploadToSupabaseStorage(file, {
+                    bucket: 'product-images',
+                    path: 'digital',
+                    filePrefix: 'product',
+                    onProgress: setUploadProgress,
+                    maxSizeBytes: maxSize,
+                    allowedTypes: validTypes,
+                  });
+
+                  if (error) throw error;
+
+                  if (url) {
+                    updateFormData({ image_url: url });
+                    toast({
+                      title: "✅ Image uploadée",
+                      description: "L'image du produit a été uploadée avec succès",
+                    });
+                  }
+                } catch (error) {
+                  logger.error('Erreur upload image produit', { error });
+                  toast({
+                    title: "❌ Erreur d'upload",
+                    description: error instanceof Error ? error.message : 'Une erreur est survenue',
+                    variant: "destructive",
+                  });
+                } finally {
+                  setUploadingImage(false);
+                  setUploadProgress(0);
+                  e.target.value = ''; // Reset input
+                }
+              }}
+              className="hidden"
+              disabled={uploadingImage}
+            />
+          </label>
+        )}
+        {formData.image_url && !uploadingImage && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const input = document.getElementById('image_upload') as HTMLInputElement;
+              input?.click();
+            }}
+            className="w-full"
+          >
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Changer l'image
+          </Button>
         )}
       </div>
 
