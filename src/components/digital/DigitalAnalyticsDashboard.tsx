@@ -28,7 +28,7 @@ import {
   useUserDownloadStats,
   useLicenseAnalytics,
 } from '@/hooks/digital/useDigitalAnalytics';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { LazyRechartsWrapper } from '@/components/charts/LazyRechartsWrapper';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { subDays } from 'date-fns';
@@ -328,34 +328,38 @@ export const DigitalAnalyticsDashboard = ({
               <CardDescription>30 derniers jours</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={trends || []}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(value) => format(new Date(value), 'dd MMM', { locale: fr })}
-                  />
-                  <YAxis />
-                  <Tooltip
-                    labelFormatter={(value) => format(new Date(value as string), 'dd MMMM yyyy', { locale: fr })}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="downloads"
-                    stroke="#8884d8"
-                    name="Téléchargements"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="unique_users"
-                    stroke="#82ca9d"
-                    name="Utilisateurs uniques"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <LazyRechartsWrapper>
+                {(recharts) => (
+                  <recharts.ResponsiveContainer width="100%" height={300}>
+                    <recharts.LineChart data={trends || []}>
+                      <recharts.CartesianGrid strokeDasharray="3 3" />
+                      <recharts.XAxis
+                        dataKey="date"
+                        tickFormatter={(value) => format(new Date(value), 'dd MMM', { locale: fr })}
+                      />
+                      <recharts.YAxis />
+                      <recharts.Tooltip
+                        labelFormatter={(value) => format(new Date(value as string), 'dd MMMM yyyy', { locale: fr })}
+                      />
+                      <recharts.Legend />
+                      <recharts.Line
+                        type="monotone"
+                        dataKey="downloads"
+                        stroke="#8884d8"
+                        name="Téléchargements"
+                        strokeWidth={2}
+                      />
+                      <recharts.Line
+                        type="monotone"
+                        dataKey="unique_users"
+                        stroke="#82ca9d"
+                        name="Utilisateurs uniques"
+                        strokeWidth={2}
+                      />
+                    </recharts.LineChart>
+                  </recharts.ResponsiveContainer>
+                )}
+              </LazyRechartsWrapper>
             </CardContent>
           </Card>
         </TabsContent>
@@ -489,33 +493,37 @@ export const DigitalAnalyticsDashboard = ({
               <CardTitle>Répartition des licenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart
-                  data={[
-                    {
-                      name: 'Actives',
-                      value: licenseAnalytics?.active_licenses || 0,
-                      fill: '#10b981',
-                    },
-                    {
-                      name: 'Expirées',
-                      value: licenseAnalytics?.expired_licenses || 0,
-                      fill: '#ef4444',
-                    },
-                    {
-                      name: 'Suspendues',
-                      value: licenseAnalytics?.suspended_licenses || 0,
-                      fill: '#f59e0b',
-                    },
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" />
-                </BarChart>
-              </ResponsiveContainer>
+              <LazyRechartsWrapper>
+                {(recharts) => (
+                  <recharts.ResponsiveContainer width="100%" height={250}>
+                    <recharts.BarChart
+                      data={[
+                        {
+                          name: 'Actives',
+                          value: licenseAnalytics?.active_licenses || 0,
+                          fill: '#10b981',
+                        },
+                        {
+                          name: 'Expirées',
+                          value: licenseAnalytics?.expired_licenses || 0,
+                          fill: '#ef4444',
+                        },
+                        {
+                          name: 'Suspendues',
+                          value: licenseAnalytics?.suspended_licenses || 0,
+                          fill: '#f59e0b',
+                        },
+                      ]}
+                    >
+                      <recharts.CartesianGrid strokeDasharray="3 3" />
+                      <recharts.XAxis dataKey="name" />
+                      <recharts.YAxis />
+                      <recharts.Tooltip />
+                      <recharts.Bar dataKey="value" />
+                    </recharts.BarChart>
+                  </recharts.ResponsiveContainer>
+                )}
+              </LazyRechartsWrapper>
             </CardContent>
           </Card>
         </TabsContent>

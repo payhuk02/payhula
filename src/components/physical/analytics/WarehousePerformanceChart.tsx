@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { WarehousePerformance } from '@/hooks/physical/usePhysicalAnalytics';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { LazyRechartsWrapper } from '@/components/charts/LazyRechartsWrapper';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -85,32 +85,36 @@ export function WarehousePerformanceChart({ warehousePerformance, periodType }: 
           <CardDescription>Revenus, coûts et profit par entrepôt</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={warehouseData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="warehouseName" />
-              <YAxis />
-              <Tooltip
-                formatter={(value: number, name: string) => {
-                  if (name === 'revenue' || name === 'costs' || name === 'profit') {
-                    return [
-                      new Intl.NumberFormat('fr-FR', {
-                        style: 'currency',
-                        currency: 'XOF',
-                        minimumFractionDigits: 0,
-                      }).format(value),
-                      name === 'revenue' ? 'Revenus' : name === 'costs' ? 'Coûts' : 'Profit',
-                    ];
-                  }
-                  return [value, name];
-                }}
-              />
-              <Legend />
-              <Bar dataKey="revenue" fill="#8884d8" name="Revenus" />
-              <Bar dataKey="costs" fill="#ffc658" name="Coûts" />
-              <Bar dataKey="profit" fill="#82ca9d" name="Profit" />
-            </BarChart>
-          </ResponsiveContainer>
+          <LazyRechartsWrapper>
+            {(recharts) => (
+              <recharts.ResponsiveContainer width="100%" height={300}>
+                <recharts.BarChart data={warehouseData}>
+                  <recharts.CartesianGrid strokeDasharray="3 3" />
+                  <recharts.XAxis dataKey="warehouseName" />
+                  <recharts.YAxis />
+                  <recharts.Tooltip
+                    formatter={(value: number, name: string) => {
+                      if (name === 'revenue' || name === 'costs' || name === 'profit') {
+                        return [
+                          new Intl.NumberFormat('fr-FR', {
+                            style: 'currency',
+                            currency: 'XOF',
+                            minimumFractionDigits: 0,
+                          }).format(value),
+                          name === 'revenue' ? 'Revenus' : name === 'costs' ? 'Coûts' : 'Profit',
+                        ];
+                      }
+                      return [value, name];
+                    }}
+                  />
+                  <recharts.Legend />
+                  <recharts.Bar dataKey="revenue" fill="#8884d8" name="Revenus" />
+                  <recharts.Bar dataKey="costs" fill="#ffc658" name="Coûts" />
+                  <recharts.Bar dataKey="profit" fill="#82ca9d" name="Profit" />
+                </recharts.BarChart>
+              </recharts.ResponsiveContainer>
+            )}
+          </LazyRechartsWrapper>
         </CardContent>
       </Card>
 
@@ -120,31 +124,35 @@ export function WarehousePerformanceChart({ warehousePerformance, periodType }: 
           <CardDescription>Revenus et profit dans le temps</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={timeSeriesData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="period" />
-              <YAxis />
-              <Tooltip
-                formatter={(value: number, name: string) => {
-                  if (name === 'revenue' || name === 'profit') {
-                    return [
-                      new Intl.NumberFormat('fr-FR', {
-                        style: 'currency',
-                        currency: 'XOF',
-                        minimumFractionDigits: 0,
-                      }).format(value),
-                      name === 'revenue' ? 'Revenus' : 'Profit',
-                    ];
-                  }
-                  return [value, name];
-                }}
-              />
-              <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#8884d8" name="Revenus" strokeWidth={2} />
-              <Line type="monotone" dataKey="profit" stroke="#82ca9d" name="Profit" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          <LazyRechartsWrapper>
+            {(recharts) => (
+              <recharts.ResponsiveContainer width="100%" height={300}>
+                <recharts.LineChart data={timeSeriesData}>
+                  <recharts.CartesianGrid strokeDasharray="3 3" />
+                  <recharts.XAxis dataKey="period" />
+                  <recharts.YAxis />
+                  <recharts.Tooltip
+                    formatter={(value: number, name: string) => {
+                      if (name === 'revenue' || name === 'profit') {
+                        return [
+                          new Intl.NumberFormat('fr-FR', {
+                            style: 'currency',
+                            currency: 'XOF',
+                            minimumFractionDigits: 0,
+                          }).format(value),
+                          name === 'revenue' ? 'Revenus' : 'Profit',
+                        ];
+                      }
+                      return [value, name];
+                    }}
+                  />
+                  <recharts.Legend />
+                  <recharts.Line type="monotone" dataKey="revenue" stroke="#8884d8" name="Revenus" strokeWidth={2} />
+                  <recharts.Line type="monotone" dataKey="profit" stroke="#82ca9d" name="Profit" strokeWidth={2} />
+                </recharts.LineChart>
+              </recharts.ResponsiveContainer>
+            )}
+          </LazyRechartsWrapper>
         </CardContent>
       </Card>
     </div>

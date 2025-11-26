@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useProductAnalytics } from '@/hooks/physical/usePhysicalAnalytics';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LazyRechartsWrapper } from '@/components/charts/LazyRechartsWrapper';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -108,46 +108,50 @@ export function SalesOverview({ storeId, periodType, startDate, endDate }: Sales
           <CardDescription>Revenus et unités vendues par période</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="period" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip
-                formatter={(value: number, name: string) => {
-                  if (name === 'revenue' || name === 'profit') {
-                    return [
-                      new Intl.NumberFormat('fr-FR', {
-                        style: 'currency',
-                        currency: 'XOF',
-                        minimumFractionDigits: 0,
-                      }).format(value),
-                      name === 'revenue' ? 'Revenus' : 'Profit',
-                    ];
-                  }
-                  return [value, name === 'units' ? 'Unités' : name];
-                }}
-              />
-              <Legend />
-              <Line
-                yAxisId="left"
-                type="monotone"
-                dataKey="revenue"
-                stroke="#8884d8"
-                name="Revenus"
-                strokeWidth={2}
-              />
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="units"
-                stroke="#82ca9d"
-                name="Unités"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <LazyRechartsWrapper>
+            {(recharts) => (
+              <recharts.ResponsiveContainer width="100%" height={300}>
+                <recharts.LineChart data={chartData}>
+                  <recharts.CartesianGrid strokeDasharray="3 3" />
+                  <recharts.XAxis dataKey="period" />
+                  <recharts.YAxis yAxisId="left" />
+                  <recharts.YAxis yAxisId="right" orientation="right" />
+                  <recharts.Tooltip
+                    formatter={(value: number, name: string) => {
+                      if (name === 'revenue' || name === 'profit') {
+                        return [
+                          new Intl.NumberFormat('fr-FR', {
+                            style: 'currency',
+                            currency: 'XOF',
+                            minimumFractionDigits: 0,
+                          }).format(value),
+                          name === 'revenue' ? 'Revenus' : 'Profit',
+                        ];
+                      }
+                      return [value, name === 'units' ? 'Unités' : name];
+                    }}
+                  />
+                  <recharts.Legend />
+                  <recharts.Line
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#8884d8"
+                    name="Revenus"
+                    strokeWidth={2}
+                  />
+                  <recharts.Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="units"
+                    stroke="#82ca9d"
+                    name="Unités"
+                    strokeWidth={2}
+                  />
+                </recharts.LineChart>
+              </recharts.ResponsiveContainer>
+            )}
+          </LazyRechartsWrapper>
         </CardContent>
       </Card>
 
@@ -157,23 +161,27 @@ export function SalesOverview({ storeId, periodType, startDate, endDate }: Sales
           <CardDescription>Produits les plus vendus par revenus</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={topProducts} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="productName" type="category" width={120} />
-              <Tooltip
-                formatter={(value: number) =>
-                  new Intl.NumberFormat('fr-FR', {
-                    style: 'currency',
-                    currency: 'XOF',
-                    minimumFractionDigits: 0,
-                  }).format(value)
-                }
-              />
-              <Bar dataKey="revenue" fill="#8884d8" name="Revenus" />
-            </BarChart>
-          </ResponsiveContainer>
+          <LazyRechartsWrapper>
+            {(recharts) => (
+              <recharts.ResponsiveContainer width="100%" height={300}>
+                <recharts.BarChart data={topProducts} layout="vertical">
+                  <recharts.CartesianGrid strokeDasharray="3 3" />
+                  <recharts.XAxis type="number" />
+                  <recharts.YAxis dataKey="productName" type="category" width={120} />
+                  <recharts.Tooltip
+                    formatter={(value: number) =>
+                      new Intl.NumberFormat('fr-FR', {
+                        style: 'currency',
+                        currency: 'XOF',
+                        minimumFractionDigits: 0,
+                      }).format(value)
+                    }
+                  />
+                  <recharts.Bar dataKey="revenue" fill="#8884d8" name="Revenus" />
+                </recharts.BarChart>
+              </recharts.ResponsiveContainer>
+            )}
+          </LazyRechartsWrapper>
         </CardContent>
       </Card>
     </div>

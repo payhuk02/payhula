@@ -23,7 +23,7 @@ import { useStore } from '@/hooks/useStore';
 import { TrendingUp, TrendingDown, DollarSign, Percent, AlertTriangle, RefreshCw, Calculator, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LazyRechartsWrapper } from '@/components/charts/LazyRechartsWrapper';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 // Types étendus avec relation product
@@ -902,17 +902,21 @@ export default function CostOptimizationDashboard() {
               </CardHeader>
               <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
                 {marginTrendData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-                    <LineChart data={marginTrendData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" style={{ fontSize: '12px' }} />
-                      <YAxis style={{ fontSize: '12px' }} />
-                      <Tooltip />
-                      <Legend wrapperStyle={{ fontSize: '12px' }} />
-                      <Line type="monotone" dataKey="grossMargin" stroke="#8884d8" name="Marge brute (%)" strokeWidth={2} />
-                      <Line type="monotone" dataKey="netMargin" stroke="#82ca9d" name="Marge nette (%)" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <LazyRechartsWrapper>
+                    {(recharts) => (
+                      <recharts.ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
+                        <recharts.LineChart data={marginTrendData}>
+                          <recharts.CartesianGrid strokeDasharray="3 3" />
+                          <recharts.XAxis dataKey="date" style={{ fontSize: '12px' }} />
+                          <recharts.YAxis style={{ fontSize: '12px' }} />
+                          <recharts.Tooltip />
+                          <recharts.Legend wrapperStyle={{ fontSize: '12px' }} />
+                          <recharts.Line type="monotone" dataKey="grossMargin" stroke="#8884d8" name="Marge brute (%)" strokeWidth={2} />
+                          <recharts.Line type="monotone" dataKey="netMargin" stroke="#82ca9d" name="Marge nette (%)" strokeWidth={2} />
+                        </recharts.LineChart>
+                      </recharts.ResponsiveContainer>
+                    )}
+                  </LazyRechartsWrapper>
                 ) : (
                   <div className="h-[250px] sm:h-[300px] flex flex-col items-center justify-center text-muted-foreground px-3 sm:px-4">
                     <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center mb-4">
@@ -939,16 +943,20 @@ export default function CostOptimizationDashboard() {
               </CardHeader>
               <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
                 {marginTrendData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-                    <BarChart data={marginTrendData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" style={{ fontSize: '12px' }} />
-                      <YAxis style={{ fontSize: '12px' }} />
-                      <Tooltip />
-                      <Legend wrapperStyle={{ fontSize: '12px' }} />
-                      <Bar dataKey="revenue" fill="#8884d8" name="Revenus (XOF)" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <LazyRechartsWrapper>
+                    {(recharts) => (
+                      <recharts.ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
+                        <recharts.BarChart data={marginTrendData}>
+                          <recharts.CartesianGrid strokeDasharray="3 3" />
+                          <recharts.XAxis dataKey="date" style={{ fontSize: '12px' }} />
+                          <recharts.YAxis style={{ fontSize: '12px' }} />
+                          <recharts.Tooltip />
+                          <recharts.Legend wrapperStyle={{ fontSize: '12px' }} />
+                          <recharts.Bar dataKey="revenue" fill="#8884d8" name="Revenus (XOF)" />
+                        </recharts.BarChart>
+                      </recharts.ResponsiveContainer>
+                    )}
+                  </LazyRechartsWrapper>
                 ) : (
                   <div className="h-[250px] sm:h-[300px] flex flex-col items-center justify-center text-muted-foreground px-3 sm:px-4">
                     <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/10 border border-purple-500/30 flex items-center justify-center mb-4">
