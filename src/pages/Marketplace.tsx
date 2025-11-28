@@ -1263,10 +1263,12 @@ const Marketplace = () => {
                 <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 h-11 sm:h-14 px-6 sm:px-8 transition-all duration-300 hover:scale-105 w-full sm:w-auto text-sm sm:text-base">
-              <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              {getValue('marketplace.cta.joinCommunity')}
-            </Button>
+            <Link to="/community" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 h-11 sm:h-14 px-6 sm:px-8 transition-all duration-300 hover:scale-105 w-full sm:w-auto text-sm sm:text-base">
+                <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                {getValue('marketplace.cta.joinCommunity')}
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
