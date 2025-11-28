@@ -351,13 +351,13 @@ const Landing = () => {
                             "{testimonial.content}"
                           </p>
                           <div className="flex items-center gap-3">
-                            <OptimizedImage
+                            <img
                               src={avatars[index]}
                               alt={`Photo de ${testimonial.name}`}
                               width={48}
                               height={48}
                               className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
-                              priority={index === 0}
+                              loading={index === 0 ? "eager" : "lazy"}
                             />
                             <div>
                               <p className="font-semibold text-foreground">{testimonial.name}</p>
