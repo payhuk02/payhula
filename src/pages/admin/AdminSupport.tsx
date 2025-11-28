@@ -110,7 +110,7 @@ export default function AdminSupport() {
                   Gérez les tickets de support des utilisateurs
                 </p>
               </div>
-              <Button>
+              <Button className="min-h-[44px]">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Nouveau Ticket
               </Button>
@@ -177,16 +177,16 @@ export default function AdminSupport() {
                         placeholder="Rechercher tickets..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8"
+                        className="pl-8 min-h-[44px]"
                       />
                     </div>
                   </div>
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList>
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="open">Ouverts</TabsTrigger>
-                      <TabsTrigger value="pending">En attente</TabsTrigger>
-                      <TabsTrigger value="resolved">Résolus</TabsTrigger>
+                      <TabsTrigger value="all" className="min-h-[44px]">Tous</TabsTrigger>
+                      <TabsTrigger value="open" className="min-h-[44px]">Ouverts</TabsTrigger>
+                      <TabsTrigger value="pending" className="min-h-[44px]">En attente</TabsTrigger>
+                      <TabsTrigger value="resolved" className="min-h-[44px]">Résolus</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>

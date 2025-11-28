@@ -170,7 +170,7 @@ export default function AdminSecurity() {
                   </Alert>
                 )}
                 {!qr && !secret ? (
-                  <Button onClick={startEnroll} disabled={enrolling}>
+                  <Button onClick={startEnroll} disabled={enrolling} className="min-h-[44px]">
                     {enrolling ? 'Activation en cours...' : 'Commencer l\'activation'}
                   </Button>
                 ) : (
@@ -210,12 +210,13 @@ export default function AdminSecurity() {
                           <Input 
                             value={secret} 
                             readOnly 
-                            className="font-mono text-sm"
+                            className="font-mono text-sm min-h-[44px]"
                           />
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={copySecret}
+                            className="min-h-[44px] min-w-[44px]"
                           >
                             {secretCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                           </Button>
@@ -233,10 +234,10 @@ export default function AdminSecurity() {
                           placeholder="000000" 
                           value={verifyCode} 
                           onChange={e => setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))} 
-                          className="w-48 font-mono text-center text-lg tracking-widest"
+                          className="w-48 font-mono text-center text-lg tracking-widest min-h-[44px]"
                           maxLength={6}
                         />
-                        <Button onClick={verifyEnroll} disabled={!verifyCode || verifyCode.length !== 6}>
+                        <Button onClick={verifyEnroll} disabled={!verifyCode || verifyCode.length !== 6} className="min-h-[44px]">
                           Vérifier
                         </Button>
                       </div>
@@ -246,6 +247,7 @@ export default function AdminSecurity() {
                           size="sm"
                           onClick={startEnroll}
                           disabled={enrolling}
+                          className="min-h-[44px]"
                         >
                           {enrolling ? 'Génération...' : 'Générer un nouveau QR code'}
                         </Button>

@@ -198,7 +198,7 @@ const AdminReferrals = () => {
                   Tous les parrainages de la plateforme
                 </CardDescription>
               </div>
-              <Button onClick={exportToCSV} variant="outline" size="sm">
+              <Button onClick={exportToCSV} variant="outline" size="sm" className="min-h-[44px]">
                 <Download className="h-4 w-4 mr-2" />
                 Exporter CSV
               </Button>
@@ -209,7 +209,7 @@ const AdminReferrals = () => {
                 placeholder="Rechercher par nom ou code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 min-h-[44px]"
               />
             </div>
           </CardHeader>

@@ -158,45 +158,45 @@ export default function AdminAudit() {
                       placeholder="Rechercher (action, cible, id)" 
                       value={search} 
                       onChange={e => { setSearch(e.target.value); setPage(1); }} 
-                      className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm" 
+                      className="pl-8 sm:pl-10 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm" 
                     />
                   </div>
                   <Input 
                     placeholder="Filtrer action" 
                     value={actionFilter} 
                     onChange={e => { setActionFilter(e.target.value); setPage(1); }} 
-                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                    className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                   />
                   <Input 
                     placeholder="Filtrer acteur (UUID)" 
                     value={actorFilter} 
                     onChange={e => { setActorFilter(e.target.value); setPage(1); }} 
-                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                    className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                   />
                   <div className="flex items-center gap-2">
                     <Input 
                       type="date" 
                       value={fromDate} 
                       onChange={e => { setFromDate(e.target.value); setPage(1); }} 
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                     <Input 
                       type="date" 
                       value={toDate} 
                       onChange={e => { setToDate(e.target.value); setPage(1); }} 
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
                 <div className="relative flex-1">
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Button variant="outline" onClick={exportCSV} size="sm" className="h-9 sm:h-10 text-xs sm:text-sm">
+                      <Button variant="outline" onClick={exportCSV} size="sm" className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
                         <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2"/>
                         <span className="hidden sm:inline">Exporter CSV</span>
                         <span className="sm:hidden">CSV</span>
                       </Button>
-                      <Button variant="outline" onClick={exportJSON} size="sm" className="h-9 sm:h-10 text-xs sm:text-sm">
+                      <Button variant="outline" onClick={exportJSON} size="sm" className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
                         <span className="hidden sm:inline">Exporter JSON</span>
                         <span className="sm:hidden">JSON</span>
                       </Button>
@@ -204,7 +204,7 @@ export default function AdminAudit() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs sm:text-sm text-muted-foreground">Page</span>
                       <Input 
-                        className="w-16 h-9 sm:h-10 text-xs sm:text-sm" 
+                        className="w-16 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm" 
                         type="number" 
                         min={1} 
                         value={page} 
@@ -212,7 +212,7 @@ export default function AdminAudit() {
                       />
                       <span className="text-xs sm:text-sm text-muted-foreground">/ {Math.max(1, Math.ceil(filtered.length / pageSize))}</span>
                       <select 
-                        className="border rounded px-2 py-1 text-xs sm:text-sm h-9 sm:h-10" 
+                        className="border rounded px-2 py-1 text-xs sm:text-sm min-h-[44px] h-11 sm:h-12" 
                         value={pageSize} 
                         onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
                       >

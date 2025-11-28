@@ -175,16 +175,16 @@ export default function AdminShipping() {
                         placeholder="Rechercher par tracking ou commande..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8"
+                        className="pl-8 min-h-[44px]"
                       />
                     </div>
                   </div>
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList>
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="pending">En attente</TabsTrigger>
-                      <TabsTrigger value="in_transit">En transit</TabsTrigger>
-                      <TabsTrigger value="delivered">Livrés</TabsTrigger>
+                      <TabsTrigger value="all" className="min-h-[44px]">Tous</TabsTrigger>
+                      <TabsTrigger value="pending" className="min-h-[44px]">En attente</TabsTrigger>
+                      <TabsTrigger value="in_transit" className="min-h-[44px]">En transit</TabsTrigger>
+                      <TabsTrigger value="delivered" className="min-h-[44px]">Livrés</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>

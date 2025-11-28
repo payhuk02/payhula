@@ -228,11 +228,11 @@ export default function AdminReturnManagement() {
                       placeholder="Rechercher par numéro ou produit..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 min-h-[44px]"
                     />
                   </div>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-48">
+                    <SelectTrigger className="w-full sm:w-48 min-h-[44px]">
                       <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
                     <SelectContent>

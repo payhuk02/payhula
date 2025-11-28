@@ -115,7 +115,7 @@ export default function AdminInventory() {
                   Vue d'ensemble de l'inventaire de tous les vendeurs
                 </p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="min-h-[44px]">
                 <Download className="h-4 w-4 mr-2" aria-hidden="true" />
                 Exporter CSV
               </Button>
@@ -175,15 +175,15 @@ export default function AdminInventory() {
                         placeholder="Rechercher..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8"
+                        className="pl-8 min-h-[44px]"
                       />
                     </div>
                   </div>
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList>
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="low">Stock Faible</TabsTrigger>
-                      <TabsTrigger value="out">Rupture</TabsTrigger>
+                      <TabsTrigger value="all" className="min-h-[44px]">Tous</TabsTrigger>
+                      <TabsTrigger value="low" className="min-h-[44px]">Stock Faible</TabsTrigger>
+                      <TabsTrigger value="out" className="min-h-[44px]">Rupture</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>

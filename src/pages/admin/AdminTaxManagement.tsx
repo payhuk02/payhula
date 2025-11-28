@@ -209,7 +209,7 @@ export default function AdminTaxManagement() {
               </div>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={handleOpenCreate}>
+                  <Button onClick={handleOpenCreate} className="min-h-[44px]">
                     <Plus className="h-4 w-4 mr-2" />
                     Nouvelle Configuration
                   </Button>
@@ -251,6 +251,7 @@ export default function AdminTaxManagement() {
                           value={formData.state_province || ''}
                           onChange={(e) => setFormData({ ...formData, state_province: e.target.value || undefined })}
                           placeholder="Ex: Ouagadougou, Abidjan..."
+                          className="min-h-[44px]"
                         />
                       </div>
                     </div>
@@ -283,6 +284,7 @@ export default function AdminTaxManagement() {
                           onChange={(e) => setFormData({ ...formData, tax_name: e.target.value })}
                           placeholder="Ex: TVA, GST..."
                           required
+                          className="min-h-[44px]"
                         />
                       </div>
                     </div>
@@ -299,6 +301,7 @@ export default function AdminTaxManagement() {
                           value={formData.rate || 0}
                           onChange={(e) => setFormData({ ...formData, rate: parseFloat(e.target.value) || 0 })}
                           required
+                          className="min-h-[44px]"
                         />
                       </div>
 
@@ -309,6 +312,7 @@ export default function AdminTaxManagement() {
                           type="number"
                           value={formData.priority || 0}
                           onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })}
+                          className="min-h-[44px]"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                           Plus élevé = appliqué en premier
@@ -325,6 +329,7 @@ export default function AdminTaxManagement() {
                           value={formData.effective_from || ''}
                           onChange={(e) => setFormData({ ...formData, effective_from: e.target.value })}
                           required
+                          className="min-h-[44px]"
                         />
                       </div>
 
@@ -335,6 +340,7 @@ export default function AdminTaxManagement() {
                           type="date"
                           value={formData.effective_to || ''}
                           onChange={(e) => setFormData({ ...formData, effective_to: e.target.value || undefined })}
+                          className="min-h-[44px]"
                         />
                       </div>
                     </div>

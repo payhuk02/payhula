@@ -655,7 +655,7 @@ ALTER TABLE disputes ENABLE ROW LEVEL SECURITY;
                                     }
                                   }}
                                 >
-                                  <SelectTrigger className="w-[140px] h-8">
+                                  <SelectTrigger className="w-[140px] min-h-[44px]">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -673,7 +673,7 @@ ALTER TABLE disputes ENABLE ROW LEVEL SECURITY;
                                   value={dispute.status}
                                   onValueChange={(value) => isAAL2 && updateDisputeStatus(dispute.id, value as DisputeStatus)}
                                 >
-                                  <SelectTrigger className="w-[160px] h-8">
+                                  <SelectTrigger className="w-[160px] min-h-[44px]">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>

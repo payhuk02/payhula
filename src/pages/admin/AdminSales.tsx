@@ -207,8 +207,8 @@ const AdminSales = () => {
         {/* Tabs */}
         <Tabs defaultValue="sales" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="sales">Ventes</TabsTrigger>
-            <TabsTrigger value="commissions">Commissions</TabsTrigger>
+            <TabsTrigger value="sales" className="min-h-[44px]">Ventes</TabsTrigger>
+            <TabsTrigger value="commissions" className="min-h-[44px]">Commissions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sales" className="space-y-4">
@@ -221,7 +221,7 @@ const AdminSales = () => {
                       Toutes les transactions effectuées
                     </CardDescription>
                   </div>
-                  <Button onClick={() => exportToCSV('sales')} variant="outline" size="sm">
+                  <Button onClick={() => exportToCSV('sales')} variant="outline" size="sm" className="min-h-[44px]">
                     <Download className="h-4 w-4 mr-2" />
                     Exporter CSV
                   </Button>
@@ -232,7 +232,7 @@ const AdminSales = () => {
                     placeholder="Rechercher par boutique ou numéro de commande..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 min-h-[44px]"
                   />
                 </div>
               </CardHeader>
@@ -292,7 +292,7 @@ const AdminSales = () => {
                       10% de commission sur chaque vente
                     </CardDescription>
                   </div>
-                  <Button onClick={() => exportToCSV('commissions')} variant="outline" size="sm">
+                  <Button onClick={() => exportToCSV('commissions')} variant="outline" size="sm" className="min-h-[44px]">
                     <Download className="h-4 w-4 mr-2" />
                     Exporter CSV
                   </Button>
