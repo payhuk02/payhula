@@ -398,7 +398,7 @@ export default function BatchShippingManagement() {
                               variant="ghost"
                               size="sm"
                               onClick={() => setSelectedBatch(batch)}
-                              className="text-xs h-8 ml-auto"
+                              className="text-xs min-h-[44px] h-11 ml-auto"
                             >
                               Voir détails
                             </Button>
