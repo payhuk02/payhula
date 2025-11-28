@@ -292,7 +292,7 @@ const Auth = () => {
               className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 sm:relative sm:left-auto sm:top-auto sm:translate-y-0 sm:h-10 sm:w-10 z-0 opacity-60 sm:opacity-100"
               priority
             />
-            <span className="relative z-10 pl-8 sm:pl-0 text-2xl sm:text-3xl font-bold">
+            <span className="relative z-10 pl-7 sm:pl-0 text-2xl sm:text-3xl font-bold">
               Payhuk
             </span>
           </Link>
