@@ -289,10 +289,10 @@ const Auth = () => {
               alt="Payhuk Logo"
               width={40}
               height={40}
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 sm:relative sm:top-auto sm:translate-y-0 sm:left-auto z-0 opacity-60 sm:opacity-100"
+              className="relative h-8 w-8 sm:h-10 sm:w-10 z-0 opacity-60 sm:opacity-100 -ml-1 sm:ml-0"
               priority
             />
-            <span className="relative z-10 text-2xl sm:text-3xl font-bold pl-10 sm:pl-0">
+            <span className="relative z-10 -ml-8 sm:ml-0 text-2xl sm:text-3xl font-bold">
               Payhuk
             </span>
           </Link>
