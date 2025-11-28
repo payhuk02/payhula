@@ -487,7 +487,7 @@ const ProductCardProfessionalComponent = ({
             <Button
               variant="outline"
               size="sm"
-              className="product-action-button flex-1 h-10 px-3 text-sm text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="product-action-button flex-1 min-h-[44px] h-11 px-3 text-sm text-white border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               asChild
             >
               <Link 
@@ -506,7 +506,7 @@ const ProductCardProfessionalComponent = ({
               disabled={loading}
               size="sm"
               variant="outline"
-              className="product-action-button h-10 px-3 text-sm border-purple-300 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-400 dark:hover:border-purple-500 transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50"
+              className="product-action-button min-h-[44px] h-11 px-3 text-sm border-purple-300 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-400 dark:hover:border-purple-500 transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50"
               aria-label={`Ajouter ${product.name} au panier`}
             >
               <ShoppingBag className="h-4 w-4" aria-hidden="true" />
@@ -517,7 +517,7 @@ const ProductCardProfessionalComponent = ({
             onClick={handleBuyNow}
             disabled={loading}
             size="sm"
-            className="product-action-button w-full h-10 px-3 text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:from-blue-800 active:to-purple-800 text-white font-medium transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+            className="product-action-button w-full min-h-[44px] h-11 px-3 text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:from-blue-800 active:to-purple-800 text-white font-medium transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
             aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'FCFA'}`}
           >
             <div className="flex items-center justify-center gap-1.5 truncate w-full">

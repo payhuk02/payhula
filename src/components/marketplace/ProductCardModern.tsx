@@ -476,7 +476,7 @@ const ProductCardModernComponent = ({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 border-amber-500 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+              className="flex-1 min-h-[44px] h-11 text-xs sm:text-xs text-white bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 border-amber-500 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
               asChild
             >
               <Link 
@@ -493,7 +493,7 @@ const ProductCardModernComponent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 h-11 sm:h-8 text-xs sm:text-xs text-white bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 border-purple-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+                className="flex-1 min-h-[44px] h-11 text-xs sm:text-xs text-white bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 border-purple-700 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
                 asChild
               >
                 <Link 
@@ -512,7 +512,7 @@ const ProductCardModernComponent = ({
               onClick={handleBuyNow}
               disabled={loading}
               size="sm"
-              className="flex-1 h-11 sm:h-8 text-xs sm:text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
+              className="flex-1 min-h-[44px] h-11 text-xs sm:text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium disabled:opacity-50 px-3 sm:px-3 touch-manipulation active:scale-95 transition-transform"
               aria-label={loading ? `Traitement de l'achat de ${product.name} en cours` : `Acheter ${product.name} pour ${formatPrice(price)} ${product.currency || 'XOF'}`}
             >
               {loading ? (
