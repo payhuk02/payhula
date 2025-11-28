@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -350,17 +350,15 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
     og_description: "seo",
   };
 
-  // Calculer les erreurs par onglet
-  const getTabErrors = (): Record<string, number> => {
-    const tabErrors: Record<string, number> = {};
+  // Calculer les erreurs par onglet (optimisé avec useMemo)
+  const tabErrors = useMemo((): Record<string, number> => {
+    const errors: Record<string, number> = {};
     Object.keys(validationErrors).forEach(field => {
       const tab = fieldToTab[field] || "info";
-      tabErrors[tab] = (tabErrors[tab] || 0) + 1;
+      errors[tab] = (errors[tab] || 0) + 1;
     });
-    return tabErrors;
-  };
-
-  const tabErrors = getTabErrors();
+    return errors;
+  }, [validationErrors]);
 
   // Validation des champs requis
   const validateForm = (): boolean => {
