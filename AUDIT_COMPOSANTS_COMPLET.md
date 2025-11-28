@@ -347,11 +347,11 @@ size: {
 ## 12. PROCHAINES ÉTAPES
 
 1. ✅ **Phase 1 Complétée**: Composants UI de base (Button, Input, Select)
-2. ✅ **Phase 2 Partielle**: ProductCard principal corrigé
-3. **Phase 2 Restante**: Autres variants ProductCard
-4. **Phase 3 À faire**: SupplierOrders et autres composants Physical
-5. **Phase 4 À faire**: Accessibilité (ARIA, navigation clavier)
-6. **Phase 5 À faire**: Performance (debounce manquants, virtualisation)
+2. ✅ **Phase 2 Complétée**: ProductCard et variants (tous optimisés)
+3. ✅ **Phase 3 Vérifiée**: SupplierOrders déjà optimisé
+4. **Phase 4 À faire**: Autres composants Physical (audit individuel)
+5. **Phase 5 À faire**: Accessibilité (ARIA, navigation clavier)
+6. **Phase 6 À faire**: Performance (debounce manquants, virtualisation)
 
 ---
 
