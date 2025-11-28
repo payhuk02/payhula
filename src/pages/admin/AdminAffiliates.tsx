@@ -145,82 +145,106 @@ const AdminAffiliates = () => {
 
   const handleApproveCommission = useCallback(async (commission: any) => {
     logger.info(`Approbation commission ${commission.id}`);
-    await approveCommission({ commission_id: commission.id });
-    logger.info('Commission approuvée avec succès');
+    const success = await approveCommission({ commission_id: commission.id });
+    if (success) {
+      logger.info('Commission approuvée avec succès');
+      // Refetch automatique géré par le hook
+    }
   }, [approveCommission]);
 
   const handleRejectCommission = useCallback(async () => {
     if (selectedCommission && rejectReason) {
-      await rejectCommission({ 
+      logger.info(`Rejet commission ${selectedCommission.id}`);
+      const success = await rejectCommission({ 
         commission_id: selectedCommission.id, 
         rejection_reason: rejectReason 
       });
-      logger.info(`Rejet commission ${selectedCommission.id}`);
-      setShowRejectDialog(false);
-      setRejectReason('');
-      setSelectedCommission(null);
-      logger.info('Commission rejetée avec succès');
+      if (success) {
+        setShowRejectDialog(false);
+        setRejectReason('');
+        setSelectedCommission(null);
+        logger.info('Commission rejetée avec succès');
+        // Refetch automatique géré par le hook
+      }
     }
   }, [selectedCommission, rejectReason, rejectCommission]);
 
   const handlePayCommission = useCallback(async () => {
     if (selectedCommission && paymentReference) {
       logger.info(`Paiement commission ${selectedCommission.id}`);
-      await markAsPaid({
+      const success = await markAsPaid({
         commission_id: selectedCommission.id,
         payment_method: 'mobile_money',
         payment_reference: paymentReference,
       });
-      logger.info('Paiement commission marqué avec succès');
-      setShowPayDialog(false);
-      setPaymentReference('');
-      setSelectedCommission(null);
+      if (success) {
+        setShowPayDialog(false);
+        setPaymentReference('');
+        setSelectedCommission(null);
+        logger.info('Paiement commission marqué avec succès');
+        // Refetch automatique géré par le hook
+      }
     }
   }, [selectedCommission, paymentReference, markAsPaid]);
 
   const handleApproveWithdrawal = useCallback(async (withdrawal: any) => {
     logger.info(`Approbation retrait ${withdrawal.id}`);
-    await approveWithdrawal(withdrawal.id);
-    logger.info('Retrait approuvé avec succès');
+    const success = await approveWithdrawal(withdrawal.id);
+    if (success) {
+      logger.info('Retrait approuvé avec succès');
+      // Refetch automatique géré par le hook
+    }
   }, [approveWithdrawal]);
 
   const handleRejectWithdrawal = useCallback(async () => {
     if (selectedWithdrawal && rejectReason) {
       logger.info(`Rejet retrait ${selectedWithdrawal.id}`);
-      await rejectWithdrawal(selectedWithdrawal.id, rejectReason);
-      logger.info('Retrait rejeté avec succès');
-      setShowRejectDialog(false);
-      setRejectReason('');
-      setSelectedWithdrawal(null);
+      const success = await rejectWithdrawal(selectedWithdrawal.id, rejectReason);
+      if (success) {
+        setShowRejectDialog(false);
+        setRejectReason('');
+        setSelectedWithdrawal(null);
+        logger.info('Retrait rejeté avec succès');
+        // Refetch automatique géré par le hook
+      }
     }
   }, [selectedWithdrawal, rejectReason, rejectWithdrawal]);
 
   const handleCompleteWithdrawal = useCallback(async () => {
     if (selectedWithdrawal && paymentReference) {
       logger.info(`Complétion retrait ${selectedWithdrawal.id}`);
-      await completeWithdrawal(selectedWithdrawal.id, paymentReference);
-      logger.info('Retrait complété avec succès');
-      setShowPayDialog(false);
-      setPaymentReference('');
-      setSelectedWithdrawal(null);
+      const success = await completeWithdrawal(selectedWithdrawal.id, paymentReference);
+      if (success) {
+        setShowPayDialog(false);
+        setPaymentReference('');
+        setSelectedWithdrawal(null);
+        logger.info('Retrait complété avec succès');
+        // Refetch automatique géré par le hook
+      }
     }
   }, [selectedWithdrawal, paymentReference, completeWithdrawal]);
 
   const handleSuspendAffiliate = useCallback(async () => {
     if (selectedAffiliate && suspendReason) {
       logger.info(`Suspension affilié ${selectedAffiliate.id}`);
-      await suspendAffiliate(selectedAffiliate.id, suspendReason);
-      logger.info('Affilié suspendu avec succès');
-      setShowSuspendDialog(false);
-      setSuspendReason('');
-      setSelectedAffiliate(null);
+      const success = await suspendAffiliate(selectedAffiliate.id, suspendReason);
+      if (success) {
+        setShowSuspendDialog(false);
+        setSuspendReason('');
+        setSelectedAffiliate(null);
+        logger.info('Affilié suspendu avec succès');
+        // Refetch automatique géré par le hook
+      }
     }
   }, [selectedAffiliate, suspendReason, suspendAffiliate]);
 
   const handleActivateAffiliate = useCallback(async (affiliate: any) => {
     logger.info(`Activation affilié ${affiliate.id}`);
-    await activateAffiliate(affiliate.id);
-    logger.info('Affilié activé avec succès');
+    const success = await activateAffiliate(affiliate.id);
+    if (success) {
+      logger.info('Affilié activé avec succès');
+      // Refetch automatique géré par le hook
+    }
   }, [activateAffiliate]);
 
   const exportToCSV = useCallback(() => {
