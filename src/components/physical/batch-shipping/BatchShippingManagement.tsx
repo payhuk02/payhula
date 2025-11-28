@@ -479,7 +479,7 @@ export default function BatchShippingManagement() {
             <Button 
               onClick={handleCreateBatch} 
               disabled={selectedOrderIds.length === 0 || createBatch.isPending}
-              className="w-full sm:w-auto h-9 sm:h-10 text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="w-full sm:w-auto min-h-[44px] h-11 sm:h-12 text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
             >
               {createBatch.isPending ? 'Création...' : 'Créer le lot'}
             </Button>
