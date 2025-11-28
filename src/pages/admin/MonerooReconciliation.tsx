@@ -128,11 +128,12 @@ export default function MonerooReconciliation() {
                 placeholder="ID de transaction"
                 value={transactionId}
                 onChange={(e) => setTransactionId(e.target.value)}
-                className="flex-1"
+                className="flex-1 min-h-[44px]"
               />
               <Button
                 onClick={handleReconcileTransaction}
                 disabled={reconcileTransactionMutation.isPending}
+                className="min-h-[44px]"
               >
                 {reconcileTransactionMutation.isPending ? (
                   <>
@@ -204,6 +205,7 @@ export default function MonerooReconciliation() {
               onClick={handleReconcileAll}
               disabled={reconcileTransactionsMutation.isPending}
               variant="outline"
+              className="min-h-[44px]"
             >
               {reconcileTransactionsMutation.isPending ? (
                 <>
@@ -260,6 +262,7 @@ export default function MonerooReconciliation() {
               onClick={handleGenerateReport}
               disabled={generateReportMutation.isPending}
               variant="outline"
+              className="min-h-[44px]"
             >
               {generateReportMutation.isPending ? (
                 <>

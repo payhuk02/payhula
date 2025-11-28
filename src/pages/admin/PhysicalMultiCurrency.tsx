@@ -43,14 +43,14 @@ export default function PhysicalMultiCurrency() {
               <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-muted/50 backdrop-blur-sm">
                 <TabsTrigger 
                   value="manager"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <span className="hidden xs:inline">{t('admin.physicalMultiCurrency.tabs.currencies')}</span>
                   <span className="xs:hidden">{t('admin.physicalMultiCurrency.tabs.currenciesShort')}</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="converter"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   {t('admin.physicalMultiCurrency.tabs.converter')}
                 </TabsTrigger>
