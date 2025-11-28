@@ -291,17 +291,17 @@ export default function IntegrationsPage() {
                   className="animate-in fade-in slide-in-from-bottom-4 duration-700"
                 >
                   <TabsList className="grid w-full grid-cols-3 gap-2 overflow-x-auto">
-                    <TabsTrigger value="zoom" className="text-xs sm:text-sm">
+                    <TabsTrigger value="zoom" className="text-xs sm:text-sm min-h-[44px]">
                       <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                       <span className="hidden sm:inline">Video Conferencing</span>
                       <span className="sm:hidden">Video</span>
                     </TabsTrigger>
-                    <TabsTrigger value="ai" className="text-xs sm:text-sm">
+                    <TabsTrigger value="ai" className="text-xs sm:text-sm min-h-[44px]">
                       <Brain className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                       <span className="hidden sm:inline">AI Features</span>
                       <span className="sm:hidden">AI</span>
                     </TabsTrigger>
-                    <TabsTrigger value="shipping" className="text-xs sm:text-sm">
+                    <TabsTrigger value="shipping" className="text-xs sm:text-sm min-h-[44px]">
                       <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                       <span className="hidden sm:inline">Shipping APIs</span>
                       <span className="sm:hidden">Shipping</span>
