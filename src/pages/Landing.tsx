@@ -125,10 +125,10 @@ const Landing = () => {
               alt="Payhuk"
               width={32}
               height={32}
-              className="relative h-6 w-6 sm:h-8 sm:w-8 z-0 opacity-60 sm:opacity-100 -ml-1 sm:ml-0"
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 sm:relative sm:top-auto sm:translate-y-0 sm:left-auto z-0 opacity-60 sm:opacity-100"
               priority={true}
             />
-            <span className="relative z-10 -ml-6 sm:ml-0 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+            <span className="relative z-10 pl-7 sm:pl-0 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               Payhuk
             </span>
           </div>
