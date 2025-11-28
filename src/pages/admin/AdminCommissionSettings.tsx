@@ -188,15 +188,15 @@ export default function AdminCommissionSettings() {
 
         <Tabs defaultValue="commissions" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="commissions">
+            <TabsTrigger value="commissions" className="min-h-[44px]">
               <Percent className="h-4 w-4 mr-2" />
               Commissions
             </TabsTrigger>
-            <TabsTrigger value="retraits">
+            <TabsTrigger value="retraits" className="min-h-[44px]">
               <DollarSign className="h-4 w-4 mr-2" />
               Retraits
             </TabsTrigger>
-            <TabsTrigger value="simulation">
+            <TabsTrigger value="simulation" className="min-h-[44px]">
               <Calculator className="h-4 w-4 mr-2" />
               Simulation
             </TabsTrigger>

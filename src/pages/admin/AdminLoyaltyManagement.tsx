@@ -337,16 +337,16 @@ export default function AdminLoyaltyManagement() {
             {/* Tabs - Responsive */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
               <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full overflow-x-auto">
-                <TabsTrigger value="overview" className="text-xs sm:text-sm">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px]">
                   <span className="hidden sm:inline">Vue d'ensemble</span>
                   <span className="sm:hidden">Vue</span>
                 </TabsTrigger>
-                <TabsTrigger value="tiers" className="text-xs sm:text-sm">Tiers</TabsTrigger>
-                <TabsTrigger value="rewards" className="text-xs sm:text-sm">
+                <TabsTrigger value="tiers" className="text-xs sm:text-sm min-h-[44px]">Tiers</TabsTrigger>
+                <TabsTrigger value="rewards" className="text-xs sm:text-sm min-h-[44px]">
                   <span className="hidden sm:inline">Récompenses</span>
                   <span className="sm:hidden">Récomp.</span>
                 </TabsTrigger>
-                <TabsTrigger value="transactions" className="text-xs sm:text-sm">
+                <TabsTrigger value="transactions" className="text-xs sm:text-sm min-h-[44px]">
                   <span className="hidden sm:inline">Transactions</span>
                   <span className="sm:hidden">Trans.</span>
                 </TabsTrigger>
@@ -541,14 +541,14 @@ export default function AdminLoyaltyManagement() {
                         placeholder="Rechercher..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full sm:w-64 h-9 sm:h-10 text-xs sm:text-sm pl-8 sm:pl-10"
+                        className="w-full sm:w-64 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm pl-8 sm:pl-10"
                       />
                       <Search className="absolute left-2.5 sm:left-3 top-2.5 sm:top-2.5 h-4 w-4 text-muted-foreground" />
                       {searchQuery && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute right-1 top-1 h-7 w-7 sm:h-8 sm:w-8"
+                          className="absolute right-1 top-1 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12"
                           onClick={() => setSearchQuery('')}
                         >
                           <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -729,7 +729,7 @@ export default function AdminLoyaltyManagement() {
                         setTierFormData({ ...tierFormData, tier_type: value, badge_color: getTierColor(value) })
                       }
                     >
-                      <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
+                      <SelectTrigger className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -749,7 +749,7 @@ export default function AdminLoyaltyManagement() {
                       onChange={(e) => setTierFormData({ ...tierFormData, name: e.target.value })}
                       required
                       placeholder="Membre Bronze"
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
@@ -778,7 +778,7 @@ export default function AdminLoyaltyManagement() {
                         setTierFormData({ ...tierFormData, min_points_required: parseInt(e.target.value) || 0 })
                       }
                       required
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -792,7 +792,7 @@ export default function AdminLoyaltyManagement() {
                       onChange={(e) =>
                         setTierFormData({ ...tierFormData, points_multiplier: parseFloat(e.target.value) || 1.0 })
                       }
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -806,7 +806,7 @@ export default function AdminLoyaltyManagement() {
                       onChange={(e) =>
                         setTierFormData({ ...tierFormData, discount_percentage: parseFloat(e.target.value) || 0 })
                       }
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
@@ -873,7 +873,7 @@ export default function AdminLoyaltyManagement() {
                       onChange={(e) => setRewardFormData({ ...rewardFormData, name: e.target.value })}
                       required
                       placeholder="Réduction 10%"
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -884,7 +884,7 @@ export default function AdminLoyaltyManagement() {
                         setRewardFormData({ ...rewardFormData, reward_type: value })
                       }
                     >
-                      <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
+                      <SelectTrigger className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -922,7 +922,7 @@ export default function AdminLoyaltyManagement() {
                         setRewardFormData({ ...rewardFormData, points_cost: parseInt(e.target.value) || 0 })
                       }
                       required
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
+                      className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                     />
                   </div>
                   {rewardFormData.reward_type === 'discount' && (
@@ -937,7 +937,7 @@ export default function AdminLoyaltyManagement() {
                         onChange={(e) =>
                           setRewardFormData({ ...rewardFormData, discount_percentage: parseFloat(e.target.value) || undefined })
                         }
-                        className="h-9 sm:h-10 text-xs sm:text-sm"
+                        className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                       />
                     </div>
                   )}

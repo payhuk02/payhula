@@ -285,13 +285,13 @@ export default function AdminGiftCardManagement() {
                             placeholder="Rechercher..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-8 sm:pl-10 pr-8 sm:pr-10 h-9 sm:h-10 text-xs sm:text-sm w-full sm:w-64"
+                            className="pl-8 sm:pl-10 pr-8 sm:pr-10 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm w-full sm:w-64"
                           />
                           {searchTerm && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="absolute right-1 top-1 h-7 w-7 sm:h-8 sm:w-8"
+                              className="absolute right-1 top-1 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12"
                               onClick={() => setSearchTerm('')}
                             >
                               <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -299,7 +299,7 @@ export default function AdminGiftCardManagement() {
                           )}
                         </div>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                          <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm w-full sm:w-40">
+                          <SelectTrigger className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm w-full sm:w-40">
                             <SelectValue placeholder="Statut" />
                           </SelectTrigger>
                           <SelectContent>
@@ -390,7 +390,7 @@ export default function AdminGiftCardManagement() {
                                       : 'Jamais'}
                                   </TableCell>
                                   <TableCell>
-                                    <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8">
+                                    <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12">
                                       <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                     </Button>
                                   </TableCell>
@@ -450,7 +450,7 @@ export default function AdminGiftCardManagement() {
                                     </div>
                                   </div>
                                   <div className="flex justify-end pt-2">
-                                    <Button variant="ghost" size="sm" className="h-8">
+                                    <Button variant="ghost" size="sm" className="min-h-[44px]">
                                       <Edit className="h-3.5 w-3.5 mr-1.5" />
                                       Modifier
                                     </Button>
@@ -689,7 +689,7 @@ function CreateGiftCardDialog({
                 required
                 value={formData.initial_amount}
                 onChange={(e) => setFormData({ ...formData, initial_amount: e.target.value })}
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div className="space-y-2">
@@ -699,7 +699,7 @@ function CreateGiftCardDialog({
                 type="datetime-local"
                 value={formData.expires_at}
                 onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
           </div>
@@ -712,7 +712,7 @@ function CreateGiftCardDialog({
                 type="email"
                 value={formData.recipient_email}
                 onChange={(e) => setFormData({ ...formData, recipient_email: e.target.value })}
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div className="space-y-2">
@@ -721,7 +721,7 @@ function CreateGiftCardDialog({
                 id="recipient_name"
                 value={formData.recipient_name}
                 onChange={(e) => setFormData({ ...formData, recipient_name: e.target.value })}
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
           </div>

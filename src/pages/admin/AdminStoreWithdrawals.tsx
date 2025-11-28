@@ -442,7 +442,7 @@ const AdminStoreWithdrawals = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => downloadWithdrawalsCSV(filteredWithdrawals)}
-                      className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                      className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                     >
                       <Download className="h-3 w-3 sm:mr-1" />
                       <span className="hidden sm:inline">CSV</span>
@@ -451,7 +451,7 @@ const AdminStoreWithdrawals = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => downloadWithdrawalsJSON(filteredWithdrawals)}
-                      className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                      className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                     >
                       <Download className="h-3 w-3 sm:mr-1" />
                       <span className="hidden sm:inline">JSON</span>
@@ -528,7 +528,7 @@ const AdminStoreWithdrawals = () => {
                                   setSelectedWithdrawal(withdrawal);
                                   setShowViewDialog(true);
                                 }}
-                                className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                                className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                               >
                                 <Eye className="h-3 w-3 sm:mr-1" />
                                 <span className="hidden sm:inline">Voir</span>
@@ -537,7 +537,7 @@ const AdminStoreWithdrawals = () => {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => setHistoryWithdrawalId(withdrawal.id)}
-                                className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                                className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                                 title="Voir l'historique"
                               >
                                 <History className="h-3 w-3" />
@@ -551,7 +551,7 @@ const AdminStoreWithdrawals = () => {
                                       setSelectedWithdrawal(withdrawal);
                                       setShowApproveDialog(true);
                                     }}
-                                    className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                                    className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                                   >
                                     <span className="hidden sm:inline">Approuver</span>
                                     <span className="sm:hidden">✓</span>
@@ -563,7 +563,7 @@ const AdminStoreWithdrawals = () => {
                                       setSelectedWithdrawal(withdrawal);
                                       setShowRejectDialog(true);
                                     }}
-                                    className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                                    className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                                   >
                                     <span className="hidden sm:inline">Rejeter</span>
                                     <span className="sm:hidden">✕</span>
@@ -578,7 +578,7 @@ const AdminStoreWithdrawals = () => {
                                     setSelectedWithdrawal(withdrawal);
                                     setShowCompleteDialog(true);
                                   }}
-                                  className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                                  className="text-xs sm:text-sm min-h-[44px] h-11 sm:h-12 px-2 sm:px-3"
                                 >
                                   <span className="hidden sm:inline">Compléter</span>
                                   <span className="sm:hidden">✓</span>
