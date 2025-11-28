@@ -284,20 +284,22 @@ export const ProductForm = ({ storeId, storeSlug, productId, initialData, onSucc
     return getEmptyFormData();
   });
 
-  const updateFormData = (field: string, value: ProductFormDataUpdate[keyof ProductFormDataUpdate]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const updateFormData = useCallback((field: string, value: ProductFormDataUpdate[keyof ProductFormDataUpdate]) => {
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      // Auto-generate slug from name
+      if (field === "name" && !productId) {
+        newData.slug = generateSlug(value);
+      }
+      return newData;
+    });
     setIsDirty(true);
-    
-    // Auto-generate slug from name
-    if (field === "name" && !productId) {
-      setFormData(prev => ({ ...prev, slug: generateSlug(value) }));
-    }
     
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
       setValidationErrors(prev => ({ ...prev, [field]: "" }));
     }
-  };
+  }, [productId, validationErrors]);
 
   const checkSlugAvailability = async (slug: string): Promise<boolean> => {
     if (!slug) return false;
