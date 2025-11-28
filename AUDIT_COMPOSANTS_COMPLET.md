@@ -335,9 +335,9 @@ size: {
 - ✅ Input component: `min-h-[44px]`
 - ✅ Select component: `min-h-[44px]`
 - ✅ ProductCard: Correction des boutons (`min-h-[44px] h-11`)
+- ✅ SupplierOrders.tsx: 24 éléments corrigés (`min-h-[44px]`)
 
 ### Corrections Restantes ⚠️
-- ⚠️ SupplierOrders.tsx: 24 éléments à corriger
 - ⚠️ Autres ProductCard variants (ProductCardModern, ProductCardProfessional)
 - ⚠️ Composants Physical avec inputs/selects non optimisés
 - ⚠️ Accessibilité: Ajouter ARIA labels manquants
