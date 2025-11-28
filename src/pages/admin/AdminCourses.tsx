@@ -181,16 +181,16 @@ export default function AdminCourses() {
                         placeholder="Rechercher cours ou instructeur..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8"
+                        className="pl-8 min-h-[44px]"
                       />
                     </div>
                   </div>
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList>
-                      <TabsTrigger value="all">Tous</TabsTrigger>
-                      <TabsTrigger value="published">Publiés</TabsTrigger>
-                      <TabsTrigger value="draft">Brouillons</TabsTrigger>
-                      <TabsTrigger value="archived">Archivés</TabsTrigger>
+                      <TabsTrigger value="all" className="min-h-[44px]">Tous</TabsTrigger>
+                      <TabsTrigger value="published" className="min-h-[44px]">Publiés</TabsTrigger>
+                      <TabsTrigger value="draft" className="min-h-[44px]">Brouillons</TabsTrigger>
+                      <TabsTrigger value="archived" className="min-h-[44px]">Archivés</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>

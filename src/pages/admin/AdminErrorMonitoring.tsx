@@ -193,11 +193,11 @@ export default function AdminErrorMonitoring() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={loadErrorLogs}>
+          <Button variant="outline" onClick={loadErrorLogs} className="min-h-[44px]">
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualiser
           </Button>
-          <Button variant="destructive" onClick={handleClearLogs}>
+          <Button variant="destructive" onClick={handleClearLogs} className="min-h-[44px]">
             <Trash2 className="h-4 w-4 mr-2" />
             Vider les logs
           </Button>
@@ -275,7 +275,7 @@ export default function AdminErrorMonitoring() {
                   placeholder="Rechercher..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 min-h-[44px]"
                 />
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function AdminErrorMonitoring() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Niveau</label>
               <Select value={levelFilter} onValueChange={setLevelFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue placeholder="Tous les niveaux" />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,7 +299,7 @@ export default function AdminErrorMonitoring() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Type</label>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent>

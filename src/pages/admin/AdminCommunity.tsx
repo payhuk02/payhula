@@ -189,9 +189,9 @@ export default function AdminCommunity() {
 
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="members">Membres</TabsTrigger>
-              <TabsTrigger value="posts">Publications</TabsTrigger>
+              <TabsTrigger value="overview" className="min-h-[44px]">Vue d'ensemble</TabsTrigger>
+              <TabsTrigger value="members" className="min-h-[44px]">Membres</TabsTrigger>
+              <TabsTrigger value="posts" className="min-h-[44px]">Publications</TabsTrigger>
             </TabsList>
 
             {/* Vue d'ensemble */}
@@ -331,11 +331,11 @@ export default function AdminCommunity() {
                         placeholder="Rechercher un membre..."
                         value={memberSearch}
                         onChange={(e) => setMemberSearch(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 min-h-[44px]"
                       />
                     </div>
                     <Select value={memberStatusFilter} onValueChange={(v) => setMemberStatusFilter(v as typeof memberStatusFilter)}>
-                      <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                         <SelectValue placeholder="Statut" />
                       </SelectTrigger>
                       <SelectContent>
@@ -425,7 +425,7 @@ export default function AdminCommunity() {
                                   <TableCell className="text-right">
                                     <DropdownMenu>
                                       <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                        <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] h-11 w-11">
                                           <MoreVertical className="h-4 w-4" />
                                         </Button>
                                       </DropdownMenuTrigger>
@@ -514,11 +514,11 @@ export default function AdminCommunity() {
                         placeholder="Rechercher une publication..."
                         value={postSearch}
                         onChange={(e) => setPostSearch(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 min-h-[44px]"
                       />
                     </div>
                     <Select value={postStatusFilter} onValueChange={setPostStatusFilter}>
-                      <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                         <SelectValue placeholder="Statut" />
                       </SelectTrigger>
                       <SelectContent>

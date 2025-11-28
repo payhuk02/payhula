@@ -279,7 +279,7 @@ const AdminAffiliates = () => {
               Superviser l'ensemble des affiliés et leurs performances
             </p>
           </div>
-          <Button onClick={exportToCSV} variant="outline" className="gap-2">
+          <Button onClick={exportToCSV} variant="outline" className="gap-2 min-h-[44px]">
             <Download className="h-4 w-4" />
             Exporter CSV
           </Button>
@@ -375,10 +375,10 @@ const AdminAffiliates = () => {
         {/* Tabs */}
         <Tabs defaultValue="affiliates" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="affiliates">
+            <TabsTrigger value="affiliates" className="min-h-[44px]">
               Affiliés ({affiliates.length})
             </TabsTrigger>
-            <TabsTrigger value="commissions">
+            <TabsTrigger value="commissions" className="min-h-[44px]">
               Commissions
               {commissions.filter(c => c.status === 'pending').length > 0 && (
                 <Badge variant="destructive" className="ml-2">
@@ -386,7 +386,7 @@ const AdminAffiliates = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="withdrawals">
+            <TabsTrigger value="withdrawals" className="min-h-[44px]">
               Retraits
               {pendingWithdrawals.length > 0 && (
                 <Badge variant="destructive" className="ml-2">
@@ -394,7 +394,7 @@ const AdminAffiliates = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="stats">Statistiques</TabsTrigger>
+            <TabsTrigger value="stats" className="min-h-[44px]">Statistiques</TabsTrigger>
           </TabsList>
 
           {/* Affiliés */}
@@ -415,11 +415,11 @@ const AdminAffiliates = () => {
                         placeholder="Rechercher..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 w-64"
+                        className="pl-10 w-64 min-h-[44px]"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-40">
+                      <SelectTrigger className="w-40 min-h-[44px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
