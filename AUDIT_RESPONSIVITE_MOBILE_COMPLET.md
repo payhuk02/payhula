@@ -349,14 +349,14 @@
 ## 7. RÉSUMÉ DES CORRECTIONS
 
 ### Composants Corrigés (8)
-1. ✅ **Tabs** - Touch targets et hauteur
-2. ✅ **Card** - Padding et typographie responsive
-3. ✅ **Table** - Touch targets et accessibilité
-4. ✅ **Pagination** - Touch targets
-5. ✅ **Sheet** - Padding responsive et touch targets
-6. ✅ **AlertDialog** - Typographie responsive
-7. ✅ **Popover** - Largeur responsive
-8. ✅ **DropdownMenu** - Touch targets et largeur responsive
+1. ✅ **Tabs** - Touch targets et hauteur (TabsList, TabsTrigger)
+2. ✅ **Card** - Padding et typographie responsive (CardHeader, CardContent, CardFooter, CardTitle, CardDescription)
+3. ✅ **Table** - Touch targets et accessibilité (TableHead avec `min-h-[44px]`, `role="table"`)
+4. ✅ **Pagination** - Touch targets (PaginationEllipsis)
+5. ✅ **Sheet** - Padding responsive et touch targets (SheetContent, SheetClose)
+6. ✅ **AlertDialog** - Typographie responsive (AlertDialogTitle)
+7. ✅ **Popover** - Largeur responsive (PopoverContent avec `w-[calc(100vw-2rem)]`)
+8. ✅ **DropdownMenu** - Touch targets et largeur responsive (DropdownMenuItem, DropdownMenuSubTrigger, DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuContent/SubContent)
 
 ### Métriques Améliorées
 - ✅ **Touch Targets**: 100% des éléments interactifs ont maintenant `min-h-[44px]`
