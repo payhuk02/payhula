@@ -284,15 +284,17 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-6 sm:mb-8">
           <Link to="/" className="relative inline-flex items-center gap-2 mb-4 sm:mb-6" aria-label="Retour à l'accueil">
-            <OptimizedImage
-              src={payhukLogo}
-              alt="Payhuk Logo"
-              width={40}
-              height={40}
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 sm:relative sm:top-auto sm:translate-y-0 sm:left-auto z-0 opacity-60 sm:opacity-100"
-              priority
-            />
-            <span className="relative z-10 pl-10 sm:pl-0 text-2xl sm:text-3xl font-bold">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+              <OptimizedImage
+                src={payhukLogo}
+                alt="Payhuk Logo"
+                width={40}
+                height={40}
+                className="absolute inset-0 h-full w-full sm:relative sm:inset-auto z-0 opacity-60 sm:opacity-100"
+                priority
+              />
+            </div>
+            <span className="relative z-10 -ml-8 sm:ml-0 text-2xl sm:text-3xl font-bold">
               Payhuk
             </span>
           </Link>
