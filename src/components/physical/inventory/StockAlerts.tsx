@@ -220,16 +220,16 @@ export const StockAlerts: React.FC = () => {
                   placeholder="Rechercher..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm"
-                  aria-label="Rechercher"
+                  className="pl-8 sm:pl-10 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
+                  aria-label="Rechercher dans les alertes de stock"
                 />
                 {searchInput && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 sm:h-8 sm:w-8"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12"
                     onClick={handleClearSearch}
-                    aria-label="Effacer"
+                    aria-label="Effacer la recherche"
                   >
                     <X className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
@@ -238,7 +238,7 @@ export const StockAlerts: React.FC = () => {
 
               {/* Severity Filter */}
               <Select value={severityFilter} onValueChange={setSeverityFilter}>
-                <SelectTrigger className="w-full sm:w-48 h-9 sm:h-10 text-xs sm:text-sm">
+                <SelectTrigger className="w-full sm:w-48 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm" aria-label="Filtrer par sévérité">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

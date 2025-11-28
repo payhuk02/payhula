@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -294,19 +295,21 @@ export function ProductBundleBuilder({
     onSave?.(finalBundle);
   };
 
-  // Filter products for picker
-  const availableProducts = MOCK_PRODUCTS.filter((p) => {
-    if (bundle.products?.some((bp) => bp.product_id === p.id)) return false;
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        p.name.toLowerCase().includes(query) ||
-        p.sku?.toLowerCase().includes(query) ||
-        p.variant_label?.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
+  // Filter products for picker with debounce and memoization
+  const availableProducts = useMemo(() => {
+    return MOCK_PRODUCTS.filter((p) => {
+      if (bundle.products?.some((bp) => bp.product_id === p.id)) return false;
+      if (debouncedSearchQuery) {
+        const query = debouncedSearchQuery.toLowerCase();
+        return (
+          p.name.toLowerCase().includes(query) ||
+          p.sku?.toLowerCase().includes(query) ||
+          p.variant_label?.toLowerCase().includes(query)
+        );
+      }
+      return true;
+    });
+  }, [bundle.products, debouncedSearchQuery]);
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -629,7 +632,8 @@ export function ProductBundleBuilder({
                 placeholder="Rechercher un produit..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 min-h-[44px] h-11"
+                aria-label="Rechercher un produit à ajouter au pack"
               />
             </div>
 

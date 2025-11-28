@@ -146,14 +146,16 @@ export default function BatchShippingManagement() {
             placeholder="Rechercher par numéro, nom ou transporteur..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-9 pr-9 h-10 sm:h-11 text-sm"
+            className="pl-9 pr-9 min-h-[44px] h-11 sm:h-12 text-sm"
+            aria-label="Rechercher par numéro, nom ou transporteur"
           />
           {searchInput && (
             <Button
               variant="ghost"
               size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11 p-0"
               onClick={() => setSearchInput('')}
+              aria-label="Effacer la recherche"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -166,7 +168,8 @@ export default function BatchShippingManagement() {
         </div>
         <Button 
           onClick={() => setIsCreateDialogOpen(true)}
-          className="h-10 sm:h-11 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+          className="min-h-[44px] h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+          aria-label="Créer un nouveau lot d'expédition"
         >
           <Plus className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Créer un lot</span>
