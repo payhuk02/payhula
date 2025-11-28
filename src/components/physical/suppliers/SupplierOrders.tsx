@@ -310,14 +310,14 @@ export default function SupplierOrders() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="pl-7 sm:pl-8 md:pl-9 lg:pl-10 pr-7 sm:pr-8 md:pr-9 lg:pr-10 h-9 sm:h-10 md:h-11 lg:h-12 text-xs sm:text-sm md:text-base w-full touch-manipulation"
+                className="pl-7 sm:pl-8 md:pl-9 lg:pl-10 pr-7 sm:pr-8 md:pr-9 lg:pr-10 min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 text-xs sm:text-sm md:text-base w-full touch-manipulation"
                 title="Rechercher par numéro de commande ou fournisseur"
               />
               {searchInput && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 sm:right-1.5 md:right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 p-0 hover:bg-muted touch-manipulation"
+                  className="absolute right-1 sm:right-1.5 md:right-2 top-1/2 transform -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12 p-0 hover:bg-muted touch-manipulation"
                   onClick={() => setSearchInput('')}
                   aria-label="Effacer la recherche"
                 >
@@ -334,7 +334,7 @@ export default function SupplierOrders() {
         </Card>
         <Button 
           onClick={() => setIsDialogOpen(true)}
-          className="h-9 sm:h-10 md:h-11 lg:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 lg:px-6 w-full sm:w-auto shrink-0"
+          className="min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation text-xs sm:text-sm md:text-base px-3 sm:px-4 md:px-5 lg:px-6 w-full sm:w-auto shrink-0"
         >
           <Plus className="mr-1 sm:mr-1.5 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5" />
           <span className="hidden sm:inline">Nouvelle commande</span>
@@ -390,7 +390,7 @@ export default function SupplierOrders() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-background hover:scale-110 transition-all duration-200 touch-manipulation"
+                    className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-background hover:scale-110 transition-all duration-200 touch-manipulation"
                     onClick={scrollTabsLeft}
                     aria-label="Défiler vers la gauche"
                   >
@@ -407,7 +407,7 @@ export default function SupplierOrders() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-background hover:scale-110 transition-all duration-200 touch-manipulation"
+                    className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-background hover:scale-110 transition-all duration-200 touch-manipulation"
                     onClick={scrollTabsRight}
                     aria-label="Défiler vers la droite"
                   >
@@ -476,7 +476,7 @@ export default function SupplierOrders() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 lg:h-10 lg:w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200 touch-manipulation"
+                      className="min-h-[44px] min-w-[44px] h-11 w-11 lg:h-12 lg:w-12 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200 touch-manipulation"
                       onClick={scrollTableLeft}
                       aria-label="Défiler vers la gauche"
                     >
@@ -493,7 +493,7 @@ export default function SupplierOrders() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 lg:h-10 lg:w-10 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200 touch-manipulation"
+                      className="min-h-[44px] min-w-[44px] h-11 w-11 lg:h-12 lg:w-12 rounded-full bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg hover:bg-card hover:scale-110 transition-all duration-200 touch-manipulation"
                       onClick={scrollTableRight}
                       aria-label="Défiler vers la droite"
                     >
@@ -564,7 +564,7 @@ export default function SupplierOrders() {
                                   handleStatusUpdate(order.id, value)
                                 }
                               >
-                                <SelectTrigger className="w-full max-w-[160px] lg:max-w-[180px] h-8 lg:h-9 xl:h-10 text-xs lg:text-sm touch-manipulation">
+                                <SelectTrigger className="w-full max-w-[160px] lg:max-w-[180px] min-h-[44px] h-11 lg:h-12 xl:h-12 text-xs lg:text-sm touch-manipulation">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[300px]">
@@ -591,7 +591,7 @@ export default function SupplierOrders() {
                             <TableCell className="text-right whitespace-nowrap min-w-[80px] lg:min-w-[100px] px-2.5 lg:px-3 xl:px-4 2xl:px-6">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-7 w-7 lg:h-8 lg:w-8 xl:h-9 xl:w-9 p-0 touch-manipulation">
+                                  <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] h-11 w-11 lg:h-12 lg:w-12 xl:h-12 xl:w-12 p-0 touch-manipulation">
                                     <MoreVertical className="h-3.5 w-3.5 lg:h-4 lg:w-4 xl:h-5 xl:w-5" />
                                   </Button>
                                 </DropdownMenuTrigger>
@@ -650,7 +650,7 @@ export default function SupplierOrders() {
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 p-0 shrink-0 touch-manipulation">
+                            <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] h-11 w-11 xs:h-12 xs:w-12 sm:h-12 sm:w-12 p-0 shrink-0 touch-manipulation">
                               <MoreVertical className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -694,7 +694,7 @@ export default function SupplierOrders() {
                             handleStatusUpdate(order.id, value)
                           }
                         >
-                          <SelectTrigger className="w-full xs:w-[140px] sm:w-[160px] md:w-[180px] h-8 xs:h-9 sm:h-10 text-[10px] xs:text-xs sm:text-sm md:text-base touch-manipulation">
+                          <SelectTrigger className="w-full xs:w-[140px] sm:w-[160px] md:w-[180px] min-h-[44px] h-11 xs:h-12 sm:h-12 text-[10px] xs:text-xs sm:text-sm md:text-base touch-manipulation">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="max-h-[300px] w-[var(--radix-select-trigger-width)]">
@@ -741,7 +741,7 @@ export default function SupplierOrders() {
               <div className="space-y-1.5 sm:space-y-2 w-full">
                 <Label htmlFor="supplier" className="text-xs sm:text-sm md:text-base font-medium">Fournisseur *</Label>
                 <Select value={selectedSupplier} onValueChange={setSelectedSupplier} required>
-                  <SelectTrigger className="h-9 sm:h-10 md:h-11 lg:h-12 text-xs sm:text-sm md:text-base w-full touch-manipulation">
+                  <SelectTrigger className="min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 text-xs sm:text-sm md:text-base w-full touch-manipulation">
                     <SelectValue placeholder="Sélectionner un fournisseur" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[200px] sm:max-h-[300px] w-[var(--radix-select-trigger-width)]">
@@ -768,7 +768,7 @@ export default function SupplierOrders() {
                     variant="outline" 
                     size="sm" 
                     onClick={handleAddItem} 
-                    className="h-8 sm:h-9 md:h-10 lg:h-11 text-xs sm:text-sm md:text-base w-full xs:w-auto shrink-0 touch-manipulation"
+                    className="min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 text-xs sm:text-sm md:text-base w-full xs:w-auto shrink-0 touch-manipulation"
                   >
                     <Plus className="mr-1 sm:mr-1.5 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5" />
                     <span className="hidden sm:inline">Ajouter un article</span>
@@ -792,7 +792,7 @@ export default function SupplierOrders() {
                               onChange={(e) =>
                                 handleUpdateItem(index, item.product_id ? 'product_id' : 'supplier_product_id', e.target.value)
                               }
-                              className="text-xs sm:text-sm md:text-base h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 w-full touch-manipulation"
+                              className="text-xs sm:text-sm md:text-base min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 xl:h-12 w-full touch-manipulation"
                             />
                           </div>
                           
@@ -806,7 +806,7 @@ export default function SupplierOrders() {
                               onChange={(e) =>
                                 handleUpdateItem(index, 'quantity', parseInt(e.target.value) || 0)
                               }
-                              className="text-xs sm:text-sm md:text-base h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 w-full touch-manipulation"
+                              className="text-xs sm:text-sm md:text-base min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 xl:h-12 w-full touch-manipulation"
                             />
                           </div>
                           
@@ -821,7 +821,7 @@ export default function SupplierOrders() {
                               onChange={(e) =>
                                 handleUpdateItem(index, 'unit_cost', parseFloat(e.target.value) || 0)
                               }
-                              className="text-xs sm:text-sm md:text-base h-8 sm:h-9 md:h-10 lg:h-11 xl:h-12 w-full touch-manipulation"
+                              className="text-xs sm:text-sm md:text-base min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 xl:h-12 w-full touch-manipulation"
                             />
                           </div>
                           
@@ -847,7 +847,7 @@ export default function SupplierOrders() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleRemoveItem(index)}
-                              className="h-8 sm:h-9 md:h-10 w-full sm:w-auto px-3 sm:px-4 text-[10px] xs:text-xs sm:text-sm md:text-base text-destructive hover:text-destructive hover:bg-destructive/10 touch-manipulation"
+                              className="min-h-[44px] h-11 sm:h-12 md:h-12 w-full sm:w-auto px-3 sm:px-4 text-[10px] xs:text-xs sm:text-sm md:text-base text-destructive hover:text-destructive hover:bg-destructive/10 touch-manipulation"
                             >
                               <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1.5 sm:mr-2 md:mr-0" />
                               <span className="sm:hidden">Supprimer</span>
@@ -900,14 +900,14 @@ export default function SupplierOrders() {
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsDialogOpen(false)} 
-                className="w-full xs:w-auto h-9 sm:h-10 md:h-11 lg:h-12 text-xs sm:text-sm md:text-base order-2 xs:order-1 touch-manipulation shrink-0"
+                className="w-full xs:w-auto min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 text-xs sm:text-sm md:text-base order-2 xs:order-1 touch-manipulation shrink-0"
               >
                 Annuler
               </Button>
               <Button 
                 type="submit" 
                 disabled={createOrder.isPending} 
-                className="w-full xs:w-auto h-9 sm:h-10 md:h-11 lg:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 text-xs sm:text-sm md:text-base order-1 xs:order-2 touch-manipulation shrink-0"
+                className="w-full xs:w-auto min-h-[44px] h-11 sm:h-12 md:h-12 lg:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 hover:scale-105 active:scale-95 text-xs sm:text-sm md:text-base order-1 xs:order-2 touch-manipulation shrink-0"
               >
                 {createOrder.isPending ? (
                   <>
