@@ -296,7 +296,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             <Button 
               variant="outline" 
               size="sm"
-              className="product-button product-button-secondary h-7 sm:h-8 text-[10px] sm:text-xs px-2 sm:px-3"
+              className="product-button product-button-secondary min-h-[44px] h-11 text-[10px] sm:text-xs px-2 sm:px-3"
               aria-label={`Voir les détails du produit ${product.name}`}
             >
               <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5 flex-shrink-0" aria-hidden="true" />
@@ -309,7 +309,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
               <Button 
                 variant="outline" 
                 size="sm"
-                className="product-button product-button-secondary h-7 sm:h-8 text-[10px] sm:text-xs px-2 sm:px-3"
+                className="product-button product-button-secondary min-h-[44px] h-11 text-[10px] sm:text-xs px-2 sm:px-3"
                 aria-label={`Contacter le vendeur pour ${product.name}`}
               >
                 <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5 flex-shrink-0" aria-hidden="true" />
@@ -323,7 +323,7 @@ const ProductCardComponent = ({ product, storeSlug }: ProductCardProps) => {
             onClick={handleBuyNow}
             disabled={loading}
             size="sm"
-            className="product-button product-button-primary h-7 sm:h-8 text-[10px] sm:text-xs px-2 sm:px-3"
+            className="product-button product-button-primary min-h-[44px] h-11 text-[10px] sm:text-xs px-2 sm:px-3"
             aria-label={`Acheter le produit ${product.name} pour ${price.toLocaleString()} ${product.currency ?? "FCFA"}`}
           >
             {loading ? (
