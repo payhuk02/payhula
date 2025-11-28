@@ -169,6 +169,7 @@ export function ProductBundleBuilder({
 
   const [showProductPicker, setShowProductPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Calculate prices
   const calculatePrices = (products: BundleProduct[], bundlePrice?: number) => {
