@@ -119,13 +119,13 @@ const Landing = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur-sm shadow-soft" role="banner">
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
-          <div className="relative flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 flex-shrink-0">
+          <div className="relative flex items-center justify-start gap-1.5 sm:gap-2 flex-shrink-0">
             <OptimizedImage
               src={payhukLogo}
               alt="Payhuk"
               width={32}
               height={32}
-              className="absolute left-0 h-6 w-6 sm:h-8 sm:w-8 sm:relative sm:left-auto sm:translate-x-0 z-0 opacity-60 sm:opacity-100"
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 sm:relative sm:top-auto sm:translate-y-0 sm:left-auto z-0 opacity-60 sm:opacity-100"
               priority={true}
             />
             <span className="relative z-10 text-lg sm:text-xl md:text-2xl font-bold text-foreground pl-7 sm:pl-0">
