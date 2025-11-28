@@ -81,15 +81,22 @@ export function useCurrentCommunityMember() {
         .from('community_members')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
+      // PGRST116 = no rows returned (user doesn't have a profile yet)
+      // This is expected and not an error
       if (error && error.code !== 'PGRST116') {
         logger.error('Error fetching current community member', { error });
+        // Don't throw for 403 errors - user might not have permission yet
+        if (error.code === '42501' || error.message?.includes('permission denied')) {
+          return null;
+        }
         throw error;
       }
 
       return data as CommunityMember | null;
     },
+    retry: false, // Don't retry on auth errors
   });
 }
 
