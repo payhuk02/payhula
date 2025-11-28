@@ -97,6 +97,7 @@ export default function MonerooAnalytics() {
                   endDate: new Date(),
                 });
               }}
+              className="min-h-[44px]"
             >
               7 derniers jours
             </Button>
@@ -108,6 +109,7 @@ export default function MonerooAnalytics() {
                   endDate: new Date(),
                 });
               }}
+              className="min-h-[44px]"
             >
               30 derniers jours
             </Button>
@@ -119,6 +121,7 @@ export default function MonerooAnalytics() {
                   endDate: new Date(),
                 });
               }}
+              className="min-h-[44px]"
             >
               90 derniers jours
             </Button>

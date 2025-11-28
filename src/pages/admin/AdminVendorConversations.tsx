@@ -412,12 +412,12 @@ export default function AdminVendorConversations() {
                       placeholder="Rechercher par boutique, produit, utilisateur..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 min-h-[44px]"
                     />
                   </div>
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                     <SelectValue placeholder="Statut" />
                   </SelectTrigger>
                   <SelectContent>
@@ -514,6 +514,7 @@ export default function AdminVendorConversations() {
                         variant="outline"
                         size="sm"
                         onClick={() => setShowInterventionDialog(true)}
+                        className="min-h-[44px]"
                       >
                         <Shield className="h-4 w-4 mr-2" />
                         Intervenir
@@ -523,6 +524,7 @@ export default function AdminVendorConversations() {
                           variant="destructive"
                           size="sm"
                           onClick={() => markAsDisputed.mutate(selectedConversation.id)}
+                          className="min-h-[44px]"
                         >
                           <AlertTriangle className="h-4 w-4 mr-2" />
                           Litige
@@ -608,12 +610,14 @@ export default function AdminVendorConversations() {
                 <Button
                   variant="outline"
                   onClick={() => setShowInterventionDialog(false)}
+                  className="min-h-[44px]"
                 >
                   Annuler
                 </Button>
                 <Button
                   onClick={() => sendInterventionMessage.mutate(interventionMessage)}
                   disabled={!interventionMessage.trim() || sendInterventionMessage.isPending}
+                  className="min-h-[44px]"
                 >
                   {sendInterventionMessage.isPending ? (
                     <>

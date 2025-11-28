@@ -383,7 +383,7 @@ export default function AdminWebhookManagement() {
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => handleOpenDialog()}
-                    className="h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    className="min-h-[44px] h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
                     <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     <span className="hidden sm:inline text-xs sm:text-sm">Nouveau Webhook</span>
@@ -470,7 +470,7 @@ export default function AdminWebhookManagement() {
                       placeholder="Rechercher un webhook..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8 pr-8 h-9 sm:h-10 text-xs sm:text-sm flex-1"
+                      className="pl-8 pr-8 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm flex-1"
                     />
                     {searchQuery && (
                       <button
@@ -551,7 +551,7 @@ export default function AdminWebhookManagement() {
                                         onClick={() => {
                                           setSelectedWebhookId(webhook.id);
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                                       >
                                         <Activity className="h-3.5 w-3.5" />
                                       </Button>
@@ -560,7 +560,7 @@ export default function AdminWebhookManagement() {
                                         size="sm"
                                         onClick={() => handleTest(webhook)}
                                         disabled={testWebhook.isPending}
-                                        className="h-8 w-8 p-0"
+                                        className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                                       >
                                         <TestTube className="h-3.5 w-3.5" />
                                       </Button>
@@ -568,7 +568,7 @@ export default function AdminWebhookManagement() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleOpenDialog(webhook)}
-                                        className="h-8 w-8 p-0"
+                                        className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                                       >
                                         <Edit className="h-3.5 w-3.5" />
                                       </Button>
@@ -577,7 +577,7 @@ export default function AdminWebhookManagement() {
                                         size="sm"
                                         onClick={() => handleDelete(webhook)}
                                         disabled={deleteWebhook.isPending}
-                                        className="h-8 w-8 p-0"
+                                        className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                                       >
                                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
                                       </Button>

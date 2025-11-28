@@ -155,6 +155,7 @@ export default function TransactionMonitoring() {
             <Button
               variant="outline"
               onClick={loadStats}
+              className="min-h-[44px]"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Actualiser
@@ -163,6 +164,7 @@ export default function TransactionMonitoring() {
               variant="outline"
               onClick={generateReport}
               disabled={generatingReport}
+              className="min-h-[44px]"
             >
               {generatingReport ? (
                 <>
@@ -262,13 +264,13 @@ export default function TransactionMonitoring() {
 
                 <Tabs defaultValue="high">
                   <TabsList>
-                    <TabsTrigger value="high">
+                    <TabsTrigger value="high" className="min-h-[44px]">
                       Critique ({highSeverityIssues})
                     </TabsTrigger>
-                    <TabsTrigger value="medium">
+                    <TabsTrigger value="medium" className="min-h-[44px]">
                       Moyen ({mediumSeverityIssues})
                     </TabsTrigger>
-                    <TabsTrigger value="low">
+                    <TabsTrigger value="low" className="min-h-[44px]">
                       Mineur ({lowSeverityIssues})
                     </TabsTrigger>
                   </TabsList>

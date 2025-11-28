@@ -444,11 +444,11 @@ export default function AdminShippingConversations() {
                     placeholder="Rechercher par sujet, boutique, service..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full"
+                    className="w-full min-h-[44px]"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                     <SelectValue placeholder="Statut" />
                   </SelectTrigger>
                   <SelectContent>
@@ -459,7 +459,7 @@ export default function AdminShippingConversations() {
                   </SelectContent>
                 </Select>
                 <Select value={disputedFilter} onValueChange={setDisputedFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                     <SelectValue placeholder="Litiges" />
                   </SelectTrigger>
                   <SelectContent>
@@ -571,7 +571,7 @@ export default function AdminShippingConversations() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="flex-1 sm:flex-none"
+                              className="flex-1 sm:flex-none min-h-[44px]"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedConversation(conversation);
@@ -585,7 +585,7 @@ export default function AdminShippingConversations() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="flex-1 sm:flex-none"
+                                className="flex-1 sm:flex-none min-h-[44px]"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedConversation(conversation);
@@ -638,7 +638,7 @@ export default function AdminShippingConversations() {
                 <div className="flex flex-col sm:flex-row justify-end gap-2">
                   <Button
                     variant="outline"
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[44px]"
                     onClick={() => {
                       setShowInterventionDialog(false);
                       setInterventionMessage('');
@@ -647,7 +647,7 @@ export default function AdminShippingConversations() {
                     Annuler
                   </Button>
                   <Button
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[44px]"
                     onClick={() => sendInterventionMessageMutation.mutate()}
                     disabled={!interventionMessage.trim() || sendInterventionMessageMutation.isPending}
                   >
