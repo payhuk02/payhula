@@ -353,7 +353,7 @@ const Auth = () => {
                           setResetError("");
                           setResetEmail("");
                         }}
-                        className="text-xs sm:text-sm text-primary hover:underline min-h-[44px] px-2 flex items-center"
+                        className="text-xs sm:text-sm text-primary hover:underline min-h-[44px] px-2 flex items-center touch-manipulation"
                         aria-label="Réinitialiser le mot de passe"
                       >
                         {t('auth.login.forgotPassword', 'Mot de passe oublié ?')}

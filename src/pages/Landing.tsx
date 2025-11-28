@@ -893,28 +893,28 @@ const Landing = () => {
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.product')}</h4>
               <ul className="space-y-2.5 text-sm sm:text-base">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.features')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.pricing')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.demo')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.features')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.pricing')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.demo')}</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.support')}</h4>
               <ul className="space-y-2.5 text-sm sm:text-base">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.documentation')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.guides')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.contact')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.documentation')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.guides')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.contact')}</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm md:text-base">{getValue('landing.footer.company')}</h4>
               <ul className="space-y-2.5 text-sm sm:text-base">
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.about')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.blog')}</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth min-h-[44px] flex items-center">{getValue('landing.footer.links.careers')}</Link></li>
-                <li><Link to="/community" className="text-muted-foreground hover:text-primary hover:translate-x-1 inline-block transition-smooth flex items-center gap-1 min-h-[44px]">
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.about')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.blog')}</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth min-h-[44px] flex items-center touch-manipulation">{getValue('landing.footer.links.careers')}</Link></li>
+                <li><Link to="/community" className="text-muted-foreground hover:text-primary hover:translate-x-1 block transition-smooth flex items-center gap-1 min-h-[44px] touch-manipulation">
                   <Users className="h-3 w-3 sm:h-4 sm:w-4" />
                   Communauté
                 </Link></li>

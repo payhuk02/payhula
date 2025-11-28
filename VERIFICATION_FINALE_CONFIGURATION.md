@@ -66,3 +66,4 @@ Si le bucket **n'est pas marqué "Public"** dans les paramètres du dashboard, m
 
 
 
+
