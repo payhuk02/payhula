@@ -176,10 +176,11 @@ export function MonitoringDashboard() {
                   <span>
                     {alert.severity === 'critical' ? 'Critique' : 'Avertissement'}: {alert.metricName}
                   </span>
-                  <Button className="min-h-[44px]"
+                  <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleAcknowledge(alert.id)}
+                    className="min-h-[44px]"
                   >
                     Acquitter
                   </Button>
