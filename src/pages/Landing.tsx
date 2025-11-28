@@ -356,8 +356,10 @@ const Landing = () => {
                               alt={`Photo de ${testimonial.name}`}
                               width={48}
                               height={48}
-                              className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
+                              className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20 flex-shrink-0"
+                              style={{ aspectRatio: '1/1' }}
                               loading={index === 0 ? "eager" : "lazy"}
+                              decoding="async"
                             />
                             <div>
                               <p className="font-semibold text-foreground">{testimonial.name}</p>
