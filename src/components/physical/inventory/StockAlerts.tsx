@@ -255,7 +255,7 @@ export const StockAlerts: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleRefresh}
-                className="h-9 sm:h-10"
+                className="min-h-[44px] h-11 sm:h-12"
                 aria-label="Rafraîchir"
               >
                 <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -377,7 +377,7 @@ export const StockAlerts: React.FC = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => setSelectedAlert(alert)}
-                              className="h-8"
+                              className="min-h-[44px] h-11"
                             >
                               Résoudre
                             </Button>

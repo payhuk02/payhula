@@ -378,7 +378,7 @@ export default function BatchShippingManagement() {
                                 size="sm"
                                 onClick={() => handleProcessBatch(batch.id)}
                                 disabled={processBatch.isPending}
-                                className="text-xs h-8"
+                                className="text-xs min-h-[44px] h-11"
                               >
                                 <RefreshCw className={`h-3.5 w-3.5 mr-1 ${processBatch.isPending ? 'animate-spin' : ''}`} />
                                 Traiter
@@ -388,7 +388,7 @@ export default function BatchShippingManagement() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-xs h-8"
+                                className="text-xs min-h-[44px] h-11"
                               >
                                 <Download className="h-3.5 w-3.5 mr-1" />
                                 Télécharger
@@ -455,7 +455,7 @@ export default function BatchShippingManagement() {
                 value={batchName}
                 onChange={(e) => setBatchName(e.target.value)}
                 placeholder="Ex: Expédition du 27 janvier"
-                className="text-sm h-9 sm:h-10"
+                className="text-sm min-h-[44px] h-11 sm:h-12"
               />
             </div>
             <div className="space-y-2">
@@ -472,7 +472,7 @@ export default function BatchShippingManagement() {
               type="button" 
               variant="outline" 
               onClick={() => setIsCreateDialogOpen(false)}
-              className="w-full sm:w-auto h-9 sm:h-10 text-sm"
+              className="w-full sm:w-auto min-h-[44px] h-11 sm:h-12 text-sm"
             >
               Annuler
             </Button>
