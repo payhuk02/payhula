@@ -282,8 +282,8 @@ const Auth = () => {
       </div>
 
       <div className="w-full max-w-md">
-        <div className="text-center mb-6 sm:mb-8">
-          <Link to="/" className="relative inline-flex items-center justify-start gap-2 mb-4 sm:mb-6" aria-label="Retour à l'accueil">
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <Link to="/" className="relative inline-flex items-center gap-2 mb-4 sm:mb-6" aria-label="Retour à l'accueil">
             <OptimizedImage
               src={payhukLogo}
               alt="Payhuk Logo"
