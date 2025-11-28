@@ -179,14 +179,14 @@ export default function AdminProductKitsManagement() {
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <Tabs defaultValue="kits" className="w-full">
                 <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 w-full sm:w-auto grid grid-cols-3 sm:flex">
-                  <TabsTrigger
+                  <TabsTrigger className="min-h-[44px]"
                     value="kits"
                     className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                   >
                     <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="hidden sm:inline">Kits</span>
                   </TabsTrigger>
-                  <TabsTrigger
+                  <TabsTrigger className="min-h-[44px]"
                     value="components"
                     className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                   >
@@ -194,7 +194,7 @@ export default function AdminProductKitsManagement() {
                     <span className="hidden sm:inline">Composants</span>
                     <span className="sm:hidden">Comp.</span>
                   </TabsTrigger>
-                  <TabsTrigger
+                  <TabsTrigger className="min-h-[44px]"
                     value="assemblies"
                     className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                   >

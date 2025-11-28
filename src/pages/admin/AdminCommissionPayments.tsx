@@ -321,7 +321,7 @@ export default function AdminCommissionPayments() {
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <Label>Type:</Label>
                 <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as typeof typeFilter)}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-40 min-h-[44px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -335,7 +335,7 @@ export default function AdminCommissionPayments() {
               <div className="flex items-center gap-2">
                 <Label>Statut:</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-40 min-h-[44px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

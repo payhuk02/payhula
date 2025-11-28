@@ -326,7 +326,7 @@ export default function IntegrationsPage() {
                           setSelectedType('zoom');
                           setIsDialogOpen(true);
                         }}
-                        className="h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                        className="min-h-[44px] h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       >
                         {getIntegrationByType('zoom') ? (
                           <>
@@ -371,7 +371,7 @@ export default function IntegrationsPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => deleteIntegration.mutate(getIntegrationByType('zoom')!.id)}
-                              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+                              className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12 p-0"
                             >
                               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </Button>
@@ -412,7 +412,7 @@ export default function IntegrationsPage() {
                           setSelectedType('openai');
                           setIsDialogOpen(true);
                         }}
-                        className="h-9 sm:h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                        className="min-h-[44px] h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       >
                         {getIntegrationByType('openai') ? (
                           <>
@@ -457,7 +457,7 @@ export default function IntegrationsPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => deleteIntegration.mutate(getIntegrationByType('openai')!.id)}
-                              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+                              className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-12 sm:w-12 p-0"
                             >
                               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </Button>
@@ -531,7 +531,7 @@ export default function IntegrationsPage() {
                                   setSelectedType(type);
                                   setIsDialogOpen(true);
                                 }}
-                                className="h-8 sm:h-9 text-xs sm:text-sm"
+                                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                               >
                                 {integration ? (
                                   <>
@@ -619,7 +619,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_key: e.target.value },
                 })}
                 placeholder="Zoom API Key"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div>
@@ -632,7 +632,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_secret: e.target.value },
                 })}
                 placeholder="Zoom API Secret"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div>
@@ -644,7 +644,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, account_id: e.target.value },
                 })}
                 placeholder="Zoom Account ID (pour OAuth)"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
           </>
@@ -662,7 +662,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_key: e.target.value },
                 })}
                 placeholder="OpenAI API Key"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div>
@@ -674,7 +674,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, model: e.target.value },
                 })}
                 placeholder="gpt-4-turbo-preview"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
           </>
@@ -694,7 +694,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_key: e.target.value },
                 })}
                 placeholder="Shipping API Key"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div>
@@ -707,7 +707,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, api_secret: e.target.value },
                 })}
                 placeholder="Shipping API Secret"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
             <div>
@@ -719,7 +719,7 @@ const IntegrationConfigForm = ({
                   config: { ...formData.config, account_number: e.target.value },
                 })}
                 placeholder="Account Number"
-                className="h-9 sm:h-10 text-xs sm:text-sm"
+                className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
               />
             </div>
           </>
@@ -754,10 +754,10 @@ const IntegrationConfigForm = ({
         />
       </div>
       <DialogFooter className="flex-col sm:flex-row gap-2">
-        <Button variant="outline" onClick={() => {}} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
+        <Button variant="outline" onClick={() => {}} className="w-full sm:w-auto min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
           Annuler
         </Button>
-        <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+        <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
           {integration ? 'Modifier' : 'Créer'}
         </Button>
       </DialogFooter>

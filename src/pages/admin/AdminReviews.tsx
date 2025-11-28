@@ -4,7 +4,7 @@
  * Design responsive inspiré de la page Inventaire
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { logger } from '@/lib/logger';
@@ -43,7 +43,7 @@ export const AdminReviews = () => {
     pageSize 
   });
   const reviews = reviewsResult?.data || [];
-  const totalCount = reviewsResult?.count || 0;
+  // const totalCount = reviewsResult?.count || 0; // Utilisé pour pagination future
 
   useEffect(() => {
     if (!isLoading && reviews) {
@@ -113,28 +113,28 @@ export const AdminReviews = () => {
           {[
             { 
               label: 'En attente', 
-              value: stats?.pending || 0, 
+              value: (stats && typeof stats === 'object' && 'pending' in stats) ? stats.pending : 0, 
               icon: Clock, 
               color: "from-orange-600 to-amber-600",
               description: "Avis à modérer"
             },
             { 
               label: 'Signalés', 
-              value: stats?.flagged || 0, 
+              value: (stats && typeof stats === 'object' && 'flagged' in stats) ? stats.flagged : 0, 
               icon: Flag, 
               color: "from-red-600 to-rose-600",
               description: "Signalements actifs"
             },
             { 
               label: 'Approuvés', 
-              value: stats?.approved || 0, 
+              value: (stats && typeof stats === 'object' && 'approved' in stats) ? stats.approved : 0, 
               icon: CheckCircle2, 
               color: "from-green-600 to-emerald-600",
               description: "Total approuvés"
             },
             { 
               label: 'Rejetés', 
-              value: stats?.rejected || 0, 
+              value: (stats && typeof stats === 'object' && 'rejected' in stats) ? stats.rejected : 0, 
               icon: XCircle, 
               color: "from-gray-600 to-slate-600",
               description: "Total rejetés"
@@ -175,7 +175,7 @@ export const AdminReviews = () => {
                 className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
               >
                 En attente
-                {stats?.pending > 0 && (
+                {stats && typeof stats === 'object' && 'pending' in stats && stats.pending > 0 && (
                   <Badge variant="secondary" className="ml-1.5 text-[10px] px-1.5 py-0">
                     {stats.pending}
                   </Badge>
@@ -186,7 +186,7 @@ export const AdminReviews = () => {
                 className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
               >
                 Signalés
-                {stats?.flagged > 0 && (
+                {stats && typeof stats === 'object' && 'flagged' in stats && stats.flagged > 0 && (
                   <Badge variant="destructive" className="ml-1.5 text-[10px] px-1.5 py-0">
                     {stats.flagged}
                   </Badge>
