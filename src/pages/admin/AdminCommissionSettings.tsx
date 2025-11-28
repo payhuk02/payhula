@@ -243,7 +243,7 @@ export default function AdminCommissionSettings() {
                       min="0"
                       max="100"
                       step="0.01"
-                      className="max-w-xs"
+                      className="max-w-xs min-h-[44px]"
                     />
                     <div className="flex items-center gap-2">
                       <Button
