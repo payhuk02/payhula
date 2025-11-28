@@ -516,8 +516,10 @@ const AdminUsers = () => {
                             size="sm"
                             disabled={!isAAL2}
                             onClick={async () => {
-                              await unsuspendUser(user.user_id);
-                              refetch();
+                              const success = await unsuspendUser(user.user_id);
+                              if (success) {
+                                await refetch();
+                              }
                             }}
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
@@ -800,10 +802,12 @@ const AdminUsers = () => {
                 variant="destructive"
                 onClick={async () => {
                   if (selectedUser && suspensionReason.trim()) {
-                    await suspendUser(selectedUser, suspensionReason);
-                    setSuspendDialogOpen(false);
-                    setSuspensionReason('');
-                    refetch();
+                    const success = await suspendUser(selectedUser, suspensionReason);
+                    if (success) {
+                      setSuspendDialogOpen(false);
+                      setSuspensionReason('');
+                      await refetch();
+                    }
                   }
                 }}
               >

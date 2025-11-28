@@ -177,8 +177,10 @@ const AdminProducts = () => {
                                     disabled={!isAAL2}
                                     onClick={async () => {
                                       if (!isAAL2) return;
-                                      await toggleProductStatus(product.id, product.is_active);
-                                      fetchProducts();
+                                      const success = await toggleProductStatus(product.id, product.is_active);
+                                      if (success) {
+                                        await fetchProducts();
+                                      }
                                     }}
                                   >
                                     {product.is_active ? (
