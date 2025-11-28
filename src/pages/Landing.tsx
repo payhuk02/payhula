@@ -130,7 +130,7 @@ const Landing = () => {
                 loading="eager"
               />
             </div>
-            <span className="relative z-10 pl-5 sm:pl-0 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+            <span className="relative z-10 pl-7 sm:pl-0 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               Payhuk
             </span>
           </div>

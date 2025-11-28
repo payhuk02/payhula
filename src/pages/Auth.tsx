@@ -294,7 +294,7 @@ const Auth = () => {
                 loading="eager"
               />
             </div>
-            <span className="relative z-10 pl-7 sm:pl-0 text-2xl sm:text-3xl font-bold">
+            <span className="relative z-10 pl-9 sm:pl-0 text-2xl sm:text-3xl font-bold">
               Payhuk
             </span>
           </Link>
