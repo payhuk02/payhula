@@ -158,7 +158,7 @@ export default function CustomerMyGiftCards() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleCopyCode(card.code)}
-                          className="h-8 w-8 p-0"
+                          className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                         >
                           {copiedCode === card.code ? (
                             <Check className="h-4 w-4 text-green-600" />

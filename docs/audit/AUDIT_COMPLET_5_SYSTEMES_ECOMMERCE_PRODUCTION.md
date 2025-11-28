@@ -813,4 +813,3 @@
 **Date**: 1 Mars 2025  
 **Prochaine révision recommandée**: Après correction problème images artistes
 
-

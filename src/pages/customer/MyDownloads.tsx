@@ -234,14 +234,14 @@ export default function MyDownloads() {
                       placeholder="Rechercher un produit..."
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-8 sm:pl-10 pr-8 sm:pr-20 h-9 sm:h-10 text-xs sm:text-sm"
+                      className="pl-8 sm:pl-10 pr-12 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                       aria-label="Rechercher"
                     />
                     {searchInput && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11"
                         onClick={() => setSearchInput('')}
                       >
                         <XCircle className="h-3.5 w-3.5" />
@@ -254,7 +254,7 @@ export default function MyDownloads() {
                     <TabsList className="grid w-full sm:w-auto grid-cols-3 h-auto p-1 bg-muted/50 backdrop-blur-sm">
                       <TabsTrigger 
                         value="all" 
-                        className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                        className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                       >
                         Tous
                       </TabsTrigger>

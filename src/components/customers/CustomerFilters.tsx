@@ -39,22 +39,23 @@ const CustomerFiltersComponent = ({
           placeholder="Rechercher par nom, email ou téléphone..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9 pr-9 h-9 sm:h-10 text-xs sm:text-sm"
+          className="pl-9 pr-12 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
         />
         {searchQuery && (
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
+            className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11 hover:bg-muted"
             onClick={handleClearSearch}
+            aria-label="Effacer la recherche"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         )}
       </div>
 
       <Select value={sortBy} onValueChange={onSortChange}>
-        <SelectTrigger className="w-full sm:w-[200px] h-9 sm:h-10 text-xs sm:text-sm">
+        <SelectTrigger className="w-full sm:w-[200px] min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
           <SelectValue placeholder="Trier par" />
         </SelectTrigger>
         <SelectContent>
@@ -67,9 +68,9 @@ const CustomerFiltersComponent = ({
       
       {onSortOrderChange && (
         <Select value={sortOrder} onValueChange={onSortOrderChange}>
-          <SelectTrigger className="w-full sm:w-[150px] h-9 sm:h-10 text-xs sm:text-sm">
-            <SelectValue placeholder="Ordre" />
-          </SelectTrigger>
+        <SelectTrigger className="w-full sm:w-[150px] min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
+          <SelectValue placeholder="Ordre" />
+        </SelectTrigger>
           <SelectContent>
             <SelectItem value="asc">Croissant</SelectItem>
             <SelectItem value="desc">Décroissant</SelectItem>

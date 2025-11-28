@@ -199,7 +199,7 @@ const AdminDashboard = () => {
                   className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
+                    <div className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm sm:text-base">
                       #{index + 1}
                     </div>
                     <p className="font-medium">{store.name}</p>

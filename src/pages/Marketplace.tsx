@@ -1232,7 +1232,7 @@ const Marketplace = () => {
                   : t('marketplace.noProductsDefault')}
               </p>
               <Link to="/auth">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold h-10 sm:h-12 px-4 sm:px-8 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105 text-xs sm:text-sm">
+                <Button className="min-h-[44px] bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold h-11 sm:h-12 px-4 sm:px-8 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105 text-xs sm:text-sm">
                   {t('marketplace.createStore')}
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>

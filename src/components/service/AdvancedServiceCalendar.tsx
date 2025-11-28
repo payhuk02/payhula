@@ -202,17 +202,17 @@ export default function AdvancedServiceCalendar({
   // Navigation
   const navigate = useCallback((action: 'prev' | 'next' | 'today') => {
     if (action === 'prev') {
-      if (view === Views.MONTH) {
+      if (view === 'month') {
         setDate(addDays(date, -30));
-      } else if (view === Views.WEEK) {
+      } else if (view === 'week') {
         setDate(addDays(date, -7));
       } else {
         setDate(addDays(date, -1));
       }
     } else if (action === 'next') {
-      if (view === Views.MONTH) {
+      if (view === 'month') {
         setDate(addDays(date, 30));
-      } else if (view === Views.WEEK) {
+      } else if (view === 'week') {
         setDate(addDays(date, 7));
       } else {
         setDate(addDays(date, 1));
@@ -311,7 +311,7 @@ export default function AdvancedServiceCalendar({
   }, [timelineView, staff, filteredBookings, handleSelectEvent]);
 
   // Déterminer la vue active pour les Tabs
-  const activeView = timelineView ? 'timeline' : view === Views.MONTH ? 'month' : view === Views.WEEK ? 'week' : 'day';
+  const activeView = timelineView ? 'timeline' : view === 'month' ? 'month' : view === 'week' ? 'week' : 'day';
 
   if (bookingsLoading) {
     return (
@@ -417,15 +417,15 @@ export default function AdvancedServiceCalendar({
             onValueChange={(value) => {
               if (value === 'timeline') {
                 setTimelineView(true);
-                setView(Views.WEEK);
+                setView('week');
               } else {
                 setTimelineView(false);
                 if (value === 'month') {
-                  setView(Views.MONTH);
+                  setView('month');
                 } else if (value === 'week') {
-                  setView(Views.WEEK);
+                  setView('week');
                 } else if (value === 'day') {
-                  setView(Views.DAY);
+                  setView('day');
                 }
               }
             }}
@@ -555,31 +555,45 @@ export default function AdvancedServiceCalendar({
                 </Card>
               ) : (
                 <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-auto">
-                  <Calendar
-                    localizer={localizer}
-                    events={filteredBookings}
-                    startAccessor="start"
-                    endAccessor="end"
-                    view={Views.WEEK}
-                    onView={(newView: View) => {
-                      setView(newView);
-                      setTimelineView(false);
+                  <LazyCalendarWrapper>
+                    {(calendar) => {
+                      const localizer = calendar.dateFnsLocalizer({
+                        format,
+                        parse,
+                        startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
+                        getDay,
+                        locales: { 'fr': fr },
+                      });
+
+                      return (
+                        <calendar.Calendar
+                          localizer={localizer}
+                          events={filteredBookings}
+                          startAccessor="start"
+                          endAccessor="end"
+                          view={calendar.Views.WEEK}
+                          onView={(newView: any) => {
+                            setView(newView);
+                            setTimelineView(false);
+                          }}
+                          date={date}
+                          onNavigate={setDate}
+                          onSelectEvent={handleSelectEvent}
+                          onEventDrop={enableDragDrop ? handleEventDrop : undefined}
+                          eventPropGetter={eventStyleGetter}
+                          messages={messages}
+                          step={30}
+                          timeslots={2}
+                          min={new Date(0, 0, 0, 8, 0, 0)}
+                          max={new Date(0, 0, 0, 20, 0, 0)}
+                          defaultDate={new Date()}
+                          draggableAccessor={() => enableDragDrop}
+                          resizable={false}
+                          popup
+                        />
+                      );
                     }}
-                    date={date}
-                    onNavigate={setDate}
-                    onSelectEvent={handleSelectEvent}
-                    onEventDrop={enableDragDrop ? handleEventDrop : undefined}
-                    eventPropGetter={eventStyleGetter}
-                    messages={messages}
-                    step={30}
-                    timeslots={2}
-                    min={new Date(0, 0, 0, 8, 0, 0)}
-                    max={new Date(0, 0, 0, 20, 0, 0)}
-                    defaultDate={new Date()}
-                    draggableAccessor={() => enableDragDrop}
-                    resizable={false}
-                    popup
-                  />
+                  </LazyCalendarWrapper>
                 </div>
               )}
             </TabsContent>
@@ -599,31 +613,45 @@ export default function AdvancedServiceCalendar({
                 </Card>
               ) : (
                 <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-auto">
-                  <Calendar
-                    localizer={localizer}
-                    events={filteredBookings}
-                    startAccessor="start"
-                    endAccessor="end"
-                    view={Views.DAY}
-                    onView={(newView: View) => {
-                      setView(newView);
-                      setTimelineView(false);
+                  <LazyCalendarWrapper>
+                    {(calendar) => {
+                      const localizer = calendar.dateFnsLocalizer({
+                        format,
+                        parse,
+                        startOfWeek: () => startOfWeek(new Date(), { locale: fr }),
+                        getDay,
+                        locales: { 'fr': fr },
+                      });
+
+                      return (
+                        <calendar.Calendar
+                          localizer={localizer}
+                          events={filteredBookings}
+                          startAccessor="start"
+                          endAccessor="end"
+                          view={calendar.Views.DAY}
+                          onView={(newView: any) => {
+                            setView(newView);
+                            setTimelineView(false);
+                          }}
+                          date={date}
+                          onNavigate={setDate}
+                          onSelectEvent={handleSelectEvent}
+                          onEventDrop={enableDragDrop ? handleEventDrop : undefined}
+                          eventPropGetter={eventStyleGetter}
+                          messages={messages}
+                          step={30}
+                          timeslots={2}
+                          min={new Date(0, 0, 0, 8, 0, 0)}
+                          max={new Date(0, 0, 0, 20, 0, 0)}
+                          defaultDate={new Date()}
+                          draggableAccessor={() => enableDragDrop}
+                          resizable={false}
+                          popup
+                        />
+                      );
                     }}
-                    date={date}
-                    onNavigate={setDate}
-                    onSelectEvent={handleSelectEvent}
-                    onEventDrop={enableDragDrop ? handleEventDrop : undefined}
-                    eventPropGetter={eventStyleGetter}
-                    messages={messages}
-                    step={30}
-                    timeslots={2}
-                    min={new Date(0, 0, 0, 8, 0, 0)}
-                    max={new Date(0, 0, 0, 20, 0, 0)}
-                    defaultDate={new Date()}
-                    draggableAccessor={() => enableDragDrop}
-                    resizable={false}
-                    popup
-                  />
+                  </LazyCalendarWrapper>
                 </div>
               )}
             </TabsContent>

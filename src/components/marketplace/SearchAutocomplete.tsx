@@ -124,7 +124,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={cn(
-            'pl-12 pr-12',
+            'pl-12 pr-12 min-h-[44px]',
             isFocused && 'ring-2 ring-primary'
           )}
           autoFocus={autoFocus}
@@ -133,10 +133,11 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11"
             onClick={clearSearch}
+            aria-label="Effacer la recherche"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         )}
       </div>
@@ -164,7 +165,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                     <button
                       key={index}
                       onClick={() => handleSuggestionClick(suggestion.suggestion)}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-md hover:bg-muted transition-colors text-left"
                     >
                       {suggestion.suggestion_type === 'product' && (
                         <Package className="h-4 w-4 text-muted-foreground" />
@@ -183,7 +184,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                   ))}
                   <button
                     onClick={() => handleSearch(debouncedQuery)}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-3 min-h-[44px] mt-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     <span>Rechercher "{debouncedQuery}"</span>
                     <ArrowRight className="h-4 w-4" />

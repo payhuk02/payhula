@@ -168,7 +168,7 @@ const Customers = () => {
               </div>
               <Button 
                 onClick={() => setIsCreateDialogOpen(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="min-h-[44px] bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
                 size="sm"
               >
                 <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
@@ -282,11 +282,12 @@ const Customers = () => {
                         size="sm"
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage === 1 || customersLoading}
+                        className="min-h-[44px] text-xs sm:text-sm"
                       >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
-                        Précédent
+                        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+                        <span className="text-xs sm:text-sm">Précédent</span>
                       </Button>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 sm:gap-2">
                         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                           let pageNum;
                           if (totalPages <= 5) {
@@ -305,7 +306,7 @@ const Customers = () => {
                               size="sm"
                               onClick={() => setCurrentPage(pageNum)}
                               disabled={customersLoading}
-                              className="min-w-[40px]"
+                              className="min-h-[44px] min-w-[44px] h-11 w-11"
                             >
                               {pageNum}
                             </Button>
@@ -317,9 +318,10 @@ const Customers = () => {
                         size="sm"
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages || customersLoading}
+                        className="min-h-[44px] text-xs sm:text-sm"
                       >
-                        Suivant
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        <span className="text-xs sm:text-sm">Suivant</span>
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-1" />
                       </Button>
                     </div>
                   </div>
@@ -340,10 +342,10 @@ const Customers = () => {
                   {!searchQuery && (
                     <Button 
                       onClick={() => setIsCreateDialogOpen(true)}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      className="min-h-[44px] bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm sm:text-base"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Ajouter un client
+                      <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                      <span className="text-sm sm:text-base">Ajouter un client</span>
                     </Button>
                   )}
                 </CardContent>

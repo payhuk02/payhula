@@ -279,4 +279,3 @@ CHECK (
 
 Toutes les validations serveur sont maintenant en place pour garantir l'intégrité et la sécurité des données des produits artistes.
 
-

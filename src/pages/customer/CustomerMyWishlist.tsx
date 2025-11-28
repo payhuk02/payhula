@@ -427,7 +427,7 @@ export default function CustomerMyWishlist() {
                         markAsRead.mutate(drop.product_id);
                       });
                     }}
-                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                    className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                   >
                     Marquer comme lu
                   </Button>
@@ -494,7 +494,7 @@ export default function CustomerMyWishlist() {
                       placeholder="Rechercher par nom de produit..."
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-8 sm:pl-10 pr-8 sm:pr-20 h-9 sm:h-10 text-xs sm:text-sm"
+                      className="pl-8 sm:pl-10 pr-12 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                       aria-label="Rechercher"
                     />
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -502,7 +502,7 @@ export default function CustomerMyWishlist() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 sm:h-8 sm:w-8"
+                          className="min-h-[44px] min-w-[44px] h-11 w-11"
                           onClick={() => setSearchInput('')}
                           aria-label="Effacer"
                         >
@@ -528,14 +528,14 @@ export default function CustomerMyWishlist() {
                 <TabsList className="bg-muted/50 backdrop-blur-sm h-auto p-1 w-full sm:w-auto">
                   <TabsTrigger 
                     value="all" 
-                    className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                    className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 min-h-[44px] text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                   >
                     Tous ({stats.total})
                   </TabsTrigger>
                   {stats.byType.digital > 0 && (
                     <TabsTrigger 
                       value="digital" 
-                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 min-h-[44px] text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                     >
                       Digitaux ({stats.byType.digital})
                     </TabsTrigger>
@@ -543,7 +543,7 @@ export default function CustomerMyWishlist() {
                   {stats.byType.physical > 0 && (
                     <TabsTrigger 
                       value="physical" 
-                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 min-h-[44px] text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                     >
                       Physiques ({stats.byType.physical})
                     </TabsTrigger>
@@ -551,7 +551,7 @@ export default function CustomerMyWishlist() {
                   {stats.byType.service > 0 && (
                     <TabsTrigger 
                       value="service" 
-                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 min-h-[44px] text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                     >
                       Services ({stats.byType.service})
                     </TabsTrigger>
@@ -559,7 +559,7 @@ export default function CustomerMyWishlist() {
                   {stats.byType.course > 0 && (
                     <TabsTrigger 
                       value="course" 
-                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                      className="flex-1 sm:flex-none gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 min-h-[44px] text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                     >
                       Cours ({stats.byType.course})
                     </TabsTrigger>

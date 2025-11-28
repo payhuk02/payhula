@@ -76,7 +76,7 @@ function CustomerDigitalPortalContent() {
                 <TabsList className="inline-flex w-full sm:w-auto min-w-full sm:min-w-0 flex-nowrap sm:flex-wrap gap-1 sm:gap-2 p-1 h-auto bg-gray-100 dark:bg-gray-800">
                   <TabsTrigger 
                     value="products" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
+                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
                   >
                     <Package className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                     <span className="hidden xs:inline">Mes Produits</span>
@@ -84,7 +84,7 @@ function CustomerDigitalPortalContent() {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="licenses" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
+                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
                   >
                     <Key className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                     <span className="hidden xs:inline">Mes Licences</span>
@@ -92,7 +92,7 @@ function CustomerDigitalPortalContent() {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="downloads" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
+                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
                   >
                     <Download className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                     <span className="hidden xs:inline">Téléchargements</span>
@@ -100,7 +100,7 @@ function CustomerDigitalPortalContent() {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="stats" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
+                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
                   >
                     <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                     <span className="hidden xs:inline">Statistiques</span>
@@ -108,7 +108,7 @@ function CustomerDigitalPortalContent() {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="preferences" 
-                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[36px] sm:min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
+                    className="text-[11px] xs:text-xs sm:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap min-h-[44px] touch-manipulation data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 flex items-center gap-1 sm:gap-2"
                   >
                     <Settings className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                     <span className="hidden xs:inline">Paramètres</span>

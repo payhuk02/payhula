@@ -97,4 +97,3 @@ Le code a été amélioré pour détecter cette erreur et afficher un message cl
 **Difficulté**: ⭐ Facile  
 **Dernière mise à jour**: 1 Mars 2025
 
-

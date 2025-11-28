@@ -324,67 +324,67 @@ export default function CustomerPortal() {
                   <TabsList className="inline-flex min-w-max sm:w-auto sm:min-w-0 flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 h-auto touch-manipulation bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                     <TabsTrigger 
                       value="overview" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Vue d'ensemble
                     </TabsTrigger>
                     <TabsTrigger 
                       value="orders" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Commandes
                     </TabsTrigger>
                     <TabsTrigger 
                       value="downloads" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Téléchargements
                     </TabsTrigger>
                     <TabsTrigger 
                       value="licenses" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Licences
                     </TabsTrigger>
                     <TabsTrigger 
                       value="updates" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Mises à jour
                     </TabsTrigger>
                     <TabsTrigger 
                       value="courses" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Mes Cours
                     </TabsTrigger>
                     <TabsTrigger 
                       value="wishlist" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Favoris
                     </TabsTrigger>
                     <TabsTrigger 
                       value="loyalty" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Fidélité
                     </TabsTrigger>
                     <TabsTrigger 
                       value="gift-cards" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Cartes Cadeaux
                     </TabsTrigger>
                     <TabsTrigger 
                       value="returns" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Mes Retours
                     </TabsTrigger>
                     <TabsTrigger 
                       value="profile" 
-                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[40px] sm:min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap min-h-[44px] touch-manipulation font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 flex-shrink-0"
                     >
                       Mon Profil
                     </TabsTrigger>
@@ -409,7 +409,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0 transition-all duration-300 min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir toutes mes commandes</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -430,7 +430,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Accéder aux téléchargements</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -451,7 +451,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-orange-600 to-red-600 text-white hover:from-orange-700 hover:to-red-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-orange-600 to-red-600 text-white hover:from-orange-700 hover:to-red-700 border-0 transition-all duration-300 min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir mes cours</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -472,7 +472,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 border-0 transition-all duration-300 min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir mes réservations</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -493,7 +493,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 border-0 transition-all duration-300 min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir mes factures</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>
@@ -514,7 +514,7 @@ export default function CustomerPortal() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] touch-manipulation text-xs sm:text-sm">
+                      <Button variant="outline" className="w-full justify-between bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 border-0 transition-all duration-300 min-h-[44px] touch-manipulation text-xs sm:text-sm">
                         <span className="truncate">Voir ma wishlist</span>
                         <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2 flex-shrink-0" />
                       </Button>

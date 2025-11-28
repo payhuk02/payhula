@@ -140,6 +140,7 @@ const AdminSettings = () => {
                 min="0"
                 max="100"
                 step="0.01"
+                className="min-h-[44px]"
               />
               <p className="text-sm text-muted-foreground">
                 Commission prélevée sur chaque vente
@@ -158,6 +159,7 @@ const AdminSettings = () => {
                 min="0"
                 max="100"
                 step="0.01"
+                className="min-h-[44px]"
               />
               <p className="text-sm text-muted-foreground">
                 Commission versée au parrain sur les ventes du filleul
@@ -194,6 +196,7 @@ const AdminSettings = () => {
                 }
                 min="0"
                 step="1"
+                className="min-h-[44px]"
               />
               <p className="text-sm text-muted-foreground">
                 Montant minimum requis pour effectuer un retrait
@@ -310,7 +313,7 @@ const AdminSettings = () => {
             </CardContent>
           </Card>
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <Input placeholder="Rechercher un rôle…" value={roleSearch} onChange={(e) => setRoleSearch(e.target.value)} className="max-w-sm" />
+                  <Input placeholder="Rechercher un rôle…" value={roleSearch} onChange={(e) => setRoleSearch(e.target.value)} className="max-w-sm min-h-[44px]" />
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
@@ -437,7 +440,7 @@ const AdminSettings = () => {
               <Button variant="outline" size="sm" onClick={() => setRoutes(defaultRoutes)}>Réinitialiser par défaut</Button>
             </div>
             <div className="flex gap-2">
-              <Input placeholder="/admin/xxx" value={newRoute} onChange={e => setNewRoute(e.target.value)} />
+              <Input placeholder="/admin/xxx" value={newRoute} onChange={e => setNewRoute(e.target.value)} className="min-h-[44px]" />
               <Button
                 onClick={() => {
                   const r = newRoute.trim();

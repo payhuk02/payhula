@@ -72,25 +72,25 @@ const Settings = () => {
             {/* Tabs - Fully Responsive */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
               <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 h-auto gap-2 overflow-x-auto">
-                <TabsTrigger value="profile" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="profile" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.profile')}
                 </TabsTrigger>
-                <TabsTrigger value="store" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="store" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.store')}
                 </TabsTrigger>
-                <TabsTrigger value="domain" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="domain" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.domain')}
                 </TabsTrigger>
-                <TabsTrigger value="notifications" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="notifications" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.notifications')}
                 </TabsTrigger>
-                <TabsTrigger value="import-export" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="import-export" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   Import/Export
                 </TabsTrigger>
-                <TabsTrigger value="security" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="security" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.security')}
                 </TabsTrigger>
-                <TabsTrigger value="debug" className="text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3">
+                <TabsTrigger value="debug" className="text-xs sm:text-sm min-h-[44px] py-2 sm:py-2.5 lg:py-3">
                   {t('settings.tabs.debug')}
                 </TabsTrigger>
               </TabsList>

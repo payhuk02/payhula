@@ -231,7 +231,7 @@ export default function PriceStockAlerts() {
                   onClick={handleRefresh}
                   size="sm"
                   variant="outline"
-                  className="h-9 sm:h-10 transition-all hover:scale-105 text-xs sm:text-sm"
+                  className="min-h-[44px] h-11 sm:h-12 transition-all hover:scale-105 text-xs sm:text-sm"
                   disabled={isLoading}
                 >
                   <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -324,14 +324,14 @@ export default function PriceStockAlerts() {
                 <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-muted/50">
                   <TabsTrigger
                     value="price"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px]"
                   >
                     <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Prix ({stats.price})
                   </TabsTrigger>
                   <TabsTrigger
                     value="stock"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px]"
                   >
                     <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Stock ({stats.stock})

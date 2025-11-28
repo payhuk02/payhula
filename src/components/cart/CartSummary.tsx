@@ -67,7 +67,7 @@ const CartSummaryComponent = ({ summary, onCheckout }: CartSummaryProps) => {
   return (
     <Card className="sticky top-4">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
           <ShoppingBag className="h-5 w-5" />
           Récapitulatif
         </CardTitle>
@@ -122,6 +122,7 @@ const CartSummaryComponent = ({ summary, onCheckout }: CartSummaryProps) => {
                   onClick={handleApplyCoupon}
                   disabled={applyingCoupon || isLoading || !couponCode.trim()}
                   variant="outline"
+                  className="min-h-[44px] whitespace-nowrap"
                 >
                   Appliquer
                 </Button>
@@ -175,11 +176,11 @@ const CartSummaryComponent = ({ summary, onCheckout }: CartSummaryProps) => {
         <Button
           onClick={handleCheckout}
           disabled={summary.item_count === 0 || isLoading}
-          className="w-full"
+          className="w-full min-h-[44px] text-base sm:text-lg"
           size="lg"
         >
           Procéder au paiement
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
 
         <p className="text-xs text-center text-muted-foreground">

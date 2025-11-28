@@ -323,7 +323,7 @@ const AdminUsers = () => {
                       placeholder="Email, nom, prénom..."
                       value={filters.searchTerm || ''}
                       onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-                      className="pl-10"
+                      className="pl-10 min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -335,7 +335,7 @@ const AdminUsers = () => {
                     value={filters.role || 'all'}
                     onValueChange={(value) => handleFilterChange('role', value)}
                   >
-                    <SelectTrigger id="role-filter">
+                    <SelectTrigger id="role-filter" className="min-h-[44px]">
                       <SelectValue placeholder="Tous les rôles" />
                     </SelectTrigger>
                     <SelectContent>
@@ -363,7 +363,7 @@ const AdminUsers = () => {
                     value={filters.status || 'all'}
                     onValueChange={(value) => handleFilterChange('status', value)}
                   >
-                    <SelectTrigger id="status-filter">
+                    <SelectTrigger id="status-filter" className="min-h-[44px]">
                       <SelectValue placeholder="Tous les statuts" />
                     </SelectTrigger>
                     <SelectContent>
@@ -398,7 +398,7 @@ const AdminUsers = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -ml-3"
+                      className="min-h-[44px] h-11 -ml-3"
                       onClick={() => handleSort('display_name')}
                     >
                       Nom complet
@@ -422,7 +422,7 @@ const AdminUsers = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -ml-3"
+                      className="min-h-[44px] h-11 -ml-3"
                       onClick={() => handleSort('created_at')}
                     >
                       Date d'inscription
@@ -601,7 +601,7 @@ const AdminUsers = () => {
                     setPageSize(Number(value));
                     setPage(1);
                   }}>
-                    <SelectTrigger className="w-[100px]">
+                    <SelectTrigger className="w-[100px] min-h-[44px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

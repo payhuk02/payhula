@@ -849,16 +849,16 @@ const Products = () => {
                                 <span className="sm:hidden">/ page</span>
                               </div>
 
-                              <div className="flex items-center gap-1" role="group" aria-label={t('products.pagination.controls')}>
+                              <div className="flex items-center gap-1 sm:gap-2" role="group" aria-label={t('products.pagination.controls')}>
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handlePageChange(1)}
                                   disabled={currentPage === 1}
                                   aria-label={t('products.pagination.firstPage', 'Première page')}
-                                  className="h-8 w-8 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
+                                  className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
                                 >
-                                  <ChevronsLeft className="h-4 w-4" aria-hidden="true" />
+                                  <ChevronsLeft className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
                                 </Button>
                                 <Button
                                   variant="outline"
@@ -866,9 +866,9 @@ const Products = () => {
                                   onClick={() => handlePageChange(currentPage - 1)}
                                   disabled={currentPage === 1}
                                   aria-label={t('products.pagination.previousPage', 'Page précédente')}
-                                  className="h-8 w-8 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
+                                  className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
                                 >
-                                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                                  <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
                                 </Button>
 
                                 <div className="flex items-center gap-1 px-1 sm:px-2">
@@ -890,7 +890,7 @@ const Products = () => {
                                         variant={currentPage === pageNumber ? "default" : "outline"}
                                         size="sm"
                                         onClick={() => handlePageChange(pageNumber)}
-                                        className="min-w-[32px] sm:min-w-[36px] h-8 transition-all duration-200 hover:scale-105 active:scale-95"
+                                        className="min-h-[44px] min-w-[44px] h-11 w-11 transition-all duration-200 hover:scale-105 active:scale-95"
                                         aria-label={`Aller à la page ${pageNumber}`}
                                         aria-current={currentPage === pageNumber ? "page" : undefined}
                                       >
@@ -906,9 +906,9 @@ const Products = () => {
                                   onClick={() => handlePageChange(currentPage + 1)}
                                   disabled={currentPage === totalPages}
                                   aria-label={t('products.pagination.nextPage', 'Page suivante')}
-                                  className="h-8 w-8 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
+                                  className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
                                 >
-                                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
                                 </Button>
                                 <Button
                                   variant="outline"
@@ -916,9 +916,9 @@ const Products = () => {
                                   onClick={() => handlePageChange(totalPages)}
                                   disabled={currentPage === totalPages}
                                   aria-label={t('products.pagination.lastPage', 'Dernière page')}
-                                  className="h-8 w-8 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
+                                  className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 hover:bg-accent/50 transition-all duration-200 disabled:opacity-40"
                                 >
-                                  <ChevronsRight className="h-4 w-4" aria-hidden="true" />
+                                  <ChevronsRight className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
                                 </Button>
                               </div>
 
@@ -976,7 +976,7 @@ const Products = () => {
       {/* Quick View Dialog */}
       {quickViewProduct && (
         <Dialog open={!!quickViewProduct} onOpenChange={(open) => !open && setQuickViewProduct(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5" />

@@ -136,7 +136,7 @@ const AdminStores = () => {
                 placeholder="Rechercher par nom ou propriétaire..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 min-h-[44px]"
               />
             </div>
           </CardHeader>

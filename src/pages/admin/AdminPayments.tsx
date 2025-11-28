@@ -198,7 +198,7 @@ export default function AdminPayments() {
                         placeholder="Rechercher..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8"
+                        className="pl-8 min-h-[44px]"
                       />
                     </div>
                   </div>

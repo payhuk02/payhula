@@ -352,7 +352,7 @@ const Orders = () => {
                   variant="outline" 
                   onClick={handleExportCSV} 
                   disabled={!orders || orders.length === 0}
-                  className="h-9 sm:h-10 text-xs sm:text-sm"
+                  className="min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                   aria-label={t('orders.export', 'Exporter')}
                 >
                   <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
@@ -364,7 +364,7 @@ const Orders = () => {
                     setIsCreateDialogOpen(true);
                     logger.info('Ouverture dialog création commande');
                   }}
-                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 h-9 sm:h-10 text-xs sm:text-sm"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                   aria-label={t('orders.new', 'Nouvelle commande')}
                 >
                   <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
@@ -442,18 +442,18 @@ const Orders = () => {
                       placeholder={t('orders.searchPlaceholder', 'Rechercher par numéro, client...')}
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm"
+                      className="pl-8 sm:pl-10 min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm"
                       aria-label={t('orders.search', 'Rechercher')}
                     />
                     {searchInput && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 sm:h-8 sm:w-8"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11"
                         onClick={handleClearSearch}
                         aria-label={t('common.clear', 'Effacer')}
                       >
-                        <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <X className="w-4 h-4 sm:w-5 sm:h-5" />
                       </Button>
                     )}
                     {/* Keyboard shortcut indicator */}
@@ -474,10 +474,10 @@ const Orders = () => {
                           setViewMode('list');
                           logger.info('Mode d\'affichage: liste');
                         }}
-                        className="h-8 w-8 p-0"
+                        className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                         aria-label={t('orders.viewList', 'Vue liste')}
                       >
-                        <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <List className="h-4 w-4 sm:h-5 sm:w-5" />
                       </Button>
                       <Button
                         variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -486,10 +486,10 @@ const Orders = () => {
                           setViewMode('grid');
                           logger.info('Mode d\'affichage: grille');
                         }}
-                        className="h-8 w-8 p-0"
+                        className="min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                         aria-label={t('orders.viewGrid', 'Vue grille')}
                       >
-                        <Grid3x3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <Grid3x3 className="h-4 w-4 sm:h-5 sm:w-5" />
                       </Button>
                     </div>
 
@@ -498,10 +498,10 @@ const Orders = () => {
                       variant="outline"
                       size="sm"
                       onClick={handleRefresh}
-                      className="h-9 sm:h-10"
+                      className="min-h-[44px] h-11 sm:h-12"
                       aria-label={t('orders.refresh', 'Rafraîchir')}
                     >
-                      <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
                   </div>
                 </div>
@@ -584,11 +584,11 @@ const Orders = () => {
                         setIsCreateDialogOpen(true);
                         logger.info('Ouverture dialog création depuis état vide');
                       }}
-                      className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      className="min-h-[44px] bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm sm:text-base"
                       aria-label={t('orders.empty.createFirst', 'Créer votre première commande')}
                     >
-                      <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
-                      {t('orders.empty.createFirst', 'Créer votre première commande')}
+                      <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" aria-hidden="true" />
+                      <span className="text-sm sm:text-base">{t('orders.empty.createFirst', 'Créer votre première commande')}</span>
                     </Button>
                   )}
                 </CardContent>

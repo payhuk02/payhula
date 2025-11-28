@@ -486,10 +486,10 @@ const Checkout = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Button asChild variant="ghost" className="mb-4">
+          <Button asChild variant="ghost" className="mb-4 min-h-[44px]">
             <Link to={product && store ? `/stores/${store.slug}/products/${product.slug}` : "/marketplace"}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
+              <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-sm sm:text-base">Retour</span>
             </Link>
           </Button>
           <h1 className="text-2xl sm:text-3xl font-bold">Finaliser votre commande</h1>
@@ -525,7 +525,7 @@ const Checkout = () => {
                         value={formData.firstName}
                         onChange={(e) => handleFieldChange("firstName", e.target.value)}
                         placeholder="Votre prénom"
-                        className={formErrors.firstName ? "border-destructive" : ""}
+                        className={`min-h-[44px] ${formErrors.firstName ? "border-destructive" : ""}`}
                         required
                       />
                       {formErrors.firstName && (
@@ -544,7 +544,7 @@ const Checkout = () => {
                         value={formData.lastName}
                         onChange={(e) => handleFieldChange("lastName", e.target.value)}
                         placeholder="Votre nom"
-                        className={formErrors.lastName ? "border-destructive" : ""}
+                        className={`min-h-[44px] ${formErrors.lastName ? "border-destructive" : ""}`}
                         required
                       />
                       {formErrors.lastName && (
@@ -566,7 +566,7 @@ const Checkout = () => {
                       value={formData.email}
                       onChange={(e) => handleFieldChange("email", e.target.value)}
                       placeholder="votre@email.com"
-                      className={formErrors.email ? "border-destructive" : ""}
+                      className={`min-h-[44px] ${formErrors.email ? "border-destructive" : ""}`}
                       required
                     />
                     {formErrors.email && (
@@ -587,7 +587,7 @@ const Checkout = () => {
                       value={formData.phone}
                       onChange={(e) => handleFieldChange("phone", e.target.value)}
                       placeholder="+226 XX XX XX XX"
-                      className={formErrors.phone ? "border-destructive" : ""}
+                      className={`min-h-[44px] ${formErrors.phone ? "border-destructive" : ""}`}
                       required
                     />
                     {formErrors.phone && (
@@ -645,18 +645,18 @@ const Checkout = () => {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full"
+                      className="w-full min-h-[44px] text-base sm:text-lg"
                       disabled={submitting}
                     >
                       {submitting ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Traitement en cours...
+                          <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                          <span className="text-sm sm:text-base">Traitement en cours...</span>
                         </>
                       ) : (
                         <>
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          Procéder au paiement
+                          <CreditCard className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                          <span className="text-sm sm:text-base">Procéder au paiement</span>
                         </>
                       )}
                     </Button>

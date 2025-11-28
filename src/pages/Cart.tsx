@@ -105,13 +105,13 @@ export default function Cart() {
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               <div>
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                  <ShoppingBag className="h-8 w-8" aria-hidden="true" />
+                <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                  <ShoppingBag className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
                   {getValue('cart.title')}
                 </h1>
-                <p className="text-muted-foreground mt-1" id="cart-description">
+                <p className="text-sm sm:text-base text-muted-foreground mt-1" id="cart-description">
                   {summary.item_count} {getValue('cart.itemCount') || (summary.item_count > 1 ? 'articles' : 'article')}
                 </p>
               </div>
@@ -119,11 +119,11 @@ export default function Cart() {
                 <Button
                   variant="outline"
                   onClick={handleClearCart}
-                  className="text-destructive hover:text-destructive"
+                  className="min-h-[44px] text-destructive hover:text-destructive w-full sm:w-auto"
                   aria-label="Vider le panier"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
-                  {getValue('cart.clearCart')}
+                  <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" aria-hidden="true" />
+                  <span className="text-sm sm:text-base">{getValue('cart.clearCart')}</span>
                 </Button>
               )}
             </header>

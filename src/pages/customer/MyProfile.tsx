@@ -429,7 +429,7 @@ export default function MyProfile() {
                   onClick={handleRefresh}
                   size="sm"
                   variant="outline"
-                  className="h-9 sm:h-10 transition-all hover:scale-105 text-xs sm:text-sm"
+                  className="min-h-[44px] h-11 sm:h-12 transition-all hover:scale-105 text-xs sm:text-sm"
                 >
                   <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                   <span className="hidden sm:inline">Rafraîchir</span>
@@ -495,7 +495,7 @@ export default function MyProfile() {
                               type="email"
                               value={profileData.email}
                               disabled
-                              className="pl-10 sm:pl-12 bg-muted h-10 sm:h-11 text-sm sm:text-base"
+                              className="pl-10 sm:pl-12 bg-muted min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
                           <p className="text-xs text-muted-foreground">
@@ -511,7 +511,7 @@ export default function MyProfile() {
                             onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
                             onKeyDown={handleSpaceKeyDown}
                             placeholder="Jean Dupont"
-                            className="h-10 sm:h-11 text-sm sm:text-base"
+                            className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                           />
                         </div>
 
@@ -526,7 +526,7 @@ export default function MyProfile() {
                               onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                               onKeyDown={handleSpaceKeyDown}
                               placeholder="+226 70 12 34 56"
-                              className="pl-10 sm:pl-12 h-10 sm:h-11 text-sm sm:text-base"
+                              className="pl-10 sm:pl-12 min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
                         </div>
@@ -578,7 +578,7 @@ export default function MyProfile() {
                               onChange={(e) => setAddressForm({ ...addressForm, full_name: e.target.value })}
                               onKeyDown={handleSpaceKeyDown}
                               placeholder="Jean Dupont"
-                              className="h-10 sm:h-11 text-sm sm:text-base"
+                              className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
 
@@ -590,7 +590,7 @@ export default function MyProfile() {
                               onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
                               onKeyDown={handleSpaceKeyDown}
                               placeholder="+226 70 12 34 56"
-                              className="h-10 sm:h-11 text-sm sm:text-base"
+                              className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
 
@@ -602,7 +602,7 @@ export default function MyProfile() {
                               onChange={(e) => setAddressForm({ ...addressForm, address_line1: e.target.value })}
                               onKeyDown={handleSpaceKeyDown}
                               placeholder="123 Rue principale"
-                              className="h-10 sm:h-11 text-sm sm:text-base"
+                              className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
 
@@ -613,7 +613,7 @@ export default function MyProfile() {
                               value={addressForm.address_line2}
                               onChange={(e) => setAddressForm({ ...addressForm, address_line2: e.target.value })}
                               placeholder="Appartement, étage..."
-                              className="h-10 sm:h-11 text-sm sm:text-base"
+                              className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
 
@@ -625,7 +625,7 @@ export default function MyProfile() {
                               onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
                               onKeyDown={handleSpaceKeyDown}
                               placeholder="Ouagadougou"
-                              className="h-10 sm:h-11 text-sm sm:text-base"
+                              className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
 
@@ -636,7 +636,7 @@ export default function MyProfile() {
                               value={addressForm.postal_code}
                               onChange={(e) => setAddressForm({ ...addressForm, postal_code: e.target.value })}
                               placeholder="01 BP 1234"
-                              className="h-10 sm:h-11 text-sm sm:text-base"
+                              className="min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                             />
                           </div>
 
@@ -646,7 +646,7 @@ export default function MyProfile() {
                               id="addr_country"
                               value={addressForm.country}
                               onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
-                              className="flex h-10 sm:h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm sm:text-base"
+                              className="flex min-h-[44px] h-11 sm:h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm sm:text-base"
                             >
                               <option value="BF">Burkina Faso</option>
                               <option value="CI">Côte d'Ivoire</option>

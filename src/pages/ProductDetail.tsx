@@ -711,7 +711,7 @@ const ProductDetails = () => {
                   {/* Bouton principal - Acheter maintenant */}
                   <Button 
                     size="lg" 
-                    className="w-full touch-manipulation min-h-[48px] sm:min-h-[44px] text-sm sm:text-base font-semibold shadow-md hover:shadow-lg transition-shadow"
+                    className="w-full touch-manipulation min-h-[44px] text-sm sm:text-base font-semibold shadow-md hover:shadow-lg transition-shadow"
                     onClick={handleBuyNow}
                     disabled={isPurchasing || !product || !product.is_active}
                   >
@@ -742,7 +742,7 @@ const ProductDetails = () => {
                       <Button
                         size="lg"
                         variant="outline"
-                        className="flex-1 sm:flex-1 touch-manipulation min-h-[48px] sm:min-h-[44px] text-sm sm:text-base border-2"
+                        className="flex-1 sm:flex-1 touch-manipulation min-h-[44px] text-sm sm:text-base border-2"
                         asChild
                       >
                         <Link to={`/vendor/messaging/${product.store_id}?productId=${product.id}`}>
@@ -764,7 +764,7 @@ const ProductDetails = () => {
                         stockQuantity={(product as any).stock_quantity}
                         variant="outline"
                         size="lg"
-                        className="w-full touch-manipulation min-h-[48px] sm:min-h-[44px]"
+                        className="w-full touch-manipulation min-h-[44px]"
                       />
                     </div>
                   </div>

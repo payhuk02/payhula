@@ -217,7 +217,7 @@ export default function CustomerMyReturns() {
                   onClick={handleRefresh}
                   size="sm"
                   variant="outline"
-                  className="h-9 sm:h-10 transition-all hover:scale-105 text-xs sm:text-sm"
+                  className="min-h-[44px] h-11 sm:h-12 transition-all hover:scale-105 text-xs sm:text-sm"
                   disabled={isLoading}
                 >
                   <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -315,14 +315,14 @@ export default function CustomerMyReturns() {
                       placeholder="Rechercher par numéro de retour ou produit..."
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-10 sm:pl-12 pr-10 h-10 sm:h-11 text-sm sm:text-base"
+                      className="pl-10 sm:pl-12 pr-12 min-h-[44px] h-11 sm:h-12 text-sm sm:text-base"
                     />
                     {searchInput && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSearchInput('')}
-                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 min-h-[44px] min-w-[44px] h-11 w-11 p-0"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -336,41 +336,41 @@ export default function CustomerMyReturns() {
                 <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 h-auto p-1 bg-muted/50 overflow-x-auto">
                   <TabsTrigger
                     value="all"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px] flex-shrink-0"
                   >
                     Tous
                   </TabsTrigger>
                   <TabsTrigger
                     value="requested"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px] flex-shrink-0"
                   >
                     <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     En Cours
                   </TabsTrigger>
                   <TabsTrigger
                     value="approved"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px] flex-shrink-0"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Approuvés
                   </TabsTrigger>
                   <TabsTrigger
                     value="refunded"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px] flex-shrink-0"
                   >
                     <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Remboursés
                   </TabsTrigger>
                   <TabsTrigger
                     value="rejected"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px] flex-shrink-0"
                   >
                     <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Rejetés
                   </TabsTrigger>
                   <TabsTrigger
                     value="cancelled"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 min-h-[44px] flex-shrink-0"
                   >
                     <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Annulés
