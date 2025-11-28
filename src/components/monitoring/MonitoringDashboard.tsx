@@ -76,11 +76,11 @@ export function MonitoringDashboard() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard de Monitoring</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Dashboard de Monitoring</h1>
+          <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
             Surveillance en temps réel des performances et alertes
           </p>
         </div>
@@ -94,7 +94,7 @@ export function MonitoringDashboard() {
       </div>
 
       {/* Statistiques globales */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Métriques</CardTitle>
