@@ -90,12 +90,12 @@ ${report.recommendations.map(r => `- ${r}`).join('\n')}
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={generateReport} disabled={loading}>
+            <Button onClick={generateReport} disabled={loading} className="min-h-[44px]">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               {loading ? 'Analyse...' : 'Rafraîchir'}
             </Button>
             {report && (
-              <Button variant="outline" onClick={exportReport}>
+              <Button variant="outline" onClick={exportReport} className="min-h-[44px]">
                 <Download className="h-4 w-4 mr-2" />
                 Exporter
               </Button>

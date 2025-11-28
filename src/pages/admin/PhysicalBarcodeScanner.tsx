@@ -116,7 +116,7 @@ export default function PhysicalBarcodeScanner() {
               <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 backdrop-blur-sm">
                 <TabsTrigger 
                   value="scanner"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <Camera className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden xs:inline">Scanner</span>
@@ -124,14 +124,14 @@ export default function PhysicalBarcodeScanner() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="search"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <Search className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Recherche
                 </TabsTrigger>
                 <TabsTrigger 
                   value="generator"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <span className="hidden xs:inline">Générateur</span>
                   <span className="xs:hidden">Générer</span>
@@ -153,7 +153,7 @@ export default function PhysicalBarcodeScanner() {
                   <CardContent>
                     <Button 
                       onClick={() => setShowScanner(true)} 
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" 
+                      className="w-full min-h-[44px] bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" 
                       size="lg"
                     >
                       <Camera className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -172,7 +172,7 @@ export default function PhysicalBarcodeScanner() {
                           variant="ghost"
                           size="icon"
                           onClick={handleClearSearch}
-                          className="h-8 w-8"
+                          className="min-h-[44px] min-w-[44px] h-11 w-11"
                         >
                           <X className="h-4 w-4" />
                         </Button>

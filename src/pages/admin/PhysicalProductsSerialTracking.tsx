@@ -115,7 +115,7 @@ export default function PhysicalProductsSerialTracking() {
               <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 backdrop-blur-sm">
                 <TabsTrigger 
                   value="serials"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <Hash className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden xs:inline">Numéros de Série</span>
@@ -123,7 +123,7 @@ export default function PhysicalProductsSerialTracking() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="warranty"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <AlertTriangle className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden xs:inline">Réclamations Garantie</span>
@@ -131,7 +131,7 @@ export default function PhysicalProductsSerialTracking() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="repairs"
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-2 min-h-[44px] data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
                 >
                   <Wrench className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden xs:inline">Réparations</span>
@@ -144,7 +144,7 @@ export default function PhysicalProductsSerialTracking() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                     <Label className="text-xs sm:text-sm whitespace-nowrap">Sélectionner un Produit</Label>
                     <Select value={selectedProductId} onValueChange={setSelectedProductId}>
-                      <SelectTrigger className="w-full sm:w-[300px] h-9 sm:h-10 text-xs sm:text-sm">
+                      <SelectTrigger className="w-full sm:w-[300px] min-h-[44px] h-11 sm:h-12 text-xs sm:text-sm">
                         <SelectValue placeholder="Choisir un produit..." />
                       </SelectTrigger>
                       <SelectContent>
