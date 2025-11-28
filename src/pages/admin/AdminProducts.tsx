@@ -257,8 +257,12 @@ const AdminProducts = () => {
               <AlertDialogAction
                 onClick={async () => {
                   if (selectedProduct) {
-                    await deleteProduct(selectedProduct);
-                    fetchProducts();
+                    const success = await deleteProduct(selectedProduct);
+                    if (success) {
+                      setDeleteDialogOpen(false);
+                      setSelectedProduct(null);
+                      await fetchProducts();
+                    }
                   }
                 }}
                 className="bg-destructive hover:bg-destructive/90"

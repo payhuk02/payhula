@@ -210,8 +210,12 @@ const AdminStores = () => {
               <AlertDialogAction
                 onClick={async () => {
                   if (selectedStore) {
-                    await deleteStore(selectedStore);
-                    fetchStores();
+                    const success = await deleteStore(selectedStore);
+                    if (success) {
+                      setDeleteDialogOpen(false);
+                      setSelectedStore(null);
+                      await fetchStores();
+                    }
                   }
                 }}
                 className="bg-destructive hover:bg-destructive/90"

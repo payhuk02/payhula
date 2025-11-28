@@ -830,8 +830,12 @@ const AdminUsers = () => {
               <AlertDialogAction
                 onClick={async () => {
                   if (selectedUser) {
-                    await deleteUser(selectedUser);
-                    refetch();
+                    const success = await deleteUser(selectedUser);
+                    if (success) {
+                      setDeleteDialogOpen(false);
+                      setSelectedUser(null);
+                      await refetch();
+                    }
                   }
                 }}
                 className="bg-destructive hover:bg-destructive/90"
