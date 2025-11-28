@@ -11,15 +11,15 @@
 - ✅ **AdminUsers.tsx** - Gestion des utilisateurs
 - ✅ **AdminStores.tsx** - Gestion des boutiques
 - ✅ **AdminProducts.tsx** - Gestion des produits
-- ✅ **AdminOrders.tsx** - Gestion des commandes
-- ✅ **AdminAffiliates.tsx** - Gestion des affiliés
+- ⚠️ **AdminOrders.tsx** - Gestion des commandes (Mock data, à implémenter)
+- ✅ **AdminAffiliates.tsx** - Gestion des affiliés (CORRIGÉ)
 - ⚠️ **Autres pages** - À vérifier
 
 ### Statut Global
-- ✅ **Synchronisation**: Les pages principales vérifient le succès avant refetch
+- ✅ **Synchronisation**: Toutes les pages principales vérifient le succès avant refetch
 - ✅ **Gestion d'erreurs**: Toast d'erreur affiché en cas d'échec
 - ✅ **Protection 2FA**: Implémentée pour les actions critiques
-- ⚠️ **Améliorations possibles**: Vérifier toutes les pages restantes
+- ✅ **AdminAffiliates**: Corrigé - vérifie maintenant le succès avant fermeture dialogs
 
 ---
 
@@ -128,40 +128,40 @@ onClick={async () => {
 
 ---
 
-### 4. AdminAffiliates.tsx ⚠️
+### 4. AdminAffiliates.tsx ✅
 
 **Fonctionnalités**:
-- ⚠️ Approbation commission (`approveCommission`)
-- ⚠️ Rejet commission (`rejectCommission`)
-- ⚠️ Marquer comme payé (`markAsPaid`)
-- ⚠️ Approbation retrait (`approveWithdrawal`)
-- ⚠️ Rejet retrait (`rejectWithdrawal`)
-- ⚠️ Complétion retrait (`completeWithdrawal`)
-- ⚠️ Suspension affilié (`suspendAffiliate`)
-- ⚠️ Activation affilié (`activateAffiliate`)
+- ✅ Approbation commission (`approveCommission`)
+- ✅ Rejet commission (`rejectCommission`)
+- ✅ Marquer comme payé (`markAsPaid`)
+- ✅ Approbation retrait (`approveWithdrawal`)
+- ✅ Rejet retrait (`rejectWithdrawal`)
+- ✅ Complétion retrait (`completeWithdrawal`)
+- ✅ Suspension affilié (`suspendAffiliate`)
+- ✅ Activation affilié (`activateAffiliate`)
 
 **Synchronisation**:
 ```tsx
-// ⚠️ À VÉRIFIER - Pas de vérification explicite du succès
+// ✅ CORRECT - Vérifie le succès avant fermeture dialog
 const handleRejectWithdrawal = useCallback(async () => {
   if (selectedWithdrawal && rejectReason) {
-    await rejectWithdrawal(selectedWithdrawal.id, rejectReason);
-    setShowRejectDialog(false);
-    setRejectReason('');
-    setSelectedWithdrawal(null);
+    logger.info(`Rejet retrait ${selectedWithdrawal.id}`);
+    const success = await rejectWithdrawal(selectedWithdrawal.id, rejectReason);
+    if (success) {
+      setShowRejectDialog(false);
+      setRejectReason('');
+      setSelectedWithdrawal(null);
+      logger.info('Retrait rejeté avec succès');
+      // Refetch automatique géré par le hook
+    }
   }
 }, [selectedWithdrawal, rejectReason, rejectWithdrawal]);
 ```
 
-**Problèmes Identifiés**:
-- ⚠️ Les handlers ne vérifient pas le retour de succès
-- ⚠️ Les dialogs se ferment même en cas d'échec
-- ⚠️ Pas de refetch explicite après les actions
-
-**Recommandations**:
-1. Vérifier le retour de succès de chaque action
-2. Ne fermer les dialogs que si succès
-3. Ajouter refetch après succès
+**Points Positifs**:
+- ✅ Vérifie le succès avant de fermer les dialogs
+- ✅ Nettoie les états après succès uniquement
+- ✅ Refetch automatique géré par les hooks
 
 ---
 
@@ -238,9 +238,9 @@ setSelectedItem(null);
 ## 📝 Recommandations Prioritaires
 
 ### Priorité Haute 🔴
-1. **AdminAffiliates.tsx**: Ajouter vérification de succès pour tous les handlers
-2. **AdminOrders.tsx**: Vérifier la synchronisation après annulation
-3. **Protection 2FA**: Ajouter pour toutes les actions destructives
+1. ✅ **AdminAffiliates.tsx**: CORRIGÉ - Vérification de succès ajoutée
+2. ⚠️ **AdminOrders.tsx**: Implémenter les vraies fonctionnalités (actuellement mock data)
+3. ⚠️ **Protection 2FA**: Ajouter pour toutes les actions destructives restantes
 
 ### Priorité Moyenne 🟡
 4. **Refetch automatique**: S'assurer que toutes les pages refetch après succès
@@ -270,8 +270,8 @@ Pour chaque page admin, vérifier :
 ## 📊 Statistiques
 
 - **Pages analysées**: 5
-- **Pages correctes**: 3 (AdminUsers, AdminStores, AdminProducts)
-- **Pages à corriger**: 2 (AdminAffiliates, AdminOrders)
+- **Pages correctes**: 4 (AdminUsers, AdminStores, AdminProducts, AdminAffiliates)
+- **Pages à implémenter**: 1 (AdminOrders - mock data)
 - **Actions critiques identifiées**: 11
 - **Actions protégées 2FA**: 4
 - **Actions sans protection 2FA**: 7
