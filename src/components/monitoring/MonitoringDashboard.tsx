@@ -87,6 +87,7 @@ export function MonitoringDashboard() {
         <Button
           variant={autoRefresh ? 'default' : 'outline'}
           onClick={() => setAutoRefresh(!autoRefresh)}
+          className="min-h-[44px]"
         >
           {autoRefresh ? 'Pause' : 'Reprendre'} Auto-refresh
         </Button>
@@ -175,7 +176,7 @@ export function MonitoringDashboard() {
                   <span>
                     {alert.severity === 'critical' ? 'Critique' : 'Avertissement'}: {alert.metricName}
                   </span>
-                  <Button
+                  <Button className="min-h-[44px]"
                     variant="ghost"
                     size="sm"
                     onClick={() => handleAcknowledge(alert.id)}
