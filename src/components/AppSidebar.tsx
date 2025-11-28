@@ -507,6 +507,11 @@ const menuSections = [
         url: "/dashboard/settings",
         icon: Settings,
       },
+      {
+        title: "Rejoindre la communauté",
+        url: "/community",
+        icon: Users,
+      },
     ]
   },
 ];
