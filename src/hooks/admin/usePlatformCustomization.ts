@@ -275,6 +275,12 @@ export const usePlatformCustomization = () => {
       // Mettre à jour l'état local immédiatement
       setCustomizationData(updatedData);
       
+      // Déclencher l'événement immédiatement pour synchronisation temps réel
+      // (avant même la sauvegarde en base)
+      window.dispatchEvent(new CustomEvent('platform-customization-updated', {
+        detail: { customizationData: updatedData }
+      }));
+      
       // Si on est en mode preview, sauvegarder dans localStorage
       if (previewMode) {
         savePreviewToLocalStorage(updatedData);

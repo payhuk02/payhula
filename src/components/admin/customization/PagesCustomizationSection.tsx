@@ -3,7 +3,7 @@
  * Permet de personnaliser tous les éléments de chaque page (textes, images, couleurs, polices, etc.)
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -1412,6 +1412,7 @@ export const PagesCustomizationSection = ({ onChange }: PagesCustomizationSectio
   const [selectedSection, setSelectedSection] = useState<string>('');
   const [pageValues, setPageValues] = useState<Record<string, Record<string, any>>>({});
   const [uploadingImages, setUploadingImages] = useState<Record<string, boolean>>({});
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Charger les valeurs existantes
   useEffect(() => {
@@ -1420,10 +1421,23 @@ export const PagesCustomizationSection = ({ onChange }: PagesCustomizationSectio
     }
   }, [customizationData]);
 
+  // Cleanup du timeout au démontage
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const selectedPageConfig = useMemo(() => 
     PAGES_CONFIG.find(p => p.id === selectedPage),
     [selectedPage]
   );
+
+  // Debounce pour les sauvegardes automatiques
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingChangesRef = useRef<Record<string, Record<string, any>>>({});
 
   const handleElementChange = useCallback((pageId: string, elementKey: string, value: any) => {
     setPageValues(prev => {
@@ -1435,22 +1449,65 @@ export const PagesCustomizationSection = ({ onChange }: PagesCustomizationSectio
         },
       };
       
-      // Sauvegarder automatiquement avec les données à jour
-      save('pages', {
-        ...prev,
+      // Mettre à jour les changements en attente
+      pendingChangesRef.current = {
+        ...pendingChangesRef.current,
         [pageId]: {
-          ...prev[pageId],
+          ...pendingChangesRef.current[pageId],
           [elementKey]: value,
         },
-      }).catch((error) => {
-        logger.error('Error saving page customization', { error, pageId, elementKey });
-      });
+      };
+      
+      // Déclencher immédiatement l'événement pour synchronisation temps réel
+      // (avant même la sauvegarde en base)
+      const currentData = customizationData || {};
+      const updatedData = {
+        ...currentData,
+        pages: {
+          ...currentData.pages,
+          ...updated,
+        },
+      };
+      
+      // Mettre à jour l'état local immédiatement pour synchronisation temps réel
+      window.dispatchEvent(new CustomEvent('platform-customization-updated', {
+        detail: { customizationData: updatedData }
+      }));
+      
+      // Debounce la sauvegarde en base (500ms)
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      
+      saveTimeoutRef.current = setTimeout(async () => {
+        const changesToSave = pendingChangesRef.current;
+        if (Object.keys(changesToSave).length > 0) {
+          setIsSyncing(true);
+          try {
+            // Fusionner avec les données existantes
+            const currentPages = customizationData?.pages || {};
+            const mergedPages = {
+              ...currentPages,
+              ...changesToSave,
+            };
+            
+            await save('pages', mergedPages).catch((error) => {
+              logger.error('Error saving page customization', { error, pageId, elementKey });
+            });
+            
+            // Réinitialiser les changements en attente
+            pendingChangesRef.current = {};
+          } finally {
+            setIsSyncing(false);
+          }
+        }
+      }, 500);
       
       return updated;
     });
 
     if (onChange) onChange();
-  }, [save, onChange]);
+  }, [save, onChange, customizationData]);
 
   const handleImageUpload = useCallback(async (pageId: string, elementKey: string, file: File) => {
     try {

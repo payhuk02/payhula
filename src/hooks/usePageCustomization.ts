@@ -9,25 +9,43 @@ import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization
 
 export const usePageCustomization = (pageId: string) => {
   const { t } = useTranslation();
-  const { customizationData } = usePlatformCustomization();
+  const { customizationData, setCustomizationData } = usePlatformCustomization();
   const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [localCustomization, setLocalCustomization] = useState<Record<string, any>>({});
   
   // Écouter les changements de personnalisation pour forcer le re-render
   useEffect(() => {
-    const handleUpdate = () => {
-      setUpdateTrigger(prev => prev + 1);
+    const handleUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const updatedData = customEvent.detail?.customizationData;
+      
+      if (updatedData?.pages?.[pageId]) {
+        // Mettre à jour les données locales immédiatement pour synchronisation temps réel
+        setLocalCustomization(updatedData.pages[pageId]);
+        setUpdateTrigger(prev => prev + 1);
+      }
     };
     
     window.addEventListener('platform-customization-updated', handleUpdate);
     return () => {
       window.removeEventListener('platform-customization-updated', handleUpdate);
     };
-  }, []);
+  }, [pageId]);
+  
+  // Synchroniser avec les données du hook
+  useEffect(() => {
+    if (customizationData?.pages?.[pageId]) {
+      setLocalCustomization(customizationData.pages[pageId]);
+    }
+  }, [customizationData, pageId]);
   
   const pageCustomization = useMemo(() => {
-    return customizationData?.pages?.[pageId] || {};
+    // Priorité : données locales (temps réel) > données du hook (sauvegardées)
+    return localCustomization && Object.keys(localCustomization).length > 0
+      ? localCustomization
+      : customizationData?.pages?.[pageId] || {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customizationData, pageId, updateTrigger]);
+  }, [localCustomization, customizationData, pageId, updateTrigger]);
 
   /**
    * Récupère une valeur personnalisée pour un élément de page

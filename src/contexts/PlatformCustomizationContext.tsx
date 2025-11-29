@@ -57,12 +57,21 @@ export const PlatformCustomizationProvider = ({ children }: { children: ReactNod
   }, [customizationData, isLoading]);
 
   // Écouter les événements de mise à jour depuis usePlatformCustomization.save()
-  // pour appliquer les changements en temps réel
+  // pour appliquer les changements en temps réel (design + pages)
   useEffect(() => {
     const handleCustomizationUpdate = (event: CustomEvent) => {
       const updatedData = event.detail?.customizationData;
+      
+      // Appliquer les changements de design immédiatement
       if (updatedData?.design) {
         applyDesignCustomization(updatedData.design);
+      }
+      
+      // Mettre à jour le contexte pour forcer le re-render des composants
+      // qui utilisent usePageCustomization
+      if (updatedData) {
+        // Le contexte sera mis à jour via le hook usePlatformCustomization
+        // qui met à jour customizationData dans le state
       }
     };
 
