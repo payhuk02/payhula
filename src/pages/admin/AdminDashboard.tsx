@@ -137,11 +137,11 @@ const AdminDashboard = () => {
                   <stat.icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${stat.color}`} />
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                 <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>
                   {stat.value.toLocaleString()}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                   {stat.description}
                 </p>
               </CardContent>
