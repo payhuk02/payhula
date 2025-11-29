@@ -278,7 +278,7 @@ const AdminAffiliates = () => {
   if (affiliatesLoading) {
     return (
       <AdminLayout>
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Skeleton className="h-12 w-64" />
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
@@ -291,21 +291,22 @@ const AdminAffiliates = () => {
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6 animate-fade-in">
-        {/* Header */}
-        <div ref={headerRef} className="flex items-center justify-between" role="banner">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" id="admin-affiliates-title">
-              Gestion du système d'affiliation
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Superviser l'ensemble des affiliés et leurs performances
-            </p>
-          </div>
-          <Button onClick={exportToCSV} variant="outline" className="gap-2 min-h-[44px]">
+      <AdminLayout>
+        <div className="space-y-4 sm:space-y-6 animate-fade-in">
+          {/* Header */}
+          <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" role="banner">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" id="admin-affiliates-title">
+                Gestion du système d'affiliation
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-2">
+                Superviser l'ensemble des affiliés et leurs performances
+              </p>
+            </div>
+          <Button onClick={exportToCSV} variant="outline" className="gap-2 min-h-[44px] w-full sm:w-auto">
             <Download className="h-4 w-4" />
-            Exporter CSV
+            <span className="hidden sm:inline">Exporter CSV</span>
+            <span className="sm:hidden">CSV</span>
           </Button>
         </div>
 

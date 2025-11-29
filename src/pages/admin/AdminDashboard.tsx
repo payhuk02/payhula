@@ -138,7 +138,7 @@ const AdminDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${stat.color}`}>
+                <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>
                   {stat.value.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
