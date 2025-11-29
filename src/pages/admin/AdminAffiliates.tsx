@@ -398,29 +398,38 @@ const AdminAffiliates = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="affiliates" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="affiliates" className="min-h-[44px]">
-              Affiliés ({affiliates.length})
-            </TabsTrigger>
-            <TabsTrigger value="commissions" className="min-h-[44px]">
-              Commissions
-              {commissions.filter(c => c.status === 'pending').length > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {commissions.filter(c => c.status === 'pending').length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="min-h-[44px]">
-              Retraits
-              {pendingWithdrawals.length > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {pendingWithdrawals.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="min-h-[44px]">Statistiques</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="affiliates" className="space-y-4 sm:space-y-6">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-hide">
+            <TabsList className="inline-flex w-full sm:w-auto min-w-full sm:min-w-0 grid grid-cols-4 sm:inline-flex gap-1 sm:gap-2">
+              <TabsTrigger value="affiliates" className="min-h-[44px] text-xs sm:text-sm">
+                <span className="hidden sm:inline">Affiliés</span>
+                <span className="sm:hidden">Aff.</span>
+                <span className="ml-1">({affiliates.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="commissions" className="min-h-[44px] text-xs sm:text-sm">
+                <span className="hidden sm:inline">Commissions</span>
+                <span className="sm:hidden">Com.</span>
+                {commissions.filter(c => c.status === 'pending').length > 0 && (
+                  <Badge variant="destructive" className="ml-1 sm:ml-2 text-[10px] sm:text-xs">
+                    {commissions.filter(c => c.status === 'pending').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="withdrawals" className="min-h-[44px] text-xs sm:text-sm">
+                <span className="hidden sm:inline">Retraits</span>
+                <span className="sm:hidden">Ret.</span>
+                {pendingWithdrawals.length > 0 && (
+                  <Badge variant="destructive" className="ml-1 sm:ml-2 text-[10px] sm:text-xs">
+                    {pendingWithdrawals.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="min-h-[44px] text-xs sm:text-sm">
+                <span className="hidden sm:inline">Statistiques</span>
+                <span className="sm:hidden">Stats</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Affiliés */}
           <TabsContent value="affiliates" className="space-y-4">
