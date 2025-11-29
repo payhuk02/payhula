@@ -335,11 +335,11 @@ const AdminAffiliates = () => {
               </CardTitle>
               <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-emerald-600">
                 {globalStats.active_affiliates}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 Sur {globalStats.total_affiliates} total
               </p>
             </CardContent>
@@ -352,11 +352,11 @@ const AdminAffiliates = () => {
               </CardTitle>
               <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">
                 {globalStats.total_sales}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 {globalStats.total_clicks} clics au total
               </p>
             </CardContent>
@@ -369,11 +369,11 @@ const AdminAffiliates = () => {
               </CardTitle>
               <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-purple-600">
                 {formatCurrency(globalStats.total_revenue)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 Via affiliation
               </p>
             </CardContent>
@@ -386,11 +386,11 @@ const AdminAffiliates = () => {
               </CardTitle>
               <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-orange-600">
                 {formatCurrency(globalStats.total_commission_paid)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 {formatCurrency(globalStats.pending_commission)} en attente
               </p>
             </CardContent>
