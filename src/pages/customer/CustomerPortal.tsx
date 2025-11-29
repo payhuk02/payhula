@@ -149,9 +149,12 @@ export default function CustomerPortal() {
         }
       }
 
-      // Active subscriptions - Table n'existe pas, retourner 0
-      // TODO: Implémenter lorsque la table subscriptions sera créée
-      const subscriptionsCount = 0;
+      // Active subscriptions
+      const { count: subscriptionsCount } = await supabase
+        .from('subscriptions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('status', 'active');
 
       return {
         totalOrders: ordersCount || 0,

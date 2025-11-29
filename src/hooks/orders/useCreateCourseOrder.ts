@@ -115,7 +115,7 @@ export const useCreateCourseOrder = () => {
       }
 
       // Récupérer les options de paiement configurées
-      const paymentOptions = (product.payment_options as any) || { payment_type: 'full', percentage_rate: 30 };
+      const paymentOptions = (product.payment_options as { payment_type?: string; percentage_rate?: number } | null) || { payment_type: 'full', percentage_rate: 30 };
       const paymentType = paymentOptions.payment_type || 'full';
       const percentageRate = paymentOptions.percentage_rate || 30;
 

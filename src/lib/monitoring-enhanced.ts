@@ -226,12 +226,12 @@ class MetricsStore {
     totalMetrics: number;
     totalAlerts: number;
     activeAlerts: number;
-    metricsByType: Record<MetricType, number>;
-    averageValues: Record<MetricType, number>;
+    metricsByType: Partial<Record<MetricType, number>>;
+    averageValues: Partial<Record<MetricType, number>>;
   } {
-    const metricsByType: Record<MetricType, number> = {} as any;
-    const sumByType: Record<MetricType, number> = {} as any;
-    const countByType: Record<MetricType, number> = {} as any;
+    const metricsByType: Partial<Record<MetricType, number>> = {};
+    const sumByType: Partial<Record<MetricType, number>> = {};
+    const countByType: Partial<Record<MetricType, number>> = {};
 
     this.metrics.forEach(metric => {
       metricsByType[metric.type] = (metricsByType[metric.type] || 0) + 1;
@@ -239,10 +239,10 @@ class MetricsStore {
       countByType[metric.type] = (countByType[metric.type] || 0) + 1;
     });
 
-    const averageValues: Record<MetricType, number> = {} as any;
-    Object.keys(metricsByType).forEach(type => {
-      const count = countByType[type as MetricType] || 1;
-      averageValues[type as MetricType] = (sumByType[type as MetricType] || 0) / count;
+    const averageValues: Partial<Record<MetricType, number>> = {};
+    (Object.keys(metricsByType) as MetricType[]).forEach(type => {
+      const count = countByType[type] || 1;
+      averageValues[type] = (sumByType[type] || 0) / count;
     });
 
     return {
@@ -286,7 +286,7 @@ export function recordMetric(metric: Omit<Metric, 'id' | 'timestamp'>): void {
 
   // Envoyer à Sentry si c'est une métrique importante
   if (metric.type === 'error_rate' || metric.type === 'page_load') {
-    Sentry.setMeasurement(metric.name, metric.value, metric.unit as any);
+    Sentry.setMeasurement(metric.name, metric.value, metric.unit as Sentry.MeasurementUnit);
   }
 }
 
@@ -386,16 +386,30 @@ export function getAlertThreshold(type: MetricType): AlertThreshold | undefined 
   return metricsStore.getThreshold(type);
 }
 
+// Type pour l'API performance.memory (Chrome-specific)
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface PerformanceWithMemory extends Performance {
+  memory?: PerformanceMemory;
+}
+
 /**
  * Surveiller la mémoire
  */
 export function startMemoryMonitoring(interval: number = 60000): () => void {
-  if (typeof performance === 'undefined' || !(performance as any).memory) {
+  const perfWithMemory = performance as PerformanceWithMemory;
+  
+  if (typeof performance === 'undefined' || !perfWithMemory.memory) {
     return () => {}; // Performance API non disponible
   }
 
   const intervalId = setInterval(() => {
-    const memory = (performance as any).memory;
+    const memory = perfWithMemory.memory;
+    if (!memory) return;
     
     recordMetric({
       name: 'Memory Usage',

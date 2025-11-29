@@ -223,23 +223,35 @@ export const approveCommissionPayment = async (
     }
 
     // Récupérer les infos du paiement pour la notification
-    const { data: paymentData } = await supabase
-      .from(type === 'affiliate' ? 'affiliate_withdrawals' : 'commission_payments')
-      .select(type === 'affiliate' ? 'affiliate_id, amount, currency, affiliates(user_id)' : 'referrer_id, amount, currency')
-      .eq('id', paymentId)
-      .single();
+    if (type === 'affiliate') {
+      const { data: paymentData } = await supabase
+        .from('affiliate_withdrawals')
+        .select('affiliate_id, amount, currency, affiliates(user_id)')
+        .eq('id', paymentId)
+        .single();
 
-    // Notifier l'utilisateur
-    const userId = type === 'affiliate' 
-      ? (paymentData as any)?.affiliates?.user_id 
-      : (paymentData as any)?.referrer_id;
+      const userId = (paymentData?.affiliates as { user_id?: string } | null)?.user_id;
+      if (userId && paymentData) {
+        await notifyPaymentRequestApproved(userId, {
+          payment_id: paymentId,
+          amount: paymentData.amount,
+          currency: paymentData.currency || 'XOF',
+        });
+      }
+    } else {
+      const { data: paymentData } = await supabase
+        .from('commission_payments')
+        .select('referrer_id, amount, currency')
+        .eq('id', paymentId)
+        .single();
 
-    if (userId && paymentData) {
-      await notifyPaymentRequestApproved(userId, {
-        payment_id: paymentId,
-        amount: (paymentData as any).amount,
-        currency: (paymentData as any).currency || 'XOF',
-      });
+      if (paymentData?.referrer_id) {
+        await notifyPaymentRequestApproved(paymentData.referrer_id, {
+          payment_id: paymentId,
+          amount: paymentData.amount,
+          currency: paymentData.currency || 'XOF',
+        });
+      }
     }
 
     logger.log('Commission payment approved', { payment_id: paymentId, admin_id: adminId });
@@ -285,24 +297,38 @@ export const processCommissionPayment = async (
     }
 
     // Récupérer les infos du paiement pour la notification
-    const { data: paymentData } = await supabase
-      .from(type === 'affiliate' ? 'affiliate_withdrawals' : 'commission_payments')
-      .select(type === 'affiliate' ? 'affiliate_id, amount, currency, affiliates(user_id)' : 'referrer_id, amount, currency')
-      .eq('id', paymentId)
-      .single();
+    // (le trigger SQL le fait déjà, mais on peut aussi l'envoyer ici)
+    if (type === 'affiliate') {
+      const { data: paymentData } = await supabase
+        .from('affiliate_withdrawals')
+        .select('affiliate_id, amount, currency, affiliates(user_id)')
+        .eq('id', paymentId)
+        .single();
 
-    // Notifier l'utilisateur (le trigger SQL le fait déjà, mais on peut aussi l'envoyer ici)
-    const userId = type === 'affiliate' 
-      ? (paymentData as any)?.affiliates?.user_id 
-      : (paymentData as any)?.referrer_id;
+      const userId = (paymentData?.affiliates as { user_id?: string } | null)?.user_id;
+      if (userId && paymentData) {
+        await notifyPaymentRequestProcessed(userId, {
+          payment_id: paymentId,
+          amount: paymentData.amount,
+          currency: paymentData.currency || 'XOF',
+          transaction_reference: transactionReference,
+        });
+      }
+    } else {
+      const { data: paymentData } = await supabase
+        .from('commission_payments')
+        .select('referrer_id, amount, currency')
+        .eq('id', paymentId)
+        .single();
 
-    if (userId && paymentData) {
-      await notifyPaymentRequestProcessed(userId, {
-        payment_id: paymentId,
-        amount: (paymentData as any).amount,
-        currency: (paymentData as any).currency || 'XOF',
-        transaction_reference: transactionReference,
-      });
+      if (paymentData?.referrer_id) {
+        await notifyPaymentRequestProcessed(paymentData.referrer_id, {
+          payment_id: paymentId,
+          amount: paymentData.amount,
+          currency: paymentData.currency || 'XOF',
+          transaction_reference: transactionReference,
+        });
+      }
     }
 
     logger.log('Commission payment processed', {
