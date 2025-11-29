@@ -280,7 +280,7 @@ const AdminAffiliates = () => {
       <AdminLayout>
         <div className="space-y-6">
           <Skeleton className="h-12 w-64" />
-          <div className="grid gap-6 md:grid-cols-4">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-32" />
             ))}
@@ -326,7 +326,7 @@ const AdminAffiliates = () => {
         )}
 
         {/* Stats globales */}
-        <div ref={statsRef} className="grid gap-6 md:grid-cols-4" role="region" aria-label="Statistiques des affiliés">
+        <div ref={statsRef} className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Statistiques des affiliés">
           <Card className="hover-scale">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -845,7 +845,7 @@ const AdminAffiliates = () => {
 
           {/* Stats */}
           <TabsContent value="stats" className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle>Top 10 Affiliés</CardTitle>

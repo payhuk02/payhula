@@ -95,9 +95,9 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="container mx-auto p-6 space-y-6">
+        <div className="container mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
           <Skeleton className="h-12 w-64" />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(7)].map((_, i) => (
               <Skeleton key={i} className="h-32" />
             ))}
@@ -109,24 +109,24 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 space-y-6 animate-fade-in">
-        <div ref={headerRef} className="flex items-center justify-between" role="banner">
+      <div className="container mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 animate-fade-in">
+        <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" role="banner">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" id="admin-dashboard-title">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" id="admin-dashboard-title">
               Tableau de bord administrateur
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">
               Vue d'ensemble de la plateforme
             </p>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground" role="status" aria-label="Statistiques globales">
-            <BarChart3 className="h-5 w-5" aria-hidden="true" />
-            <span className="text-sm">Statistiques globales</span>
+            <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+            <span className="text-xs sm:text-sm">Statistiques globales</span>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div ref={statsRef} className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Cartes statistiques">
+        <div ref={statsRef} className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Cartes statistiques">
           {statsCards.map((stat, index) => (
             <Card key={index} className="hover-scale border-muted/50 hover:border-primary/50 transition-all">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
