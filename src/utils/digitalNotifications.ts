@@ -167,12 +167,8 @@ export const sendNewVersionNotification = async (
     }
 
     // Envoyer l'email à chaque client
-    type CustomerItem = {
-      order_id: string;
-      orders?: { customers?: { id: string; email: string; name?: string } };
-    };
     const results = await Promise.allSettled(
-      customers.map((item: CustomerItem) => {
+      customers.map((item) => {
         const customer = item.orders?.customers;
         if (!customer || !customer.email) return Promise.resolve({ success: false });
 
@@ -325,13 +321,6 @@ export const checkAndSendPriceDropNotifications = async (): Promise<{
       .from('price_drop_alerts')
       .select(`
         *,
-        user_favorites!inner (
-          user_id,
-          users!inner (
-            email,
-            user_metadata
-          )
-        ),
         products!inner (
           name,
           slug
@@ -350,31 +339,29 @@ export const checkAndSendPriceDropNotifications = async (): Promise<{
     }
 
     let sent = 0;
-    let errors = 0;
+    let errorsCount = 0;
 
-    type AlertWithRelations = {
-      id: string;
-      product_id: string;
-      old_price: number;
-      new_price: number;
-      price_drop_percentage: number;
-      user_favorites?: { id: string; user_id: string; users?: { email: string; user_metadata?: { full_name?: string } } };
-      products?: { name: string; slug?: string };
-    };
-    for (const alert of alerts as AlertWithRelations[]) {
-      const favorite = alert.user_favorites;
+    for (const alert of alerts) {
       const product = alert.products;
-      const user = favorite?.users;
 
-      if (!user || !user.email || !product) {
-        errors++;
+      if (!product) {
+        errorsCount++;
+        continue;
+      }
+
+      // Récupérer l'utilisateur séparément
+      const { data: userData } = await supabase.auth.admin.getUserById(alert.user_id);
+      const user = userData?.user;
+
+      if (!user || !user.email) {
+        errorsCount++;
         continue;
       }
 
       const result = await sendPriceDropNotification({
-        userId: favorite.user_id,
+        userId: alert.user_id,
         userEmail: user.email,
-        userName: user.user_metadata?.full_name || user.email,
+        userName: user.user_metadata?.full_name as string || user.email,
         productId: alert.product_id,
         productName: product.name,
         productSlug: product.slug,
@@ -382,7 +369,6 @@ export const checkAndSendPriceDropNotifications = async (): Promise<{
         newPrice: Number(alert.new_price),
         priceDropPercentage: Number(alert.price_drop_percentage),
         priceDropAmount: Number(alert.old_price) - Number(alert.new_price),
-        wishlistId: favorite.id,
       });
 
       if (result.success) {
@@ -393,17 +379,17 @@ export const checkAndSendPriceDropNotifications = async (): Promise<{
           .update({ email_sent: true })
           .eq('id', alert.id);
       } else {
-        errors++;
+        errorsCount++;
       }
     }
 
     logger.info('Vérification des alertes de baisse de prix terminée', {
       total: alerts.length,
       sent,
-      errors,
+      errors: errorsCount,
     });
 
-    return { sent, errors };
+    return { sent, errors: errorsCount };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de la vérification des alertes de baisse de prix', {
@@ -423,10 +409,9 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
 }> => {
   try {
     const now = new Date();
-    const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-    // Récupérer les licences expirant dans 7 jours et 30 jours
+    // Récupérer les licences expirant dans les 30 prochains jours
     const { data: licenses, error } = await supabase
       .from('digital_product_licenses')
       .select(`
@@ -443,7 +428,6 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
       .gte('expires_at', now.toISOString())
       .lte('expires_at', in30Days.toISOString())
       .eq('is_active', true)
-      .eq('notification_sent', false)
       .limit(100);
 
     if (error) {
@@ -455,22 +439,14 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
     }
 
     let sent = 0;
-    let errors = 0;
+    let errorsCount = 0;
 
-    type LicenseWithRelations = {
-      id: string;
-      user_id: string;
-      product_id: string;
-      expires_at: string;
-      products?: { name: string; slug?: string };
-      customers?: { email: string; name?: string };
-    };
-    for (const license of licenses as LicenseWithRelations[]) {
+    for (const license of licenses) {
       const product = license.products;
       const customer = license.customers;
 
-      if (!customer || !customer.email || !product) {
-        errors++;
+      if (!customer || !customer.email || !product || !license.expires_at) {
+        errorsCount++;
         continue;
       }
 
@@ -480,7 +456,7 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
       // Envoyer seulement si expirant dans 7 jours ou 30 jours
       if (daysUntilExpiry === 7 || daysUntilExpiry === 30) {
         const result = await sendLicenseExpiringNotification({
-          userId: license.user_id,
+          userId: license.customer_id || '',
           userEmail: customer.email,
           userName: customer.name || customer.email,
           licenseId: license.id,
@@ -493,13 +469,11 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
 
         if (result.success) {
           sent++;
-          // Marquer comme envoyé
-          await supabase
-            .from('digital_product_licenses')
-            .update({ notification_sent: true })
-            .eq('id', license.id);
+          // Note: Le champ notification_sent n'existe pas encore dans la table
+          // Il faudra créer une migration pour l'ajouter si nécessaire
+          logger.info('License expiring notification sent', { licenseId: license.id });
         } else {
-          errors++;
+          errorsCount++;
         }
       }
     }
@@ -507,10 +481,10 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
     logger.info('Vérification des licences expirant terminée', {
       total: licenses.length,
       sent,
-      errors,
+      errors: errorsCount,
     });
 
-    return { sent, errors };
+    return { sent, errors: errorsCount };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de la vérification des licences expirant', {
