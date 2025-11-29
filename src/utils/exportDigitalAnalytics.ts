@@ -96,7 +96,9 @@ export const exportAnalyticsToPDF = async (
     styles: { fontSize: 10 },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 15;
+  // jspdf-autotable ajoute lastAutoTable au document
+  const docWithAutoTable = doc as typeof doc & { lastAutoTable?: { finalY: number } };
+  yPos = (docWithAutoTable.lastAutoTable?.finalY ?? yPos) + 15;
   
   // License Stats
   if (data.licenseStats) {
@@ -121,7 +123,7 @@ export const exportAnalyticsToPDF = async (
       styles: { fontSize: 10 },
     });
     
-    yPos = (doc as any).lastAutoTable.finalY + 15;
+    yPos = (docWithAutoTable.lastAutoTable?.finalY ?? yPos) + 15;
   }
   
   // Top Files
@@ -154,7 +156,7 @@ export const exportAnalyticsToPDF = async (
       styles: { fontSize: 9 },
     });
     
-    yPos = (doc as any).lastAutoTable.finalY + 15;
+    yPos = (docWithAutoTable.lastAutoTable?.finalY ?? yPos) + 15;
   }
   
   // Trends (if available and requested)

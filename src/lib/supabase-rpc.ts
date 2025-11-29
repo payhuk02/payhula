@@ -18,13 +18,24 @@ import type {
 } from '@/types/supabase-rpc';
 
 /**
+ * Helper pour les appels RPC non-typés dans le schéma Supabase
+ * Les fonctions RPC custom ne sont pas toujours générées dans les types
+ */
+type RpcFunction = (fn: string, params: Record<string, unknown>) => Promise<{
+  data: unknown;
+  error: { message?: string } | null;
+}>;
+
+const rpc = supabase.rpc.bind(supabase) as unknown as RpcFunction;
+
+/**
  * Créer une facture à partir d'une commande
  */
 export async function createInvoiceFromOrder(
   params: CreateInvoiceFromOrderParams
 ): Promise<{ data: CreateInvoiceFromOrderResult | null; error: Error | null }> {
   try {
-    const { data, error } = await (supabase.rpc as any)('create_invoice_from_order', params);
+    const { data, error } = await rpc('create_invoice_from_order', params);
     if (error) {
       return { data: null, error: new Error(error.message || 'Failed to create invoice') };
     }
@@ -41,7 +52,7 @@ export async function applyCouponToOrder(
   params: ApplyCouponToOrderParams
 ): Promise<{ data: ApplyCouponToOrderResult | null; error: Error | null }> {
   try {
-    const { data, error } = await (supabase.rpc as any)('apply_coupon_to_order', params);
+    const { data, error } = await rpc('apply_coupon_to_order', params);
     if (error) {
       return { data: null, error: new Error(error.message || 'Failed to apply coupon') };
     }
@@ -58,7 +69,7 @@ export async function recordCouponUsage(
   params: RecordCouponUsageParams
 ): Promise<{ data: RecordCouponUsageResult | null; error: Error | null }> {
   try {
-    const { data, error } = await (supabase.rpc as any)('record_coupon_usage', params);
+    const { data, error } = await rpc('record_coupon_usage', params);
     if (error) {
       return { data: null, error: new Error(error.message || 'Failed to record coupon usage') };
     }
@@ -75,7 +86,7 @@ export async function redeemGiftCard(
   params: RedeemGiftCardParams
 ): Promise<{ data: RedeemGiftCardResult[] | null; error: Error | null }> {
   try {
-    const { data, error } = await (supabase.rpc as any)('redeem_gift_card', params);
+    const { data, error } = await rpc('redeem_gift_card', params);
     if (error) {
       return { data: null, error: new Error(error.message || 'Failed to redeem gift card') };
     }
@@ -92,7 +103,7 @@ export async function markCartRecovered(
   params: MarkCartRecoveredParams
 ): Promise<{ data: MarkCartRecoveredResult | null; error: Error | null }> {
   try {
-    const { data, error } = await (supabase.rpc as any)('mark_cart_recovered', params);
+    const { data, error } = await rpc('mark_cart_recovered', params);
     if (error) {
       return { data: null, error: new Error(error.message || 'Failed to mark cart as recovered') };
     }
