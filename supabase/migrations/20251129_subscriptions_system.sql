@@ -257,22 +257,22 @@ DECLARE
 BEGIN
   SELECT json_build_object(
     'total_subscriptions', COUNT(*),
-    'active_subscriptions', COUNT(*) FILTER (WHERE status = 'active'),
-    'paused_subscriptions', COUNT(*) FILTER (WHERE status = 'paused'),
-    'cancelled_subscriptions', COUNT(*) FILTER (WHERE status = 'cancelled'),
+    'active_subscriptions', COUNT(*) FILTER (WHERE subscriptions.status = 'active'),
+    'paused_subscriptions', COUNT(*) FILTER (WHERE subscriptions.status = 'paused'),
+    'cancelled_subscriptions', COUNT(*) FILTER (WHERE subscriptions.status = 'cancelled'),
     'total_monthly_cost', COALESCE(SUM(
-      CASE billing_cycle
-        WHEN 'weekly' THEN amount * 4
-        WHEN 'monthly' THEN amount
-        WHEN 'quarterly' THEN amount / 3
-        WHEN 'yearly' THEN amount / 12
-        ELSE amount
+      CASE subscriptions.billing_cycle
+        WHEN 'weekly' THEN subscriptions.amount * 4
+        WHEN 'monthly' THEN subscriptions.amount
+        WHEN 'quarterly' THEN subscriptions.amount / 3
+        WHEN 'yearly' THEN subscriptions.amount / 12
+        ELSE subscriptions.amount
       END
-    ) FILTER (WHERE status = 'active'), 0)
+    ) FILTER (WHERE subscriptions.status = 'active'), 0)
   )
   INTO v_result
   FROM public.subscriptions
-  WHERE user_id = p_user_id;
+  WHERE subscriptions.user_id = p_user_id;
   
   RETURN v_result;
 END;
