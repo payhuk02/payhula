@@ -39,7 +39,8 @@ class PayDunyaClient {
       // Vérifier si c'est une erreur Edge Function (non-2xx)
       if (errorMessage.includes('non-2xx') || errorMessage.includes('Edge Function')) {
         // L'erreur contient probablement des détails dans error.context ou error.data
-        const errorDetails = (error as any)?.context || (error as any)?.data || {};
+        const errorWithExtras = error as { context?: { message?: string; error?: string }; data?: { message?: string; error?: string } };
+        const errorDetails = errorWithExtras?.context || errorWithExtras?.data || {};
         const detailedMessage = errorDetails.message || errorDetails.error || errorMessage;
         
         // Vérifier si c'est une erreur de configuration API

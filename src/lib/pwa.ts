@@ -243,7 +243,7 @@ export async function registerBackgroundSync(tag: string): Promise<void> {
 /**
  * Envoyer un message au Service Worker
  */
-export function sendMessageToSW(message: any): void {
+export function sendMessageToSW(message: unknown): void {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(message);
   }
@@ -272,8 +272,9 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
  * Vérifier si l'app est installée (PWA)
  */
 export function isAppInstalled(): boolean {
+  const navigatorWithStandalone = navigator as typeof navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches ||
-         (window.navigator as any).standalone === true;
+         navigatorWithStandalone.standalone === true;
 }
 
 /**

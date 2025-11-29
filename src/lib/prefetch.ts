@@ -193,7 +193,17 @@ export function prefetchCriticalResources(): void {
  */
 export function smartPrefetch(urls: string[]): void {
   // Vérifier le type de connexion
-  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+  type NavigatorWithConnection = typeof navigator & {
+    connection?: NetworkInformation;
+    mozConnection?: NetworkInformation;
+    webkitConnection?: NetworkInformation;
+  };
+  type NetworkInformation = {
+    effectiveType?: '2g' | '3g' | '4g' | 'wifi';
+    saveData?: boolean;
+  };
+  const nav = navigator as NavigatorWithConnection;
+  const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
 
   if (!connection) {
     // Si pas d'info de connexion, précharger normalement

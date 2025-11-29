@@ -182,8 +182,8 @@ export const validateURL = (
     const urlObj = new URL(sanitized);
 
     // Protocole autorisé
-    const protocol = urlObj.protocol.replace(':', '');
-    if (!protocols.includes(protocol as any)) {
+    const protocol = urlObj.protocol.replace(':', '') as 'http' | 'https';
+    if (!protocols.includes(protocol)) {
       return {
         valid: false,
         error: `Seuls les protocoles ${protocols.join(', ')} sont autorisés`
