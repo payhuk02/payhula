@@ -673,16 +673,22 @@ const AdminUsers = () => {
                     size="sm"
                     onClick={() => setPage(page + 1)}
                     disabled={page === totalPages}
+                    className="min-h-[44px] min-w-[44px] sm:min-w-auto"
+                    aria-label="Page suivante"
                   >
-                    Suivant
+                    <ChevronRight className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Suivant</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(totalPages)}
                     disabled={page === totalPages}
+                    className="min-h-[44px] min-w-[44px] sm:min-w-auto"
+                    aria-label="Dernière page"
                   >
-                    Dernier
+                    <ChevronsRight className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Dernier</span>
                   </Button>
                 </div>
               </div>
