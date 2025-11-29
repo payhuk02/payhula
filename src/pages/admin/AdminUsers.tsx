@@ -709,8 +709,8 @@ const AdminUsers = () => {
                 </SelectContent>
               </Select>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>Annuler</Button>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setRoleDialogOpen(false)} className="w-full sm:w-auto">Annuler</Button>
               <Button
                 onClick={async () => {
                   if (roleTargetUser) {
@@ -721,6 +721,7 @@ const AdminUsers = () => {
                     }
                   }
                 }}
+                className="w-full sm:w-auto"
               >
                 Enregistrer
               </Button>
@@ -760,8 +761,8 @@ const AdminUsers = () => {
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setAddAdminOpen(false)}>Annuler</Button>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setAddAdminOpen(false)} className="w-full sm:w-auto">Annuler</Button>
               <Button
                 onClick={async () => {
                   if (!addAdminEmail.trim()) return;
@@ -772,6 +773,7 @@ const AdminUsers = () => {
                     refetch();
                   }
                 }}
+                className="w-full sm:w-auto"
               >
                 Ajouter
               </Button>
@@ -795,8 +797,8 @@ const AdminUsers = () => {
               onChange={(e) => setSuspensionReason(e.target.value)}
               rows={4}
             />
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setSuspendDialogOpen(false)}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setSuspendDialogOpen(false)} className="w-full sm:w-auto">
                 Annuler
               </Button>
               <Button
@@ -811,6 +813,7 @@ const AdminUsers = () => {
                     }
                   }
                 }}
+                className="w-full sm:w-auto"
               >
                 Suspendre
               </Button>

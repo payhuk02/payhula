@@ -958,14 +958,15 @@ const AdminAffiliates = () => {
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowRejectDialog(false)} className="w-full sm:w-auto">
                 Annuler
               </Button>
               <Button 
                 variant="destructive" 
                 onClick={selectedCommission ? handleRejectCommission : handleRejectWithdrawal}
                 disabled={!rejectReason}
+                className="w-full sm:w-auto"
               >
                 Rejeter
               </Button>
@@ -994,14 +995,15 @@ const AdminAffiliates = () => {
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowSuspendDialog(false)}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowSuspendDialog(false)} className="w-full sm:w-auto">
                 Annuler
               </Button>
               <Button 
                 variant="destructive" 
                 onClick={handleSuspendAffiliate}
                 disabled={!suspendReason}
+                className="w-full sm:w-auto"
               >
                 Suspendre
               </Button>
