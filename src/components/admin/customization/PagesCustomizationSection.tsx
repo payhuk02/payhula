@@ -1403,6 +1403,203 @@ const PAGES_CONFIG: PageConfig[] = [
       },
     ],
   },
+  {
+    id: 'dashboardCustomers',
+    name: 'Dashboard Clients',
+    route: '/dashboard/customers',
+    description: 'Personnalisez tous les éléments de la page clients du dashboard',
+    icon: Users,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre principal', type: 'text', key: 'dashboardCustomers.header.title', defaultValue: 'Clients' },
+          { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'dashboardCustomers.header.subtitle', defaultValue: 'Gérez votre base de clients et suivez leurs achats' },
+          { id: 'newCustomerButton', label: 'Bouton Nouveau client', type: 'text', key: 'dashboardCustomers.header.newCustomerButton', defaultValue: 'Nouveau client' },
+        ],
+      },
+      {
+        id: 'stats',
+        name: 'Statistiques',
+        type: 'content',
+        elements: [
+          { id: 'totalLabel', label: 'Label Total', type: 'text', key: 'dashboardCustomers.stats.total', defaultValue: 'Total' },
+          { id: 'totalOrdersLabel', label: 'Label Total commandes', type: 'text', key: 'dashboardCustomers.stats.totalOrders', defaultValue: 'Total commandes' },
+          { id: 'totalSpentLabel', label: 'Label Total dépensé', type: 'text', key: 'dashboardCustomers.stats.totalSpent', defaultValue: 'Total dépensé' },
+          { id: 'averageSpentLabel', label: 'Label Moyenne dépensée', type: 'text', key: 'dashboardCustomers.stats.averageSpent', defaultValue: 'Moyenne dépensée' },
+        ],
+      },
+      {
+        id: 'filters',
+        name: 'Filtres',
+        type: 'content',
+        elements: [
+          { id: 'searchPlaceholder', label: 'Placeholder Recherche', type: 'text', key: 'dashboardCustomers.filters.searchPlaceholder', defaultValue: 'Rechercher un client...' },
+          { id: 'sortByName', label: 'Trier par Nom', type: 'text', key: 'dashboardCustomers.filters.sortByName', defaultValue: 'Nom' },
+          { id: 'sortByDate', label: 'Trier par Date', type: 'text', key: 'dashboardCustomers.filters.sortByDate', defaultValue: 'Date' },
+          { id: 'sortByOrders', label: 'Trier par Commandes', type: 'text', key: 'dashboardCustomers.filters.sortByOrders', defaultValue: 'Commandes' },
+          { id: 'sortBySpent', label: 'Trier par Dépensé', type: 'text', key: 'dashboardCustomers.filters.sortBySpent', defaultValue: 'Dépensé' },
+        ],
+      },
+      {
+        id: 'customer',
+        name: 'Client',
+        type: 'content',
+        elements: [
+          { id: 'viewButton', label: 'Bouton Voir', type: 'text', key: 'dashboardCustomers.customer.viewButton', defaultValue: 'Voir' },
+          { id: 'editButton', label: 'Bouton Modifier', type: 'text', key: 'dashboardCustomers.customer.editButton', defaultValue: 'Modifier' },
+          { id: 'noCustomersMessage', label: 'Message Aucun client', type: 'textarea', key: 'dashboardCustomers.customer.noCustomers', defaultValue: 'Aucun client pour le moment' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dashboardPayments',
+    name: 'Dashboard Paiements',
+    route: '/dashboard/payments',
+    description: 'Personnalisez tous les éléments de la page paiements du dashboard',
+    icon: CreditCard,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre principal', type: 'text', key: 'dashboardPayments.header.title', defaultValue: 'Paiements' },
+          { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'dashboardPayments.header.subtitle', defaultValue: 'Gérez tous vos paiements et transactions' },
+          { id: 'newPaymentButton', label: 'Bouton Nouveau paiement', type: 'text', key: 'dashboardPayments.header.newPaymentButton', defaultValue: 'Nouveau paiement' },
+          { id: 'exportButton', label: 'Bouton Exporter', type: 'text', key: 'dashboardPayments.header.exportButton', defaultValue: 'Exporter' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'allTab', label: 'Onglet Tous', type: 'text', key: 'dashboardPayments.tabs.all', defaultValue: 'Tous' },
+          { id: 'completedTab', label: 'Onglet Complétés', type: 'text', key: 'dashboardPayments.tabs.completed', defaultValue: 'Complétés' },
+          { id: 'pendingTab', label: 'Onglet En attente', type: 'text', key: 'dashboardPayments.tabs.pending', defaultValue: 'En attente' },
+          { id: 'failedTab', label: 'Onglet Échoués', type: 'text', key: 'dashboardPayments.tabs.failed', defaultValue: 'Échoués' },
+        ],
+      },
+      {
+        id: 'payment',
+        name: 'Paiement',
+        type: 'content',
+        elements: [
+          { id: 'viewButton', label: 'Bouton Voir', type: 'text', key: 'dashboardPayments.payment.viewButton', defaultValue: 'Voir' },
+          { id: 'editButton', label: 'Bouton Modifier', type: 'text', key: 'dashboardPayments.payment.editButton', defaultValue: 'Modifier' },
+          { id: 'deleteButton', label: 'Bouton Supprimer', type: 'text', key: 'dashboardPayments.payment.deleteButton', defaultValue: 'Supprimer' },
+          { id: 'statusCompleted', label: 'Statut Complété', type: 'text', key: 'dashboardPayments.payment.statusCompleted', defaultValue: 'Complété' },
+          { id: 'statusPending', label: 'Statut En attente', type: 'text', key: 'dashboardPayments.payment.statusPending', defaultValue: 'En attente' },
+          { id: 'statusFailed', label: 'Statut Échoué', type: 'text', key: 'dashboardPayments.payment.statusFailed', defaultValue: 'Échoué' },
+          { id: 'noPaymentsMessage', label: 'Message Aucun paiement', type: 'textarea', key: 'dashboardPayments.payment.noPayments', defaultValue: 'Aucun paiement pour le moment' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dashboardPromotions',
+    name: 'Dashboard Promotions',
+    route: '/dashboard/promotions',
+    description: 'Personnalisez tous les éléments de la page promotions du dashboard',
+    icon: Tag,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre principal', type: 'text', key: 'dashboardPromotions.header.title', defaultValue: 'Promotions' },
+          { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'dashboardPromotions.header.subtitle', defaultValue: 'Gérez vos codes promo et réductions' },
+          { id: 'newPromotionButton', label: 'Bouton Nouvelle promotion', type: 'text', key: 'dashboardPromotions.header.newPromotionButton', defaultValue: 'Nouvelle promotion' },
+        ],
+      },
+      {
+        id: 'stats',
+        name: 'Statistiques',
+        type: 'content',
+        elements: [
+          { id: 'totalLabel', label: 'Label Total', type: 'text', key: 'dashboardPromotions.stats.total', defaultValue: 'Total' },
+          { id: 'activeLabel', label: 'Label Actives', type: 'text', key: 'dashboardPromotions.stats.active', defaultValue: 'Actives' },
+          { id: 'totalUsesLabel', label: 'Label Total utilisations', type: 'text', key: 'dashboardPromotions.stats.totalUses', defaultValue: 'Total utilisations' },
+          { id: 'averageDiscountLabel', label: 'Label Remise moyenne', type: 'text', key: 'dashboardPromotions.stats.averageDiscount', defaultValue: 'Remise moyenne' },
+        ],
+      },
+      {
+        id: 'filters',
+        name: 'Filtres',
+        type: 'content',
+        elements: [
+          { id: 'searchPlaceholder', label: 'Placeholder Recherche', type: 'text', key: 'dashboardPromotions.filters.searchPlaceholder', defaultValue: 'Rechercher une promotion...' },
+          { id: 'filterAll', label: 'Filtre Toutes', type: 'text', key: 'dashboardPromotions.filters.all', defaultValue: 'Toutes' },
+          { id: 'filterActive', label: 'Filtre Actives', type: 'text', key: 'dashboardPromotions.filters.active', defaultValue: 'Actives' },
+          { id: 'filterInactive', label: 'Filtre Inactives', type: 'text', key: 'dashboardPromotions.filters.inactive', defaultValue: 'Inactives' },
+        ],
+      },
+      {
+        id: 'promotion',
+        name: 'Promotion',
+        type: 'content',
+        elements: [
+          { id: 'codeLabel', label: 'Label Code', type: 'text', key: 'dashboardPromotions.promotion.code', defaultValue: 'Code' },
+          { id: 'discountLabel', label: 'Label Remise', type: 'text', key: 'dashboardPromotions.promotion.discount', defaultValue: 'Remise' },
+          { id: 'usesLabel', label: 'Label Utilisations', type: 'text', key: 'dashboardPromotions.promotion.uses', defaultValue: 'Utilisations' },
+          { id: 'noPromotionsMessage', label: 'Message Aucune promotion', type: 'textarea', key: 'dashboardPromotions.promotion.noPromotions', defaultValue: 'Aucune promotion pour le moment' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dashboardStore',
+    name: 'Dashboard Boutique',
+    route: '/dashboard/store',
+    description: 'Personnalisez tous les éléments de la page boutique du dashboard',
+    icon: Store,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre principal', type: 'text', key: 'dashboardStore.header.title', defaultValue: 'Boutique' },
+          { id: 'viewStoreButton', label: 'Bouton Voir la boutique', type: 'text', key: 'dashboardStore.header.viewStoreButton', defaultValue: 'Voir la boutique' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'manageTab', label: 'Onglet Gérer', type: 'text', key: 'dashboardStore.tabs.manage', defaultValue: 'Gérer' },
+          { id: 'createTab', label: 'Onglet Créer', type: 'text', key: 'dashboardStore.tabs.create', defaultValue: 'Créer' },
+        ],
+      },
+      {
+        id: 'empty',
+        name: 'État vide',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre état vide', type: 'text', key: 'dashboardStore.empty.title', defaultValue: 'Aucune boutique' },
+          { id: 'description', label: 'Description état vide', type: 'textarea', key: 'dashboardStore.empty.description', defaultValue: 'Créez votre première boutique pour commencer à vendre' },
+          { id: 'createButton', label: 'Bouton Créer boutique', type: 'text', key: 'dashboardStore.empty.createButton', defaultValue: 'Créer ma boutique' },
+        ],
+      },
+      {
+        id: 'store',
+        name: 'Boutique',
+        type: 'content',
+        elements: [
+          { id: 'nameLabel', label: 'Label Nom', type: 'text', key: 'dashboardStore.store.name', defaultValue: 'Nom' },
+          { id: 'slugLabel', label: 'Label Slug', type: 'text', key: 'dashboardStore.store.slug', defaultValue: 'Slug' },
+          { id: 'descriptionLabel', label: 'Label Description', type: 'text', key: 'dashboardStore.store.description', defaultValue: 'Description' },
+          { id: 'statusLabel', label: 'Label Statut', type: 'text', key: 'dashboardStore.store.status', defaultValue: 'Statut' },
+        ],
+      },
+    ],
+  },
 ];
 
 export const PagesCustomizationSection = ({ onChange }: PagesCustomizationSectionProps) => {
