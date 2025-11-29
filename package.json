@@ -52,7 +52,9 @@
     "build:analyze": "npm run build -- --mode analyze",
     "issues:create": "powershell -ExecutionPolicy Bypass -File scripts/create-github-issues.ps1",
     "issues:create:bash": "bash scripts/create-github-issues.sh",
-    "issues:create:api": "powershell -ExecutionPolicy Bypass -File scripts/create-github-issues-api.ps1"
+    "issues:create:api": "powershell -ExecutionPolicy Bypass -File scripts/create-github-issues-api.ps1",
+    "supabase:types": "npx supabase gen types typescript --project-id hbdnzajbyjakdhuavrvb --schema public > src/integrations/supabase/types.ts",
+    "supabase:types:check": "npx supabase gen types typescript --project-id hbdnzajbyjakdhuavrvb --schema public"
   },
   "vercel": {
     "buildCommand": "npm run build",
@@ -164,9 +166,13 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.0.1",
+    "lint-staged": "^15.2.11",
     "postcss": "^8.5.6",
+    "prettier": "^3.4.2",
     "rollup-plugin-visualizer": "^6.0.5",
+    "supabase": "^2.63.1",
     "tailwindcss": "^3.4.17",
     "terser": "^5.44.0",
     "tsx": "^4.20.6",
@@ -175,9 +181,6 @@
     "vite": "^7.2.2",
     "vite-plugin-compression2": "^2.3.0",
     "vitest": "^4.0.1",
-    "wait-on": "^9.0.1",
-    "prettier": "^3.4.2",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.2.11"
+    "wait-on": "^9.0.1"
   }
 }

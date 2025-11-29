@@ -171,9 +171,8 @@ export const useStoreAffiliates = (
   const { data: affiliates = [], isLoading, error } = useQuery({
     queryKey: ['store-affiliates', storeId],
     queryFn: async () => {
-      // @ts-ignore - Table 'affiliates' exists in database but not in generated types
       const { data, error: fetchError } = await supabase
-        .from('affiliates' as any)
+        .from('affiliates')
         .select(`
           *,
           profiles!affiliates_user_id_fkey(
@@ -187,7 +186,7 @@ export const useStoreAffiliates = (
 
       if (fetchError) throw fetchError;
 
-      return ((data as any) || []).map((affiliate: AffiliateFromDB) => ({
+      return (data || []).map((affiliate) => ({
         id: affiliate.id,
         affiliate_id: affiliate.id,
         user_id: affiliate.user_id,
@@ -213,24 +212,22 @@ export const useStoreAffiliates = (
   const { data: stats } = useQuery({
     queryKey: ['store-affiliate-stats', storeId],
     queryFn: async () => {
-      // @ts-ignore - Table 'affiliates' exists in database but not in generated types
       const { data: affiliatesData } = await supabase
-        .from('affiliates' as any)
+        .from('affiliates')
         .select('status, total_clicks, total_sales, total_revenue, total_commission_earned, pending_commission')
         .eq('store_id', storeId);
 
       if (!affiliatesData) return null;
 
-      const dataArray = affiliatesData as any[];
       const stats: StoreAffiliateStats = {
-        total_affiliates: dataArray.length,
-        active_affiliates: dataArray.filter((a: any) => a.status === 'active').length,
-        pending_affiliates: dataArray.filter((a: any) => a.status === 'pending').length,
-        total_clicks: dataArray.reduce((sum: number, a: any) => sum + (a.total_clicks || 0), 0),
-        total_sales: dataArray.reduce((sum: number, a: any) => sum + (a.total_sales || 0), 0),
-        total_revenue: dataArray.reduce((sum: number, a: any) => sum + (a.total_revenue || 0), 0),
-        total_commissions_paid: dataArray.reduce((sum: number, a: any) => sum + (a.total_commission_earned || 0), 0),
-        pending_commissions: dataArray.reduce((sum: number, a: any) => sum + (a.pending_commission || 0), 0),
+        total_affiliates: affiliatesData.length,
+        active_affiliates: affiliatesData.filter((a) => a.status === 'active').length,
+        pending_affiliates: affiliatesData.filter((a) => a.status === 'pending').length,
+        total_clicks: affiliatesData.reduce((sum, a) => sum + (a.total_clicks || 0), 0),
+        total_sales: affiliatesData.reduce((sum, a) => sum + (a.total_sales || 0), 0),
+        total_revenue: affiliatesData.reduce((sum, a) => sum + (a.total_revenue || 0), 0),
+        total_commissions_paid: affiliatesData.reduce((sum, a) => sum + (a.total_commission_earned || 0), 0),
+        pending_commissions: affiliatesData.reduce((sum, a) => sum + (a.pending_commission || 0), 0),
       };
 
       return stats;
@@ -243,9 +240,8 @@ export const useStoreAffiliates = (
     queryKey: ['store-affiliate-links', storeId, linksPage, linksPageSize],
     queryFn: async () => {
       // Compter le total
-      // @ts-ignore - Table 'affiliate_links' exists in database but not in generated types
       const { count, error: countError } = await supabase
-        .from('affiliate_links' as any)
+        .from('affiliate_links')
         .select('*', { count: 'exact', head: true })
         .eq('store_id', storeId);
 
@@ -255,9 +251,8 @@ export const useStoreAffiliates = (
       const from = (linksPage - 1) * linksPageSize;
       const to = from + linksPageSize - 1;
 
-      // @ts-ignore - Table 'affiliate_links' exists in database but not in generated types
       const { data, error: fetchError } = await supabase
-        .from('affiliate_links' as any)
+        .from('affiliate_links')
         .select(`
           *,
           products(
@@ -278,7 +273,7 @@ export const useStoreAffiliates = (
 
       if (fetchError) throw fetchError;
 
-      const links = ((data as any) || []).map((link: AffiliateLinkFromDB) => ({
+      const links = (data || []).map((link) => ({
         id: link.id,
         affiliate_id: link.affiliate_id,
         product_id: link.product_id,
@@ -328,9 +323,8 @@ export const useStoreAffiliates = (
     queryKey: ['store-affiliate-commissions', storeId, commissionsPage, commissionsPageSize],
     queryFn: async () => {
       // Compter le total
-      // @ts-ignore - Table 'affiliate_commissions' exists in database but not in generated types
       const { count, error: countError } = await supabase
-        .from('affiliate_commissions' as any)
+        .from('affiliate_commissions')
         .select('*', { count: 'exact', head: true })
         .eq('store_id', storeId);
 
@@ -340,9 +334,8 @@ export const useStoreAffiliates = (
       const from = (commissionsPage - 1) * commissionsPageSize;
       const to = from + commissionsPageSize - 1;
 
-      // @ts-ignore - Table 'affiliate_commissions' exists in database but not in generated types
       const { data, error: fetchError } = await supabase
-        .from('affiliate_commissions' as any)
+        .from('affiliate_commissions')
         .select(`
           *,
           affiliates(
@@ -363,7 +356,7 @@ export const useStoreAffiliates = (
 
       if (fetchError) throw fetchError;
 
-      const commissions = ((data as any) || []).map((commission: any) => ({
+      const commissions = (data || []).map((commission) => ({
         id: commission.id,
         affiliate_id: commission.affiliate_id,
         affiliate_link_id: commission.affiliate_link_id,
@@ -414,16 +407,14 @@ export const useStoreAffiliates = (
   const approveAffiliate = useMutation({
     mutationFn: async (affiliateId: string) => {
       // Récupérer les infos de l'affilié avant la mise à jour
-      // @ts-ignore - Table 'affiliates' exists in database but not in generated types
       const { data: affiliate } = await supabase
-        .from('affiliates' as any)
+        .from('affiliates')
         .select('user_id')
         .eq('id', affiliateId)
-        .single() as { data: any };
+        .single();
 
-      // @ts-ignore - Table 'affiliates' exists in database but not in generated types
       const { error } = await supabase
-        .from('affiliates' as any)
+        .from('affiliates')
         .update({ status: 'active', updated_at: new Date().toISOString() })
         .eq('id', affiliateId)
         .eq('store_id', storeId);
@@ -460,9 +451,8 @@ export const useStoreAffiliates = (
   // Rejeter un affilié
   const rejectAffiliate = useMutation({
     mutationFn: async (affiliateId: string) => {
-      // @ts-ignore - Table 'affiliates' exists in database but not in generated types
       const { error } = await supabase
-        .from('affiliates' as any)
+        .from('affiliates')
         .update({ status: 'rejected', updated_at: new Date().toISOString() })
         .eq('id', affiliateId)
         .eq('store_id', storeId);
@@ -490,9 +480,8 @@ export const useStoreAffiliates = (
   // Suspendre un affilié
   const suspendAffiliate = useMutation({
     mutationFn: async (affiliateId: string) => {
-      // @ts-ignore - Table 'affiliates' exists in database but not in generated types
       const { error } = await supabase
-        .from('affiliates' as any)
+        .from('affiliates')
         .update({ status: 'suspended', updated_at: new Date().toISOString() })
         .eq('id', affiliateId)
         .eq('store_id', storeId);
@@ -521,28 +510,25 @@ export const useStoreAffiliates = (
   const approveCommission = useMutation({
     mutationFn: async (commissionId: string) => {
       // Récupérer les infos de la commission avant la mise à jour
-      // @ts-ignore - Table 'affiliate_commissions' exists in database but not in generated types
       const { data: commission } = await supabase
-        .from('affiliate_commissions' as any)
+        .from('affiliate_commissions')
         .select('affiliate_id, commission_amount, order_id, affiliates(user_id), orders(order_number)')
         .eq('id', commissionId)
         .single();
 
-      // @ts-ignore - Table 'affiliate_commissions' exists in database but not in generated types
       const { error } = await supabase
-        .from('affiliate_commissions' as any)
+        .from('affiliate_commissions')
         .update({ status: 'approved', updated_at: new Date().toISOString() })
         .eq('id', commissionId);
 
       if (error) throw error;
 
       // La notification sera créée par le trigger SQL, mais on peut aussi l'envoyer ici
-      const commissionData = commission as any;
       return {
         commission_id: commissionId,
-        affiliate_user_id: commissionData?.affiliates?.user_id,
-        amount: commissionData?.commission_amount,
-        order_number: commissionData?.orders?.order_number,
+        affiliate_user_id: (commission as { affiliates?: { user_id?: string } })?.affiliates?.user_id,
+        amount: commission?.commission_amount,
+        order_number: (commission as { orders?: { order_number?: string } })?.orders?.order_number,
       };
     },
     onSuccess: async (data) => {
@@ -578,29 +564,25 @@ export const useStoreAffiliates = (
   const rejectCommission = useMutation({
     mutationFn: async (commissionId: string) => {
       // Récupérer les infos de la commission avant la mise à jour
-      // @ts-ignore - Table 'affiliate_commissions' exists in database but not in generated types
       const { data: commission } = await supabase
-        .from('affiliate_commissions' as any)
+        .from('affiliate_commissions')
         .select('affiliate_id, commission_amount, order_id, affiliates(user_id), orders(order_number)')
         .eq('id', commissionId)
         .single();
 
-      // @ts-ignore - Table 'affiliate_commissions' exists in database but not in generated types
       const { error } = await supabase
-        .from('affiliate_commissions' as any)
+        .from('affiliate_commissions')
         .update({ status: 'rejected', updated_at: new Date().toISOString() })
         .eq('id', commissionId);
 
       if (error) throw error;
 
       // La notification sera créée par le trigger SQL, mais on peut aussi l'envoyer ici
-      // @ts-ignore - Type inference issue with Supabase types
-      const commissionData: any = commission;
       return {
         commission_id: commissionId,
-        affiliate_user_id: commissionData?.affiliates?.user_id,
-        amount: commissionData?.commission_amount,
-        order_number: commissionData?.orders?.order_number,
+        affiliate_user_id: (commission as { affiliates?: { user_id?: string } })?.affiliates?.user_id,
+        amount: commission?.commission_amount,
+        order_number: (commission as { orders?: { order_number?: string } })?.orders?.order_number,
       };
     },
     onSuccess: async (data) => {
