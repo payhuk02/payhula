@@ -166,9 +166,11 @@ const AdminStores = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/stores/${store.slug}`)}
+                          className="min-h-[44px] min-w-[44px] sm:min-w-auto"
+                          aria-label="Voir la boutique"
                         >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
+                          <Eye className="h-4 w-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Voir</span>
                         </Button>
                         <Button
                           variant="destructive"
@@ -177,6 +179,8 @@ const AdminStores = () => {
                             setSelectedStore(store.id);
                             setDeleteDialogOpen(true);
                           }}
+                          className="min-h-[44px] min-w-[44px]"
+                          aria-label="Supprimer la boutique"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
