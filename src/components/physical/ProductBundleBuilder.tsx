@@ -618,7 +618,7 @@ export function ProductBundleBuilder({
 
       {/* Product Picker Dialog */}
       <Dialog open={showProductPicker} onOpenChange={setShowProductPicker}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Ajouter des Produits au Pack</DialogTitle>
             <DialogDescription>

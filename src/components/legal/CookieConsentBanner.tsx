@@ -161,7 +161,7 @@ export const CookieConsentBanner = () => {
 
       {/* Modal Paramètres */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Paramètres des cookies</DialogTitle>
             <DialogDescription>

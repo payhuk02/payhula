@@ -110,7 +110,7 @@ export const ProductReviewsSummary: React.FC<ProductReviewsSummaryProps> = ({
 
       {/* Dialog formulaire de review */}
       <Dialog open={showReviewForm} onOpenChange={setShowReviewForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Laisser un avis</DialogTitle>
           </DialogHeader>

@@ -603,7 +603,7 @@ export function BackorderManager({ productId, storeId, className }: BackorderMan
       {/* Customers Dialog */}
       {selectedBackorder && (
         <Dialog open={showCustomers} onOpenChange={setShowCustomers}>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Clients en Backorder</DialogTitle>
               <DialogDescription>

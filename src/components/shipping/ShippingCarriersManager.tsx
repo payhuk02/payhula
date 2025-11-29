@@ -533,7 +533,7 @@ export function ShippingCarriersManager({ storeId }: ShippingCarriersManagerProp
 
       {/* Dialog Créer/Modifier */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingCarrier ? 'Modifier le transporteur' : 'Nouveau transporteur'}

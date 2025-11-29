@@ -368,7 +368,7 @@ export const DigitalFilePreviewCompact = ({
           <Eye className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-auto">
         <DialogHeader>
           <DialogTitle>{file.name}</DialogTitle>
         </DialogHeader>

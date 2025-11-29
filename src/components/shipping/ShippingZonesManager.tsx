@@ -301,7 +301,7 @@ export function ShippingZonesManager({ storeId }: ShippingZonesManagerProps) {
 
       {/* Dialog Créer/Modifier */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingZone ? 'Modifier la zone' : 'Nouvelle zone de livraison'}
