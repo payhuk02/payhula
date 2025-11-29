@@ -109,11 +109,11 @@
 | **Checkout** | `/checkout` | 🔴 Haute | Processus de paiement | Textes, étapes, messages d'erreur | ✅ **AJOUTÉ** |
 | **PaymentSuccess** | `/payment/success` | 🔴 Haute | Confirmation paiement | Messages, boutons | ✅ **AJOUTÉ** |
 | **PaymentCancel** | `/payment/cancel` | 🔴 Haute | Annulation paiement | Messages, boutons | ✅ **AJOUTÉ** |
-| **DigitalProductDetail** | `/digital/:productId` | 🟡 Moyenne | Produits digitaux | Titre, description, CTA, prix | ⚠️ À ajouter |
-| **PhysicalProductDetail** | `/physical/:productId` | 🟡 Moyenne | Produits physiques | Titre, description, CTA, stock | ⚠️ À ajouter |
-| **ServiceDetail** | `/service/:serviceId` | 🟡 Moyenne | Services | Titre, description, réservation | ⚠️ À ajouter |
-| **CourseDetail** | `/courses/:slug` | 🟡 Moyenne | Cours | Titre, description, inscription | ⚠️ À ajouter |
-| **BundleDetail** | `/bundles/:bundleId` | 🟢 Basse | Bundles | Titre, description, prix | ⚠️ À ajouter |
+| **DigitalProductDetail** | `/digital/:productId` | 🟡 Moyenne | Produits digitaux | Titre, description, CTA, prix | ✅ **PHASE 6** |
+| **PhysicalProductDetail** | `/physical/:productId` | 🟡 Moyenne | Produits physiques | Titre, description, CTA, stock | ✅ **PHASE 6** |
+| **ServiceDetail** | `/service/:serviceId` | 🟡 Moyenne | Services | Titre, description, réservation | ✅ **AJOUTÉ** |
+| **CourseDetail** | `/courses/:slug` | 🟡 Moyenne | Cours | Titre, description, inscription | ✅ **PHASE 6** |
+| **BundleDetail** | `/bundles/:bundleId` | 🟢 Basse | Bundles | Titre, description, prix | ✅ **PHASE 6** |
 | **SharedWishlist** | `/wishlist/shared/:token` | 🟢 Basse | Liste partagée | Titre, description | ⚠️ À ajouter |
 
 ### Routes Customer Portal Manquantes (12 pages)
@@ -302,7 +302,7 @@ applyDesignCustomization(design) {
 
 | Catégorie | Total Routes | Configurées | Pourcentage |
 |-----------|--------------|-------------|-------------|
-| **Routes Publiques** | ~15 | 12 | 80% ✅ |
+| **Routes Publiques** | ~15 | 16 | ~107% ✅ |
 | **Routes Customer Portal** | 13 | 13 | **100%** ✅✅ |
 | **Routes Dashboard** | 30+ | 9 | ~30% ✅ |
 | **Routes Admin** | 50+ | 0 | 0% |
