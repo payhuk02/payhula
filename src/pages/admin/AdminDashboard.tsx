@@ -129,12 +129,12 @@ const AdminDashboard = () => {
         <div ref={statsRef} className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Cartes statistiques">
           {statsCards.map((stat, index) => (
             <Card key={index} className="hover-scale border-muted/50 hover:border-primary/50 transition-all">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-4 md:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                   {stat.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                <div className={`p-1.5 sm:p-2 rounded-lg ${stat.bgColor}`}>
+                  <stat.icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${stat.color}`} />
                 </div>
               </CardHeader>
               <CardContent>

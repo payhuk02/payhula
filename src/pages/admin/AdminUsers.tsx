@@ -279,7 +279,7 @@ const AdminUsers = () => {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               <div>
                 <CardTitle>Liste des utilisateurs</CardTitle>
                 <CardDescription>

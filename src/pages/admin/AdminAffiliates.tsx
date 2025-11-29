@@ -329,11 +329,11 @@ const AdminAffiliates = () => {
         {/* Stats globales */}
         <div ref={statsRef} className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Statistiques des affiliés">
           <Card className="hover-scale">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Affiliés actifs
               </CardTitle>
-              <Users className="h-4 w-4 text-emerald-600" />
+              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-emerald-600">
@@ -346,11 +346,11 @@ const AdminAffiliates = () => {
           </Card>
 
           <Card className="hover-scale">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Ventes totales
               </CardTitle>
-              <ShoppingCart className="h-4 w-4 text-blue-600" />
+              <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
@@ -363,11 +363,11 @@ const AdminAffiliates = () => {
           </Card>
 
           <Card className="hover-scale">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 CA généré
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-purple-600" />
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-600">
@@ -380,11 +380,11 @@ const AdminAffiliates = () => {
           </Card>
 
           <Card className="hover-scale">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Commissions versées
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-orange-600" />
+              <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-orange-600">
@@ -661,16 +661,17 @@ const AdminAffiliates = () => {
                               )}
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex flex-col sm:flex-row gap-2 justify-end">
                                 {commission.status === 'pending' && (
                                   <>
                                     <Button
                                       size="sm"
                                       onClick={() => handleApproveCommission(commission)}
-                                      className="gap-1"
+                                      className="gap-1 min-h-[44px] w-full sm:w-auto"
                                     >
-                                      <CheckCircle2 className="h-3 w-3" />
-                                      Approuver
+                                      <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      <span className="hidden sm:inline">Approuver</span>
+                                      <span className="sm:hidden">OK</span>
                                     </Button>
                                     <Button
                                       size="sm"
@@ -679,9 +680,9 @@ const AdminAffiliates = () => {
                                         setSelectedCommission(commission);
                                         setShowRejectDialog(true);
                                       }}
-                                      className="gap-1"
+                                      className="gap-1 min-h-[44px] w-full sm:w-auto"
                                     >
-                                      <XCircle className="h-3 w-3" />
+                                      <XCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                                       Rejeter
                                     </Button>
                                   </>
@@ -796,16 +797,17 @@ const AdminAffiliates = () => {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex gap-2 justify-end">
+                          <div className="flex flex-col sm:flex-row gap-2 justify-end">
                             {withdrawal.status === 'pending' && (
                               <>
                                 <Button
                                   size="sm"
                                   onClick={() => handleApproveWithdrawal(withdrawal)}
-                                  className="gap-1"
+                                  className="gap-1 min-h-[44px] w-full sm:w-auto"
                                 >
-                                  <CheckCircle2 className="h-3 w-3" />
-                                  Approuver
+                                  <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                  <span className="hidden sm:inline">Approuver</span>
+                                  <span className="sm:hidden">OK</span>
                                 </Button>
                                 <Button
                                   size="sm"
@@ -814,9 +816,9 @@ const AdminAffiliates = () => {
                                     setSelectedWithdrawal(withdrawal);
                                     setShowRejectDialog(true);
                                   }}
-                                  className="gap-1"
+                                  className="gap-1 min-h-[44px] w-full sm:w-auto"
                                 >
-                                  <XCircle className="h-3 w-3" />
+                                  <XCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                                   Rejeter
                                 </Button>
                               </>
@@ -828,10 +830,11 @@ const AdminAffiliates = () => {
                                   setSelectedWithdrawal(withdrawal);
                                   setShowPayDialog(true);
                                 }}
-                                className="gap-1"
+                                className="gap-1 min-h-[44px] w-full sm:w-auto"
                               >
-                                <CheckCircle2 className="h-3 w-3" />
-                                Marquer complété
+                                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="hidden sm:inline">Marquer complété</span>
+                                <span className="sm:hidden">Complété</span>
                               </Button>
                             )}
                           </div>
