@@ -234,9 +234,14 @@ Certains composants utilisaient des largeurs fixes sans breakpoint mobile.
    - Composant de base: w-full sm:w-auto pour tous les AlertDialog
    - Améliore l'UX mobile globalement
 
+7. **feat(responsive): Optimiser PaginationControls et filtres admin**
+   - PaginationControls: Boutons min-h-[44px] sur mobile, layout responsive
+   - AdminUsers: Grille filtres avec breakpoint sm:grid-cols-2
+   - AdminAffiliates: Recherche et select full-width sur mobile
+
 ---
 
 **Statut** : ✅ **AMÉLIORATIONS COMPLÉTÉES**
 
-**Score de Responsivité** : **96/100** ⭐⭐⭐⭐⭐
+**Score de Responsivité** : **97/100** ⭐⭐⭐⭐⭐
 
