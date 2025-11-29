@@ -228,7 +228,7 @@ export function ShippingRatesManager({ storeId }: ShippingRatesManagerProps) {
                 setDialogOpen(true);
               }}
             >
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Sélectionner une zone" />
               </SelectTrigger>
               <SelectContent>
