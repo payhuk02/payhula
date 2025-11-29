@@ -1029,13 +1029,14 @@ const AdminAffiliates = () => {
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowPayDialog(false)}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowPayDialog(false)} className="w-full sm:w-auto">
                 Annuler
               </Button>
               <Button 
                 onClick={selectedCommission ? handlePayCommission : handleCompleteWithdrawal}
                 disabled={!paymentReference}
+                className="w-full sm:w-auto"
               >
                 Confirmer le paiement
               </Button>

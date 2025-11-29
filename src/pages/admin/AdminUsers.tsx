@@ -288,9 +288,10 @@ const AdminUsers = () => {
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="min-h-[44px]">
                     <FileDown className="h-4 w-4 mr-2" />
-                    Exporter
+                    <span className="hidden sm:inline">Exporter</span>
+                    <span className="sm:hidden">Export</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
