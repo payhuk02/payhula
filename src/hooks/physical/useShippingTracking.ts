@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -348,7 +349,7 @@ export function useUpdateShipmentStatus() {
           .then(({ triggerShipmentNotification }) => {
             triggerShipmentNotification(
               data.order_id,
-              variables.status as any,
+              variables.status as 'preparing' | 'shipped' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'exception' | 'returned',
               data.tracking_number || undefined,
               undefined, // carrierName - à récupérer depuis carrier_id si nécessaire
               data.estimated_delivery ? new Date(data.estimated_delivery).toISOString().split('T')[0] : undefined

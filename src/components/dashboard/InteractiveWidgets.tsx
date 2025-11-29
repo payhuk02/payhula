@@ -310,8 +310,9 @@ export const GoalProgress = ({ goals }: GoalProgressProps) => {
                 <Progress 
                   value={progress} 
                   className="h-2"
-                  // @ts-expect-error - CSS custom property for dynamic color
-                  style={{ '--progress-background': `hsl(var(--${goal.color}))` } as React.CSSProperties}
+                  style={{ 
+                    '--progress-background': `hsl(var(--${goal.color}))` 
+                  } as React.CSSProperties & { '--progress-background'?: string }}
                 />
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Échéance: {new Date(goal.deadline).toLocaleDateString('fr-FR')}</span>

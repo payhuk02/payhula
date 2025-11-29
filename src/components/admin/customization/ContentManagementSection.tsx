@@ -18,6 +18,7 @@ import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization
 import { useEmailTemplates } from '@/hooks/useEmail';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/hooks/useI18n';
 import type { EmailTemplate } from '@/types/email';
 
 interface ContentManagementSectionProps {
@@ -136,6 +137,7 @@ const KEY_TEXTS = [
 export const ContentManagementSection = ({ onChange }: ContentManagementSectionProps) => {
   const { customizationData, save } = usePlatformCustomization();
   const { toast } = useToast();
+  const { currentLanguage } = useI18n();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [customTexts, setCustomTexts] = useState<Record<string, string>>({});
@@ -160,13 +162,14 @@ export const ContentManagementSection = ({ onChange }: ContentManagementSectionP
 
   useEffect(() => {
     if (editingTemplate) {
-      const currentLang = 'fr'; // TODO: Récupérer la langue actuelle
+      // Utiliser la langue actuelle depuis i18n
+      const currentLang = currentLanguage || 'fr';
       setTemplateContent({
         subject: editingTemplate.subject[currentLang] || '',
         html: editingTemplate.html_content[currentLang] || '',
       });
     }
-  }, [editingTemplate]);
+  }, [editingTemplate, currentLanguage]);
 
   const categories = useMemo(() => 
     Array.from(new Set(KEY_TEXTS.map(t => t.category))), 

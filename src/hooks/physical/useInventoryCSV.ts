@@ -33,8 +33,22 @@ export interface CSVImportResult {
 export function useExportInventoryCSV() {
   const { toast } = useToast();
 
+  type InventoryItem = {
+    sku?: string;
+    quantity_available?: number;
+    quantity_reserved?: number;
+    reorder_point?: number;
+    warehouse_location?: string;
+    barcode?: string;
+    cost_price?: number;
+    selling_price?: number;
+    total_value?: number;
+    updated_at?: string;
+    physical_product?: { product?: { name?: string } };
+    variant?: { physical_product?: { product?: { name?: string } } };
+  };
   const exportToCSV = useCallback(
-    async (inventoryItems: any[], filename?: string) => {
+    async (inventoryItems: InventoryItem[], filename?: string) => {
       if (!inventoryItems || inventoryItems.length === 0) {
         toast({
           title: 'Aucune donnée',
@@ -60,7 +74,7 @@ export function useExportInventoryCSV() {
           'Date Mise à Jour',
         ];
 
-        const rows = inventoryItems.map((item: any) => {
+        const rows = inventoryItems.map((item) => {
           const productName =
             item.physical_product?.product?.name ||
             item.variant?.physical_product?.product?.name ||
@@ -113,10 +127,11 @@ export function useExportInventoryCSV() {
           title: 'Export réussi',
           description: `${inventoryItems.length} article(s) exporté(s)`,
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Impossible d\'exporter le CSV';
         toast({
           title: 'Erreur export',
-          description: error.message || 'Impossible d\'exporter le CSV',
+          description: errorMessage,
           variant: 'destructive',
         });
         throw error;
@@ -162,7 +177,8 @@ export function useImportInventoryCSV() {
           skipEmptyLines: true,
           complete: async (results) => {
             try {
-              const rows = results.data as any[];
+              type CSVRow = Record<string, string>;
+              const rows = results.data as CSVRow[];
               const errors: Array<{ row: number; sku: string; error: string }> = [];
               const warnings: Array<{ row: number; sku: string; warning: string }> = [];
 
@@ -248,7 +264,12 @@ export function useImportInventoryCSV() {
                   }
 
                   // Mise à jour de la quantité
-                  const updates: any = {
+                  const updates: {
+                    quantity_available: number;
+                    updated_at: string;
+                    warehouse_location?: string;
+                    reorder_point?: number;
+                  } = {
                     quantity_available: quantity,
                     updated_at: new Date().toISOString(),
                   };
@@ -284,18 +305,19 @@ export function useImportInventoryCSV() {
                   } else {
                     result.success++;
                   }
-                } catch (error: any) {
+                } catch (error: unknown) {
+                  const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
                   errors.push({
                     row: rowNumber,
                     sku,
-                    error: error.message || 'Erreur inconnue',
+                    error: errorMessage,
                   });
                   result.failed++;
                 }
               }
 
               resolve(result);
-            } catch (error: any) {
+            } catch (error: unknown) {
               reject(error);
             }
           },

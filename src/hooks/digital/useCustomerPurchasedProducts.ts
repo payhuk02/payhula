@@ -125,10 +125,13 @@ export const useCustomerPurchasedProducts = () => {
         .in('order_id', orderIds);
 
       // Récupérer les téléchargements
+      type OrderItem = {
+        product?: { digital_product?: { id: string } };
+      };
       const productIds = orders
-        .flatMap(o => o.order_items)
-        .map((item: any) => item.product?.digital_product?.id)
-        .filter(Boolean);
+        .flatMap(o => (o.order_items || []) as OrderItem[])
+        .map((item) => item.product?.digital_product?.id)
+        .filter((id): id is string => Boolean(id));
 
       const { data: downloads } = await supabase
         .from('digital_product_downloads')
@@ -140,8 +143,33 @@ export const useCustomerPurchasedProducts = () => {
       // Organiser les données
       const purchasedProducts: PurchasedDigitalProduct[] = [];
 
-      for (const order of orders) {
-        for (const item of order.order_items as any[]) {
+      type OrderWithItems = {
+        id: string;
+        order_number: string;
+        created_at: string;
+        total_amount: number;
+        payment_status: string;
+        order_items: Array<{
+          id: string;
+          product_id: string;
+          total_price: number;
+          product?: {
+            name: string;
+            description: string | null;
+            image_url: string | null;
+            digital_product?: {
+              id: string;
+              digital_type: string;
+              license_type: string;
+              main_file_url: string;
+              download_limit: number | null;
+              download_expiry_days: number | null;
+            };
+          };
+        }>;
+      };
+      for (const order of orders as OrderWithItems[]) {
+        for (const item of order.order_items) {
           const digitalProduct = item.product?.digital_product;
           if (!digitalProduct) continue;
 

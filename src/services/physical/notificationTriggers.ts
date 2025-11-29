@@ -132,7 +132,7 @@ export async function triggerPriceChangeNotifications(
         priceDropPercentage,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error triggering price change notifications', { error, productId, variantId });
   }
 }
@@ -274,7 +274,7 @@ export async function triggerStockChangeNotifications(
         currentStatus,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error triggering stock change notifications', { error, productId, variantId });
   }
 }
@@ -310,8 +310,10 @@ export async function triggerShipmentNotification(
 
     // Pour les notifications, on utilise directement les données du customer
     // Pas besoin de récupérer l'utilisateur auth car on a déjà l'email
+    type CustomerWithName = typeof customer & { name?: string };
+    const customerWithName = customer as CustomerWithName;
     const userEmail = customer.email;
-    const userName = (customer as any).name || customer.email.split('@')[0];
+    const userName = customerWithName.name || customer.email.split('@')[0];
     const userId = customer.id;
 
     // Vérifier les préférences de notifications (optionnel, on peut aussi notifier même si pas de préférences)
@@ -380,7 +382,7 @@ export async function triggerShipmentNotification(
       orderId,
       shipmentStatus,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error triggering shipment notification', { error, orderId });
   }
 }
@@ -413,8 +415,10 @@ export async function triggerReturnNotification(
     }
 
     // Pour les notifications, on utilise directement les données du customer
+    type CustomerWithName = typeof customer & { name?: string };
+    const customerWithName = customer as CustomerWithName;
     const userEmail = customer.email;
-    const userName = (customer as any).name || customer.email.split('@')[0];
+    const userName = customerWithName.name || customer.email.split('@')[0];
     const userId = customer.id;
 
     // Vérifier les préférences de notifications (optionnel)
@@ -477,7 +481,7 @@ export async function triggerReturnNotification(
       returnId,
       returnStatus,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error triggering return notification', { error, returnId });
   }
 }

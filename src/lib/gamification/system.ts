@@ -249,10 +249,12 @@ export class GamificationSystem {
         const level = this.calculateLevel(points);
         const badges = await this.getUserBadgesCount(user.user_id);
 
+        type ProfileData = { full_name?: string; avatar_url?: string };
+        const profile = user.profiles as ProfileData | null;
         leaderboard.push({
           userId: user.user_id,
-          userName: (user.profiles as any)?.full_name || 'Anonymous',
-          userAvatar: (user.profiles as any)?.avatar_url,
+          userName: profile?.full_name || 'Anonymous',
+          userAvatar: profile?.avatar_url,
           points,
           level,
           rank: i + 1,

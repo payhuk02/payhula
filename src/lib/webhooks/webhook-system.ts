@@ -232,10 +232,11 @@ function signPayload(payload: string, secret: string): string {
   // Note: Cette partie ne sera jamais exécutée dans le navigateur
   // car le code s'exécute côté client uniquement
   try {
-    // @ts-ignore - crypto peut ne pas être typé dans l'environnement navigateur
-    if (typeof crypto !== 'undefined' && crypto.createHmac) {
-      // @ts-ignore
-      return crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    // Vérifier si crypto.createHmac est disponible (Node.js uniquement)
+    type NodeCrypto = typeof crypto & { createHmac?: (algorithm: string, secret: string) => { update: (data: string) => { digest: (encoding: 'hex') => string } } };
+    const nodeCrypto = crypto as NodeCrypto;
+    if (typeof crypto !== 'undefined' && nodeCrypto.createHmac) {
+      return nodeCrypto.createHmac('sha256', secret).update(payload).digest('hex');
     }
   } catch (e) {
     // Ignorer si crypto.createHmac n'est pas disponible

@@ -72,8 +72,21 @@ export default function ContactShippingService() {
   const { data: services, isLoading, error } = useQuery({
     queryKey: ['global-shipping-services-contact'],
     queryFn: async () => {
-      // Utiliser un type assertion car la table peut ne pas être dans les types générés
-      // @ts-expect-error - Table global_shipping_services may not be in generated types
+      // Type assertion explicite pour la table global_shipping_services
+      // qui peut ne pas être dans les types générés
+      type GlobalShippingService = {
+        id: string;
+        name: string;
+        description?: string;
+        contact_email?: string;
+        contact_phone?: string;
+        website_url?: string;
+        is_active: boolean;
+        is_featured: boolean;
+        priority: number;
+        created_at: string;
+        updated_at: string;
+      };
       const { data, error } = await supabase
         .from('global_shipping_services')
         .select('*')
@@ -81,6 +94,9 @@ export default function ContactShippingService() {
         .order('is_featured', { ascending: false })
         .order('priority', { ascending: false })
         .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return (data || []) as GlobalShippingService[];
 
       if (error) {
         // Si la table n'existe pas encore, retourner un tableau vide
