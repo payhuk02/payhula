@@ -34,13 +34,16 @@ function sendToSentry(metric: Metric) {
  * Envoyer vers Google Analytics (si configuré)
  */
 function sendToAnalytics(metric: Metric) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', metric.name, {
-      value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-      metric_id: metric.id,
-      metric_value: metric.value,
-      metric_delta: metric.delta,
-    });
+  if (typeof window !== 'undefined') {
+    const windowWithGtag = window as typeof window & { gtag?: (command: string, eventName: string, params: Record<string, unknown>) => void };
+    if (windowWithGtag.gtag) {
+      windowWithGtag.gtag('event', metric.name, {
+        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+        metric_id: metric.id,
+        metric_value: metric.value,
+        metric_delta: metric.delta,
+      });
+    }
   }
 }
 

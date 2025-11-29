@@ -163,11 +163,12 @@ export async function checkRateLimit(
     }
 
     return response;
-  } catch (error: any) {
-    logger.error('[RateLimiter] Exception:', error);
+  } catch (error: unknown) {
+    const errorObj = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('[RateLimiter] Exception:', errorObj);
     
     // Envoyer à Sentry
-    Sentry.captureException(error, {
+    Sentry.captureException(errorObj, {
       tags: {
         component: 'rate-limiter',
         endpoint,
@@ -256,11 +257,14 @@ export async function withRateLimit<T>(
       }
 
       const error = new Error(result.message || 'Rate limit exceeded. Please try again later.');
-      (error as any).rateLimitInfo = {
-        remaining: result.remaining,
-        resetAt: result.resetAt,
-        limit: result.limit,
-      };
+      // Ajouter les infos de rate limit à l'erreur
+      Object.assign(error, {
+        rateLimitInfo: {
+          remaining: result.remaining,
+          resetAt: result.resetAt,
+          limit: result.limit,
+        },
+      });
       throw error;
     }
 
@@ -281,10 +285,10 @@ export function rateLimited(
     retry?: boolean;
   }
 ) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const userId = options?.userId?.call(this);
       
       return withRateLimit(

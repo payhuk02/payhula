@@ -104,8 +104,8 @@ export const initSentry = () => {
         if (event.breadcrumbs) {
           event.breadcrumbs = event.breadcrumbs.filter(breadcrumb => {
             if (breadcrumb.category === 'fetch' && breadcrumb.data) {
-              const status = (breadcrumb.data as any).status_code;
-              if (status === 429) {
+              const fetchData = breadcrumb.data as { status_code?: number };
+              if (fetchData.status_code === 429) {
                 return false;
               }
             }
@@ -167,8 +167,8 @@ export const initSentry = () => {
       // Filtrer les breadcrumbs qui peuvent causer des problèmes
       // Ignorer les breadcrumbs de fetch pour les requêtes Sentry
       if (breadcrumb.category === 'fetch' && breadcrumb.data) {
-        const url = (breadcrumb.data as any).url;
-        if (url && url.includes('sentry.io')) {
+        const fetchData = breadcrumb.data as { url?: string };
+        if (fetchData.url && fetchData.url.includes('sentry.io')) {
           return null; // Ne pas logger les requêtes vers Sentry
         }
       }
@@ -187,7 +187,7 @@ export const initSentry = () => {
 /**
  * Capture une erreur manuellement
  */
-export const captureError = (error: Error, context?: Record<string, any>) => {
+export const captureError = (error: Error, context?: Record<string, unknown>) => {
   if (context) {
     Sentry.setContext('custom', context);
   }
@@ -254,7 +254,7 @@ export const measurePerformance = async <T,>(
 export const captureMessage = (
   message: string,
   level: Sentry.SeverityLevel = 'info',
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ) => {
   if (context) {
     Sentry.setContext('custom', context);
@@ -269,7 +269,7 @@ export const captureMessage = (
 export const createSpan = (
   operation: string,
   description?: string
-): any => {
+): { setStatus: () => void; finish: () => void } => {
   // Dans Sentry v8+, startSpan doit être utilisé directement
   // Cette fonction est conservée pour compatibilité mais deprecated
   logger.warn('createSpan is deprecated, use Sentry.startSpan directly', {
@@ -288,7 +288,7 @@ export const createSpan = (
 export const withSentry = async <T,>(
   operation: string,
   fn: () => Promise<T>,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Promise<T> => {
   return await Sentry.startSpan(
     {
