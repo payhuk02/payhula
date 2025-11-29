@@ -56,6 +56,9 @@ import {
   Calendar,
   Briefcase,
   PenTool,
+  BookOpen,
+  GraduationCap,
+  Layers,
 } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 import { useToast } from '@/hooks/use-toast';
@@ -1753,6 +1756,226 @@ const PAGES_CONFIG: PageConfig[] = [
           { id: 'descriptionTab', label: 'Onglet Description', type: 'text', key: 'artistProductDetail.tabs.description', defaultValue: 'Description' },
           { id: 'reviewsTab', label: 'Onglet Avis', type: 'text', key: 'artistProductDetail.tabs.reviews', defaultValue: 'Avis' },
           { id: 'certificateTab', label: 'Onglet Certificat', type: 'text', key: 'artistProductDetail.tabs.certificate', defaultValue: 'Certificat' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'digitalProductDetail',
+    name: 'Détail Produit Digital',
+    route: '/digital/:productId',
+    description: 'Personnalisez tous les éléments de la page de détail d\'un produit digital',
+    icon: Download,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'backButton', label: 'Bouton Retour', type: 'text', key: 'digitalProductDetail.header.backButton', defaultValue: 'Retour' },
+          { id: 'compareButton', label: 'Bouton Comparer', type: 'text', key: 'digitalProductDetail.header.compareButton', defaultValue: 'Comparer' },
+        ],
+      },
+      {
+        id: 'purchase',
+        name: 'Achat',
+        type: 'content',
+        elements: [
+          { id: 'buyButton', label: 'Bouton Acheter', type: 'text', key: 'digitalProductDetail.purchase.buyButton', defaultValue: 'Acheter maintenant' },
+          { id: 'downloadButton', label: 'Bouton Télécharger', type: 'text', key: 'digitalProductDetail.purchase.downloadButton', defaultValue: 'Télécharger' },
+          { id: 'priceLabel', label: 'Label Prix', type: 'text', key: 'digitalProductDetail.purchase.priceLabel', defaultValue: 'Prix' },
+          { id: 'licenseLabel', label: 'Label Licence', type: 'text', key: 'digitalProductDetail.purchase.licenseLabel', defaultValue: 'Licence' },
+        ],
+      },
+      {
+        id: 'files',
+        name: 'Fichiers',
+        type: 'content',
+        elements: [
+          { id: 'filesTitle', label: 'Titre Fichiers', type: 'text', key: 'digitalProductDetail.files.title', defaultValue: 'Fichiers inclus' },
+          { id: 'fileSizeLabel', label: 'Label Taille', type: 'text', key: 'digitalProductDetail.files.sizeLabel', defaultValue: 'Taille' },
+          { id: 'fileFormatLabel', label: 'Label Format', type: 'text', key: 'digitalProductDetail.files.formatLabel', defaultValue: 'Format' },
+          { id: 'downloadCountLabel', label: 'Label Téléchargements', type: 'text', key: 'digitalProductDetail.files.downloadCountLabel', defaultValue: 'Téléchargements' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'descriptionTab', label: 'Onglet Description', type: 'text', key: 'digitalProductDetail.tabs.description', defaultValue: 'Description' },
+          { id: 'filesTab', label: 'Onglet Fichiers', type: 'text', key: 'digitalProductDetail.tabs.files', defaultValue: 'Fichiers détails' },
+          { id: 'reviewsTab', label: 'Onglet Avis', type: 'text', key: 'digitalProductDetail.tabs.reviews', defaultValue: 'Avis' },
+          { id: 'faqsTab', label: 'Onglet FAQs', type: 'text', key: 'digitalProductDetail.tabs.faqs', defaultValue: 'FAQs' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'physicalProductDetail',
+    name: 'Détail Produit Physique',
+    route: '/physical/:productId',
+    description: 'Personnalisez tous les éléments de la page de détail d\'un produit physique',
+    icon: Package,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'backButton', label: 'Bouton Retour', type: 'text', key: 'physicalProductDetail.header.backButton', defaultValue: 'Retour' },
+          { id: 'shareButton', label: 'Bouton Partager', type: 'text', key: 'physicalProductDetail.header.shareButton', defaultValue: 'Partager' },
+          { id: 'wishlistButton', label: 'Bouton Wishlist', type: 'text', key: 'physicalProductDetail.header.wishlistButton', defaultValue: 'Ajouter à la wishlist' },
+        ],
+      },
+      {
+        id: 'purchase',
+        name: 'Achat',
+        type: 'content',
+        elements: [
+          { id: 'quantityLabel', label: 'Label Quantité', type: 'text', key: 'physicalProductDetail.purchase.quantityLabel', defaultValue: 'Quantité' },
+          { id: 'addToCartButton', label: 'Bouton Ajouter au panier', type: 'text', key: 'physicalProductDetail.purchase.addToCartButton', defaultValue: 'Ajouter au panier' },
+          { id: 'buyNowButton', label: 'Bouton Acheter maintenant', type: 'text', key: 'physicalProductDetail.purchase.buyNowButton', defaultValue: 'Acheter maintenant' },
+          { id: 'priceLabel', label: 'Label Prix', type: 'text', key: 'physicalProductDetail.purchase.priceLabel', defaultValue: 'Prix' },
+          { id: 'stockLabel', label: 'Label Stock', type: 'text', key: 'physicalProductDetail.purchase.stockLabel', defaultValue: 'Stock' },
+        ],
+      },
+      {
+        id: 'variants',
+        name: 'Variantes',
+        type: 'content',
+        elements: [
+          { id: 'variantLabel', label: 'Label Variante', type: 'text', key: 'physicalProductDetail.variants.variantLabel', defaultValue: 'Variante' },
+          { id: 'sizeLabel', label: 'Label Taille', type: 'text', key: 'physicalProductDetail.variants.sizeLabel', defaultValue: 'Taille' },
+          { id: 'colorLabel', label: 'Label Couleur', type: 'text', key: 'physicalProductDetail.variants.colorLabel', defaultValue: 'Couleur' },
+        ],
+      },
+      {
+        id: 'shipping',
+        name: 'Livraison',
+        type: 'content',
+        elements: [
+          { id: 'shippingTitle', label: 'Titre Livraison', type: 'text', key: 'physicalProductDetail.shipping.title', defaultValue: 'Informations de livraison' },
+          { id: 'shippingLabel', label: 'Label Livraison', type: 'text', key: 'physicalProductDetail.shipping.shippingLabel', defaultValue: 'Livraison' },
+          { id: 'dimensionsLabel', label: 'Label Dimensions', type: 'text', key: 'physicalProductDetail.shipping.dimensionsLabel', defaultValue: 'Dimensions' },
+          { id: 'weightLabel', label: 'Label Poids', type: 'text', key: 'physicalProductDetail.shipping.weightLabel', defaultValue: 'Poids' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'descriptionTab', label: 'Onglet Description', type: 'text', key: 'physicalProductDetail.tabs.description', defaultValue: 'Description' },
+          { id: 'specificationsTab', label: 'Onglet Spécifications', type: 'text', key: 'physicalProductDetail.tabs.specifications', defaultValue: 'Spécifications' },
+          { id: 'reviewsTab', label: 'Onglet Avis', type: 'text', key: 'physicalProductDetail.tabs.reviews', defaultValue: 'Avis' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'courseDetail',
+    name: 'Détail Cours',
+    route: '/courses/:slug',
+    description: 'Personnalisez tous les éléments de la page de détail d\'un cours',
+    icon: GraduationCap,
+    sections: [
+      {
+        id: 'hero',
+        name: 'Section Hero',
+        type: 'content',
+        elements: [
+          { id: 'categoryLabel', label: 'Label Catégorie', type: 'text', key: 'courseDetail.hero.categoryLabel', defaultValue: 'Catégorie' },
+          { id: 'ratingLabel', label: 'Label Note', type: 'text', key: 'courseDetail.hero.ratingLabel', defaultValue: 'Note' },
+          { id: 'studentsLabel', label: 'Label Étudiants', type: 'text', key: 'courseDetail.hero.studentsLabel', defaultValue: 'Étudiants' },
+          { id: 'durationLabel', label: 'Label Durée', type: 'text', key: 'courseDetail.hero.durationLabel', defaultValue: 'Durée' },
+          { id: 'lessonsLabel', label: 'Label Leçons', type: 'text', key: 'courseDetail.hero.lessonsLabel', defaultValue: 'Leçons' },
+          { id: 'languageLabel', label: 'Label Langue', type: 'text', key: 'courseDetail.hero.languageLabel', defaultValue: 'Langue' },
+          { id: 'instructorLabel', label: 'Label Instructeur', type: 'text', key: 'courseDetail.hero.instructorLabel', defaultValue: 'Créé par' },
+        ],
+      },
+      {
+        id: 'enrollment',
+        name: 'Inscription',
+        type: 'content',
+        elements: [
+          { id: 'enrollButton', label: 'Bouton S\'inscrire', type: 'text', key: 'courseDetail.enrollment.enrollButton', defaultValue: 'S\'inscrire maintenant' },
+          { id: 'accessButton', label: 'Bouton Accéder', type: 'text', key: 'courseDetail.enrollment.accessButton', defaultValue: 'Accéder au cours' },
+          { id: 'priceLabel', label: 'Label Prix', type: 'text', key: 'courseDetail.enrollment.priceLabel', defaultValue: 'Prix' },
+          { id: 'includesTitle', label: 'Titre Inclus', type: 'text', key: 'courseDetail.enrollment.includesTitle', defaultValue: 'Ce cours comprend' },
+          { id: 'lessonsCountLabel', label: 'Label Nombre de leçons', type: 'text', key: 'courseDetail.enrollment.lessonsCountLabel', defaultValue: 'leçons' },
+          { id: 'durationTotalLabel', label: 'Label Durée totale', type: 'text', key: 'courseDetail.enrollment.durationTotalLabel', defaultValue: 'de contenu' },
+          { id: 'certificateLabel', label: 'Label Certificat', type: 'text', key: 'courseDetail.enrollment.certificateLabel', defaultValue: 'Certificat de complétion' },
+          { id: 'lifetimeAccessLabel', label: 'Label Accès à vie', type: 'text', key: 'courseDetail.enrollment.lifetimeAccessLabel', defaultValue: 'Accès à vie' },
+        ],
+      },
+      {
+        id: 'curriculum',
+        name: 'Curriculum',
+        type: 'content',
+        elements: [
+          { id: 'curriculumTitle', label: 'Titre Curriculum', type: 'text', key: 'courseDetail.curriculum.title', defaultValue: 'Curriculum du cours' },
+          { id: 'sectionLabel', label: 'Label Section', type: 'text', key: 'courseDetail.curriculum.sectionLabel', defaultValue: 'Section' },
+          { id: 'lessonLabel', label: 'Label Leçon', type: 'text', key: 'courseDetail.curriculum.lessonLabel', defaultValue: 'Leçon' },
+          { id: 'previewLabel', label: 'Label Aperçu', type: 'text', key: 'courseDetail.curriculum.previewLabel', defaultValue: 'Aperçu' },
+        ],
+      },
+      {
+        id: 'objectives',
+        name: 'Objectifs',
+        type: 'content',
+        elements: [
+          { id: 'objectivesTitle', label: 'Titre Objectifs', type: 'text', key: 'courseDetail.objectives.title', defaultValue: 'Ce que vous allez apprendre' },
+          { id: 'prerequisitesTitle', label: 'Titre Prérequis', type: 'text', key: 'courseDetail.objectives.prerequisitesTitle', defaultValue: 'Prérequis' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bundleDetail',
+    name: 'Détail Bundle',
+    route: '/bundles/:bundleId',
+    description: 'Personnalisez tous les éléments de la page de détail d\'un bundle',
+    icon: Layers,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'backButton', label: 'Bouton Retour', type: 'text', key: 'bundleDetail.header.backButton', defaultValue: 'Retour' },
+          { id: 'shareButton', label: 'Bouton Partager', type: 'text', key: 'bundleDetail.header.shareButton', defaultValue: 'Partager' },
+        ],
+      },
+      {
+        id: 'purchase',
+        name: 'Achat',
+        type: 'content',
+        elements: [
+          { id: 'buyButton', label: 'Bouton Acheter', type: 'text', key: 'bundleDetail.purchase.buyButton', defaultValue: 'Acheter le bundle' },
+          { id: 'priceLabel', label: 'Label Prix', type: 'text', key: 'bundleDetail.purchase.priceLabel', defaultValue: 'Prix' },
+          { id: 'savingsLabel', label: 'Label Économies', type: 'text', key: 'bundleDetail.purchase.savingsLabel', defaultValue: 'Vous économisez' },
+          { id: 'valueLabel', label: 'Label Valeur', type: 'text', key: 'bundleDetail.purchase.valueLabel', defaultValue: 'Valeur totale' },
+        ],
+      },
+      {
+        id: 'products',
+        name: 'Produits',
+        type: 'content',
+        elements: [
+          { id: 'productsTitle', label: 'Titre Produits inclus', type: 'text', key: 'bundleDetail.products.title', defaultValue: 'Produits inclus dans ce bundle' },
+          { id: 'productCountLabel', label: 'Label Nombre de produits', type: 'text', key: 'bundleDetail.products.countLabel', defaultValue: 'produits' },
+          { id: 'viewProductButton', label: 'Bouton Voir produit', type: 'text', key: 'bundleDetail.products.viewProductButton', defaultValue: 'Voir le produit' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'descriptionTab', label: 'Onglet Description', type: 'text', key: 'bundleDetail.tabs.description', defaultValue: 'Description' },
+          { id: 'productsTab', label: 'Onglet Produits', type: 'text', key: 'bundleDetail.tabs.products', defaultValue: 'Produits' },
+          { id: 'reviewsTab', label: 'Onglet Avis', type: 'text', key: 'bundleDetail.tabs.reviews', defaultValue: 'Avis' },
         ],
       },
     ],
