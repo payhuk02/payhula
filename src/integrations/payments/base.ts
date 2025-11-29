@@ -15,13 +15,13 @@ export abstract class BasePaymentProvider {
   protected apiKey: string;
   protected apiSecret?: string;
   protected testMode: boolean;
-  protected config: Record<string, any>;
+  protected config: Record<string, unknown>;
 
   constructor(config: {
     apiKey: string;
     apiSecret?: string;
     testMode?: boolean;
-    [key: string]: any;
+    [key: string]: unknown;
   }) {
     this.apiKey = config.apiKey;
     this.apiSecret = config.apiSecret;
@@ -60,7 +60,7 @@ export abstract class BasePaymentProvider {
   /**
    * Parser un événement webhook
    */
-  abstract parseWebhookEvent(payload: any): WebhookEvent;
+  abstract parseWebhookEvent(payload: unknown): WebhookEvent;
 
   /**
    * Vérifier si le provider supporte une devise
@@ -80,7 +80,7 @@ export abstract class BasePaymentProvider {
    * Vérifier si le provider supporte une fonctionnalité
    */
   supportsFeature(feature: string): boolean {
-    return this.getProviderInfo().features.includes(feature as any);
+    return this.getProviderInfo().features.includes(feature);
   }
 }
 

@@ -37,8 +37,11 @@ export const loadPDFModules = async () => {
   ]);
   
   // Gérer les exports par défaut (ES modules vs CommonJS)
-  const jsPDFClass = (jsPDF as any).default || jsPDF;
-  const autoTablePlugin = (autoTable as any).default || autoTable;
+  type ModuleWithDefault<T> = T & { default?: T };
+  const jsPDFWithDefault = jsPDF as ModuleWithDefault<typeof jsPDF>;
+  const autoTableWithDefault = autoTable as ModuleWithDefault<typeof autoTable>;
+  const jsPDFClass = jsPDFWithDefault.default || jsPDF;
+  const autoTablePlugin = autoTableWithDefault.default || autoTable;
   
   return { 
     jsPDF: jsPDFClass, 

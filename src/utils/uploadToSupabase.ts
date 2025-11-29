@@ -183,10 +183,16 @@ export async function uploadToSupabaseStorage(
         setTimeout(() => reject(new Error('Validation backend timeout')), 5000)
       );
 
-      const { data: validationResult, error: validationError } = await Promise.race([
+      type ValidationResponse = {
+        data?: { isValid?: boolean; error?: string };
+        error?: { message?: string };
+      };
+      const raceResult = await Promise.race([
         validationPromise,
         timeoutPromise,
-      ]) as any;
+      ]) as ValidationResponse;
+      const validationResult = raceResult.data;
+      const validationError = raceResult.error;
 
       if (validationError) {
         // Erreur CORS ou autre - on continue avec la validation côté client
@@ -207,7 +213,7 @@ export async function uploadToSupabaseStorage(
       } else if (validationResult && !validationResult.isValid) {
         throw new Error(validationResult.error || 'Validation backend échouée');
       }
-    } catch (backendError: any) {
+    } catch (backendError: unknown) {
       // Si la validation backend échoue (Edge Function non disponible, CORS, timeout, etc.), 
       // on continue avec la validation côté client uniquement
       const errorMessage = backendError instanceof Error ? backendError.message : String(backendError);
