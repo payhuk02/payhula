@@ -51,6 +51,8 @@ import {
   BarChart3,
   Clock,
   DollarSign,
+  Tag,
+  Store,
 } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 import { useToast } from '@/hooks/use-toast';
