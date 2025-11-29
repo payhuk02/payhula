@@ -53,6 +53,9 @@ import {
   DollarSign,
   Tag,
   Store,
+  Calendar,
+  Briefcase,
+  PenTool,
 } from 'lucide-react';
 import { usePlatformCustomization } from '@/hooks/admin/usePlatformCustomization';
 import { useToast } from '@/hooks/use-toast';
@@ -1598,6 +1601,158 @@ const PAGES_CONFIG: PageConfig[] = [
           { id: 'slugLabel', label: 'Label Slug', type: 'text', key: 'dashboardStore.store.slug', defaultValue: 'Slug' },
           { id: 'descriptionLabel', label: 'Label Description', type: 'text', key: 'dashboardStore.store.description', defaultValue: 'Description' },
           { id: 'statusLabel', label: 'Label Statut', type: 'text', key: 'dashboardStore.store.status', defaultValue: 'Statut' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'serviceDetail',
+    name: 'Détail Service',
+    route: '/service/:serviceId',
+    description: 'Personnalisez tous les éléments de la page de détail d\'un service',
+    icon: Calendar,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'backButton', label: 'Bouton Retour', type: 'text', key: 'serviceDetail.header.backButton', defaultValue: 'Retour' },
+          { id: 'shareButton', label: 'Bouton Partager', type: 'text', key: 'serviceDetail.header.shareButton', defaultValue: 'Partager' },
+          { id: 'wishlistButton', label: 'Bouton Wishlist', type: 'text', key: 'serviceDetail.header.wishlistButton', defaultValue: 'Ajouter à la wishlist' },
+        ],
+      },
+      {
+        id: 'booking',
+        name: 'Réservation',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre Réservation', type: 'text', key: 'serviceDetail.booking.title', defaultValue: 'Réserver ce service' },
+          { id: 'dateLabel', label: 'Label Date', type: 'text', key: 'serviceDetail.booking.dateLabel', defaultValue: 'Sélectionner une date' },
+          { id: 'timeLabel', label: 'Label Heure', type: 'text', key: 'serviceDetail.booking.timeLabel', defaultValue: 'Sélectionner un créneau' },
+          { id: 'participantsLabel', label: 'Label Participants', type: 'text', key: 'serviceDetail.booking.participantsLabel', defaultValue: 'Nombre de participants' },
+          { id: 'bookButton', label: 'Bouton Réserver', type: 'text', key: 'serviceDetail.booking.bookButton', defaultValue: 'Réserver maintenant' },
+          { id: 'bookingMessage', label: 'Message Réservation', type: 'textarea', key: 'serviceDetail.booking.message', defaultValue: 'Veuillez sélectionner une date et un créneau horaire' },
+        ],
+      },
+      {
+        id: 'info',
+        name: 'Informations',
+        type: 'content',
+        elements: [
+          { id: 'durationLabel', label: 'Label Durée', type: 'text', key: 'serviceDetail.info.durationLabel', defaultValue: 'Durée' },
+          { id: 'locationLabel', label: 'Label Lieu', type: 'text', key: 'serviceDetail.info.locationLabel', defaultValue: 'Lieu' },
+          { id: 'capacityLabel', label: 'Label Capacité', type: 'text', key: 'serviceDetail.info.capacityLabel', defaultValue: 'Capacité' },
+          { id: 'priceLabel', label: 'Label Prix', type: 'text', key: 'serviceDetail.info.priceLabel', defaultValue: 'Prix' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'descriptionTab', label: 'Onglet Description', type: 'text', key: 'serviceDetail.tabs.description', defaultValue: 'Description' },
+          { id: 'reviewsTab', label: 'Onglet Avis', type: 'text', key: 'serviceDetail.tabs.reviews', defaultValue: 'Avis' },
+          { id: 'recommendationsTab', label: 'Onglet Recommandations', type: 'text', key: 'serviceDetail.tabs.recommendations', defaultValue: 'Recommandations' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'serviceManagement',
+    name: 'Gestion Services',
+    route: '/dashboard/service-management',
+    description: 'Personnalisez tous les éléments de la page de gestion des services',
+    icon: Briefcase,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre principal', type: 'text', key: 'serviceManagement.header.title', defaultValue: 'Gestion des Services' },
+          { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'serviceManagement.header.subtitle', defaultValue: 'Gérez vos services, calendrier et disponibilités' },
+        ],
+      },
+      {
+        id: 'stats',
+        name: 'Statistiques',
+        type: 'content',
+        elements: [
+          { id: 'bookingsLabel', label: 'Label Réservations', type: 'text', key: 'serviceManagement.stats.bookings', defaultValue: 'Réservations' },
+          { id: 'staffLabel', label: 'Label Personnel', type: 'text', key: 'serviceManagement.stats.staff', defaultValue: 'Personnel actif' },
+          { id: 'conflictsLabel', label: 'Label Conflits', type: 'text', key: 'serviceManagement.stats.conflicts', defaultValue: 'Conflits détectés' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'calendarTab', label: 'Onglet Calendrier', type: 'text', key: 'serviceManagement.tabs.calendar', defaultValue: 'Calendrier' },
+          { id: 'availabilityTab', label: 'Onglet Disponibilité', type: 'text', key: 'serviceManagement.tabs.availability', defaultValue: 'Disponibilité' },
+          { id: 'conflictsTab', label: 'Onglet Conflits', type: 'text', key: 'serviceManagement.tabs.conflicts', defaultValue: 'Conflits' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'artistProductDetail',
+    name: 'Œuvre d\'Artiste',
+    route: '/artist/:productId',
+    description: 'Personnalisez tous les éléments de la page de détail d\'une œuvre d\'artiste',
+    icon: PenTool,
+    sections: [
+      {
+        id: 'header',
+        name: 'En-tête',
+        type: 'content',
+        elements: [
+          { id: 'backButton', label: 'Bouton Retour', type: 'text', key: 'artistProductDetail.header.backButton', defaultValue: 'Retour' },
+          { id: 'shareButton', label: 'Bouton Partager', type: 'text', key: 'artistProductDetail.header.shareButton', defaultValue: 'Partager' },
+          { id: 'wishlistButton', label: 'Bouton Wishlist', type: 'text', key: 'artistProductDetail.header.wishlistButton', defaultValue: 'Ajouter à la wishlist' },
+        ],
+      },
+      {
+        id: 'purchase',
+        name: 'Achat',
+        type: 'content',
+        elements: [
+          { id: 'quantityLabel', label: 'Label Quantité', type: 'text', key: 'artistProductDetail.purchase.quantityLabel', defaultValue: 'Quantité' },
+          { id: 'addToCartButton', label: 'Bouton Ajouter au panier', type: 'text', key: 'artistProductDetail.purchase.addToCartButton', defaultValue: 'Ajouter au panier' },
+          { id: 'buyNowButton', label: 'Bouton Acheter maintenant', type: 'text', key: 'artistProductDetail.purchase.buyNowButton', defaultValue: 'Acheter maintenant' },
+          { id: 'priceLabel', label: 'Label Prix', type: 'text', key: 'artistProductDetail.purchase.priceLabel', defaultValue: 'Prix' },
+        ],
+      },
+      {
+        id: 'certificate',
+        name: 'Certificat',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre Certificat', type: 'text', key: 'artistProductDetail.certificate.title', defaultValue: 'Certificat d\'authenticité' },
+          { id: 'description', label: 'Description Certificat', type: 'textarea', key: 'artistProductDetail.certificate.description', defaultValue: 'Cette œuvre est accompagnée d\'un certificat d\'authenticité' },
+          { id: 'artistLabel', label: 'Label Artiste', type: 'text', key: 'artistProductDetail.certificate.artistLabel', defaultValue: 'Artiste' },
+          { id: 'yearLabel', label: 'Label Année', type: 'text', key: 'artistProductDetail.certificate.yearLabel', defaultValue: 'Année' },
+        ],
+      },
+      {
+        id: 'shipping',
+        name: 'Livraison',
+        type: 'content',
+        elements: [
+          { id: 'title', label: 'Titre Livraison', type: 'text', key: 'artistProductDetail.shipping.title', defaultValue: 'Informations de livraison' },
+          { id: 'shippingLabel', label: 'Label Livraison', type: 'text', key: 'artistProductDetail.shipping.shippingLabel', defaultValue: 'Livraison' },
+          { id: 'handlingLabel', label: 'Label Manutention', type: 'text', key: 'artistProductDetail.shipping.handlingLabel', defaultValue: 'Manutention spéciale' },
+        ],
+      },
+      {
+        id: 'tabs',
+        name: 'Onglets',
+        type: 'content',
+        elements: [
+          { id: 'descriptionTab', label: 'Onglet Description', type: 'text', key: 'artistProductDetail.tabs.description', defaultValue: 'Description' },
+          { id: 'reviewsTab', label: 'Onglet Avis', type: 'text', key: 'artistProductDetail.tabs.reviews', defaultValue: 'Avis' },
+          { id: 'certificateTab', label: 'Onglet Certificat', type: 'text', key: 'artistProductDetail.tabs.certificate', defaultValue: 'Certificat' },
         ],
       },
     ],
