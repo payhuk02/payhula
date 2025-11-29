@@ -108,7 +108,7 @@ export const useCreateOrder = () => {
       switch (productType) {
         case 'digital': {
           // Récupérer le digital_product_id
-          const { data: digitalProduct } = await (supabase as any)
+          const { data: digitalProduct } = await supabase
             .from('digital_products')
             .select('id')
             .eq('product_id', productId)
@@ -134,7 +134,7 @@ export const useCreateOrder = () => {
 
         case 'physical': {
           // Récupérer le physical_product_id
-          const { data: physicalProduct } = await (supabase as any)
+          const { data: physicalProduct } = await supabase
             .from('physical_products')
             .select('id')
             .eq('product_id', productId)
@@ -164,7 +164,7 @@ export const useCreateOrder = () => {
 
         case 'service': {
           // Récupérer le service_product_id
-          const { data: serviceProduct } = await (supabase as any)
+          const { data: serviceProduct } = await supabase
             .from('service_products')
             .select('id')
             .eq('product_id', productId)
@@ -195,7 +195,7 @@ export const useCreateOrder = () => {
 
         case 'course': {
           // Récupérer le course_id
-          const { data: course } = await (supabase as any)
+          const { data: course } = await supabase
             .from('courses')
             .select('id')
             .eq('product_id', productId)
@@ -220,7 +220,7 @@ export const useCreateOrder = () => {
 
         case 'artist': {
           // Récupérer le artist_product_id
-          const { data: artistProduct } = await (supabase as any)
+          const { data: artistProduct } = await supabase
             .from('artist_products')
             .select('id')
             .eq('product_id', productId)

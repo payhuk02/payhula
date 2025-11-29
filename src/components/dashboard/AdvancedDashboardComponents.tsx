@@ -1,22 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { 
   TrendingUp, 
   TrendingDown, 
   Eye, 
   ShoppingCart, 
-  Star,
-  Calendar,
   Clock,
   User,
   Package,
   DollarSign,
   Activity,
   Target,
-  Zap
 } from '@/components/icons';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
+import { 
+  LazyLineChart,
+  LazyPieChart,
+  LazyResponsiveContainer,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Pie,
+  Cell,
+} from "@/components/charts/LazyCharts";
 import { useMemo } from "react";
 
 interface AdvancedStatsCardProps {
@@ -115,41 +122,37 @@ export const RevenueChart = ({ data }: RevenueChartProps) => {
       </CardHeader>
       <CardContent>
         <div className="h-80">
-          <LazyRechartsWrapper>
-            {(recharts) => (
-              <recharts.ResponsiveContainer width="100%" height="100%">
-                <recharts.LineChart data={chartData}>
-                  <recharts.CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <recharts.XAxis 
-                    dataKey="month" 
-                    className="text-xs"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <recharts.YAxis 
-                    className="text-xs"
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => `${value.toLocaleString()} FCFA`}
-                  />
-                  <recharts.Tooltip 
-                    formatter={(value: unknown, name: string) => [
-                      name === 'revenue' ? `${Number(value).toLocaleString()} FCFA` : value,
-                      name === 'revenue' ? 'Revenus' : name === 'orders' ? 'Commandes' : 'Clients'
-                    ]}
-                    labelStyle={{ fontSize: 12 }}
-                    contentStyle={{ fontSize: 12 }}
-                  />
-                  <recharts.Line 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3}
-                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
-                  />
-                </recharts.LineChart>
-              </recharts.ResponsiveContainer>
-            )}
-          </LazyRechartsWrapper>
+          <LazyResponsiveContainer width="100%" height="100%">
+            <LazyLineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis 
+                dataKey="month" 
+                className="text-xs"
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                className="text-xs"
+                tick={{ fontSize: 12 }}
+                tickFormatter={(value) => `${value.toLocaleString()} FCFA`}
+              />
+              <Tooltip 
+                formatter={(value: unknown, name: string) => [
+                  name === 'revenue' ? `${Number(value).toLocaleString()} FCFA` : value,
+                  name === 'revenue' ? 'Revenus' : name === 'orders' ? 'Commandes' : 'Clients'
+                ]}
+                labelStyle={{ fontSize: 12 }}
+                contentStyle={{ fontSize: 12 }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="revenue" 
+                stroke="#3b82f6" 
+                strokeWidth={3}
+                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
+              />
+            </LazyLineChart>
+          </LazyResponsiveContainer>
         </div>
       </CardContent>
     </Card>
@@ -177,29 +180,25 @@ export const OrdersChart = ({ data }: OrdersChartProps) => {
       </CardHeader>
       <CardContent>
         <div className="h-80">
-          <LazyRechartsWrapper>
-            {(recharts) => (
-              <recharts.ResponsiveContainer width="100%" height="100%">
-                <recharts.PieChart>
-                  <recharts.Pie
-                    data={data}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ status, percentage }: { status: string; percentage: number }) => `${status} (${percentage}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="count"
-                  >
-                    {data.map((entry, index) => (
-                      <recharts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </recharts.Pie>
-                  <recharts.Tooltip />
-                </recharts.PieChart>
-              </recharts.ResponsiveContainer>
-            )}
-          </LazyRechartsWrapper>
+          <LazyResponsiveContainer width="100%" height="100%">
+            <LazyPieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ status, percentage }: { status: string; percentage: number }) => `${status} (${percentage}%)`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="count"
+              >
+                {data.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </LazyPieChart>
+          </LazyResponsiveContainer>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2">
           {data.map((item, index) => (

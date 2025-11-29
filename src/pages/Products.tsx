@@ -349,32 +349,63 @@ const Products = () => {
       const product = products.find(p => p.id === productId);
       if (!product) {
         logger.warn('Produit introuvable pour duplication', { productId });
+        toast({
+          title: "Erreur",
+          description: "Produit introuvable",
+          variant: "destructive",
+        });
         return;
       }
 
-      // TODO: Implémenter la duplication via l'API
-      // const duplicatedProduct = {
-      //   ...product,
-      //   id: undefined,
-      //   name: `${product.name} (copie)`,
-      //   slug: `${product.slug}-copie-${Date.now()}`,
-      //   created_at: undefined,
-      //   updated_at: undefined,
-      // };
+      // Créer le nouveau produit dupliqué
+      const timestamp = Date.now();
+      const newSlug = `${product.slug}-copie-${timestamp}`;
+      
+      const { data: duplicatedProduct, error } = await supabase
+        .from('products')
+        .insert({
+          store_id: product.store_id,
+          name: `${product.name} (copie)`,
+          slug: newSlug,
+          description: product.description,
+          price: product.price,
+          compare_at_price: product.compare_at_price,
+          image_url: product.image_url,
+          images: product.images,
+          product_type: product.product_type,
+          category: product.category,
+          tags: product.tags,
+          is_active: false, // Désactivé par défaut pour éviter les conflits
+          stock_quantity: product.stock_quantity,
+          sku: product.sku ? `${product.sku}-COPY-${timestamp}` : null,
+          metadata: product.metadata,
+        })
+        .select()
+        .single();
 
-      // Ici, vous devriez appeler votre API pour créer le nouveau produit
-      // Pour l'instant, simulons avec une mise à jour
+      if (error) {
+        throw error;
+      }
+
       await refetch();
-      logger.info('Produit dupliqué avec succès', { productId });
-      toast({
-        title: "Produit dupliqué",
-        description: "Le produit a été dupliqué avec succès",
+      logger.info('Produit dupliqué avec succès', { 
+        originalId: productId, 
+        newId: duplicatedProduct?.id 
       });
-    } catch (error: any) {
-      logger.error(error instanceof Error ? error : 'Erreur lors de la duplication du produit', { error, productId });
+      
       toast({
-        title: "Erreur",
-        description: error.message || "Impossible de dupliquer le produit",
+        title: "✅ Produit dupliqué",
+        description: `"${product.name}" a été dupliqué. Le nouveau produit est désactivé par défaut.`,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      logger.error(error instanceof Error ? error : new Error('Erreur lors de la duplication du produit'), { 
+        error: errorMessage, 
+        productId 
+      });
+      toast({
+        title: "❌ Erreur",
+        description: errorMessage || "Impossible de dupliquer le produit",
         variant: "destructive",
       });
     }

@@ -47,7 +47,10 @@ import {
   AlertCircle,
   Menu,
   User,
+  Loader2,
 } from 'lucide-react';
+import { generateInvoicePDF } from '@/lib/invoice-generator';
+import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
@@ -106,10 +109,12 @@ function MobileHeader() {
 
 export default function MyOrders() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState<OrderStatus>('all');
   const [typeFilter, setTypeFilter] = useState<ProductType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [generatingInvoice, setGeneratingInvoice] = useState<string | null>(null);
   const headerRef = useScrollAnimation<HTMLDivElement>();
   const statsRef = useScrollAnimation<HTMLDivElement>();
 
@@ -118,6 +123,42 @@ export default function MyOrders() {
       setUser(user);
     });
   }, []);
+
+  // Fonction pour générer et télécharger la facture
+  const handleDownloadInvoice = async (order: Order) => {
+    setGeneratingInvoice(order.id);
+    try {
+      await generateInvoicePDF({
+        orderNumber: order.order_number,
+        orderDate: order.created_at,
+        customerName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Client',
+        customerEmail: user?.email || '',
+        storeName: 'Payhula Store',
+        items: order.items.map(item => ({
+          name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total_price: item.total_price,
+        })),
+        subtotal: order.total_amount,
+        total: order.total_amount,
+        currency: order.currency,
+        paymentStatus: order.payment_status,
+      });
+      toast({
+        title: '✅ Facture téléchargée',
+        description: `La facture ${order.order_number} a été générée avec succès.`,
+      });
+    } catch (error) {
+      toast({
+        title: '❌ Erreur',
+        description: 'Impossible de générer la facture. Veuillez réessayer.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGeneratingInvoice(null);
+    }
+  };
 
   // Fetch orders
   const { data: orders, isLoading } = useQuery({
@@ -637,14 +678,18 @@ export default function MyOrders() {
                           {order.payment_status === 'completed' && (
                             <Button
                               variant="outline"
-                              onClick={() => {
-                                // TODO: Download invoice
-                                alert('Téléchargement facture (à implémenter)');
-                              }}
-                              className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-xs sm:text-sm bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 border-0 transition-all duration-300 hover:scale-105"
+                              onClick={() => handleDownloadInvoice(order)}
+                              disabled={generatingInvoice === order.id}
+                              className="flex-1 sm:flex-none min-h-[44px] touch-manipulation text-xs sm:text-sm bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 border-0 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
-                              <span className="truncate">Télécharger facture</span>
+                              {generatingInvoice === order.id ? (
+                                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0 animate-spin" />
+                              ) : (
+                                <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                              )}
+                              <span className="truncate">
+                                {generatingInvoice === order.id ? 'Génération...' : 'Télécharger facture'}
+                              </span>
                             </Button>
                           )}
                         </div>
