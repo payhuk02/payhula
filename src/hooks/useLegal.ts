@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import type { 
   LegalDocument, 
   UserConsent, 
@@ -122,9 +123,10 @@ export const useCookiePreferences = (userId: string | undefined) => {
         }
         
         return data || null;
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorObj = err as { code?: string; message?: string };
         // Gérer les erreurs inattendues (table n'existe pas, etc.)
-        if (err?.code === '42P01' || err?.message?.includes('does not exist') || err?.message?.includes('404')) {
+        if (errorObj?.code === '42P01' || errorObj?.message?.includes('does not exist') || errorObj?.message?.includes('404')) {
           return null; // Table n'existe pas, retourner null silencieusement
         }
         logger.warn('Erreur inattendue lors de la récupération des préférences cookies', { error: err, userId });
@@ -170,27 +172,28 @@ export const useUpdateCookiePreferences = () => {
         if (error && (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('404'))) {
           logger.warn('Table cookie_preferences n\'existe pas, sauvegarde en localStorage', { userId });
           localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
-          return preferences as any;
+          return preferences as Partial<CookiePreferences>;
         }
 
         if (error) {
           // Pour les autres erreurs, fallback localStorage
           logger.warn('Erreur lors de la sauvegarde des préférences cookies', { error, userId });
           localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
-          return preferences as any;
+          return preferences as Partial<CookiePreferences>;
         }
         
-        return data || preferences as any;
-      } catch (err: any) {
+        return data || preferences as Partial<CookiePreferences>;
+      } catch (err: unknown) {
+        const errorObj = err as { code?: string; message?: string };
         // Fallback: sauvegarder en localStorage si erreur Supabase
-        if (err?.code === '42P01' || err?.message?.includes('does not exist') || err?.message?.includes('404')) {
+        if (errorObj?.code === '42P01' || errorObj?.message?.includes('does not exist') || errorObj?.message?.includes('404')) {
           // Table n'existe pas, utiliser localStorage silencieusement
           localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
-          return preferences as any;
+          return preferences as Partial<CookiePreferences>;
         }
         logger.warn('Erreur lors de la sauvegarde des préférences cookies, fallback localStorage', { error: err, userId });
         localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
-        return preferences as any;
+        return preferences as Partial<CookiePreferences>;
       }
     },
     onSuccess: (_, variables) => {

@@ -59,9 +59,9 @@ export const useCurrentAdminPermissions = () => {
         .maybeSingle();
       if (rErr) throw rErr;
 
-      setPermissions((roleRow?.permissions as any) || {});
-    } catch (e: any) {
-      setError(e.message);
+      setPermissions((roleRow?.permissions as EffectivePermissions) || {});
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,7 @@ export const useCurrentAdminPermissions = () => {
 
   const can = useCallback((key: string) => {
     if (isSuperAdmin) return true; // full access
-    return Boolean((permissions as any)?.[key]);
+    return Boolean(permissions?.[key]);
   }, [isSuperAdmin, permissions]);
 
   return { loading, error, role, isSuperAdmin, permissions, can, refresh };

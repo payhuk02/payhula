@@ -64,7 +64,8 @@ export const trackAffiliateClick = async (
     }
 
     // Récupérer la durée du cookie depuis les paramètres du produit
-    const cookieDuration = (affiliateLink as any).cookie_duration_days?.[0]?.cookie_duration_days || AFFILIATE_COOKIE_EXPIRY_DAYS;
+    const cookieDurationSettings = affiliateLink.cookie_duration_days as { cookie_duration_days?: number }[] | null;
+    const cookieDuration = cookieDurationSettings?.[0]?.cookie_duration_days || AFFILIATE_COOKIE_EXPIRY_DAYS;
 
     // Créer un enregistrement de clic
     const trackingCookie = `${affiliateLinkId}-${Date.now()}`;
@@ -218,7 +219,20 @@ export const createAffiliateCommission = async (
       return { success: false, error: 'Clic d\'affiliation non trouvé' };
     }
 
-    const settings = (click as any).affiliate_links?.product_affiliate_settings?.[0];
+    type AffiliateSettings = {
+      commission_rate: number;
+      commission_type: 'percentage' | 'fixed';
+      fixed_commission_amount?: number | null;
+      min_order_amount?: number | null;
+    };
+    const clickWithLinks = click as { 
+      id: string;
+      affiliate_link_id: string;
+      affiliate_id: string;
+      product_id: string;
+      affiliate_links?: { product_affiliate_settings?: AffiliateSettings[] } 
+    };
+    const settings = clickWithLinks.affiliate_links?.product_affiliate_settings?.[0];
     if (!settings) {
       logger.warn('Product affiliate settings not found', { productId });
       return { success: false, error: 'Paramètres d\'affiliation non trouvés' };

@@ -121,12 +121,13 @@ export const sendPriceDropNotification = async (
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de l\'envoi de la notification de baisse de prix', {
-      error: error.message,
+      error: errorMessage,
       notification,
     });
-    return { success: false, error: error.message };
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -166,8 +167,12 @@ export const sendNewVersionNotification = async (
     }
 
     // Envoyer l'email à chaque client
+    type CustomerItem = {
+      order_id: string;
+      orders?: { customers?: { id: string; email: string; name?: string } };
+    };
     const results = await Promise.allSettled(
-      customers.map((item: any) => {
+      customers.map((item: CustomerItem) => {
         const customer = item.orders?.customers;
         if (!customer || !customer.email) return Promise.resolve({ success: false });
 
@@ -204,12 +209,13 @@ export const sendNewVersionNotification = async (
     });
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de l\'envoi des notifications de nouvelle version', {
-      error: error.message,
+      error: errorMessage,
       notification,
     });
-    return { success: false, error: error.message };
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -250,12 +256,13 @@ export const sendLicenseExpiringNotification = async (
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de l\'envoi de la notification de licence expirant', {
-      error: error.message,
+      error: errorMessage,
       notification,
     });
-    return { success: false, error: error.message };
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -294,12 +301,13 @@ export const sendLicenseExpiredNotification = async (
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de l\'envoi de la notification de licence expirée', {
-      error: error.message,
+      error: errorMessage,
       notification,
     });
-    return { success: false, error: error.message };
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -344,9 +352,18 @@ export const checkAndSendPriceDropNotifications = async (): Promise<{
     let sent = 0;
     let errors = 0;
 
-    for (const alert of alerts) {
-      const favorite = (alert as any).user_favorites;
-      const product = (alert as any).products;
+    type AlertWithRelations = {
+      id: string;
+      product_id: string;
+      old_price: number;
+      new_price: number;
+      price_drop_percentage: number;
+      user_favorites?: { id: string; user_id: string; users?: { email: string; user_metadata?: { full_name?: string } } };
+      products?: { name: string; slug?: string };
+    };
+    for (const alert of alerts as AlertWithRelations[]) {
+      const favorite = alert.user_favorites;
+      const product = alert.products;
       const user = favorite?.users;
 
       if (!user || !user.email || !product) {
@@ -387,9 +404,10 @@ export const checkAndSendPriceDropNotifications = async (): Promise<{
     });
 
     return { sent, errors };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de la vérification des alertes de baisse de prix', {
-      error: error.message,
+      error: errorMessage,
     });
     return { sent: 0, errors: 1 };
   }
@@ -439,9 +457,17 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
     let sent = 0;
     let errors = 0;
 
-    for (const license of licenses) {
-      const product = (license as any).products;
-      const customer = (license as any).customers;
+    type LicenseWithRelations = {
+      id: string;
+      user_id: string;
+      product_id: string;
+      expires_at: string;
+      products?: { name: string; slug?: string };
+      customers?: { email: string; name?: string };
+    };
+    for (const license of licenses as LicenseWithRelations[]) {
+      const product = license.products;
+      const customer = license.customers;
 
       if (!customer || !customer.email || !product) {
         errors++;
@@ -485,9 +511,10 @@ export const checkAndSendLicenseExpiringNotifications = async (): Promise<{
     });
 
     return { sent, errors };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
     logger.error('Erreur lors de la vérification des licences expirant', {
-      error: error.message,
+      error: errorMessage,
     });
     return { sent: 0, errors: 1 };
   }

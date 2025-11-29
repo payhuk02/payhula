@@ -51,7 +51,7 @@ export function logError(error: Error, context: ErrorLogContext = {}): void {
       if (typeof error === 'string') {
         errorMessage = error;
       } else if (error && typeof error === 'object') {
-        errorMessage = (error as any).message || JSON.stringify(error);
+        errorMessage = (error as { message?: string }).message || JSON.stringify(error);
       } else {
         errorMessage = String(error);
       }
@@ -87,7 +87,7 @@ export function logError(error: Error, context: ErrorLogContext = {}): void {
     Sentry.captureException(error, {
       level: context.level === 'app' ? 'fatal' : 'error',
       contexts: {
-        error_context: context as any,
+        error_context: context as Record<string, unknown>,
       },
       tags: {
         error_level: context.level || 'component',
@@ -137,7 +137,7 @@ export function logWarning(message: string, context: ErrorLogContext = {}): void
     Sentry.captureMessage(message, {
       level: 'warning',
       contexts: {
-        warning_context: context as any,
+        warning_context: context as Record<string, unknown>,
       },
     });
   }
@@ -146,7 +146,7 @@ export function logWarning(message: string, context: ErrorLogContext = {}): void
 /**
  * Log une info (pour monitoring)
  */
-export function logInfo(message: string, data?: Record<string, any>): void {
+export function logInfo(message: string, data?: Record<string, unknown>): void {
   if (process.env.NODE_ENV === 'development') {
     originalConsole.info('ℹ️ Info:', message, data);
   }
@@ -267,7 +267,8 @@ export function setupGlobalErrorHandlers(): void {
   window.addEventListener('error', (event) => {
     if (event.target && event.target !== window) {
       const target = event.target as HTMLElement;
-      const resourceUrl = (target as any).src || (target as any).href;
+      const resourceUrl = (target as HTMLImageElement | HTMLScriptElement | HTMLLinkElement).src || 
+                          (target as HTMLLinkElement | HTMLAnchorElement).href;
 
       if (resourceUrl) {
         logWarning(`Failed to load resource: ${resourceUrl}`, {

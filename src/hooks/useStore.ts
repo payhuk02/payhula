@@ -229,7 +229,7 @@ export const useStore = () => {
       
       // Gérer l'erreur spécifique de limite de la base de données
       if (error && typeof error === 'object' && 'message' in error) {
-        const errorMessage = (error as any).message;
+        const errorMessage = (error as { message?: string }).message;
         if (errorMessage && errorMessage.includes('Limite de 3 boutiques')) {
           toast({
             title: "Limite atteinte",

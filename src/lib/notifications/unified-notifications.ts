@@ -63,7 +63,7 @@ export interface UnifiedNotification {
   type: NotificationType;
   title: string;
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   action_url?: string;
   action_label?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -152,9 +152,10 @@ export async function sendUnifiedNotification(
     }
 
     return { success: true, notification_id: notificationId };
-  } catch (error: any) {
-    logger.error('Error sending unified notification', { error: error.message, notification });
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Error sending unified notification', { error: errorMessage, notification });
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -197,10 +198,12 @@ async function getUserNotificationPreferences(
     }
 
     // Convertir les préférences de la BDD en format unifié
-    const preferences: Record<NotificationType, any> = {} as any;
+    type ChannelPrefs = { in_app: boolean; email: boolean; sms: boolean; push: boolean };
+    const preferences: Partial<Record<NotificationType, ChannelPrefs>> = {};
 
     // Mapper les préférences existantes
-    Object.keys(data).forEach((key) => {
+    const dataRecord = data as Record<string, unknown>;
+    Object.keys(dataRecord).forEach((key) => {
       if (key.startsWith('email_') || key.startsWith('app_')) {
         const type = mapPreferenceKeyToNotificationType(key);
         if (type) {
@@ -208,9 +211,9 @@ async function getUserNotificationPreferences(
             preferences[type] = { in_app: false, email: false, sms: false, push: false };
           }
           if (key.startsWith('email_')) {
-            preferences[type].email = data[key] ?? true;
+            preferences[type]!.email = (dataRecord[key] as boolean) ?? true;
           } else if (key.startsWith('app_')) {
-            preferences[type].in_app = data[key] ?? true;
+            preferences[type]!.in_app = (dataRecord[key] as boolean) ?? true;
           }
         }
       }
@@ -218,7 +221,7 @@ async function getUserNotificationPreferences(
 
     return {
       user_id: userId,
-      preferences: preferences as any,
+      preferences: preferences as Record<NotificationType, ChannelPrefs>,
     };
   } catch (error) {
     logger.error('Error fetching notification preferences', { error, userId });
@@ -281,8 +284,9 @@ async function sendEmailNotification(
     }
 
     logger.info('Email notification sent', { userId: notification.user_id, type: notification.type });
-  } catch (error: any) {
-    logger.error('Error sending email notification', { error: error.message, notification });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Error sending email notification', { error: errorMessage, notification });
     throw error;
   }
 }
@@ -319,8 +323,9 @@ async function sendSMSNotification(
     }
 
     logger.info('SMS notification sent', { userId: notification.user_id, type: notification.type });
-  } catch (error: any) {
-    logger.error('Error sending SMS notification', { error: error.message, notification });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Error sending SMS notification', { error: errorMessage, notification });
     throw error;
   }
 }
@@ -358,8 +363,9 @@ async function sendPushNotification(
     }
 
     logger.info('Push notification sent', { userId: notification.user_id, type: notification.type });
-  } catch (error: any) {
-    logger.error('Error sending push notification', { error: error.message, notification });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Error sending push notification', { error: errorMessage, notification });
     throw error;
   }
 }
