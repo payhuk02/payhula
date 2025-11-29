@@ -694,10 +694,11 @@ const AdminAffiliates = () => {
                                       setSelectedCommission(commission);
                                       setShowPayDialog(true);
                                     }}
-                                    className="gap-1"
+                                    className="gap-1 min-h-[44px] w-full sm:w-auto"
                                   >
-                                    <Wallet className="h-3 w-3" />
-                                    Marquer payé
+                                    <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    <span className="hidden sm:inline">Marquer payé</span>
+                                    <span className="sm:hidden">Payé</span>
                                   </Button>
                                 )}
                               </div>
