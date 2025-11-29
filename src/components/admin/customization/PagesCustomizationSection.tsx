@@ -28,6 +28,7 @@ import {
   Trash2,
   Settings,
   ShoppingCart,
+  ShoppingBag,
   Users,
   Package,
   TrendingUp,
