@@ -1758,9 +1758,20 @@ export const PagesCustomizationSection = ({ onChange }: PagesCustomizationSectio
                 <CardTitle className="flex items-center gap-2">
                   <selectedPageConfig.icon className="h-5 w-5" />
                   {selectedPageConfig.name}
+                  {isSyncing && (
+                    <Badge variant="secondary" className="ml-2 flex items-center gap-1">
+                      <RefreshCw className="h-3 w-3 animate-spin" />
+                      <span className="text-xs">Synchronisation...</span>
+                    </Badge>
+                  )}
                 </CardTitle>
                 <CardDescription>
                   Personnalisez tous les éléments de cette page
+                  {isSyncing && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      • Les modifications sont appliquées en temps réel
+                    </span>
+                  )}
                 </CardDescription>
               </div>
               <Badge variant="outline">{selectedPageConfig.sections.length} sections</Badge>
