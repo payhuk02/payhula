@@ -433,18 +433,18 @@ const AdminAffiliates = () => {
                       Gérer tous les affiliés de la plateforme
                     </CardDescription>
                   </div>
-                  <div className="flex gap-2">
-                    <div className="relative">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:flex-initial">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Rechercher..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 w-64 min-h-[44px]"
+                        className="pl-10 w-full sm:w-64 min-h-[44px]"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-40 min-h-[44px]">
+                      <SelectTrigger className="w-full sm:w-40 min-h-[44px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

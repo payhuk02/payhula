@@ -35,9 +35,9 @@ export const PaginationControls = ({
   const endItem = Math.min(page * pageSize, total);
 
   return (
-    <div className={cn('flex items-center justify-between px-2', className)}>
-      <div className="flex items-center gap-2">
-        <p className="text-sm text-muted-foreground">
+    <div className={cn('flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-2 px-2', className)}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Affichage de <span className="font-medium">{startItem}</span> à{' '}
           <span className="font-medium">{endItem}</span> sur{' '}
           <span className="font-medium">{total}</span> résultats
@@ -46,7 +46,7 @@ export const PaginationControls = ({
           value={pageSize.toString()}
           onValueChange={(value) => onPageSizeChange(Number(value))}
         >
-          <SelectTrigger className="h-8 w-[70px]">
+          <SelectTrigger className="min-h-[44px] h-11 sm:h-8 w-full sm:w-[70px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -58,13 +58,14 @@ export const PaginationControls = ({
         </Select>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <Button
           variant="outline"
           size="sm"
           onClick={() => onPageChange(1)}
           disabled={!hasPreviousPage}
-          className="h-8 w-8 p-0"
+          className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 p-0"
+          aria-label="Première page"
         >
           <ChevronsLeft className="h-4 w-4" />
         </Button>
@@ -73,7 +74,8 @@ export const PaginationControls = ({
           size="sm"
           onClick={() => onPageChange(page - 1)}
           disabled={!hasPreviousPage}
-          className="h-8 w-8 p-0"
+          className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 p-0"
+          aria-label="Page précédente"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -97,7 +99,8 @@ export const PaginationControls = ({
                 variant={pageNum === page ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onPageChange(pageNum)}
-                className="h-8 w-8 p-0"
+                className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 p-0"
+                aria-label={`Page ${pageNum}`}
               >
                 {pageNum}
               </Button>
@@ -110,7 +113,8 @@ export const PaginationControls = ({
           size="sm"
           onClick={() => onPageChange(page + 1)}
           disabled={!hasNextPage}
-          className="h-8 w-8 p-0"
+          className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 p-0"
+          aria-label="Page suivante"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -119,7 +123,8 @@ export const PaginationControls = ({
           size="sm"
           onClick={() => onPageChange(totalPages)}
           disabled={!hasNextPage}
-          className="h-8 w-8 p-0"
+          className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 p-0"
+          aria-label="Dernière page"
         >
           <ChevronsRight className="h-4 w-4" />
         </Button>

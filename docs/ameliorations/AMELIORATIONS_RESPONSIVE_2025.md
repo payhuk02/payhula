@@ -225,9 +225,18 @@ Certains composants utilisaient des largeurs fixes sans breakpoint mobile.
    - AdminAffiliates: Header et bouton responsive
    - AdminDashboard: Typographie stats cards responsive
 
+5. **feat(responsive): Optimiser tous les DialogFooter pour mobile**
+   - AdminAffiliates: 3 DialogFooter avec boutons full-width mobile
+   - AdminUsers: 3 DialogFooter avec boutons full-width mobile
+   - AdminUsers: Bouton Exporter avec texte adaptatif
+
+6. **feat(responsive): Optimiser AlertDialogAction et AlertDialogCancel pour mobile**
+   - Composant de base: w-full sm:w-auto pour tous les AlertDialog
+   - Améliore l'UX mobile globalement
+
 ---
 
 **Statut** : ✅ **AMÉLIORATIONS COMPLÉTÉES**
 
-**Score de Responsivité** : **95/100** ⭐⭐⭐⭐⭐
+**Score de Responsivité** : **96/100** ⭐⭐⭐⭐⭐
 

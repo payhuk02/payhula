@@ -313,7 +313,7 @@ const AdminUsers = () => {
                 <Filter className="h-4 w-4" />
                 Filtres
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {/* Recherche */}
                 <div className="space-y-2">
                   <Label htmlFor="search">Rechercher</Label>
