@@ -238,6 +238,16 @@ const menuSections = [
         icon: ShoppingCart,
       },
       {
+        title: "Équipe",
+        url: "/dashboard/store/team",
+        icon: Users,
+      },
+      {
+        title: "Mes Tâches",
+        url: "/dashboard/tasks",
+        icon: GanttChart,
+      },
+      {
         title: "Retraits",
         url: "/dashboard/withdrawals",
         icon: DollarSign,

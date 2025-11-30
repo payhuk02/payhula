@@ -149,6 +149,8 @@ const Products = lazy(() =>
   })
 );
 const Store = lazy(() => import("./pages/Store"));
+const StoreTeamManagement = lazy(() => import("./pages/store/StoreTeamManagement"));
+const MyTasks = lazy(() => import("./pages/MyTasks"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Customers = lazy(() => import("./pages/Customers"));
 const Promotions = lazy(() => import("./pages/Promotions"));
@@ -453,6 +455,8 @@ const AppContent = () => {
           {/* --- Routes utilisateur (protégées) --- */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
+          <Route path="/dashboard/store/team" element={<ProtectedRoute><StoreTeamManagement /></ProtectedRoute>} />
+          <Route path="/dashboard/tasks" element={<ProtectedRoute><MyTasks /></ProtectedRoute>} />
           <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
           <Route path="/dashboard/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
           <Route path="/dashboard/withdrawals" element={<ProtectedRoute><Withdrawals /></ProtectedRoute>} />
