@@ -157,7 +157,7 @@ export const DomainSettings = () => {
   }, [currentStore]);
 
   const generateVerificationToken = () => {
-    return `payhula-verify-${Math.random().toString(36).substring(2, 15)}`;
+    return `emarzona-verify-${Math.random().toString(36).substring(2, 15)}`;
   };
 
   const validateDomain = (domain: string): boolean => {
@@ -181,7 +181,7 @@ export const DomainSettings = () => {
       },
       verificationRecord: {
         type: 'TXT',
-        name: `_payhula-verification.${domain}`,
+        name: `_emarzona-verification.${domain}`,
         value: token,
         ttl: 3600
       }
@@ -358,7 +358,7 @@ export const DomainSettings = () => {
 
       // Vérifier enregistrement TXT de vérification
       try {
-        const txtResponse = await fetch(`https://dns.google/resolve?name=_payhula-verification.${domain}&type=TXT`);
+        const txtResponse = await fetch(`https://dns.google/resolve?name=_emarzona-verification.${domain}&type=TXT`);
         const txtData = await txtResponse.json();
         
         if (txtData.Answer && txtData.Answer.length > 0) {

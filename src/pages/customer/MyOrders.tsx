@@ -133,7 +133,7 @@ export default function MyOrders() {
         orderDate: order.created_at,
         customerName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Client',
         customerEmail: user?.email || '',
-        storeName: 'Payhula Store',
+        storeName: 'Emarzona Store',
         items: order.items.map(item => ({
           name: item.product_name,
           quantity: item.quantity,

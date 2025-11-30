@@ -107,7 +107,7 @@ const Referrals = () => {
     if (!data?.referralLink) return;
 
     const text = encodeURIComponent(
-      "Rejoignez Payhula via mon lien de parrainage et profitez de tous les avantages !"
+      "Rejoignez Emarzona via mon lien de parrainage et profitez de tous les avantages !"
     );
     const url = encodeURIComponent(data.referralLink);
 
@@ -115,7 +115,7 @@ const Referrals = () => {
       twitter: `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
       whatsapp: `https://wa.me/?text=${text}%20${url}`,
-      email: `mailto:?subject=Rejoignez Payhula&body=${text}%20${url}`,
+      email: `mailto:?subject=Rejoignez Emarzona&body=${text}%20${url}`,
     };
 
     if (shareUrls[platform]) {

@@ -266,9 +266,9 @@ const Auth = () => {
     <div className="min-h-screen gradient-hero flex items-center justify-center p-3 sm:p-4 md:p-6 relative">
       {/* SEO Meta Tags */}
       <SEOMeta
-        title={`${t('nav.login')} / ${t('nav.signup')} - Payhuk`}
+        title={`${t('nav.login')} / ${t('nav.signup')} - Emarzona`}
         description={t('auth.welcomeSubtitle')}
-        keywords="payhuk, connexion, inscription, authentification, compte utilisateur"
+        keywords="emarzona, connexion, inscription, authentification, compte utilisateur"
         url={`${baseUrl}/auth`}
         canonical={`${baseUrl}/auth`}
         type="website"
@@ -287,7 +287,7 @@ const Auth = () => {
             <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 sm:relative sm:left-auto sm:top-auto sm:translate-y-0 sm:h-10 sm:w-10 z-0">
               <img
                 src={payhukLogo}
-                alt="Payhuk Logo"
+                alt="Emarzona Logo"
                 width={40}
                 height={40}
                 className="h-full w-full opacity-60 sm:opacity-100"
@@ -295,7 +295,7 @@ const Auth = () => {
               />
             </div>
             <span className="relative z-10 pl-9 sm:pl-0 text-2xl sm:text-3xl font-bold">
-              Payhuk
+              Emarzona
             </span>
           </Link>
         </div>

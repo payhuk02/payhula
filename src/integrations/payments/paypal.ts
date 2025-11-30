@@ -122,7 +122,7 @@ export class PayPalProvider extends BasePaymentProvider {
             },
           ],
           application_context: {
-            brand_name: 'Payhuk',
+            brand_name: 'Emarzona',
             landing_page: 'BILLING',
             user_action: 'PAY_NOW',
             return_url: request.returnUrl || `${window.location.origin}/payments/success`,

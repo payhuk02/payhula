@@ -23,8 +23,8 @@ export interface SEOMetadata {
  * Métadonnées par défaut
  */
 const DEFAULT_METADATA: SEOMetadata = {
-  title: 'Payhuk - Plateforme E-commerce Multi-boutiques',
-  description: 'Créez et gérez votre boutique en ligne avec Payhuk. Support pour produits digitaux, physiques, services, cours en ligne et œuvres d\'artistes.',
+  title: 'Emarzona - Plateforme de ecommerce et marketing',
+  description: 'Créez et gérez votre boutique en ligne avec Emarzona. Support pour produits digitaux, physiques, services, cours en ligne et œuvres d\'artistes.',
   keywords: ['e-commerce', 'boutique en ligne', 'vente en ligne', 'plateforme e-commerce', 'multi-boutiques'],
   ogType: 'website',
   robots: 'index, follow',

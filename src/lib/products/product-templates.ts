@@ -105,7 +105,7 @@ export const PREDEFINED_TEMPLATES: Omit<ProductTemplate, 'id' | 'created_at' | '
         download_limit: 5,
       },
       seo: {
-        meta_title: 'Mon Ebook - Payhuk',
+        meta_title: 'Mon Ebook - Emarzona',
         meta_description: 'Découvrez mon ebook...',
       },
       affiliate: {

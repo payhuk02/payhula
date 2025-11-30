@@ -93,7 +93,7 @@ const LANDING_SECTIONS: PageSection[] = [
     name: 'Témoignages',
     icon: Star,
     elements: [
-      { id: 'title', label: 'Titre', type: 'text', key: 'landing.testimonials.title', defaultValue: 'Ils réussissent avec Payhuk' },
+      { id: 'title', label: 'Titre', type: 'text', key: 'landing.testimonials.title', defaultValue: 'Ils réussissent avec Emarzona' },
       { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'landing.testimonials.subtitle', defaultValue: 'Rejoignez des centaines d\'entrepreneurs qui développent leur activité' },
     ],
   },
@@ -126,7 +126,7 @@ const LANDING_SECTIONS: PageSection[] = [
     name: 'Fonctionnalités Clés (Grid)',
     icon: CheckCircle2,
     elements: [
-      { id: 'title', label: 'Titre', type: 'text', key: 'landing.keyFeatures.title', defaultValue: 'Pourquoi choisir Payhuk ?' },
+      { id: 'title', label: 'Titre', type: 'text', key: 'landing.keyFeatures.title', defaultValue: 'Pourquoi choisir Emarzona ?' },
       { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'landing.keyFeatures.subtitle', defaultValue: 'Tout ce dont vous avez besoin pour réussir' },
     ],
   },
@@ -179,7 +179,7 @@ const LANDING_SECTIONS: PageSection[] = [
     icon: Users,
     elements: [
       { id: 'description', label: 'Description', type: 'textarea', key: 'landing.footer.description', defaultValue: 'La plateforme e-commerce pour l\'Afrique' },
-      { id: 'copyright', label: 'Copyright', type: 'text', key: 'landing.footer.copyright', defaultValue: '© 2025 Payhuk. Tous droits réservés.' },
+      { id: 'copyright', label: 'Copyright', type: 'text', key: 'landing.footer.copyright', defaultValue: '© 2025 Emarzona. Tous droits réservés.' },
       { id: 'product', label: 'Titre section Produit', type: 'text', key: 'landing.footer.product', defaultValue: 'Produit' },
       { id: 'support', label: 'Titre section Support', type: 'text', key: 'landing.footer.support', defaultValue: 'Support' },
       { id: 'company', label: 'Titre section Entreprise', type: 'text', key: 'landing.footer.company', defaultValue: 'Entreprise' },

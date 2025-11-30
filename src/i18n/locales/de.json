@@ -194,7 +194,7 @@
       "community": "Aktive Community"
     },
     "hero": {
-      "title": "Payhuk Marketplace",
+      "title": "Emarzona Marketplace",
       "subtitle": "Entdecken Sie Tausende von digitalen Produkten: Kurse, E-Books, Vorlagen, Software und mehr.",
       "tagline": "Schließen Sie sich der digitalen Handelsrevolution in Afrika an",
       "skipToMain": "Zum Hauptinhalt springen"
@@ -252,7 +252,7 @@
     },
     "cta": {
       "title": "Bereit, Ihren Shop zu starten?",
-      "subtitle": "Schließen Sie sich Hunderten von Unternehmern an, die ihr Geschäft mit Payhuk ausbauen.",
+      "subtitle": "Schließen Sie sich Hunderten von Unternehmern an, die ihr Geschäft mit Emarzona ausbauen.",
       "startFree": "Kostenlos starten",
       "joinCommunity": "Der Community beitreten"
     }
@@ -696,8 +696,8 @@
   },
   "seo": {
     "home": {
-      "title": "Payhuk - Moderne E-Commerce-Plattform",
-      "description": "Erstellen und verwalten Sie Ihren Online-Shop einfach mit Payhuk"
+      "title": "Emarzona - E-Commerce und Marketing-Plattform",
+      "description": "Erstellen und verwalten Sie Ihren Online-Shop einfach mit Emarzona"
     },
     "marketplace": {
       "title": "Marktplatz - Entdecken Sie unsere Produkte",
@@ -728,13 +728,13 @@
       "stores": "Shops"
     },
     "testimonials": {
-      "title": "Sie haben Erfolg mit Payhuk",
+      "title": "Sie haben Erfolg mit Emarzona",
       "subtitle": "Schließen Sie sich Hunderten von Unternehmern an, die ihr Geschäft ausbauen",
       "items": [
         {
           "name": "Amadou K.",
           "role": "Content Creator",
-          "content": "Ich habe mein Einkommen in 3 Monaten dank Payhuk verdoppelt. Die Plattform ist einfach und FCFA-Zahlungen sind ein echtes Plus!"
+          "content": "Ich habe mein Einkommen in 3 Monaten dank Emarzona verdoppelt. Die Plattform ist einfach und Zahlungen sind ein echtes Plus!"
         },
         {
           "name": "Fatou D.",
@@ -744,7 +744,7 @@
         {
           "name": "Ibrahim S.",
           "role": "Entwickler",
-          "content": "Moderne Benutzeroberfläche, vollständige Funktionen und reaktionsschneller Support. Payhuk ist die beste Plattform zum Verkaufen in Afrika."
+          "content": "Moderne Benutzeroberfläche, vollständige Funktionen und reaktionsschneller Support. Emarzona ist die beste Plattform zum Verkaufen online."
         }
       ]
     },
@@ -821,7 +821,7 @@
     },
     "cta": {
       "title": "Bereit, Ihr Geschäft auszubauen?",
-      "subtitle": "Schließen Sie sich Tausenden afrikanischen Unternehmern an, die mit Payhuk erfolgreich sind",
+      "subtitle": "Schließen Sie sich Tausenden von Unternehmern an, die mit Emarzona erfolgreich sind",
       "button": "Mein kostenloses Konto erstellen"
     },
     "footer": {
@@ -844,7 +844,7 @@
         "terms": "Nutzungsbedingungen",
         "privacy": "Datenschutzrichtlinie"
       },
-      "copyright": "© 2025 Payhuk. Alle Rechte vorbehalten."
+      "copyright": "© 2025 Emarzona. Alle Rechte vorbehalten."
     },
     "featureSections": {
       "feature1": {
@@ -1053,7 +1053,7 @@
     },
     "finalCta": {
       "title": "Beginnen Sie heute mit dem Verkauf digitaler Produkte!",
-      "subtitle": "Schließen Sie sich Hunderten afrikanischen Unternehmern an, die bereits Payhuk vertrauen",
+      "subtitle": "Schließen Sie sich Hunderten von Unternehmern an, die bereits Emarzona vertrauen",
       "button": "Mein kostenloses Konto erstellen"
     }
   },
@@ -1336,7 +1336,7 @@
       "description": "Richten Sie Ihr Geschäft ein, um mit dem Verkauf Ihrer digitalen Produkte und Dienstleistungen in Afrika zu beginnen"
     },
     "whatIs": {
-      "title": "Was ist ein Payhula-Geschäft?",
+      "title": "Was ist ein Emarzona-Geschäft?",
       "feature1": "Ein eindeutiger und anpassbarer Link für Ihr Unternehmen",
       "feature2": "Verkaufen Sie mehrere Produkte und Dienstleistungen",
       "feature3": "Akzeptieren Sie Zahlungen in FCFA und anderen Währungen",

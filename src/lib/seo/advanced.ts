@@ -142,7 +142,7 @@ ${urls
       image: Array.isArray(product.images) ? product.images : [product.images],
       brand: {
         '@type': 'Brand',
-        name: store?.name || 'Payhuk',
+        name: store?.name || 'Emarzona',
       },
       offers: {
         '@type': 'Offer',
@@ -168,7 +168,7 @@ ${urls
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'Payhuk',
+      name: 'Emarzona',
       url: window.location.origin,
       logo: `${window.location.origin}/logo.png`,
       sameAs: [
@@ -193,7 +193,7 @@ ${urls
       'og:image': data.image || `${window.location.origin}/og-image.png`,
       'og:url': data.url || window.location.href,
       'og:type': data.type || 'website',
-      'og:site_name': 'Payhuk',
+      'og:site_name': 'Emarzona',
     };
   }
 

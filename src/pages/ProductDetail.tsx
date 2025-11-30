@@ -264,7 +264,7 @@ const ProductDetails = () => {
     
     return {
       title: String(product.name || 'Produit') + ' - ' + String(store.name || 'Boutique'),
-      description: truncatedDescription || `Acheter ${product.name} sur ${store.name}. ${product.category || 'Produit digital'} disponible sur Payhula. Paiement sécurisé en ${product.currency || 'XOF'}.`,
+      description: truncatedDescription || `Acheter ${product.name} sur ${store.name}. ${product.category || 'Produit digital'} disponible sur Emarzona. Paiement sécurisé en ${product.currency || 'XOF'}.`,
       keywords: [
         product.name,
         product.category,

@@ -5,11 +5,10 @@
  * Affiche la liste des tâches d'une boutique
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useStoreTasks, type StoreTask, type TaskFilters } from '@/hooks/useStoreTasks';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import {
@@ -24,7 +23,6 @@ import { StoreTaskCreateDialog } from './StoreTaskCreateDialog';
 import { StoreTaskCard } from './StoreTaskCard';
 import { StoreTasksKanban } from './StoreTasksKanban';
 import { StoreTaskCalendarExport } from './StoreTaskCalendarExport';
-import { cn } from '@/lib/utils';
 
 interface StoreTasksListProps {
   storeId: string;
@@ -37,13 +35,6 @@ const PRIORITY_LABELS: Record<StoreTask['priority'], string> = {
   urgent: 'Urgente',
 };
 
-const PRIORITY_COLORS: Record<StoreTask['priority'], string> = {
-  low: 'bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20',
-  medium: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-  high: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20',
-  urgent: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20',
-};
-
 const STATUS_LABELS: Record<StoreTask['status'], string> = {
   pending: 'En attente',
   in_progress: 'En cours',
@@ -51,15 +42,6 @@ const STATUS_LABELS: Record<StoreTask['status'], string> = {
   completed: 'Terminée',
   cancelled: 'Annulée',
   on_hold: 'En pause',
-};
-
-const CATEGORY_LABELS: Record<StoreTask['category'], string> = {
-  product: 'Produit',
-  order: 'Commande',
-  customer: 'Client',
-  marketing: 'Marketing',
-  inventory: 'Inventaire',
-  other: 'Autre',
 };
 
 export const StoreTasksList = ({ storeId }: StoreTasksListProps) => {
@@ -84,28 +66,6 @@ export const StoreTasksList = ({ storeId }: StoreTasksListProps) => {
     setFilters({});
     setSearchQuery('');
   }, []);
-
-  // Tous les hooks doivent être appelés avant les early returns
-  const tasksByStatus = useMemo(() => {
-    if (!tasks) {
-      return {
-        pending: [],
-        in_progress: [],
-        review: [],
-        completed: [],
-        cancelled: [],
-        on_hold: [],
-      };
-    }
-    return {
-      pending: tasks.filter((t) => t.status === 'pending'),
-      in_progress: tasks.filter((t) => t.status === 'in_progress'),
-      review: tasks.filter((t) => t.status === 'review'),
-      completed: tasks.filter((t) => t.status === 'completed'),
-      cancelled: tasks.filter((t) => t.status === 'cancelled'),
-      on_hold: tasks.filter((t) => t.status === 'on_hold'),
-    };
-  }, [tasks]);
 
   const hasActiveFilters = Object.keys(filters).length > 0 || searchQuery.length > 0;
 

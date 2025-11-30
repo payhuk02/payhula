@@ -475,7 +475,7 @@ export default function ServiceDetail() {
           {/* SEO Meta Tags */}
           <SEOMeta
             title={service.name}
-            description={service.short_description || service.description || `${service.name} - Disponible sur Payhuk`}
+            description={service.short_description || service.description || `${service.name} - Disponible sur Emarzona`}
             keywords={service.category}
             url={serviceUrl}
             image={images[0]}

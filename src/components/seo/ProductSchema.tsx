@@ -49,7 +49,7 @@ export const ProductSchema = ({ product, store, url }: ProductSchemaProps) => {
   // Construire l'URL complète
   const fullUrl = providedUrl.startsWith('http') 
     ? providedUrl 
-    : `https://payhuk.com${providedUrl}`;
+    : `https://emarzona.com${providedUrl}`;
   
   // Images du produit
   const productImages = [
@@ -62,7 +62,7 @@ export const ProductSchema = ({ product, store, url }: ProductSchemaProps) => {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.description || `${product.name} - Disponible sur Payhuk`,
+    description: product.description || `${product.name} - Disponible sur Emarzona`,
     image: productImages,
     url: fullUrl,
     
@@ -86,7 +86,7 @@ export const ProductSchema = ({ product, store, url }: ProductSchemaProps) => {
       seller: {
         '@type': 'Organization',
         name: store.name,
-        url: `https://payhuk.com/stores/${store.slug}`,
+        url: `https://emarzona.com/stores/${store.slug}`,
         ...(store.logo_url && {
           logo: store.logo_url
         })
@@ -141,19 +141,19 @@ export const ProductSchema = ({ product, store, url }: ProductSchemaProps) => {
         '@type': 'ListItem',
         position: 1,
         name: 'Accueil',
-        item: 'https://payhuk.com'
+        item: 'https://emarzona.com'
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Marketplace',
-        item: 'https://payhuk.com/marketplace'
+        item: 'https://emarzona.com/marketplace'
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: store.name,
-        item: `https://payhuk.com/stores/${store.slug}`
+        item: `https://emarzona.com/stores/${store.slug}`
       },
       {
         '@type': 'ListItem',

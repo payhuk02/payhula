@@ -176,7 +176,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<void> {
     doc.setFontSize(8);
     doc.text('Merci pour votre achat !', 105, pageHeight - 20, { align: 'center' });
     doc.text(`Facture générée le ${new Date().toLocaleDateString('fr-FR')}`, 105, pageHeight - 15, { align: 'center' });
-    doc.text('Payhula - Plateforme E-commerce', 105, pageHeight - 10, { align: 'center' });
+    doc.text('Emarzona - Plateforme de ecommerce et marketing', 105, pageHeight - 10, { align: 'center' });
 
     // Télécharger le PDF
     doc.save(`facture-${data.orderNumber}.pdf`);

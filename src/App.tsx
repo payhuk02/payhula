@@ -348,8 +348,8 @@ const AppInitializer = ({ queryClient }: { queryClient: ReturnType<typeof create
     
     // Mettre à jour les métadonnées SEO par défaut
     updateSEOMetadata({
-      title: 'Payhuk - Plateforme E-commerce Multi-boutiques',
-      description: 'Créez et gérez votre boutique en ligne avec Payhuk',
+      title: 'Emarzona - Plateforme de ecommerce et marketing',
+      description: 'Créez et gérez votre boutique en ligne avec Emarzona',
     });
     
     // Cleanup

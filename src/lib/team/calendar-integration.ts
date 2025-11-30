@@ -27,11 +27,11 @@ export function generateICalForTask(task: StoreTask): string {
   const ical = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Payhuk//Team Tasks//EN',
+    'PRODID:-//Emarzona//Team Tasks//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${task.id}@payhuk.com`,
+    `UID:${task.id}@emarzona.com`,
     `DTSTAMP:${formatDate(now)}`,
     `DTSTART:${formatDate(startDate)}`,
     `DTEND:${formatDate(endDate)}`,
@@ -64,7 +64,7 @@ export function generateICalForTasks(tasks: StoreTask[]): string {
 
     return [
       'BEGIN:VEVENT',
-      `UID:${task.id}@payhuk.com`,
+      `UID:${task.id}@emarzona.com`,
       `DTSTAMP:${formatDate(now)}`,
       `DTSTART:${formatDate(startDate)}`,
       `DTEND:${formatDate(endDate)}`,
@@ -82,7 +82,7 @@ export function generateICalForTasks(tasks: StoreTask[]): string {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Payhuk//Team Tasks//EN',
+    'PRODID:-//Emarzona//Team Tasks//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     ...events,

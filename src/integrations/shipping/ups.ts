@@ -152,19 +152,19 @@ class UPSService {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
           'transId': `rate_${Date.now()}`,
-          'transactionSrc': 'Payhuk',
+          'transactionSrc': 'Emarzona',
         },
         body: JSON.stringify({
           RateRequest: {
             Request: {
               RequestOption: 'Rate',
               TransactionReference: {
-                CustomerContext: `Payhuk_${Date.now()}`,
+                CustomerContext: `Emarzona_${Date.now()}`,
               },
             },
             Shipment: {
               Shipper: {
-                Name: 'Payhuk',
+                Name: 'Emarzona',
                 ShipperNumber: this.accountNumber,
                 Address: {
                   AddressLine: [''],
@@ -272,14 +272,14 @@ class UPSService {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
           'transId': `ship_${Date.now()}`,
-          'transactionSrc': 'Payhuk',
+          'transactionSrc': 'Emarzona',
         },
         body: JSON.stringify({
           ShipmentRequest: {
             Request: {
               RequestOption: 'nonvalidate',
               TransactionReference: {
-                CustomerContext: `Payhuk_${Date.now()}`,
+                CustomerContext: `Emarzona_${Date.now()}`,
               },
             },
             Shipment: {
@@ -378,7 +378,7 @@ class UPSService {
                 Code: 'PDF',
                 Description: 'PDF',
               },
-              HTTPUserAgent: 'Payhuk',
+              HTTPUserAgent: 'Emarzona',
             },
           },
         }),
@@ -433,7 +433,7 @@ class UPSService {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
           'transId': `track_${Date.now()}`,
-          'transactionSrc': 'Payhuk',
+          'transactionSrc': 'Emarzona',
         },
       });
 

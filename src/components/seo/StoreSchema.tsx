@@ -39,7 +39,7 @@ export const StoreSchema = ({ store, url }: StoreSchemaProps) => {
   // Construire l'URL complète
   const fullUrl = providedUrl.startsWith('http') 
     ? providedUrl 
-    : `https://payhuk.com${providedUrl}`;
+    : `https://emarzona.com${providedUrl}`;
   
   // Réseaux sociaux
   const socialLinks = [
@@ -80,8 +80,8 @@ export const StoreSchema = ({ store, url }: StoreSchemaProps) => {
     // Organisation parente
     parentOrganization: {
       '@type': 'Organization',
-      name: 'Payhuk',
-      url: 'https://payhuk.com'
+      name: 'Emarzona',
+      url: 'https://emarzona.com'
     }
   };
 

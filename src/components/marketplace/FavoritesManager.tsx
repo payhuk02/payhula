@@ -163,7 +163,7 @@ const FavoritesManager = ({
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'mes-favoris-payhuk.csv';
+    a.download = 'mes-favoris-emarzona.csv';
     a.click();
     window.URL.revokeObjectURL(url);
     

@@ -353,7 +353,7 @@ const ArtistProductDetail = () => {
           {/* SEO Meta Tags */}
           <SEOMeta
             title={product.name}
-            description={product.short_description || product.description || `${product.name} - Œuvre d'artiste disponible sur Payhuk`}
+            description={product.short_description || product.description || `${product.name} - Œuvre d'artiste disponible sur Emarzona`}
             keywords={product.category}
             url={productUrl}
             image={images[0]}

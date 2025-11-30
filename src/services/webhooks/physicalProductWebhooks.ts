@@ -99,9 +99,9 @@ export async function sendWebhook(
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Webhook-Signature': signature,
-      'User-Agent': 'Payhula-Webhook-Client',
-      'X-Payhula-Event': payload.event,
-      'X-Payhula-Event-ID': payload.event_id || '',
+      'User-Agent': 'Emarzona-Webhook-Client',
+      'X-Emarzona-Event': payload.event,
+      'X-Emarzona-Event-ID': payload.event_id || '',
     };
 
     const response = await fetch(webhook.target_url, {

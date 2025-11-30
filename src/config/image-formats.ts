@@ -1,9 +1,9 @@
 /**
  * 📐 IMAGE FORMATS CONFIGURATION
- * Standard image dimensions for Payhuk platform
+ * Standard image dimensions for Emarzona platform
  * 
  * @version 1.0.0
- * @author Payhuk Team
+ * @author Emarzona Team
  */
 
 // ============================================================================

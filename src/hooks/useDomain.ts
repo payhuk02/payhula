@@ -102,7 +102,7 @@ export const useDomain = (storeId: string | null) => {
   const { toast } = useToast();
 
   const generateVerificationToken = useCallback(() => {
-    return `payhula-verify-${Math.random().toString(36).substring(2, 15)}`;
+    return `emarzona-verify-${Math.random().toString(36).substring(2, 15)}`;
   }, []);
 
   const validateDomain = useCallback((domain: string): boolean => {
@@ -619,14 +619,14 @@ Heure: ${new Date(incident.startTime).toLocaleString('fr-FR')}`;
       },
       verificationRecord: {
         type: "TXT",
-        name: "_payhula-verification",
+        name: "_emarzona-verification",
         value: verificationToken,
         ttl: 3600
       },
       cnameRecord: {
         type: "CNAME",
         name: "shop",
-        value: "payhula.vercel.app",
+        value: "emarzona.vercel.app",
         ttl: 3600
       }
     };

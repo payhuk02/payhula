@@ -105,11 +105,11 @@ const Landing = () => {
       <SEOMeta
         title={t('landing.hero.title')}
         description={t('landing.hero.subtitle')}
-        keywords="payhuk, marketplace, e-commerce, produits digitaux, afrique, mobile money, paiement XOF, CFA"
+        keywords="emarzona, ecommerce, marketing, plateforme e-commerce, produits digitaux, produits physiques, services, cours en ligne"
         url={baseUrl}
         canonical={baseUrl}
         image={`${baseUrl}/og-landing.jpg`}
-        imageAlt="Payhuk - Marketplace de produits digitaux en Afrique"
+        imageAlt="Emarzona - Plateforme de ecommerce et marketing"
         type="website"
         locale="fr_FR"
       />
@@ -123,7 +123,7 @@ const Landing = () => {
             <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-6 sm:relative sm:left-auto sm:top-auto sm:translate-y-0 sm:h-8 sm:w-8 z-0">
               <img
                 src={payhukLogo}
-                alt="Payhuk"
+                alt="Emarzona"
                 width={32}
                 height={32}
                 className="h-full w-full opacity-60 sm:opacity-100"
@@ -131,7 +131,7 @@ const Landing = () => {
               />
             </div>
             <span className="relative z-10 pl-7 sm:pl-0 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-              Payhuk
+              Emarzona
             </span>
           </div>
           
@@ -881,13 +881,13 @@ const Landing = () => {
               <div className="flex items-center gap-2 mb-4">
                 <OptimizedImage
                   src={payhukLogo}
-                  alt="Payhuk"
+                  alt="Emarzona"
                   width={32}
                   height={32}
                   className="h-8 w-8"
                   loading="lazy"
                 />
-                <span className="text-lg md:text-xl font-bold text-foreground">Payhuk</span>
+                <span className="text-lg md:text-xl font-bold text-foreground">Emarzona</span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 {getValue('landing.footer.description')}

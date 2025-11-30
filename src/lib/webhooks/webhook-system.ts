@@ -150,9 +150,9 @@ export async function sendWebhook(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Payhuk-Signature': signature,
-        'X-Payhuk-Timestamp': timestamp.toString(),
-        'X-Payhuk-Event': eventType,
+        'X-Emarzona-Signature': signature,
+        'X-Emarzona-Timestamp': timestamp.toString(),
+        'X-Emarzona-Event': eventType,
       },
       body: JSON.stringify({
         event: eventType,

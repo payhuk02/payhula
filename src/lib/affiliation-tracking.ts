@@ -5,7 +5,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "./logger";
 
-const AFFILIATE_COOKIE_NAME = 'payhula_affiliate';
+const AFFILIATE_COOKIE_NAME = 'emarzona_affiliate';
 const AFFILIATE_COOKIE_EXPIRY_DAYS = 30; // Par défaut, peut être surchargé par produit
 
 /**

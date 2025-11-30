@@ -351,7 +351,7 @@ export const useTestWebhook = () => {
       }
 
       const testPayload = {
-        test_data: 'This is a test payload from Payhula',
+        test_data: 'This is a test payload from Emarzona',
         timestamp: new Date().toISOString(),
         webhook_id: webhook.id,
         event_type: 'test_event',

@@ -164,7 +164,7 @@ export function logInfo(message: string, data?: Record<string, unknown>): void {
  */
 function saveErrorToLocalStorage(errorLog: ErrorLog): void {
   try {
-    const storageKey = 'payhuk_error_logs';
+    const storageKey = 'emarzona_error_logs';
     const maxLogs = 50; // Garder les 50 dernières erreurs
 
     // Récupérer les logs existants
@@ -193,7 +193,7 @@ function saveErrorToLocalStorage(errorLog: ErrorLog): void {
  */
 export function getErrorLogs(): ErrorLog[] {
   try {
-    const storageKey = 'payhuk_error_logs';
+    const storageKey = 'emarzona_error_logs';
     const logsStr = localStorage.getItem(storageKey);
     return logsStr ? JSON.parse(logsStr) : [];
   } catch (e) {
@@ -207,7 +207,7 @@ export function getErrorLogs(): ErrorLog[] {
  */
 export function clearErrorLogs(): void {
   try {
-    localStorage.removeItem('payhuk_error_logs');
+    localStorage.removeItem('emarzona_error_logs');
   } catch (e) {
     originalConsole.error('Failed to clear error logs:', e);
   }

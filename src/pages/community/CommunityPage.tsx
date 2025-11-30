@@ -82,7 +82,7 @@ export default function CommunityPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">
-                  Communauté Payhuk
+                  Communauté Emarzona
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                   Rejoignez notre communauté d'entrepreneurs et créateurs
@@ -130,7 +130,7 @@ export default function CommunityPage() {
                 <div className="flex-1">
                   <h3 className="text-base sm:text-lg font-semibold mb-2">Rejoignez la communauté</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Créez votre profil et commencez à partager avec d'autres membres de la communauté Payhuk.
+                    Créez votre profil et commencez à partager avec d'autres membres de la communauté Emarzona.
                   </p>
                 </div>
                 <Button onClick={() => setJoinFormOpen(true)} className="w-full sm:w-auto min-h-[44px] shrink-0">
@@ -216,7 +216,7 @@ export default function CommunityPage() {
           <DialogHeader>
             <DialogTitle>Rejoindre la communauté</DialogTitle>
             <DialogDescription>
-              Remplissez le formulaire pour demander à rejoindre la communauté Payhuk
+              Remplissez le formulaire pour demander à rejoindre la communauté Emarzona
             </DialogDescription>
           </DialogHeader>
           <CommunityMemberForm

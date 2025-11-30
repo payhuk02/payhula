@@ -540,8 +540,8 @@ const Marketplace = () => {
 
   // SEO Meta dynamiques
   const marketplaceSeoData = useMemo(() => ({
-    title: `Marketplace Payhula - ${stats.totalProducts} Produits Digitaux en Afrique`,
-    description: `Découvrez ${stats.totalProducts} produits digitaux sur Payhula : formations en ligne, ebooks, templates, logiciels et services. ${stats.totalStores} boutiques actives. Note moyenne: ${stats.averageRating.toFixed(1)}/5 ⭐. Paiement Mobile Money et CB. Achat sécurisé en XOF.`,
+    title: `Marketplace Emarzona - ${stats.totalProducts} Produits Digitaux`,
+    description: `Découvrez ${stats.totalProducts} produits digitaux sur Emarzona : formations en ligne, ebooks, templates, logiciels et services. ${stats.totalStores} boutiques actives. Note moyenne: ${stats.averageRating.toFixed(1)}/5 ⭐. Paiement sécurisé.`,
     keywords: 'marketplace afrique, produits digitaux, formation en ligne, ebook francophone, templates professionnels, logiciels, services digitaux, paiement mobile money, XOF, FCFA, ecommerce afrique, boutique en ligne, vente en ligne afrique',
     url: `${window.location.origin}/marketplace`,
     image: `${window.location.origin}/og-marketplace.jpg`,
@@ -587,7 +587,7 @@ const Marketplace = () => {
         keywords={marketplaceSeoData.keywords}
         url={marketplaceSeoData.url}
         image={marketplaceSeoData.image}
-        imageAlt="Marketplace Payhula - Produits Digitaux en Afrique"
+        imageAlt="Marketplace Emarzona - Produits Digitaux"
         type="website"
         canonical={marketplaceSeoData.url}
       />
@@ -602,8 +602,8 @@ const Marketplace = () => {
       {itemListItems.length > 0 && (
         <ItemListSchema
           items={itemListItems}
-          name="Marketplace Payhula"
-          description={`Collection de ${stats.totalProducts} produits digitaux disponibles sur Payhula`}
+          name="Marketplace Emarzona"
+          description={`Collection de ${stats.totalProducts} produits digitaux disponibles sur Emarzona`}
           url="/marketplace"
           numberOfItems={stats.totalProducts}
         />

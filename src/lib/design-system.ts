@@ -1,5 +1,5 @@
 /**
- * Design System Unifié - Payhuk Platform
+ * Design System Unifié - Emarzona Platform
  * Tokens de design centralisés pour cohérence visuelle
  */
 

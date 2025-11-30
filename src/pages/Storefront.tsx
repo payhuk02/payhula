@@ -137,7 +137,7 @@ const Storefront = () => {
   const seoData = useMemo(() => {
     if (!store) return null;
     
-    const description = store.description || `Découvrez les produits de ${store.name} sur Payhula. ${products.length} produits disponibles. Boutique en ligne sécurisée avec paiement Mobile Money et CB.`;
+    const description = store.description || `Découvrez les produits de ${store.name} sur Emarzona. ${products.length} produits disponibles. Boutique en ligne sécurisée avec paiement Mobile Money et CB.`;
     const truncatedDescription = description.length > 160 
       ? description.substring(0, 157) + "..." 
       : description;

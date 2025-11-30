@@ -49,7 +49,7 @@ export const notifyPaymentSuccess = async (data: PaymentNotificationData): Promi
     if (data.customerEmail) {
       await sendPaymentEmail({
         to: data.customerEmail,
-        subject: 'Paiement confirmé - Payhula',
+        subject: 'Paiement confirmé - Emarzona',
         template: 'payment_success',
         data: {
           customerName: data.customerName || 'Client',
@@ -127,7 +127,7 @@ export const notifyPaymentFailed = async (data: PaymentNotificationData): Promis
     if (data.customerEmail) {
       await sendPaymentEmail({
         to: data.customerEmail,
-        subject: 'Paiement échoué - Payhula',
+        subject: 'Paiement échoué - Emarzona',
         template: 'payment_failed',
         data: {
           customerName: data.customerName || 'Client',
@@ -187,7 +187,7 @@ export const notifyPaymentCancelled = async (data: PaymentNotificationData): Pro
     if (data.customerEmail) {
       await sendPaymentEmail({
         to: data.customerEmail,
-        subject: 'Paiement annulé - Payhula',
+        subject: 'Paiement annulé - Emarzona',
         template: 'payment_cancelled',
         data: {
           customerName: data.customerName || 'Client',
@@ -247,7 +247,7 @@ export const notifyPaymentRefunded = async (data: PaymentNotificationData): Prom
     if (data.customerEmail) {
       await sendPaymentEmail({
         to: data.customerEmail,
-        subject: 'Remboursement effectué - Payhula',
+        subject: 'Remboursement effectué - Emarzona',
         template: 'payment_refunded',
         data: {
           customerName: data.customerName || 'Client',

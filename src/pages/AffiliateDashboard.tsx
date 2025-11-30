@@ -390,7 +390,7 @@ const AffiliateDashboard = () => {
                       <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 dark:text-purple-400" />
                     </div>
                     <CardTitle className="text-xl sm:text-2xl lg:text-3xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                      Programme d'affiliation Payhuk
+                      Programme d'affiliation Emarzona
                     </CardTitle>
                     <CardDescription className="text-sm sm:text-base mt-2">
                       Gagnez des commissions en promouvant des produits de qualité

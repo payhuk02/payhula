@@ -18,8 +18,8 @@ const MarketplaceHeader = () => {
         <div className="flex h-14 sm:h-16 items-center justify-between gap-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity">
-            <img src={payhukLogo} alt="Payhuk" className="h-7 w-7 sm:h-8 sm:w-8" />
-            <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Payhuk</span>
+            <img src={payhukLogo} alt="Emarzona" className="h-7 w-7 sm:h-8 sm:w-8" />
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Emarzona</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -75,8 +75,8 @@ const MarketplaceHeader = () => {
                   {/* Header */}
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-2">
-                      <img src={payhukLogo} alt="Payhuk" className="h-7 w-7" />
-                      <span className="text-xl font-bold">Payhuk</span>
+                      <img src={payhukLogo} alt="Emarzona" className="h-7 w-7" />
+                      <span className="text-xl font-bold">Emarzona</span>
                     </div>
                     <Button
                       variant="ghost"

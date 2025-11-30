@@ -74,7 +74,7 @@ export class FlutterwaveProvider extends BasePaymentProvider {
             name: request.customerName || '',
           },
           customizations: {
-            title: 'Payhuk',
+            title: 'Emarzona',
             description: request.description || 'Order Payment',
           },
           meta: request.metadata || {},

@@ -145,7 +145,7 @@ const StoreFooter = ({
             © {currentYear} <span className="font-semibold text-foreground">{storeName}</span>. Tous droits réservés.
           </p>
           <p className="text-[10px] sm:text-xs text-muted-foreground">
-            Propulsé par <span className="text-primary font-semibold">Payhuk</span>
+            Propulsé par <span className="text-primary font-semibold">Emarzona</span>
           </p>
         </div>
       </div>

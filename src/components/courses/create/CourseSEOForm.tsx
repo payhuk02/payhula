@@ -59,7 +59,7 @@ export const CourseSEOForm = ({
   const autoFill = () => {
     onChange({
       ...data,
-      meta_title: data.meta_title || `${courseTitle} | Cours en ligne Payhuk`,
+      meta_title: data.meta_title || `${courseTitle} | Cours en ligne Emarzona`,
       meta_description: data.meta_description || courseDescription.substring(0, 160),
       og_title: data.og_title || courseTitle,
       og_description: data.og_description || courseDescription.substring(0, 200),

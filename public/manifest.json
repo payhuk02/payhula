@@ -1,7 +1,7 @@
 {
-  "name": "Payhula - Plateforme E-commerce",
-  "short_name": "Payhula",
-  "description": "Plateforme SaaS E-commerce multi-vendeurs pour produits digitaux, physiques, services et cours en ligne",
+  "name": "Emarzona - Plateforme de ecommerce et marketing",
+  "short_name": "Emarzona",
+  "description": "Plateforme de ecommerce et marketing - Solution SaaS E-commerce multi-vendeurs pour produits digitaux, physiques, services et cours en ligne",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

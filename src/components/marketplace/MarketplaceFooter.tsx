@@ -12,8 +12,8 @@ const MarketplaceFooter = () => {
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src={payhukLogo} alt="Payhuk" className="h-8 w-8" />
-              <span className="text-xl sm:text-2xl font-bold">Payhuk</span>
+              <img src={payhukLogo} alt="Emarzona" className="h-8 w-8" />
+              <span className="text-xl sm:text-2xl font-bold">Emarzona</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-4 max-w-xs">
               La plateforme tout-en-un pour vendre vos produits digitaux en Afrique
@@ -108,8 +108,8 @@ const MarketplaceFooter = () => {
             <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 flex-shrink-0" />
-                <a href="mailto:contact@payhuk.com" className="hover:text-primary transition-colors">
-                  contact@payhuk.com
+                <a href="mailto:contact@emarzona.com" className="hover:text-primary transition-colors">
+                  contact@emarzona.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -127,7 +127,7 @@ const MarketplaceFooter = () => {
 
         <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border text-center">
           <p className="text-xs sm:text-sm text-muted-foreground">
-            © {currentYear} <span className="font-semibold text-foreground">Payhuk</span>. Tous droits réservés.
+            © {currentYear} <span className="font-semibold text-foreground">Emarzona</span>. Tous droits réservés.
           </p>
         </div>
       </div>

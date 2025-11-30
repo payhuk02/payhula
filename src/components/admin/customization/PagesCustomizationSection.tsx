@@ -145,7 +145,7 @@ const PAGES_CONFIG: PageConfig[] = [
         name: 'Témoignages',
         type: 'testimonials',
         elements: [
-          { id: 'title', label: 'Titre', type: 'text', key: 'landing.testimonials.title', defaultValue: 'Ils réussissent avec Payhuk' },
+          { id: 'title', label: 'Titre', type: 'text', key: 'landing.testimonials.title', defaultValue: 'Ils réussissent avec Emarzona' },
           { id: 'subtitle', label: 'Sous-titre', type: 'textarea', key: 'landing.testimonials.subtitle', defaultValue: 'Rejoignez des centaines d\'entrepreneurs qui développent leur activité' },
         ],
       },
@@ -298,7 +298,7 @@ const PAGES_CONFIG: PageConfig[] = [
         elements: [
           { id: 'loginTitle', label: 'Titre connexion', type: 'text', key: 'auth.login.title', defaultValue: 'Connexion' },
           { id: 'signupTitle', label: 'Titre inscription', type: 'text', key: 'auth.signup.title', defaultValue: 'Créer un compte' },
-          { id: 'welcomeMessage', label: 'Message de bienvenue', type: 'textarea', key: 'auth.welcome', defaultValue: 'Bienvenue sur Payhuk' },
+          { id: 'welcomeMessage', label: 'Message de bienvenue', type: 'textarea', key: 'auth.welcome', defaultValue: 'Bienvenue sur Emarzona' },
           { id: 'loginButton', label: 'Bouton Se connecter', type: 'text', key: 'auth.login.button', defaultValue: 'Se connecter' },
           { id: 'signupButton', label: 'Bouton S\'inscrire', type: 'text', key: 'auth.signup.button', defaultValue: 'S\'inscrire' },
           { id: 'forgotPassword', label: 'Lien Mot de passe oublié', type: 'text', key: 'auth.forgotPassword.link', defaultValue: 'Mot de passe oublié ?' },

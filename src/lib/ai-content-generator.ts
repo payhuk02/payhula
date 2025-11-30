@@ -349,7 +349,7 @@ ${price ? `## Prix exceptionnel\n\nPour seulement ${price.toLocaleString()} XOF,
     : template.benefits;
 
   // Meta title
-  const metaTitle = `${name}${category ? ` - ${category}` : ''} | Payhuk`;
+  const metaTitle = `${name}${category ? ` - ${category}` : ''} | Emarzona`;
 
   // Meta description
   const metaDescription = `${shortDescription.slice(0, 140)}... ${template.cta[randomIndex]}`.slice(0, 160);

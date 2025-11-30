@@ -443,7 +443,7 @@ export default function PhysicalProductDetail() {
           {/* SEO Meta Tags */}
           <SEOMeta
             title={product.name}
-            description={product.short_description || product.description || `${product.name} - Disponible sur Payhuk`}
+            description={product.short_description || product.description || `${product.name} - Disponible sur Emarzona`}
             keywords={product.category}
             url={productUrl}
             image={images[0]}

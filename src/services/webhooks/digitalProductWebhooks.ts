@@ -103,7 +103,7 @@ export async function sendWebhook(
       'Content-Type': 'application/json',
       'X-Webhook-Signature': signature,
       'X-Webhook-Event': eventType,
-      'User-Agent': 'Payhula-Webhooks/1.0',
+      'User-Agent': 'Emarzona-Webhooks/1.0',
       ...webhook.headers,
     };
 

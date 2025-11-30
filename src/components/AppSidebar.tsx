@@ -877,13 +877,13 @@ export function AppSidebar() {
           <div className="flex items-center gap-2">
             <img 
               src={payhukLogo} 
-              alt="Payhuk" 
+              alt="Emarzona" 
               className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain"
               loading="eager" 
             />
             {!isCollapsed && (
               <span className="text-base sm:text-lg font-bold !text-black truncate">
-                Payhuk
+                Emarzona
               </span>
             )}
           </div>

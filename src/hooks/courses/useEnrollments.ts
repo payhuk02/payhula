@@ -8,7 +8,7 @@
  * - Suivi de la progression
  * - Gestion de l'accès
  * 
- * @author Payhuk Team
+ * @author Emarzona Team
  * @date 29 Octobre 2025
  */
 

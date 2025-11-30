@@ -194,7 +194,7 @@
       "community": "Comunidad activa"
     },
     "hero": {
-      "title": "Marketplace Payhuk",
+      "title": "Marketplace Emarzona",
       "subtitle": "Descubre miles de productos digitales: cursos, ebooks, plantillas, software y más.",
       "tagline": "Únete a la revolución del comercio digital en África",
       "skipToMain": "Ir al contenido principal"
@@ -252,7 +252,7 @@
     },
     "cta": {
       "title": "¿Listo para lanzar tu tienda?",
-      "subtitle": "Únete a cientos de emprendedores que están creciendo su negocio con Payhuk.",
+      "subtitle": "Únete a cientos de emprendedores que están creciendo su negocio con Emarzona.",
       "startFree": "Comenzar gratis",
       "joinCommunity": "Unirse a la comunidad"
     }
@@ -696,8 +696,8 @@
   },
   "seo": {
     "home": {
-      "title": "Payhuk - Plataforma de E-commerce Moderna",
-      "description": "Crea y gestiona tu tienda en línea fácilmente con Payhuk"
+      "title": "Emarzona - Plataforma de E-commerce y Marketing",
+      "description": "Crea y gestiona tu tienda en línea fácilmente con Emarzona"
     },
     "marketplace": {
       "title": "Mercado - Descubre nuestros productos",
@@ -728,13 +728,13 @@
       "stores": "Tiendas"
     },
     "testimonials": {
-      "title": "Tienen éxito con Payhuk",
+      "title": "Tienen éxito con Emarzona",
       "subtitle": "Únete a cientos de emprendedores que hacen crecer su negocio",
       "items": [
         {
           "name": "Amadou K.",
           "role": "Creador de Contenido",
-          "content": "Dupliqué mis ingresos en 3 meses gracias a Payhuk. ¡La plataforma es simple y los pagos en FCFA son un verdadero plus!"
+          "content": "Dupliqué mis ingresos en 3 meses gracias a Emarzona. ¡La plataforma es simple y los pagos son un verdadero plus!"
         },
         {
           "name": "Fatou D.",
@@ -744,7 +744,7 @@
         {
           "name": "Ibrahim S.",
           "role": "Desarrollador",
-          "content": "Interfaz moderna, funciones completas y soporte receptivo. Payhuk es la mejor plataforma para vender en África."
+          "content": "Interfaz moderna, funciones completas y soporte receptivo. Emarzona es la mejor plataforma para vender en línea."
         }
       ]
     },
@@ -821,7 +821,7 @@
     },
     "cta": {
       "title": "¿Listo para hacer crecer tu negocio?",
-      "subtitle": "Únete a miles de emprendedores africanos que tienen éxito con Payhuk",
+      "subtitle": "Únete a miles de emprendedores que tienen éxito con Emarzona",
       "button": "Crear mi cuenta gratis"
     },
     "footer": {
@@ -844,7 +844,7 @@
         "terms": "Términos de Servicio",
         "privacy": "Política de Privacidad"
       },
-      "copyright": "© 2025 Payhuk. Todos los derechos reservados."
+      "copyright": "© 2025 Emarzona. Todos los derechos reservados."
     },
     "featureSections": {
       "feature1": {
@@ -1053,7 +1053,7 @@
     },
     "finalCta": {
       "title": "¡Comienza a vender productos digitales hoy!",
-      "subtitle": "Únete a cientos de emprendedores africanos que ya confían en Payhuk",
+      "subtitle": "Únete a cientos de emprendedores que ya confían en Emarzona",
       "button": "Crear mi cuenta gratis"
     }
   },
@@ -1336,7 +1336,7 @@
       "description": "Configure su tienda para comenzar a vender sus productos digitales y servicios en África"
     },
     "whatIs": {
-      "title": "¿Qué es una tienda Payhula?",
+      "title": "¿Qué es una tienda Emarzona?",
       "feature1": "Un enlace único y personalizable para su negocio",
       "feature2": "Venda múltiples productos y servicios",
       "feature3": "Acepte pagos en FCFA y otras monedas",

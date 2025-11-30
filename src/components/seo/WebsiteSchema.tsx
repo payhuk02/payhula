@@ -10,10 +10,10 @@ export const WebsiteSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Payhula",
-    "alternateName": "Payhuk",
+    "name": "Emarzona",
+    "alternateName": "Emarzona - Plateforme de ecommerce et marketing",
     "url": window.location.origin,
-    "description": "Marketplace de produits digitaux et physiques en Afrique. Vendez vos formations, ebooks, templates et services en ligne avec paiement Mobile Money.",
+    "description": "Plateforme de ecommerce et marketing. Vendez vos produits digitaux, physiques, services et cours en ligne. Solution e-commerce moderne et sécurisée.",
     "inLanguage": "fr-FR",
     "potentialAction": {
       "@type": "SearchAction",
@@ -25,7 +25,7 @@ export const WebsiteSchema = () => {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Payhula",
+      "name": "Emarzona",
       "logo": {
         "@type": "ImageObject",
         "url": `${window.location.origin}/payhuk-logo.png`

@@ -1,9 +1,9 @@
 {
-  "name": "payhula",
+  "name": "emarzona",
   "private": true,
   "version": "1.0.0",
-  "description": "Application SaaS E-commerce de produits digitaux, physiques et services",
-  "author": "Payhuk Team",
+  "description": "Plateforme de ecommerce et marketing - Application SaaS E-commerce de produits digitaux, physiques et services",
+  "author": "Emarzona Team",
   "type": "module",
   "scripts": {
     "dev": "vite",

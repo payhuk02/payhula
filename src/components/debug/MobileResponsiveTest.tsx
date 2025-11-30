@@ -145,10 +145,10 @@ export const MobileResponsiveTest = () => {
               <div className="flex items-center gap-2 p-3 border rounded-lg bg-muted/50">
                 <img 
                   src={payhukLogo} 
-                  alt="Payhuk" 
+                  alt="Emarzona" 
                   className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain" 
                 />
-                <span className="text-sm font-medium">Payhuk</span>
+                <span className="text-sm font-medium">Emarzona</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -164,10 +164,10 @@ export const MobileResponsiveTest = () => {
               <div className="flex items-center gap-2 p-3 border rounded-lg bg-muted/50">
                 <img 
                   src={payhukLogo} 
-                  alt="Payhuk" 
+                  alt="Emarzona" 
                   className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0 object-contain" 
                 />
-                <span className="text-sm font-medium">Payhuk</span>
+                <span className="text-sm font-medium">Emarzona</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />

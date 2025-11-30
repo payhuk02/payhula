@@ -198,7 +198,7 @@ const CourseDetail = () => {
         courseName={product.name}
         description={product.short_description || product.description || ''}
         provider={{
-          name: store?.name || 'Payhuk',
+          name: store?.name || 'Emarzona',
           url: `https://payhula.vercel.app/stores/${store?.slug}`,
         }}
         instructor={{
